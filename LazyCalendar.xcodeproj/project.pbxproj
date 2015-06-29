@@ -14,6 +14,8 @@
 		2EC260B41B417A6E002FAED2 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2EC260B31B417A6E002FAED2 /* Images.xcassets */; };
 		2EC260B71B417A6E002FAED2 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2EC260B51B417A6E002FAED2 /* LaunchScreen.xib */; };
 		2EC260C31B417A6E002FAED2 /* LazyCalendarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC260C21B417A6E002FAED2 /* LazyCalendarTests.swift */; };
+		2EC260CD1B417F36002FAED2 /* CalendarCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC260CC1B417F36002FAED2 /* CalendarCollectionViewController.swift */; };
+		2EC260D11B41830F002FAED2 /* CalendarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC260D01B41830F002FAED2 /* CalendarCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +40,8 @@
 		2EC260BC1B417A6E002FAED2 /* LazyCalendarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LazyCalendarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2EC260C11B417A6E002FAED2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2EC260C21B417A6E002FAED2 /* LazyCalendarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyCalendarTests.swift; sourceTree = "<group>"; };
+		2EC260CC1B417F36002FAED2 /* CalendarCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCollectionViewController.swift; sourceTree = "<group>"; };
+		2EC260D01B41830F002FAED2 /* CalendarCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +83,8 @@
 		2EC260A61B417A6E002FAED2 /* LazyCalendar */ = {
 			isa = PBXGroup;
 			children = (
+				2EC260CC1B417F36002FAED2 /* CalendarCollectionViewController.swift */,
+				2EC260D01B41830F002FAED2 /* CalendarCollectionViewCell.swift */,
 				2EC260A91B417A6E002FAED2 /* AppDelegate.swift */,
 				2EC260AE1B417A6E002FAED2 /* ViewController.swift */,
 				2EC260B01B417A6E002FAED2 /* Main.storyboard */,
@@ -217,7 +223,9 @@
 			files = (
 				2EC260AF1B417A6E002FAED2 /* ViewController.swift in Sources */,
 				2EC260AA1B417A6E002FAED2 /* AppDelegate.swift in Sources */,
+				2EC260CD1B417F36002FAED2 /* CalendarCollectionViewController.swift in Sources */,
 				2EC260AD1B417A6E002FAED2 /* LazyCalendar.xcdatamodeld in Sources */,
+				2EC260D11B41830F002FAED2 /* CalendarCollectionViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
