@@ -13,21 +13,34 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     private let reuseIdentifier = "DayCell"
     
     // TODO: move this to a Calendar class
-    private let daysInMonth: [Int] = [1, 2, 3, 4 , 5, 6, 7, 8, 9, 10, 11, 12]
+    private var daysInMonth = [Int]()
     
     // 7 days in a week
     private let numDaysInWeek = 7
     // 5 weeks (overlapping with weeks in adjacent months) in a month
     private let numWeeksInMonth = 5
-    // 28-31 days in a month
-    private var numDaysInMonth: Int = 30
     // Max number of cells
     private let numCellsInMonth = 35
+    
+    private var monthStartDay = 0
+    private var currentDay = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        var calendar = NSCalendar.currentCalendar()
+        
+        // Find num days in month
+        var today = NSDate()
+        let numDays = calendar.rangeOfUnit(NSCalendarUnit.CalendarUnitDay, inUnit: NSCalendarUnit.CalendarUnitMonth, forDate: today).length
+        for (var i = 1; i <= numDays; i++) {
+            daysInMonth.append(i)
+        }
+        
+        // Get start weekday for month
+        var weekdayComponents = calendar.components(NSCalendarUnit.CalendarUnitWeekday, fromDate: today)
+        weekdayComponents.day = 1
+        monthStartDay = weekdayComponents.weekday - 1
     }
 
     override func didReceiveMemoryWarning() {
@@ -61,8 +74,14 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     // Makes cell with day number shown
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CalendarCollectionViewCell
-        if let day = (indexPath.row < daysInMonth.count ? daysInMonth[indexPath.row] : nil) {
+        
+        let afterMonthStartDay = indexPath.row >= monthStartDay
+        let beforeMonthEndDay = indexPath.row < (daysInMonth.count + monthStartDay)
+        if (afterMonthStartDay && beforeMonthEndDay) {
+            let day = daysInMonth[currentDay]
+
             cell.dayLabel.text = "\(day)"
+            currentDay++
         }
         else {
             cell.dayLabel.text = "x"
@@ -73,6 +92,7 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     
     // Blue background on selecting day
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let day = daysInMonth[indexPath.row]
     }
 
     // MARK: UICollectionViewDelegate
@@ -112,7 +132,7 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
 extension CalendarCollectionViewController: UICollectionViewDelegateFlowLayout {
     // Determines size of one cell
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.size.width / 7, height: collectionView.frame.size.height / 5) //collectionView.frame.size.height / 5)
+        return CGSize(width: collectionView.frame.size.width / 7, height: collectionView.frame.size.height / 10) //collectionView.frame.size.height / 5)
     }
     
     // Determines spacing between cells (none)
