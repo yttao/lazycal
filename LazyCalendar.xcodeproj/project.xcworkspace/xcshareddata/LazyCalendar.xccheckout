@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>FBE1B451-58D9-4CDC-AA41-8475E833689B</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>LazyCalendar</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>3B69FFDDC298B056B558110917424BF64ADA5442</key>
 		<string>https://github.com/Kimchelly/LazyCalendar.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>LazyCalendar.xcodeproj/project.xcworkspace</string>
+	<string>LazyCalendar.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>3B69FFDDC298B056B558110917424BF64ADA5442</key>

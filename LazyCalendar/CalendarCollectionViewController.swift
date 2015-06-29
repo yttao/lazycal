@@ -8,10 +8,21 @@
 
 import UIKit
 
+// Controller for view of one month
 class CalendarCollectionViewController: UICollectionViewController, UICollectionViewDataSource {
     private let reuseIdentifier = "DayCell"
-    private let daysInMonth = [1, 2, 3, 4 , 5, 6, 7]
-    private let numCellsInMonth = 7
+    
+    // TODO: move this to a Calendar class
+    private let daysInMonth: [Int] = [1, 2, 3, 4 , 5, 6, 7, 8, 9, 10, 11, 12]
+    
+    // 7 days in a week
+    private let numDaysInWeek = 7
+    // 5 weeks (overlapping with weeks in adjacent months) in a month
+    private let numWeeksInMonth = 5
+    // 28-31 days in a month
+    private var numDaysInMonth: Int = 30
+    // Max number of cells
+    private let numCellsInMonth = 35
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,23 +48,31 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     // MARK: UICollectionViewDataSource
 
     override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-        //#warning Incomplete method implementation -- Return the number of sections
         return 1
     }
 
 
+    // Returns number of items in month
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         //#warning Incomplete method implementation -- Return the number of items in the section
         return numCellsInMonth
     }
 
+    // Makes cell with day number shown
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CalendarCollectionViewCell
-        cell.dayLabel.text = "\(daysInMonth[indexPath.row])"
-    
-        // Configure the cell
+        if let day = (indexPath.row < daysInMonth.count ? daysInMonth[indexPath.row] : nil) {
+            cell.dayLabel.text = "\(day)"
+        }
+        else {
+            cell.dayLabel.text = "x"
+        }
     
         return cell
+    }
+    
+    // Blue background on selecting day
+    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
     }
 
     // MARK: UICollectionViewDelegate
@@ -87,4 +106,21 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     }
     */
 
+}
+
+// Handles sizing of cells
+extension CalendarCollectionViewController: UICollectionViewDelegateFlowLayout {
+    // Determines size of one cell
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        return CGSize(width: collectionView.frame.size.width / 7, height: collectionView.frame.size.height / 5) //collectionView.frame.size.height / 5)
+    }
+    
+    // Determines spacing between cells (none)
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
+        return CGFloat(0)
+    }
+    
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
+        return CGFloat(0)
+    }
 }

@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="mnO-Ro-4Yq">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Calendar Collection View Controller-->
@@ -27,8 +26,8 @@
                                     <rect key="frame" x="0.0" y="0.0" width="92" height="105"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DayLabel" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tBi-WE-vSe">
-                                            <rect key="frame" x="8" y="8" width="76" height="43"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="DayLabel" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tBi-WE-vSe">
+                                            <rect key="frame" x="8" y="8" width="76" height="29"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
@@ -36,12 +35,6 @@
                                     </subviews>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
-                                <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="tBi-WE-vSe" secondAttribute="bottom" constant="54" id="TYg-Cg-JCE"/>
-                                    <constraint firstItem="tBi-WE-vSe" firstAttribute="top" secondItem="eYf-hv-Hc4" secondAttribute="topMargin" id="Zfe-vk-Bxl"/>
-                                    <constraint firstItem="tBi-WE-vSe" firstAttribute="leading" secondItem="eYf-hv-Hc4" secondAttribute="leadingMargin" id="gpz-SK-k7M"/>
-                                    <constraint firstAttribute="trailingMargin" secondItem="tBi-WE-vSe" secondAttribute="trailing" id="vWF-Hv-cjt"/>
-                                </constraints>
                                 <connections>
                                     <outlet property="dayLabel" destination="tBi-WE-vSe" id="5cn-ln-eYL"/>
                                 </connections>
@@ -55,7 +48,7 @@
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PEr-Nj-DGJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="462" y="181"/>
+            <point key="canvasLocation" x="448" y="183"/>
         </scene>
     </scenes>
 </document>
