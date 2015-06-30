@@ -15,6 +15,8 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     // TODO: move this all to a Calendar class
     private var daysInMonth = [Int]()
     
+    private var calendar: NSCalendar?
+    
     // 7 days in a week
     private let numDaysInWeek = 7
     // 5 weeks (overlapping with weeks in adjacent months) in a month
@@ -22,34 +24,33 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     // Max number of cells
     private let numCellsInMonth = 35
     
-    private var monthStartDay = 0
+    private var monthStartWeekday = 0
     private var currentDay = 1
-    private var currentMonth = 0
-    private var currentYear = 0
+    // Keeps track of current date view
+    private var dateComponents: NSDateComponents?
+    
+    private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
+        NSCalendarUnit.CalendarUnitYear
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Get calendar and use today as start reference point
-        var calendar = NSCalendar.currentCalendar()
+        calendar = NSCalendar.currentCalendar()
         var today = NSDate()
         
         // Get days in month
-        let numDays = calendar.rangeOfUnit(NSCalendarUnit.CalendarUnitDay, inUnit: NSCalendarUnit.CalendarUnitMonth, forDate: today).length
+        let numDays = calendar!.rangeOfUnit(NSCalendarUnit.CalendarUnitDay, inUnit: NSCalendarUnit.CalendarUnitMonth, forDate: today).length
         for (var i = 1; i <= numDays; i++) {
             daysInMonth.append(i)
         }
         
         // Get start month (1-12), and start year
-        var dateComponents = calendar.components(.CalendarUnitDay | .CalendarUnitMonth | .CalendarUnitYear, fromDate: today)
-        currentMonth = dateComponents.month
-        currentYear = dateComponents.year
-        
+        let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
+            NSCalendarUnit.CalendarUnitYear
+        dateComponents = calendar!.components(units, fromDate: today)
         // Find first weekday of month
-        dateComponents.day = 1
-        var firstDayOfMonth = calendar.dateFromComponents(dateComponents)
-        var firstDayOfMonthComponents = calendar.components(.CalendarUnitWeekday, fromDate: firstDayOfMonth!)
-        monthStartDay = firstDayOfMonthComponents.weekday
+        monthStartWeekday = getMonthStartWeekday(dateComponents!)
         
         // On swipe left, go to the next month view
         var swipeLeft = UISwipeGestureRecognizer(target: self, action: "goToNextMonth:")
@@ -64,18 +65,37 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     
     func goToNextMonth(gesture: UIGestureRecognizer) {
         if let swipeGesture = gesture as? UISwipeGestureRecognizer {
-            currentMonth += 1
-            currentDay = 1
-            println(currentMonth)
+            dateComponents!.month++
+            dateComponents!.day = 1
+            dateComponents = getNewComponents(dateComponents!)
+            monthStartWeekday = getMonthStartWeekday(dateComponents!)
+            println("Start weekday for month \(dateComponents!.month) is \(monthStartWeekday)")
+            println(dateComponents!.description)
         }
     }
     
     func goToPrevMonth(gesture: UIGestureRecognizer) {
         if let swipeGesture = gesture as? UISwipeGestureRecognizer {
-            currentMonth -= 1
-            currentDay = 1
-            println(currentMonth)
+            dateComponents!.month--
+            dateComponents!.day = 1
+            dateComponents = getNewComponents(dateComponents!)
+            monthStartWeekday = getMonthStartWeekday(dateComponents!)
+            println("Start weekday for month \(dateComponents!.month) is \(monthStartWeekday)")
+            println(dateComponents!.description)
         }
+    }
+    
+    func getMonthStartWeekday(components: NSDateComponents) -> Int {
+        var componentsCopy = components.copy() as! NSDateComponents
+        componentsCopy.day = 1
+        var startMonthDate = calendar!.dateFromComponents(componentsCopy)
+        var startMonthDateComponents = calendar!.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
+        return startMonthDateComponents.weekday
+    }
+    
+    func getNewComponents(components: NSDateComponents) -> NSDateComponents {
+        var newDate = calendar!.dateFromComponents(components)
+        return calendar!.components(units, fromDate: newDate!)
     }
 
     override func didReceiveMemoryWarning() {
@@ -110,8 +130,8 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CalendarCollectionViewCell
         
-        let afterMonthStartDay = indexPath.row >= (monthStartDay - 1)
-        let beforeMonthEndDay = indexPath.row < (daysInMonth.count + (monthStartDay - 1))
+        let afterMonthStartDay = indexPath.row >= (monthStartWeekday - 1)
+        let beforeMonthEndDay = indexPath.row < (daysInMonth.count + (monthStartWeekday - 1))
         
         if (afterMonthStartDay && beforeMonthEndDay) {
             let day = daysInMonth[currentDay - 1]
