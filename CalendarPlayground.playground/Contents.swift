@@ -16,14 +16,10 @@ let numDaysInYear = calendar.rangeOfUnit(NSCalendarUnit.CalendarUnitMonth, inUni
 
 
 var today = NSDate()
-
 var daysSinceMonthStart = calendar.rangeOfUnit(NSCalendarUnit.CalendarUnitDay, inUnit: NSCalendarUnit.CalendarUnitMonth, forDate: NSDate())
 
 var sevenDaysAgo = today.dateByAddingTimeInterval(-7 * 24 * 60 * 60)
 
-var weekdayComponents = calendar.components(NSCalendarUnit.CalendarUnitWeekday, fromDate: NSDate())
-var components = calendar.components(NSCalendarUnit.CalendarUnitMonth |
-    NSCalendarUnit.CalendarUnitWeekday, fromDate: today)
-components.day = 1
-components.description
-components.weekday
+var components = calendar.components(NSCalendarUnit.CalendarUnitWeekday | .CalendarUnitMonth | .CalendarUnitYear, fromDate: NSDate())
+var firstDay = calendar.dateFromComponents(components)
+var firstDayComponents = calendar.components(NSCalendarUnit.CalendarUnitWeekday, fromDate: firstDay!)

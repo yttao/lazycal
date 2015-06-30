@@ -12,7 +12,7 @@ import UIKit
 class CalendarCollectionViewController: UICollectionViewController, UICollectionViewDataSource {
     private let reuseIdentifier = "DayCell"
     
-    // TODO: move this to a Calendar class
+    // TODO: move this all to a Calendar class
     private var daysInMonth = [Int]()
     
     // 7 days in a week
@@ -23,24 +23,59 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     private let numCellsInMonth = 35
     
     private var monthStartDay = 0
-    private var currentDay = 0
+    private var currentDay = 1
+    private var currentMonth = 0
+    private var currentYear = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        // Get calendar and use today as start reference point
         var calendar = NSCalendar.currentCalendar()
-        
-        // Find num days in month
         var today = NSDate()
+        
+        // Get days in month
         let numDays = calendar.rangeOfUnit(NSCalendarUnit.CalendarUnitDay, inUnit: NSCalendarUnit.CalendarUnitMonth, forDate: today).length
         for (var i = 1; i <= numDays; i++) {
             daysInMonth.append(i)
         }
         
-        // Get start weekday for month
-        var weekdayComponents = calendar.components(NSCalendarUnit.CalendarUnitWeekday, fromDate: today)
-        weekdayComponents.day = 1
-        monthStartDay = weekdayComponents.weekday - 1
+        // Get start month (1-12), and start year
+        var dateComponents = calendar.components(.CalendarUnitDay | .CalendarUnitMonth | .CalendarUnitYear, fromDate: today)
+        currentMonth = dateComponents.month
+        currentYear = dateComponents.year
+        
+        // Find first weekday of month
+        dateComponents.day = 1
+        var firstDayOfMonth = calendar.dateFromComponents(dateComponents)
+        var firstDayOfMonthComponents = calendar.components(.CalendarUnitWeekday, fromDate: firstDayOfMonth!)
+        monthStartDay = firstDayOfMonthComponents.weekday
+        
+        // On swipe left, go to the next month view
+        var swipeLeft = UISwipeGestureRecognizer(target: self, action: "goToNextMonth:")
+        swipeLeft.direction = UISwipeGestureRecognizerDirection.Left
+        view.addGestureRecognizer(swipeLeft)
+        
+        // On swipe right, go to the previous month view
+        var swipeRight = UISwipeGestureRecognizer(target: self, action: "goToPrevMonth:")
+        swipeRight.direction = UISwipeGestureRecognizerDirection.Right
+        view.addGestureRecognizer(swipeRight)
+    }
+    
+    func goToNextMonth(gesture: UIGestureRecognizer) {
+        if let swipeGesture = gesture as? UISwipeGestureRecognizer {
+            currentMonth += 1
+            currentDay = 1
+            println(currentMonth)
+        }
+    }
+    
+    func goToPrevMonth(gesture: UIGestureRecognizer) {
+        if let swipeGesture = gesture as? UISwipeGestureRecognizer {
+            currentMonth -= 1
+            currentDay = 1
+            println(currentMonth)
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -75,10 +110,11 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CalendarCollectionViewCell
         
-        let afterMonthStartDay = indexPath.row >= monthStartDay
-        let beforeMonthEndDay = indexPath.row < (daysInMonth.count + monthStartDay)
+        let afterMonthStartDay = indexPath.row >= (monthStartDay - 1)
+        let beforeMonthEndDay = indexPath.row < (daysInMonth.count + (monthStartDay - 1))
+        
         if (afterMonthStartDay && beforeMonthEndDay) {
-            let day = daysInMonth[currentDay]
+            let day = daysInMonth[currentDay - 1]
 
             cell.dayLabel.text = "\(day)"
             currentDay++
@@ -92,7 +128,6 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     
     // Blue background on selecting day
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        let day = daysInMonth[indexPath.row]
     }
 
     // MARK: UICollectionViewDelegate
