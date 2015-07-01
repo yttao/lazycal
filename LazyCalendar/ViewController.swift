@@ -8,10 +8,8 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIPageViewControllerDataSource {
+class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     var pageViewController: UIPageViewController?
-    
-    private var calendar: NSCalendar?
     
     // 7 days in a week
     private let numDaysInWeek = 7
@@ -20,12 +18,15 @@ class ViewController: UIViewController, UIPageViewControllerDataSource {
     // Max number of cells
     private let numCellsInMonth = 35
     
+    private var calendar: NSCalendar?
     private var today: NSDate?
     // Keeps track of current date view
     private var dateComponents: NSDateComponents?
     // NSCalendarUnits to keep track of
     private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
         NSCalendarUnit.CalendarUnitYear
+    private var currentIndex = 0
+    private var nextIndex = 0
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -40,14 +41,12 @@ class ViewController: UIViewController, UIPageViewControllerDataSource {
     }
     
     func goToNextMonth() {
-        println("Swipe left")
         dateComponents!.month++
         dateComponents!.day = 1
         dateComponents = getNewDateComponents(dateComponents!)
     }
     
     func goToPrevMonth() {
-        println("Swipe right")
         dateComponents!.month--
         dateComponents!.day = 1
         dateComponents = getNewDateComponents(dateComponents!)
@@ -78,44 +77,65 @@ class ViewController: UIViewController, UIPageViewControllerDataSource {
         let pageController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthController") as! UIPageViewController
         // Set data source to self
         pageController.dataSource = self
+        pageController.delegate = self
         // Make first view controller
         let firstController = getMonthController(dateComponents!)!
         let startingViewControllers = [firstController]
-        pageController.setViewControllers(startingViewControllers, direction: UIPageViewControllerNavigationDirection.Forward, animated: false, completion: nil)
+        // Set initial view controller
+        pageController.setViewControllers(startingViewControllers, direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
+        println("Page controllers set: \(pageController.viewControllers)")
         
         pageViewController = pageController
         self.addChildViewController(pageViewController!)
         self.view.addSubview(pageViewController!.view)
-        pageViewController!.didMoveToParentViewController(self)
+        /*pageViewController!.didMoveToParentViewController(self)*/
     }
+    
+    // Function to handle direction change - call goToNextMonth/goToPrevMonth twice instead of once
 
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        println("PREV MONTH FOR \(viewController.description)")
-        goToPrevMonth()
-        let monthStartWeekday = getMonthStartWeekday(dateComponents!)
-        println("Current month: \(dateComponents!.month), Weekday: \(monthStartWeekday)")
-        println(dateComponents!.description)
+        /*println("BEFORE")*/
         let components = dateComponents!.copy() as! NSDateComponents
         components.month--
+        let newComponents = getNewDateComponents(components)
+        let monthStartWeekday = getMonthStartWeekday(newComponents)
+        /*println("Month: \(newComponents.month), Weekday: \(monthStartWeekday)")*/
+
         
-        return getMonthController(getNewDateComponents(components))
+        return getMonthController(newComponents)
     }
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        println("NEXT MONTH for \(viewController.description)")
-        goToNextMonth()
-        let monthStartWeekday = getMonthStartWeekday(dateComponents!)
-        println("Current month: \(dateComponents!.month), Weekday: \(monthStartWeekday)")
-        println(dateComponents!.description)
+        /*println("AFTER")*/
         let components = dateComponents!.copy() as! NSDateComponents
         components.month++
+        let newComponents = getNewDateComponents(components)
+        let monthStartWeekday = getMonthStartWeekday(dateComponents!)
+        /*println("Month: \(newComponents.month), Weekday: \(monthStartWeekday)")*/
         
-        return getMonthController(getNewDateComponents(components))
+        return getMonthController(newComponents)
     }
-
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        super.prepareForSegue(segue, sender: sender)
+    
+    func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [AnyObject]) {
+        let currentViewController = pageViewController.viewControllers[0] as! CalendarCollectionViewController
+        let nextViewController = pendingViewControllers[0] as! CalendarCollectionViewController
         
+        println("CURRENT: \(currentViewController.dateIndex)")
+        println("NEXT: \(nextViewController.dateIndex)")
+    }
+    
+    func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
+        let newViewController = pageViewController.viewControllers[0] as! CalendarCollectionViewController
+        let oldViewController = previousViewControllers[0] as! CalendarCollectionViewController
+        
+        if (oldViewController.dateIndex!.compare(newViewController.dateIndex!) ==
+            NSComparisonResult.OrderedAscending) {
+                goToNextMonth()
+        }
+        else if (oldViewController.dateIndex!.compare(newViewController.dateIndex!) ==
+            NSComparisonResult.OrderedDescending) {
+                goToPrevMonth()
+        }
     }
     
     // Creates month view controller

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2E9D84D71B446AD7003E957D /* MonthItemHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D84D61B446AD7003E957D /* MonthItemHeaderView.swift */; };
 		2EC260AA1B417A6E002FAED2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC260A91B417A6E002FAED2 /* AppDelegate.swift */; };
 		2EC260AD1B417A6E002FAED2 /* LazyCalendar.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2EC260AB1B417A6E002FAED2 /* LazyCalendar.xcdatamodeld */; };
 		2EC260AF1B417A6E002FAED2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC260AE1B417A6E002FAED2 /* ViewController.swift */; };
@@ -29,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2E9D84D61B446AD7003E957D /* MonthItemHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonthItemHeaderView.swift; sourceTree = "<group>"; };
 		2EC260A41B417A6E002FAED2 /* LazyCalendar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LazyCalendar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2EC260A81B417A6E002FAED2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2EC260A91B417A6E002FAED2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -85,9 +87,10 @@
 			children = (
 				2EC260AE1B417A6E002FAED2 /* ViewController.swift */,
 				2EC260CC1B417F36002FAED2 /* CalendarCollectionViewController.swift */,
+				2EC260B01B417A6E002FAED2 /* Main.storyboard */,
+				2E9D84D61B446AD7003E957D /* MonthItemHeaderView.swift */,
 				2EC260D01B41830F002FAED2 /* CalendarCollectionViewCell.swift */,
 				2EC260A91B417A6E002FAED2 /* AppDelegate.swift */,
-				2EC260B01B417A6E002FAED2 /* Main.storyboard */,
 				2EC260B31B417A6E002FAED2 /* Images.xcassets */,
 				2EC260B51B417A6E002FAED2 /* LaunchScreen.xib */,
 				2EC260AB1B417A6E002FAED2 /* LazyCalendar.xcdatamodeld */,
@@ -226,6 +229,7 @@
 				2EC260CD1B417F36002FAED2 /* CalendarCollectionViewController.swift in Sources */,
 				2EC260AD1B417A6E002FAED2 /* LazyCalendar.xcdatamodeld in Sources */,
 				2EC260D11B41830F002FAED2 /* CalendarCollectionViewCell.swift in Sources */,
+				2E9D84D71B446AD7003E957D /* MonthItemHeaderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
