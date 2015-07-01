@@ -24,34 +24,59 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     // Max number of cells
     private let numCellsInMonth = 35
     
+    private var today: NSDate?
     private var monthStartWeekday = 0
     private var currentDay = 1
     // Keeps track of current date view
-    private var dateComponents: NSDateComponents?
-    
+    var dateComponents: NSDateComponents? {
+        didSet {
+            
+        }
+    }
+    // NSCalendarUnits to keep track of
     private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
         NSCalendarUnit.CalendarUnitYear
     
+    func loadData(calendar: NSCalendar, today: NSDate, dateComponents: NSDateComponents) {
+        self.calendar = calendar
+        self.today = today
+        self.dateComponents = dateComponents
+        monthStartWeekday = getMonthStartWeekday(self.dateComponents!)
+        
+        let numDays = self.calendar!.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate:
+            self.calendar!.dateFromComponents(self.dateComponents!)!).length
+        for (var i = 1; i <= numDays; i++) {
+            daysInMonth.append(i)
+        }
+    }
+    
+    /*required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        
+        // Load calendar and today's date at start
+        calendar = NSCalendar.currentCalendar()
+        today = NSDate()
+
+        // Get start month (1-12), and start year
+        dateComponents = calendar!.components(units, fromDate: today!)
+        // Find first weekday of month
+        monthStartWeekday = getMonthStartWeekday(dateComponents!)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Get calendar and use today as start reference point
-        calendar = NSCalendar.currentCalendar()
-        var today = NSDate()
         
-        // Get days in month
-        let numDays = calendar!.rangeOfUnit(NSCalendarUnit.CalendarUnitDay, inUnit: NSCalendarUnit.CalendarUnitMonth, forDate: today).length
+        let numDays = calendar!.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate:
+            calendar!.dateFromComponents(dateComponents!)!).length
         for (var i = 1; i <= numDays; i++) {
             daysInMonth.append(i)
         }
         
-        // Get start month (1-12), and start year
-        let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
-            NSCalendarUnit.CalendarUnitYear
-        dateComponents = calendar!.components(units, fromDate: today)
-        // Find first weekday of month
-        monthStartWeekday = getMonthStartWeekday(dateComponents!)
-        
+        addGestures()
+    }
+    
+    // Adds left and right swipe gestures
+    func addGestures() {
         // On swipe left, go to the next month view
         var swipeLeft = UISwipeGestureRecognizer(target: self, action: "goToNextMonth:")
         swipeLeft.direction = UISwipeGestureRecognizerDirection.Left
@@ -67,7 +92,8 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         if let swipeGesture = gesture as? UISwipeGestureRecognizer {
             dateComponents!.month++
             dateComponents!.day = 1
-            dateComponents = getNewComponents(dateComponents!)
+            currentDay = 1
+            dateComponents = getNewDateComponents(dateComponents!)
             monthStartWeekday = getMonthStartWeekday(dateComponents!)
             println("Start weekday for month \(dateComponents!.month) is \(monthStartWeekday)")
             println(dateComponents!.description)
@@ -78,13 +104,15 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         if let swipeGesture = gesture as? UISwipeGestureRecognizer {
             dateComponents!.month--
             dateComponents!.day = 1
-            dateComponents = getNewComponents(dateComponents!)
+            currentDay = 1
+            dateComponents = getNewDateComponents(dateComponents!)
             monthStartWeekday = getMonthStartWeekday(dateComponents!)
             println("Start weekday for month \(dateComponents!.month) is \(monthStartWeekday)")
             println(dateComponents!.description)
         }
-    }
+    }*/
     
+    // Gets the first weekday of the month
     func getMonthStartWeekday(components: NSDateComponents) -> Int {
         var componentsCopy = components.copy() as! NSDateComponents
         componentsCopy.day = 1
@@ -93,7 +121,8 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         return startMonthDateComponents.weekday
     }
     
-    func getNewComponents(components: NSDateComponents) -> NSDateComponents {
+    /*// Recalculates components after fields have been changed in components
+    func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
         var newDate = calendar!.dateFromComponents(components)
         return calendar!.components(units, fromDate: newDate!)
     }
@@ -101,19 +130,7 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
-
-    // MARK: UICollectionViewDataSource
+    }*/
 
     override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return 1
@@ -130,57 +147,23 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CalendarCollectionViewCell
         
+        // Check if cell is within the bounds of correct dates for that month.
         let afterMonthStartDay = indexPath.row >= (monthStartWeekday - 1)
         let beforeMonthEndDay = indexPath.row < (daysInMonth.count + (monthStartWeekday - 1))
         
         if (afterMonthStartDay && beforeMonthEndDay) {
+            // Set text
             let day = daysInMonth[currentDay - 1]
 
             cell.dayLabel.text = "\(day)"
             currentDay++
         }
         else {
-            cell.dayLabel.text = "x"
+            cell.dayLabel.text = ""
         }
     
         return cell
     }
-    
-    // Blue background on selecting day
-    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-    }
-
-    // MARK: UICollectionViewDelegate
-
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    override func collectionView(collectionView: UICollectionView, shouldHighlightItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    override func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    override func collectionView(collectionView: UICollectionView, shouldShowMenuForItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return false
-    }
-
-    override func collectionView(collectionView: UICollectionView, canPerformAction action: Selector, forItemAtIndexPath indexPath: NSIndexPath, withSender sender: AnyObject?) -> Bool {
-        return false
-    }
-
-    override func collectionView(collectionView: UICollectionView, performAction action: Selector, forItemAtIndexPath indexPath: NSIndexPath, withSender sender: AnyObject?) {
-    
-    }
-    */
-
 }
 
 // Handles sizing of cells

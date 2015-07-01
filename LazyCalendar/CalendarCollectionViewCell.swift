@@ -11,5 +11,10 @@ import UIKit
 class CalendarCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var dayLabel: UILabel!
 
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        
+        /*dayLabel.textAlignment = NSTextAlignment.Center*/
+    }
     
 }

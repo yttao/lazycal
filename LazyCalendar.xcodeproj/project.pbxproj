@@ -83,10 +83,10 @@
 		2EC260A61B417A6E002FAED2 /* LazyCalendar */ = {
 			isa = PBXGroup;
 			children = (
+				2EC260AE1B417A6E002FAED2 /* ViewController.swift */,
 				2EC260CC1B417F36002FAED2 /* CalendarCollectionViewController.swift */,
 				2EC260D01B41830F002FAED2 /* CalendarCollectionViewCell.swift */,
 				2EC260A91B417A6E002FAED2 /* AppDelegate.swift */,
-				2EC260AE1B417A6E002FAED2 /* ViewController.swift */,
 				2EC260B01B417A6E002FAED2 /* Main.storyboard */,
 				2EC260B31B417A6E002FAED2 /* Images.xcassets */,
 				2EC260B51B417A6E002FAED2 /* LaunchScreen.xib */,
@@ -421,6 +421,7 @@
 				2EC260C81B417A6E002FAED2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2EC260C91B417A6E002FAED2 /* Build configuration list for PBXNativeTarget "LazyCalendarTests" */ = {
 			isa = XCConfigurationList;
@@ -429,6 +430,7 @@
 				2EC260CB1B417A6E002FAED2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
