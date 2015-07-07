@@ -7,18 +7,18 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>1821D771-5090-446C-95FA-0047D3F4292A</string>
 	<key>IDESourceControlProjectName</key>
-	<string>CalendarPlayground</string>
+	<string>playground</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>3B69FFDDC298B056B558110917424BF64ADA5442</key>
 		<string>https://github.com/Kimchelly/LazyCalendar.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>CalendarPlayground.playground</string>
+	<string>CalendarPlayground.playground/playground.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>3B69FFDDC298B056B558110917424BF64ADA5442</key>
-		<string>..</string>
+		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/Kimchelly/LazyCalendar.git</string>

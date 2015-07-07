@@ -10,38 +10,46 @@ import UIKit
 
 // Controller for view of one month
 class CalendarCollectionViewController: UICollectionViewController, UICollectionViewDataSource {
+    // Used to order months
+    var dateIndex: NSDate?
+    
     private let reuseIdentifier = "DayCell"
     
-    // TODO: move this all to a Calendar class
     private var daysInMonth = [Int]()
     
     private var calendar: NSCalendar?
+    
+    private var selectedCell: UICollectionViewCell? {
+        didSet {
+            let selected = selectedCell as! CalendarCollectionViewCell
+            let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
+            selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
+            let selectedDate = calendar!.dateFromComponents(selectedComponents)
+            ShowEvents(selectedDate!)
+        }
+    }
     
     // 7 days in a week
     private let numDaysInWeek = 7
     // 5 weeks (overlapping with weeks in adjacent months) in a month
     private let numWeeksInMonth = 5
     // Max number of cells
-    private let numCellsInMonth = 35
+    private let numCellsInMonth = 42
     
-    private var today: NSDate?
     private var monthStartWeekday = 0
     private var currentDay = 1
     // Keeps track of current date view
-    var dateComponents: NSDateComponents? {
-        didSet {
-            
-        }
-    }
+    private var dateComponents: NSDateComponents?
+    
     // NSCalendarUnits to keep track of
     private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
         NSCalendarUnit.CalendarUnitYear
     
     func loadData(calendar: NSCalendar, today: NSDate, dateComponents: NSDateComponents) {
         self.calendar = calendar
-        self.today = today
         self.dateComponents = dateComponents
         monthStartWeekday = getMonthStartWeekday(self.dateComponents!)
+        dateIndex = calendar.dateFromComponents(self.dateComponents!)
         
         let numDays = self.calendar!.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate:
             self.calendar!.dateFromComponents(self.dateComponents!)!).length
@@ -131,6 +139,17 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }*/
+    
+    override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
+        switch kind {
+            case UICollectionElementKindSectionHeader:
+                let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "MonthItemHeaderView", forIndexPath: indexPath) as! MonthItemHeaderView
+                headerView.headerLabel.text = "\(dateComponents!.month)"
+                return headerView
+            default:
+                assert(false, "Unexpected element kind")
+        }
+    }
 
     override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return 1
@@ -139,7 +158,6 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
 
     // Returns number of items in month
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        //#warning Incomplete method implementation -- Return the number of items in the section
         return numCellsInMonth
     }
 
@@ -161,8 +179,26 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         else {
             cell.dayLabel.text = ""
         }
-    
+        
         return cell
+    }
+    
+    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        println("Selected at \(indexPath.row)")
+        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
+        if cell.dayLabel.text != "" && !(cell == selectedCell) && selectedCell != nil {
+            selectedCell!.backgroundColor = UIColor.whiteColor()
+            cell.backgroundColor = UIColor.lightGrayColor()
+            selectedCell = cell
+        }
+        else if selectedCell == nil && cell.dayLabel.text != "" {
+            cell.backgroundColor = UIColor.lightGrayColor()
+            selectedCell = cell
+        }
+    }
+    
+    func ShowEvents(date: NSDate) {
+        println(date)
     }
 }
 
@@ -170,7 +206,7 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
 extension CalendarCollectionViewController: UICollectionViewDelegateFlowLayout {
     // Determines size of one cell
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.size.width / 7, height: collectionView.frame.size.height / 10) //collectionView.frame.size.height / 5)
+        return CGSize(width: collectionView.frame.size.width / 7, height: collectionView.frame.size.height / 12) //collectionView.frame.size.height / 5)
     }
     
     // Determines spacing between cells (none)
