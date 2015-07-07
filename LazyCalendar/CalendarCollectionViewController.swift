@@ -20,7 +20,15 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     
     private var calendar: NSCalendar?
     
-    private var selectedCell: UICollectionViewCell?
+    private var selectedCell: UICollectionViewCell? {
+        didSet {
+            let selected = selectedCell as! CalendarCollectionViewCell
+            let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
+            selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
+            let selectedDate = calendar!.dateFromComponents(selectedComponents)
+            ShowEvents(selectedDate!)
+        }
+    }
     
     // 7 days in a week
     private let numDaysInWeek = 7
@@ -190,6 +198,10 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
             cell.backgroundColor = UIColor.lightGrayColor()
             selectedCell = cell
         }
+    }
+    
+    func ShowEvents(date: NSDate) {
+        println(date)
     }
 }
 

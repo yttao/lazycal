@@ -28,6 +28,8 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     private var currentIndex = 0
     private var nextIndex = 0
     
+    var selectedDate: NSDate?
+    
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         calendar = NSCalendar.currentCalendar()
