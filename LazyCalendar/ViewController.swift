@@ -86,8 +86,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         let startingViewController = [firstController]
         // Set initial view controller
         pageController.setViewControllers(startingViewController, direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
-        println("Page controllers set: \(pageController.viewControllers)")
-        
+
         pageViewController = pageController
         self.addChildViewController(pageViewController!)
         self.view.addSubview(pageViewController!.view)
@@ -97,7 +96,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     // Function to handle direction change - call goToNextMonth/goToPrevMonth twice instead of once
 
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        println("BEFORE")
+        /*println("BEFORE")*/
         let components = dateComponents!.copy() as! NSDateComponents
         components.month--
         let newComponents = getNewDateComponents(components)
@@ -109,7 +108,8 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     }
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        println("AFTER")
+        /*println("AFTER")*/
+
         let components = dateComponents!.copy() as! NSDateComponents
         components.month++
         let newComponents = getNewDateComponents(components)
@@ -128,7 +128,6 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     }
     
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
-        println("Did finish animating")
         let newViewController = pageViewController.viewControllers[0] as! CalendarCollectionViewController
         let oldViewController = previousViewControllers[0] as! CalendarCollectionViewController
         
