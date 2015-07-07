@@ -145,9 +145,10 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
             case UICollectionElementKindSectionHeader:
                 let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "MonthItemHeaderView", forIndexPath: indexPath) as! MonthItemHeaderView
                 headerView.headerLabel.text = "\(dateComponents!.month)"
+                
                 return headerView
             default:
-                assert(false, "Unexpected element kind")
+                assert(false, "Not a header")
         }
     }
 
