@@ -40,7 +40,6 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     override func viewDidLoad() {
         super.viewDidLoad()
         createPageViewController()
-        print("View loaded fully")
     }
     
     func goToNextMonth() {
@@ -109,7 +108,6 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
         /*println("AFTER")*/
-
         let components = dateComponents!.copy() as! NSDateComponents
         components.month++
         let newComponents = getNewDateComponents(components)
