@@ -77,16 +77,15 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     // Creates first page view controller
     private func createPageViewController() {
         let pageController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthController") as! UIPageViewController
-        // Set data source to self
+        // Set data source and delegate
         pageController.dataSource = self
         pageController.delegate = self
         // Make first view controller
         let firstController = getMonthController(dateComponents!)!
-        let startingViewControllers = [firstController]
+        let startingViewController = [firstController]
         // Set initial view controller
-        pageController.setViewControllers(startingViewControllers, direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
-        println("Page controllers set: \(pageController.viewControllers)")
-        
+        pageController.setViewControllers(startingViewController, direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
+
         pageViewController = pageController
         self.addChildViewController(pageViewController!)
         self.view.addSubview(pageViewController!.view)
@@ -118,13 +117,13 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         return getMonthController(newComponents)
     }
     
-    func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [AnyObject]) {
+    /*func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [AnyObject]) {
         let currentViewController = pageViewController.viewControllers[0] as! CalendarCollectionViewController
         let nextViewController = pendingViewControllers[0] as! CalendarCollectionViewController
         
         println("CURRENT: \(currentViewController.dateIndex)")
         println("NEXT: \(nextViewController.dateIndex)")
-    }
+    }*/
     
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
         let newViewController = pageViewController.viewControllers[0] as! CalendarCollectionViewController
@@ -133,10 +132,12 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         if (oldViewController.dateIndex!.compare(newViewController.dateIndex!) ==
             NSComparisonResult.OrderedAscending) {
                 goToNextMonth()
+                oldViewController.clearSelected()
         }
         else if (oldViewController.dateIndex!.compare(newViewController.dateIndex!) ==
             NSComparisonResult.OrderedDescending) {
                 goToPrevMonth()
+                oldViewController.clearSelected()
         }
     }
     
@@ -145,8 +146,9 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         // Instantiate copy of prefab view controller
         let calendarCollectionViewController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemController") as! CalendarCollectionViewController
         calendarCollectionViewController.loadData(calendar!, today: today!, dateComponents: components)
-        // TODO: Figure out how to load date info into collectionviewcontroller before creating it.
+
         return calendarCollectionViewController
     }
 }
+
 
