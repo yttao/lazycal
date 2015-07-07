@@ -119,13 +119,13 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         return getMonthController(newComponents)
     }
     
-    func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [AnyObject]) {
+    /*func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [AnyObject]) {
         let currentViewController = pageViewController.viewControllers[0] as! CalendarCollectionViewController
         let nextViewController = pendingViewControllers[0] as! CalendarCollectionViewController
         
         println("CURRENT: \(currentViewController.dateIndex)")
         println("NEXT: \(nextViewController.dateIndex)")
-    }
+    }*/
     
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
         let newViewController = pageViewController.viewControllers[0] as! CalendarCollectionViewController
@@ -134,10 +134,12 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         if (oldViewController.dateIndex!.compare(newViewController.dateIndex!) ==
             NSComparisonResult.OrderedAscending) {
                 goToNextMonth()
+                oldViewController.clearSelected()
         }
         else if (oldViewController.dateIndex!.compare(newViewController.dateIndex!) ==
             NSComparisonResult.OrderedDescending) {
                 goToPrevMonth()
+                oldViewController.clearSelected()
         }
     }
     

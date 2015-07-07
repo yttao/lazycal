@@ -21,11 +21,12 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     
     private var selectedCell: UICollectionViewCell? {
         didSet {
-            let selected = selectedCell as! CalendarCollectionViewCell
-            let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
-            selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
-            let selectedDate = calendar!.dateFromComponents(selectedComponents)
-            ShowEvents(selectedDate!)
+            if let selected = selectedCell as? CalendarCollectionViewCell {
+                let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
+                selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
+                let selectedDate = calendar!.dateFromComponents(selectedComponents)
+                ShowEvents(selectedDate!)
+            }
         }
     }
     
@@ -56,6 +57,14 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         for (var i = 1; i <= numDays; i++) {
             daysInMonth.append(i)
         }
+    }
+    
+    func clearSelected() {
+        if selectedCell != nil {
+            selectedCell!.backgroundColor = UIColor.whiteColor()
+        }
+        
+        selectedCell = nil
     }
     
     /*required init(coder aDecoder: NSCoder) {
@@ -133,12 +142,12 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
         var newDate = calendar!.dateFromComponents(components)
         return calendar!.components(units, fromDate: newDate!)
-    }
+    }*/
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }*/
+    }
     
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
         switch kind {
