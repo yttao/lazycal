@@ -15,18 +15,18 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     
     private let reuseIdentifier = "DayCell"
     
-    // TODO: move this all to a Calendar class
     private var daysInMonth = [Int]()
     
     private var calendar: NSCalendar?
     
     private var selectedCell: UICollectionViewCell? {
         didSet {
-            let selected = selectedCell as! CalendarCollectionViewCell
-            let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
-            selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
-            let selectedDate = calendar!.dateFromComponents(selectedComponents)
-            ShowEvents(selectedDate!)
+            if let selected = selectedCell as? CalendarCollectionViewCell {
+                let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
+                selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
+                let selectedDate = calendar!.dateFromComponents(selectedComponents)
+                ShowEvents(selectedDate!)
+            }
         }
     }
     
@@ -57,6 +57,14 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         for (var i = 1; i <= numDays; i++) {
             daysInMonth.append(i)
         }
+    }
+    
+    func clearSelected() {
+        if selectedCell != nil {
+            selectedCell!.backgroundColor = UIColor.whiteColor()
+        }
+        
+        selectedCell = nil
     }
     
     /*required init(coder aDecoder: NSCoder) {
@@ -134,12 +142,12 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
         var newDate = calendar!.dateFromComponents(components)
         return calendar!.components(units, fromDate: newDate!)
-    }
+    }*/
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }*/
+    }
     
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
         switch kind {
@@ -160,7 +168,6 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
 
     // Returns number of items in month
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        //#warning Incomplete method implementation -- Return the number of items in the section
         return numCellsInMonth
     }
 
@@ -182,7 +189,7 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         else {
             cell.dayLabel.text = ""
         }
-    
+        
         return cell
     }
     
