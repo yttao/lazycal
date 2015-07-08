@@ -42,14 +42,16 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
         NSCalendarUnit.CalendarUnitYear
     
+    required init(coder: NSCoder) {
+        super.init(coder: coder)
+        //self.automaticallyAdjustsScrollViewInsets = false
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         monthItemCollectionView.delegate = self
         monthItemCollectionView.dataSource = self
-        println(monthItemCollectionView.frame.size)
-        println(monthItemTableView?.frame.size)
-        // Do any additional setup after loading the view.
+        self.automaticallyAdjustsScrollViewInsets = false
     }
     
     func loadData(calendar: NSCalendar, today: NSDate, dateComponents: NSDateComponents) {
@@ -128,7 +130,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
             selectedCell = cell
             
             let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
-            println(selectedCell!.description)
+            //println(selectedCell!.description)
             selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
             let selectedDate = calendar!.dateFromComponents(selectedComponents)
             ShowEvents(selectedDate!)
@@ -136,7 +138,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     }
     
     func ShowEvents(date: NSDate) {
-        println(date)
+        //println(date)
     }
     
     override func didReceiveMemoryWarning() {
@@ -150,10 +152,10 @@ extension MonthItemViewController: UICollectionViewDelegateFlowLayout {
     // Determines size of one cell
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
-        println("Collection view width: \(collectionView.frame.size.width)")
+        /*println("Collection view width: \(collectionView.frame.size.width)")
         println("Collection view height: \(collectionView.frame.size.height)")
         println("Total view width: \(view.frame.size.width)")
-        println("Total height:  \(view.frame.size.height)")
+        println("Total height:  \(view.frame.size.height)")*/
         
         return CGSize(width: collectionView.frame.size.width / 7, height: (collectionView.frame.size.height) / 6)
     }

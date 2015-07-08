@@ -89,7 +89,7 @@
                             <constraint firstItem="BeG-sY-bqe" firstAttribute="leading" secondItem="CM5-Bu-5Hb" secondAttribute="leading" id="uVT-VO-g0J"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Month" id="qr9-bq-Ai5"/>
+                    <navigationItem key="navigationItem" title="Month" id="qr9-bq-Ai5" userLabel="MonthItemNavigationItem"/>
                     <connections>
                         <outlet property="monthItemCollectionView" destination="BeG-sY-bqe" id="a35-vO-r5o"/>
                     </connections>

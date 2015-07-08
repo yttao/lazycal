@@ -118,7 +118,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     }
     
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
-        println(pageViewController.viewControllers[0].childViewControllers)
+        //println(pageViewController.viewControllers[0].childViewControllers)
         let newViewController = pageViewController.viewControllers[0].childViewControllers[0] as! MonthItemViewController
         let oldViewController = previousViewControllers[0].childViewControllers[0] as! MonthItemViewController
         
