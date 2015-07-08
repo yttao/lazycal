@@ -76,7 +76,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     
     // Creates first page view controller
     private func createPageViewController() {
-        let pageController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthController") as! UIPageViewController
+        let pageController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthPageViewController") as! UIPageViewController
         // Set data source and delegate
         pageController.dataSource = self
         pageController.delegate = self
@@ -126,8 +126,9 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     }*/
     
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
-        let newViewController = pageViewController.viewControllers[0] as! CalendarCollectionViewController
-        let oldViewController = previousViewControllers[0] as! CalendarCollectionViewController
+        println(pageViewController.viewControllers[0].childViewControllers)
+        let newViewController = pageViewController.viewControllers[0].childViewControllers[0] as! MonthItemViewController
+        let oldViewController = previousViewControllers[0].childViewControllers[0] as! MonthItemViewController
         
         if (oldViewController.dateIndex!.compare(newViewController.dateIndex!) ==
             NSComparisonResult.OrderedAscending) {
@@ -142,12 +143,15 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     }
     
     // Creates month view controller
-    private func getMonthController(components: NSDateComponents) -> CalendarCollectionViewController? {
+    private func getMonthController(components: NSDateComponents) -> MonthItemNavigationController? {
         // Instantiate copy of prefab view controller
-        let calendarCollectionViewController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemController") as! CalendarCollectionViewController
-        calendarCollectionViewController.loadData(calendar!, today: today!, dateComponents: components)
+        let monthItemViewController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemViewController") as! MonthItemViewController
+        
+        let monthItemNavigationController = MonthItemNavigationController(rootViewController: monthItemViewController)
+        monthItemViewController.loadData(calendar!, today: today!, dateComponents: components)
+        monthItemNavigationController.loadData(dateComponents!)
 
-        return calendarCollectionViewController
+        return monthItemNavigationController
     }
 }
 

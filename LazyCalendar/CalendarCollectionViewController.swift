@@ -57,6 +57,8 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         for (var i = 1; i <= numDays; i++) {
             daysInMonth.append(i)
         }
+        
+        self.navigationItem.title = String(dateComponents.month)
     }
     
     func clearSelected() {
@@ -149,17 +151,19 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         // Dispose of any resources that can be recreated.
     }
     
-    override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
+    /*override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
         switch kind {
             case UICollectionElementKindSectionHeader:
                 let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "MonthItemHeaderView", forIndexPath: indexPath) as! MonthItemHeaderView
-                println("Is month item header view")
-                headerView.headerLabel.text = "\(dateComponents!.month)"
+                if dateComponents != nil {
+                    headerView.headerLabel.text = "\(dateComponents!.month)"
+                }
+                
                 return headerView
             default:
                 assert(false, "Unexpected element kind")
         }
-    }
+    }*/
 
     override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return 1
@@ -187,7 +191,7 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
             currentDay++
         }
         else {
-            cell.dayLabel.text = ""
+            cell.dayLabel.text = "x"
         }
         
         return cell

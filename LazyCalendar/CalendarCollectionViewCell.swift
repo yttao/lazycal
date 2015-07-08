@@ -13,8 +13,6 @@ class CalendarCollectionViewCell: UICollectionViewCell {
 
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
-        /*dayLabel.textAlignment = NSTextAlignment.Center*/
     }
     
 }
