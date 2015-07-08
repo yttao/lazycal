@@ -44,15 +44,24 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     
     required init(coder: NSCoder) {
         super.init(coder: coder)
-        //self.automaticallyAdjustsScrollViewInsets = false
+        self.automaticallyAdjustsScrollViewInsets = false
+        println("View initialized")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         monthItemCollectionView.delegate = self
         monthItemCollectionView.dataSource = self
-        self.automaticallyAdjustsScrollViewInsets = false
+        //self.automaticallyAdjustsScrollViewInsets = false
     }
+    
+    /*override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let top = self.topLayoutGuide.length
+        let bottom = self.bottomLayoutGuide.length
+        let newInsets = UIEdgeInsetsMake(top, 0, bottom, 0)
+        monthItemCollectionView.contentInset = newInsets
+    }*/
     
     func loadData(calendar: NSCalendar, today: NSDate, dateComponents: NSDateComponents) {
         self.calendar = calendar

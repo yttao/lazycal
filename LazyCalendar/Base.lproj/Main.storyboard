@@ -39,11 +39,11 @@
                         <viewControllerLayoutGuide type="bottom" id="mEZ-xe-epo"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="CM5-Bu-5Hb">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="536"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="BeG-sY-bqe">
-                                <rect key="frame" x="0.0" y="64" width="600" height="300"/>
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
                                 <color key="backgroundColor" red="0.49019607843137253" green="1" blue="0.49019607843137253" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="300" id="afn-ae-93q"/>
@@ -89,6 +89,7 @@
                             <constraint firstItem="BeG-sY-bqe" firstAttribute="leading" secondItem="CM5-Bu-5Hb" secondAttribute="leading" id="uVT-VO-g0J"/>
                         </constraints>
                     </view>
+                    <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
                     <navigationItem key="navigationItem" title="Month" id="qr9-bq-Ai5" userLabel="MonthItemNavigationItem"/>
                     <connections>
                         <outlet property="monthItemCollectionView" destination="BeG-sY-bqe" id="a35-vO-r5o"/>
@@ -128,6 +129,7 @@
         <scene sceneID="3xo-ef-0IO">
             <objects>
                 <navigationController storyboardIdentifier="MonthItemNavigationController" title="MonthItemNavigationController" automaticallyAdjustsScrollViewInsets="NO" id="yT2-qU-bNq" customClass="MonthItemNavigationController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
+                    <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="OSw-gZ-iiq">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
