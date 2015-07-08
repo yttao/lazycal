@@ -13,6 +13,9 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     // Used to order months
     var dateIndex: NSDate?
     
+    private let backgroundColor = UIColor.blackColor()
+    private let selectedColor = UIColor.grayColor()
+    
     private let reuseIdentifier = "DayCell"
     
     private var daysInMonth = [Int]()
@@ -63,7 +66,7 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     
     func clearSelected() {
         if selectedCell != nil {
-            selectedCell!.backgroundColor = UIColor.whiteColor()
+            selectedCell!.backgroundColor = self.backgroundColor
         }
         
         selectedCell = nil
@@ -201,12 +204,12 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         println("Selected at \(indexPath.row)")
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         if cell.dayLabel.text != "" && !(cell == selectedCell) && selectedCell != nil {
-            selectedCell!.backgroundColor = UIColor.whiteColor()
-            cell.backgroundColor = UIColor.lightGrayColor()
+            selectedCell!.backgroundColor = backgroundColor
+            cell.backgroundColor = selectedColor
             selectedCell = cell
         }
         else if selectedCell == nil && cell.dayLabel.text != "" {
-            cell.backgroundColor = UIColor.lightGrayColor()
+            cell.backgroundColor = selectedColor
             selectedCell = cell
         }
     }

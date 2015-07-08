@@ -10,15 +10,21 @@ import UIKit
 
 class MonthItemNavigationController: UINavigationController {
     private var dateComponents: NSDateComponents?
+    private var monthItemViewController: MonthItemViewController?
     
+    required init(coder: NSCoder) {
+        super.init(coder: coder)
+        monthItemViewController = self.viewControllers.first as? MonthItemViewController
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
     }
     
-    func loadData(components: NSDateComponents) {
+    func loadData(calendar: NSCalendar, today: NSDate, components: NSDateComponents) {
         dateComponents = components
+        monthItemViewController!.loadData(calendar, today: today, dateComponents: components)
     }
     
     override func didReceiveMemoryWarning() {

@@ -15,23 +15,16 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     // Used to order months
     var dateIndex: NSDate?
     
+    private let backgroundColor = UIColor(red: 125, green: 255, blue: 125, alpha: 0)
+    private let selectedColor = UIColor.whiteColor()
+    
     private let reuseIdentifier = "DayCell"
     
     private var daysInMonth = [Int]()
     
     private var calendar: NSCalendar?
     
-    private var selectedCell: UICollectionViewCell? {
-        didSet {
-            if let selected = selectedCell as? CalendarCollectionViewCell {
-                let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
-                println(selectedCell!.description)
-                selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
-                let selectedDate = calendar!.dateFromComponents(selectedComponents)
-                ShowEvents(selectedDate!)
-            }
-        }
-    }
+    private var selectedCell: UICollectionViewCell?
     
     // 7 days in a week
     private let numDaysInWeek = 7
@@ -76,7 +69,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     
     func clearSelected() {
         if selectedCell != nil {
-            selectedCell!.backgroundColor = UIColor.whiteColor()
+            selectedCell!.backgroundColor = backgroundColor
         }
         
         selectedCell = nil
@@ -121,13 +114,24 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
         println("Selected at \(indexPath.row)")
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         if cell.dayLabel.text != nil && !(cell == selectedCell) && selectedCell != nil {
-            selectedCell!.backgroundColor = UIColor.whiteColor()
-            cell.backgroundColor = UIColor.lightGrayColor()
+            selectedCell!.backgroundColor = backgroundColor
+            cell.backgroundColor = selectedColor
             selectedCell = cell
+            
+            let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
+            selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
+            let selectedDate = calendar!.dateFromComponents(selectedComponents)
+            ShowEvents(selectedDate!)
         }
         else if selectedCell == nil && cell.dayLabel.text != nil {
-            cell.backgroundColor = UIColor.lightGrayColor()
+            cell.backgroundColor = selectedColor
             selectedCell = cell
+            
+            let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
+            println(selectedCell!.description)
+            selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
+            let selectedDate = calendar!.dateFromComponents(selectedComponents)
+            ShowEvents(selectedDate!)
         }
     }
     
@@ -147,11 +151,11 @@ extension MonthItemViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
         println("Collection view width: \(collectionView.frame.size.width)")
-        println("Collection view height: \(collectionView.frame.size.height - navigationBarHeight!)")
+        println("Collection view height: \(collectionView.frame.size.height)")
         println("Total view width: \(view.frame.size.width)")
         println("Total height:  \(view.frame.size.height)")
         
-        return CGSize(width: collectionView.frame.size.width / 7, height: (collectionView.frame.size.height - navigationBarHeight!) / 6)
+        return CGSize(width: collectionView.frame.size.width / 7, height: (collectionView.frame.size.height) / 6)
     }
     
     // Determines spacing between cells (none)

@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="VZ1-Iz-3z0">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -31,7 +30,7 @@
             </objects>
             <point key="canvasLocation" x="243" y="-409"/>
         </scene>
-        <!--Month Item View Controller-->
+        <!--Month-->
         <scene sceneID="DiK-Na-GGh">
             <objects>
                 <viewController storyboardIdentifier="MonthItemViewController" id="s3a-8X-qOr" customClass="MonthItemViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
@@ -44,10 +43,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="BeG-sY-bqe">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
-                                <color key="backgroundColor" red="0.48548004490000002" green="1" blue="0.49205435879999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <rect key="frame" x="0.0" y="64" width="600" height="300"/>
+                                <color key="backgroundColor" red="0.49019607843137253" green="1" blue="0.49019607843137253" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="300" id="czx-kK-B6f"/>
+                                    <constraint firstAttribute="height" constant="300" id="afn-ae-93q"/>
                                 </constraints>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="azq-Uf-nrf">
                                     <size key="itemSize" width="80" height="74"/>
@@ -57,7 +56,7 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="DayCell" id="eYf-hv-Hc4" customClass="CalendarCollectionViewCell" customModule="LazyCalendar" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="80" height="74"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="80" height="74"/>
@@ -86,17 +85,18 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="BeG-sY-bqe" secondAttribute="trailing" id="TnS-6o-Hbr"/>
+                            <constraint firstItem="BeG-sY-bqe" firstAttribute="top" secondItem="sRs-V0-IPn" secondAttribute="bottom" id="nYk-W7-BeM"/>
                             <constraint firstItem="BeG-sY-bqe" firstAttribute="leading" secondItem="CM5-Bu-5Hb" secondAttribute="leading" id="uVT-VO-g0J"/>
-                            <constraint firstItem="BeG-sY-bqe" firstAttribute="top" secondItem="CM5-Bu-5Hb" secondAttribute="topMargin" id="vyP-pi-peB"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="Month" id="qr9-bq-Ai5"/>
                     <connections>
                         <outlet property="monthItemCollectionView" destination="BeG-sY-bqe" id="a35-vO-r5o"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eqT-qC-29j" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="615" y="1303"/>
+            <point key="canvasLocation" x="988" y="660"/>
         </scene>
         <!--MonthItemController-->
         <scene sceneID="ifj-bc-d0x">
@@ -122,7 +122,7 @@
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PEr-Nj-DGJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="990" y="660"/>
+            <point key="canvasLocation" x="1226" y="1308"/>
         </scene>
         <!--MonthItemNavigationController-->
         <scene sceneID="3xo-ef-0IO">
@@ -134,6 +134,9 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="s3a-8X-qOr" kind="relationship" relationship="rootViewController" id="9cs-3Q-5ol"/>
+                    </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aiS-Rz-goW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

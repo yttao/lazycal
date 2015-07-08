@@ -117,14 +117,6 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         return getMonthController(newComponents)
     }
     
-    /*func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [AnyObject]) {
-        let currentViewController = pageViewController.viewControllers[0] as! CalendarCollectionViewController
-        let nextViewController = pendingViewControllers[0] as! CalendarCollectionViewController
-        
-        println("CURRENT: \(currentViewController.dateIndex)")
-        println("NEXT: \(nextViewController.dateIndex)")
-    }*/
-    
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
         println(pageViewController.viewControllers[0].childViewControllers)
         let newViewController = pageViewController.viewControllers[0].childViewControllers[0] as! MonthItemViewController
@@ -145,11 +137,9 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     // Creates month view controller
     private func getMonthController(components: NSDateComponents) -> MonthItemNavigationController? {
         // Instantiate copy of prefab view controller
-        let monthItemViewController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemViewController") as! MonthItemViewController
+        let monthItemNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemNavigationController") as! MonthItemNavigationController
         
-        let monthItemNavigationController = MonthItemNavigationController(rootViewController: monthItemViewController)
-        monthItemViewController.loadData(calendar!, today: today!, dateComponents: components)
-        monthItemNavigationController.loadData(dateComponents!)
+        monthItemNavigationController.loadData(calendar!, today: today!, components: components)
 
         return monthItemNavigationController
     }
