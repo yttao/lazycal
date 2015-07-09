@@ -9,15 +9,8 @@
 import UIKit
 
 class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
-    var pageViewController: UIPageViewController?
-    
-    // 7 days in a week
-    private let numDaysInWeek = 7
-    // 5 weeks (overlapping with weeks in adjacent months) in a month
-    private let numWeeksInMonth = 5
-    // Max number of cells
-    private let numCellsInMonth = 35
-    
+    private var pageViewController: UIPageViewController?
+
     private var calendar: NSCalendar?
     private var today: NSDate?
     // Keeps track of current date view
@@ -25,10 +18,6 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     // NSCalendarUnits to keep track of
     private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
         NSCalendarUnit.CalendarUnitYear
-    private var currentIndex = 0
-    private var nextIndex = 0
-    
-    var selectedDate: NSDate?
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -52,15 +41,6 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         dateComponents!.month--
         dateComponents!.day = 1
         dateComponents = getNewDateComponents(dateComponents!)
-    }
-    
-    // Gets the first weekday of the month
-    func getMonthStartWeekday(components: NSDateComponents) -> Int {
-        var componentsCopy = components.copy() as! NSDateComponents
-        componentsCopy.day = 1
-        var startMonthDate = calendar!.dateFromComponents(componentsCopy)
-        var startMonthDateComponents = calendar!.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
-        return startMonthDateComponents.weekday
     }
     
     // Recalculates components after fields have been changed in components
@@ -95,42 +75,35 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     // Function to handle direction change - call goToNextMonth/goToPrevMonth twice instead of once
 
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        /*println("BEFORE")*/
         let components = dateComponents!.copy() as! NSDateComponents
         components.month--
         let newComponents = getNewDateComponents(components)
-        let monthStartWeekday = getMonthStartWeekday(newComponents)
-        /*println("Month: \(newComponents.month), Weekday: \(monthStartWeekday)")*/
 
-        
         return getMonthController(newComponents)
     }
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        /*println("AFTER")*/
         let components = dateComponents!.copy() as! NSDateComponents
         components.month++
         let newComponents = getNewDateComponents(components)
-        let monthStartWeekday = getMonthStartWeekday(dateComponents!)
-        /*println("Month: \(newComponents.month), Weekday: \(monthStartWeekday)")*/
         
         return getMonthController(newComponents)
     }
     
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
-        //println(pageViewController.viewControllers[0].childViewControllers)
-        let newViewController = pageViewController.viewControllers[0].childViewControllers[0] as! MonthItemViewController
-        let oldViewController = previousViewControllers[0].childViewControllers[0] as! MonthItemViewController
+        let newMonth = pageViewController.viewControllers[0].childViewControllers[0] as! MonthItemViewController
+        let oldMonth = previousViewControllers[0].childViewControllers[0] as! MonthItemViewController
         
-        if (oldViewController.dateIndex!.compare(newViewController.dateIndex!) ==
+        // Change current month
+        if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) ==
             NSComparisonResult.OrderedAscending) {
                 goToNextMonth()
-                oldViewController.clearSelected()
+                oldMonth.clearSelected()
         }
-        else if (oldViewController.dateIndex!.compare(newViewController.dateIndex!) ==
+        else if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) ==
             NSComparisonResult.OrderedDescending) {
                 goToPrevMonth()
-                oldViewController.clearSelected()
+                oldMonth.clearSelected()
         }
     }
     
@@ -138,7 +111,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     private func getMonthController(components: NSDateComponents) -> MonthItemNavigationController? {
         // Instantiate copy of prefab view controller
         let monthItemNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemNavigationController") as! MonthItemNavigationController
-        
+        // Load data
         monthItemNavigationController.loadData(calendar!, today: today!, components: components)
 
         return monthItemNavigationController

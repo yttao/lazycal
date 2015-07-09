@@ -10,74 +10,67 @@ import UIKit
 
 class MonthItemViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     @IBOutlet weak var monthItemCollectionView: UICollectionView!
-    @IBOutlet weak var monthItemTableView: UITableView?
     
-    // Used to order months
+    // Used to identify month
     var dateIndex: NSDate?
     
+    // 7 days in a week
+    private static let numDaysInWeek = 7
+    // Max number of weeks that can be displayed
+    private static let numWeeksInMonth = 6
+    // Max number of cells (7 days * 6 rows)
+    private static let numCellsInMonth = 42
+    
+    // Colors used
     private let backgroundColor = UIColor(red: 125, green: 255, blue: 125, alpha: 0)
     private let selectedColor = UIColor.whiteColor()
     
     private let reuseIdentifier = "DayCell"
     
-    private var daysInMonth = [Int]()
-    
-    private var calendar: NSCalendar?
-    
-    private var selectedCell: UICollectionViewCell?
-    
-    // 7 days in a week
-    private let numDaysInWeek = 7
-    // 5 weeks (overlapping with weeks in adjacent months) in a month
-    private let numWeeksInMonth = 5
-    // Max number of cells
-    private let numCellsInMonth = 42
-    
-    private var monthStartWeekday = 0
-    private var currentDay = 1
-    // Keeps track of current date view
-    private var dateComponents: NSDateComponents?
-    
     // NSCalendarUnits to keep track of
     private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
         NSCalendarUnit.CalendarUnitYear
     
+    private var daysInMonth = [Int?](count: MonthItemViewController.numCellsInMonth, repeatedValue: nil)
+    private var calendar: NSCalendar?
+    private var selectedCell: UICollectionViewCell?
+    
+    private var monthStartWeekday = 0
+    // Keeps track of current date view
+    private var dateComponents: NSDateComponents?
+    
     required init(coder: NSCoder) {
         super.init(coder: coder)
-        self.automaticallyAdjustsScrollViewInsets = false
-        println("View initialized")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         monthItemCollectionView.delegate = self
         monthItemCollectionView.dataSource = self
-        //self.automaticallyAdjustsScrollViewInsets = false
+        
+        let heightConstraint = NSLayoutConstraint(item: monthItemCollectionView, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
+        monthItemCollectionView.addConstraint(heightConstraint)
     }
-    
-    /*override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        let top = self.topLayoutGuide.length
-        let bottom = self.bottomLayoutGuide.length
-        let newInsets = UIEdgeInsetsMake(top, 0, bottom, 0)
-        monthItemCollectionView.contentInset = newInsets
-    }*/
+
     
     func loadData(calendar: NSCalendar, today: NSDate, dateComponents: NSDateComponents) {
         self.calendar = calendar
         self.dateComponents = dateComponents
+        
         monthStartWeekday = getMonthStartWeekday(self.dateComponents!)
+        
         dateIndex = calendar.dateFromComponents(self.dateComponents!)
         
-        let numDays = self.calendar!.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate:
-            self.calendar!.dateFromComponents(self.dateComponents!)!).length
-        for (var i = 1; i <= numDays; i++) {
-            daysInMonth.append(i)
+        let numDays = self.calendar!.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: self.calendar!.dateFromComponents(self.dateComponents!)!).length
+        
+        for (var i = monthStartWeekday - 1; i < numDays + (monthStartWeekday - 1); i++) {
+            daysInMonth[i] = i - (monthStartWeekday - 2)
         }
         
         self.navigationItem.title = String(dateComponents.month)
     }
     
+    // Clears current selection
     func clearSelected() {
         if selectedCell != nil {
             selectedCell!.backgroundColor = backgroundColor
@@ -88,31 +81,26 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     
     // Gets the first weekday of the month
     func getMonthStartWeekday(components: NSDateComponents) -> Int {
-        var componentsCopy = components.copy() as! NSDateComponents
+        let componentsCopy = components.copy() as! NSDateComponents
         componentsCopy.day = 1
-        var startMonthDate = calendar!.dateFromComponents(componentsCopy)
-        var startMonthDateComponents = calendar!.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
+        let startMonthDate = calendar!.dateFromComponents(componentsCopy)
+        let startMonthDateComponents = calendar!.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
         return startMonthDateComponents.weekday
     }
     
+    // Determines number of items in month
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return numCellsInMonth
+        return MonthItemViewController.numCellsInMonth
     }
     
     // Makes cell with day number shown
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CalendarCollectionViewCell
         
-        // Check if cell is within the bounds of correct dates for that month.
-        let afterMonthStartDay = indexPath.row >= (monthStartWeekday - 1)
-        let beforeMonthEndDay = indexPath.row < (daysInMonth.count + (monthStartWeekday - 1))
-        
-        if (afterMonthStartDay && beforeMonthEndDay) {
-            // Set text
-            let day = daysInMonth[currentDay - 1]
+        // Set day number for cell
+        if let day = daysInMonth[indexPath.row] {
             
-            cell.dayLabel.text = "\(day)"
-            currentDay++
+            cell.dayLabel.text = String(day)
         }
         else {
             cell.dayLabel.text = nil
@@ -122,7 +110,6 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     }
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        println("Selected at \(indexPath.row)")
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         if cell.dayLabel.text != nil && !(cell == selectedCell) && selectedCell != nil {
             selectedCell!.backgroundColor = backgroundColor
@@ -139,7 +126,6 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
             selectedCell = cell
             
             let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
-            //println(selectedCell!.description)
             selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
             let selectedDate = calendar!.dateFromComponents(selectedComponents)
             ShowEvents(selectedDate!)
@@ -147,12 +133,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     }
     
     func ShowEvents(date: NSDate) {
-        //println(date)
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        println(date)
     }
 }
 
@@ -160,13 +141,13 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
 extension MonthItemViewController: UICollectionViewDelegateFlowLayout {
     // Determines size of one cell
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
-        /*println("Collection view width: \(collectionView.frame.size.width)")
-        println("Collection view height: \(collectionView.frame.size.height)")
-        println("Total view width: \(view.frame.size.width)")
-        println("Total height:  \(view.frame.size.height)")*/
+        //println(collectionView.frame.size.height)
+        //println(view.frame.size.height)
         
-        return CGSize(width: collectionView.frame.size.width / 7, height: (collectionView.frame.size.height) / 6)
+        return CGSize(width: collectionView.frame.size.width /
+            CGFloat(MonthItemViewController.numDaysInWeek),
+            height: (collectionView.frame.size.height) /
+                CGFloat(MonthItemViewController.numWeeksInMonth))
     }
     
     // Determines spacing between cells (none)
