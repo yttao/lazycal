@@ -4,10 +4,10 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--MainViewController-->
         <scene sceneID="C3a-aH-E0f">
             <objects>
-                <viewController storyboardIdentifier="ViewController" id="VZ1-Iz-3z0" customClass="ViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ViewController" title="MainViewController" id="VZ1-Iz-3z0" customClass="ViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="6TI-6O-A0z"/>
                         <viewControllerLayoutGuide type="bottom" id="cC5-Iq-bTC"/>
@@ -20,7 +20,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2mM-aW-n5v" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-423" y="-404"/>
+            <point key="canvasLocation" x="-463" y="-1000"/>
         </scene>
         <!--MonthPageViewController-->
         <scene sceneID="gG5-VG-ot4">
@@ -28,20 +28,24 @@
                 <pageViewController storyboardIdentifier="MonthPageViewController" autoresizesArchivedViewToFullSize="NO" title="MonthPageViewController" transitionStyle="scroll" navigationOrientation="horizontal" spineLocation="none" id="EkH-VZ-V3c" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="69i-VH-ED5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="243" y="-409"/>
+            <point key="canvasLocation" x="221" y="-1000"/>
         </scene>
-        <!--Month-->
+        <!--MonthItemViewController-->
         <scene sceneID="DiK-Na-GGh">
             <objects>
-                <viewController storyboardIdentifier="MonthItemViewController" id="s3a-8X-qOr" customClass="MonthItemViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MonthItemViewController" title="MonthItemViewController" id="s3a-8X-qOr" customClass="MonthItemViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="sRs-V0-IPn"/>
                         <viewControllerLayoutGuide type="bottom" id="mEZ-xe-epo"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="CM5-Bu-5Hb">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="536"/>
+                        <rect key="frame" x="0.0" y="64" width="600" height="536"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="MLe-gc-Jb5">
+                                <rect key="frame" x="0.0" y="300" width="600" height="236"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </tableView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="BeG-sY-bqe">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
                                 <color key="backgroundColor" red="0.49019607843137253" green="1" blue="0.49019607843137253" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -78,31 +82,34 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" ambiguous="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="MLe-gc-Jb5">
-                                <rect key="frame" x="0.0" y="536" width="600" height="0.0"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="MLe-gc-Jb5" secondAttribute="trailing" id="JrG-7S-ncg"/>
                             <constraint firstItem="MLe-gc-Jb5" firstAttribute="leading" secondItem="CM5-Bu-5Hb" secondAttribute="leading" id="LMe-TN-f8g"/>
+                            <constraint firstItem="MLe-gc-Jb5" firstAttribute="top" secondItem="BeG-sY-bqe" secondAttribute="bottom" id="REh-Ee-8Er"/>
                             <constraint firstAttribute="trailing" secondItem="BeG-sY-bqe" secondAttribute="trailing" id="TnS-6o-Hbr"/>
-                            <constraint firstItem="MLe-gc-Jb5" firstAttribute="top" secondItem="BeG-sY-bqe" secondAttribute="bottom" id="V8m-Vl-e8k"/>
                             <constraint firstItem="BeG-sY-bqe" firstAttribute="top" secondItem="sRs-V0-IPn" secondAttribute="bottom" id="nYk-W7-BeM"/>
                             <constraint firstItem="BeG-sY-bqe" firstAttribute="leading" secondItem="CM5-Bu-5Hb" secondAttribute="leading" id="uVT-VO-g0J"/>
                             <constraint firstAttribute="bottom" secondItem="MLe-gc-Jb5" secondAttribute="bottom" id="vOX-E9-FzA"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
-                    <navigationItem key="navigationItem" title="Month" id="qr9-bq-Ai5" userLabel="MonthItemNavigationItem"/>
+                    <navigationItem key="navigationItem" title="Month" id="qr9-bq-Ai5" userLabel="MonthItemNavigationBar">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="KCg-mh-iyA">
+                            <connections>
+                                <action selector="addEvent:" destination="s3a-8X-qOr" id="DCd-8r-jrO"/>
+                                <segue destination="Kpu-RP-WZZ" kind="presentation" id="edf-XK-E42"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="monthItemCollectionView" destination="BeG-sY-bqe" id="a35-vO-r5o"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eqT-qC-29j" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="988" y="660"/>
+            <point key="canvasLocation" x="221" y="-326"/>
         </scene>
         <!--MonthItemNavigationController-->
         <scene sceneID="3xo-ef-0IO">
@@ -121,7 +128,85 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aiS-Rz-goW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="321" y="660"/>
+            <point key="canvasLocation" x="-463" y="-320"/>
+        </scene>
+        <!--ChangeEventViewController-->
+        <scene sceneID="0S0-v0-qKi">
+            <objects>
+                <tableViewController storyboardIdentifier="ChangeEventViewController" title="ChangeEventViewController" id="aIB-mu-9DI" customClass="ChangeEventViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="f63-bW-5MK">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <datePicker key="tableFooterView" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" datePickerMode="dateAndTime" minuteInterval="1" id="4rL-QE-M9a">
+                            <rect key="frame" x="0.0" y="210" width="600" height="164"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <date key="date" timeIntervalSinceReferenceDate="458146715.07423902">
+                                <!--2015-07-09 14:58:35 +0000-->
+                            </date>
+                        </datePicker>
+                        <sections>
+                            <tableViewSection headerTitle="Event" id="Jxk-rW-Cv4">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="AwU-zA-sIe">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AwU-zA-sIe" id="sl7-LQ-EV9">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hmy-da-q8Z">
+                                                    <rect key="frame" x="8" y="7" width="584" height="30"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <textInputTraits key="textInputTraits"/>
+                                                </textField>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Date" id="MAz-wX-5TJ">
+                                <cells/>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="aIB-mu-9DI" id="eFb-n3-aDf"/>
+                            <outlet property="delegate" destination="aIB-mu-9DI" id="fg0-bV-uhg"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Add Event" id="wLI-Ar-jJU">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="Zzn-7a-6Qk">
+                            <connections>
+                                <segue destination="xNc-MM-so5" kind="unwind" unwindAction="cancelEvent:" id="jgU-bI-mij"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="save" id="myN-zM-rAG">
+                            <connections>
+                                <segue destination="xNc-MM-so5" kind="unwind" unwindAction="saveEvent:" id="aGE-TZ-y1l"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jh7-wV-qEo" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="xNc-MM-so5" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="221" y="369"/>
+        </scene>
+        <!--ChangeEventNavigationController-->
+        <scene sceneID="3oe-iH-Ngm">
+            <objects>
+                <navigationController storyboardIdentifier="ChangeEventNavigationController" title="ChangeEventNavigationController" automaticallyAdjustsScrollViewInsets="NO" id="Kpu-RP-WZZ" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="muQ-W1-9zc">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="aIB-mu-9DI" kind="relationship" relationship="rootViewController" id="iKe-F4-6EX"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="T5Z-z1-Ho5" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-463" y="369"/>
         </scene>
     </scenes>
 </document>

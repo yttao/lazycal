@@ -10,7 +10,7 @@ import UIKit
 
 class MonthItemViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     @IBOutlet weak var monthItemCollectionView: UICollectionView!
-    
+
     // Used to identify month
     var dateIndex: NSDate?
     
@@ -38,6 +38,19 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     private var monthStartWeekday = 0
     // Keeps track of current date view
     private var dateComponents: NSDateComponents?
+    
+    @IBAction func addEvent(sender: AnyObject) {
+        
+    }
+    
+    @IBAction func cancelEvent(segue: UIStoryboardSegue) {
+        
+    }
+    
+    @IBAction func saveEvent(segue: UIStoryboardSegue) {
+    
+    }
+
     
     required init(coder: NSCoder) {
         super.init(coder: coder)
