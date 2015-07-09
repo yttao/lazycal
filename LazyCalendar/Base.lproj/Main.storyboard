@@ -138,13 +138,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                        <datePicker key="tableFooterView" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" datePickerMode="dateAndTime" minuteInterval="1" id="4rL-QE-M9a">
-                            <rect key="frame" x="0.0" y="210" width="600" height="164"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <date key="date" timeIntervalSinceReferenceDate="458146715.07423902">
-                                <!--2015-07-09 14:58:35 +0000-->
-                            </date>
-                        </datePicker>
                         <sections>
                             <tableViewSection headerTitle="Event" id="Jxk-rW-Cv4">
                                 <cells>
@@ -163,8 +156,25 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Date" id="MAz-wX-5TJ">
-                                <cells/>
+                            <tableViewSection headerTitle="From" id="MAz-wX-5TJ">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="PM5-Lt-ovr">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="PM5-Lt-ovr" id="7sB-19-9WO">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="To" id="alo-7e-9Yq">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="WF6-ZY-Wwk">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="WF6-ZY-Wwk" id="zcV-bG-R8e">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
                             </tableViewSection>
                         </sections>
                         <connections>
@@ -185,7 +195,6 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="eventDatePicker" destination="4rL-QE-M9a" id="nqk-Ae-c1K"/>
                         <outlet property="eventNameTextField" destination="hmy-da-q8Z" id="As1-As-gd0"/>
                     </connections>
                 </tableViewController>

@@ -8,18 +8,27 @@
 
 import UIKit
 
-class ChangeEventViewController: UITableViewController {
+class ChangeEventViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
 
     private var date: NSDate?
     
     @IBOutlet weak var eventNameTextField: UITextField!
     
-    @IBOutlet weak var eventDatePicker: UIDatePicker!
+    private let eventDateStartPicker = UIDatePicker()
+    private let eventDateEndPicker = UIDatePicker()
+    
+    private var selectedIndexPath: NSIndexPath?
+    
+    required init(coder: NSCoder) {
+        super.init(coder: coder)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        eventDatePicker.date = self.date!
+        eventDateStartPicker.date = date!
+        
+        eventNameTextField.userInteractionEnabled = false
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -33,14 +42,82 @@ class ChangeEventViewController: UITableViewController {
         self.date = date
     }
 
-    // MARK: - Table view data source
-
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Potentially incomplete method implementation.
-        // Return the number of sections.
-        return 2
+        return 3
     }
 
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        selectedIndexPath = indexPath
+        switch indexPath.section {
+        case 0:
+            eventNameTextField.userInteractionEnabled = true
+            eventNameTextField.becomeFirstResponder()
+        case 1:
+            // Add date picker
+            let cell = tableView.cellForRowAtIndexPath(indexPath)!
+            cell.contentView.addSubview(eventDateStartPicker)
+            cell.contentView.didAddSubview(eventDateStartPicker)
+            
+            // Recalculate height to display date picker
+            tableView.reloadSections(NSIndexSet(index: indexPath.section),withRowAnimation: .None)
+            tableView.reloadData()
+        case 2:
+            // Add date picker
+            let cell = tableView.cellForRowAtIndexPath(indexPath)!
+            cell.contentView.addSubview(eventDateEndPicker)
+            cell.contentView.didAddSubview(eventDateEndPicker)
+            
+            // Recalculate height to display date picker
+            tableView.reloadSections(NSIndexSet(index: indexPath.section), withRowAnimation: .None)
+            tableView.reloadData()
+        default:
+            break
+        }
+    }
+    
+    override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
+        switch indexPath.section {
+        case 1:
+            println("Deselected \(indexPath.section)")
+            // Recalculate height to hide date picker
+            let cell = tableView.cellForRowAtIndexPath(indexPath)!
+            let subviews = cell.contentView.subviews
+            for subview in subviews {
+                if subview as? UIDatePicker != nil && subview as! UIDatePicker == eventDateStartPicker {
+                    subview.removeFromSuperview()
+                }
+            }
+        default:
+            break
+        }
+    }
+    
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        switch indexPath.section {
+        case 1:
+            if (selectedIndexPath == indexPath) {
+                let datePickerHeight = eventDateStartPicker.frame.size.height
+                return CGFloat(datePickerHeight)
+            }
+            else {
+                let cell = UITableViewCell()
+                return cell.frame.height
+            }
+        case 2:
+            if (selectedIndexPath == indexPath) {
+                let datePickerHeight = eventDateEndPicker.frame.size.height
+                return CGFloat(datePickerHeight)
+            }
+            else {
+                let cell = UITableViewCell()
+                return cell.frame.height
+            }
+        default:
+            let cell = UITableViewCell()
+            return cell.frame.height
+        }
+    }
+    
     /*override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete method implementation.
         // Return the number of rows in the section.
