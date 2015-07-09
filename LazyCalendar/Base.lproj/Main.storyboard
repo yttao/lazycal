@@ -99,7 +99,7 @@
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="KCg-mh-iyA">
                             <connections>
                                 <action selector="addEvent:" destination="s3a-8X-qOr" id="DCd-8r-jrO"/>
-                                <segue destination="Kpu-RP-WZZ" kind="presentation" id="edf-XK-E42"/>
+                                <segue destination="Kpu-RP-WZZ" kind="presentation" identifier="AddEventSegue" id="edf-XK-E42"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -184,6 +184,10 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="eventDatePicker" destination="4rL-QE-M9a" id="nqk-Ae-c1K"/>
+                        <outlet property="eventNameTextField" destination="hmy-da-q8Z" id="As1-As-gd0"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jh7-wV-qEo" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="xNc-MM-so5" userLabel="Exit" sceneMemberID="exit"/>

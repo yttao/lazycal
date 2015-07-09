@@ -47,7 +47,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     
     // Recalculates components after fields have been changed in components
     func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
-        var newDate = calendar!.dateFromComponents(components)
+        let newDate = calendar!.dateFromComponents(components)
         return calendar!.components(units, fromDate: newDate!)
     }
     
@@ -66,7 +66,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         pageViewController = pageController
         self.addChildViewController(pageViewController!)
         self.view.addSubview(pageViewController!.view)
-        /*pageViewController!.didMoveToParentViewController(self)*/
+        pageViewController!.didMoveToParentViewController(self)
     }
 
     // Previous view controller is for previous month
@@ -112,7 +112,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         // Instantiate copy of prefab view controller
         let monthItemNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemNavigationController") as! MonthItemNavigationController
         // Load data
-        monthItemNavigationController.loadData(calendar!, components: components)
+        monthItemNavigationController.loadData(components)
 
         return monthItemNavigationController
     }

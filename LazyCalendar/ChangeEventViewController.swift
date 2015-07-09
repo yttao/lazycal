@@ -10,19 +10,27 @@ import UIKit
 
 class ChangeEventViewController: UITableViewController {
 
+    private var date: NSDate?
+    
+    @IBOutlet weak var eventNameTextField: UITextField!
+    
+    @IBOutlet weak var eventDatePicker: UIDatePicker!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        eventDatePicker.date = self.date!
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func setInitialDate(date: NSDate) {
+        println("Set date to: \(date)")
+        self.date = date
     }
 
     // MARK: - Table view data source

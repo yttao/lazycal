@@ -19,8 +19,8 @@ class MonthItemNavigationController: UINavigationController {
     }
     
     // Loads data into month item view controller
-    func loadData(calendar: NSCalendar, components: NSDateComponents) {
+    func loadData(components: NSDateComponents) {
         dateComponents = components
-        monthItemViewController!.loadData(calendar, dateComponents: components)
+        monthItemViewController!.loadData(components)
     }
 }

@@ -13,6 +13,8 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
 
     // Used to identify month
     var dateIndex: NSDate?
+
+    private let addEventSegueIdentifier = "AddEventSegue"
     
     // 7 days in a week
     private static let numDaysInWeek = 7
@@ -32,23 +34,36 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
         NSCalendarUnit.CalendarUnitYear
     
     private var daysInMonth = [Int?](count: MonthItemViewController.numCellsInMonth, repeatedValue: nil)
-    private var calendar: NSCalendar?
-    private var selectedCell: UICollectionViewCell?
+    private let calendar = NSCalendar.currentCalendar()
+    private var selectedCell: CalendarCollectionViewCell?
     
     private var monthStartWeekday = 0
     // Keeps track of current date view
     private var dateComponents: NSDateComponents?
     
+    // When adding event, load currently selected date into event adder
     @IBAction func addEvent(sender: AnyObject) {
         
     }
     
-    @IBAction func cancelEvent(segue: UIStoryboardSegue) {
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        super.prepareForSegue(segue, sender: sender)
         
+        if segue.identifier != nil && segue.identifier == addEventSegueIdentifier {
+            let navigationController = segue.destinationViewController as! UINavigationController
+            let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
+            let initialDate = calendar.dateFromComponents(dateComponents!)
+            println("Initial date: \(initialDate)")
+            addEventViewController.setInitialDate(initialDate!)
+        }
+    }
+    
+    @IBAction func cancelEvent(segue: UIStoryboardSegue) {
+        println("Cancelled event")
     }
     
     @IBAction func saveEvent(segue: UIStoryboardSegue) {
-    
+        println("Saved event")
     }
 
     
@@ -66,15 +81,14 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     }
 
     
-    func loadData(calendar: NSCalendar, dateComponents: NSDateComponents) {
-        self.calendar = calendar
+    func loadData(dateComponents: NSDateComponents) {
         self.dateComponents = dateComponents
         
         monthStartWeekday = getMonthStartWeekday(self.dateComponents!)
         
         dateIndex = calendar.dateFromComponents(self.dateComponents!)
         
-        let numDays = self.calendar!.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: self.calendar!.dateFromComponents(self.dateComponents!)!).length
+        let numDays = self.calendar.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: self.calendar.dateFromComponents(self.dateComponents!)!).length
         
         for (var i = monthStartWeekday - 1; i < numDays + (monthStartWeekday - 1); i++) {
             daysInMonth[i] = i - (monthStartWeekday - 2)
@@ -101,8 +115,8 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     func getMonthStartWeekday(components: NSDateComponents) -> Int {
         let componentsCopy = components.copy() as! NSDateComponents
         componentsCopy.day = 1
-        let startMonthDate = calendar!.dateFromComponents(componentsCopy)
-        let startMonthDateComponents = calendar!.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
+        let startMonthDate = calendar.dateFromComponents(componentsCopy)
+        let startMonthDateComponents = calendar.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
         return startMonthDateComponents.weekday
     }
     
@@ -132,22 +146,36 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
         if cell.dayLabel.text != nil && !(cell == selectedCell) && selectedCell != nil {
             selectedCell!.backgroundColor = backgroundColor
             cell.backgroundColor = selectedColor
-            selectedCell = cell
+            selectedCell = cell as CalendarCollectionViewCell
             
-            let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
-            selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
-            let selectedDate = calendar!.dateFromComponents(selectedComponents)
+            dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
+            dateComponents = getNewDateComponents(dateComponents!)
+            
+            /*let selectedComponents = calendar.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
+            selectedComponents.day = selectedCell!.dayLabel.text!.toInt()!
+            let selectedDate = calendar.dateFromComponents(selectedComponents)*/
+            let selectedDate = calendar.dateFromComponents(dateComponents!)
             ShowEvents(selectedDate!)
         }
+            
         else if selectedCell == nil && cell.dayLabel.text != nil {
             cell.backgroundColor = selectedColor
-            selectedCell = cell
+            selectedCell = cell as CalendarCollectionViewCell
             
-            let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
-            selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
-            let selectedDate = calendar!.dateFromComponents(selectedComponents)
+            dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
+            dateComponents = getNewDateComponents(dateComponents!)
+            
+            /*let selectedComponents = calendar.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
+            selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!*/
+            let selectedDate = calendar.dateFromComponents(dateComponents!)
             ShowEvents(selectedDate!)
         }
+    }
+    
+    // Recalculates components after fields have been changed in components
+    func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
+        let newDate = calendar.dateFromComponents(components)
+        return calendar.components(units, fromDate: newDate!)
     }
     
     // Shows events for a date
