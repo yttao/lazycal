@@ -27,11 +27,13 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     private let backgroundColor = UIColor(red: 125, green: 255, blue: 125, alpha: 0)
     private let selectedColor = UIColor.whiteColor()
     
+    // Calendar cell reuse identifier
     private let reuseIdentifier = "DayCell"
     
     // NSCalendarUnits to keep track of
-    private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
-        NSCalendarUnit.CalendarUnitYear
+    private let units = NSCalendarUnit.CalendarUnitYear | NSCalendarUnit.CalendarUnitMonth |
+        NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitHour |
+        NSCalendarUnit.CalendarUnitMinute
     
     private var daysInMonth = [Int?](count: MonthItemViewController.numCellsInMonth, repeatedValue: nil)
     private let calendar = NSCalendar.currentCalendar()
@@ -41,19 +43,23 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     // Keeps track of current date view
     private var dateComponents: NSDateComponents?
     
-    // When adding event, load currently selected date into event adder
-    @IBAction func addEvent(sender: AnyObject) {
-        
-    }
-    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         super.prepareForSegue(segue, sender: sender)
         
         if segue.identifier != nil && segue.identifier == addEventSegueIdentifier {
             let navigationController = segue.destinationViewController as! UINavigationController
             let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
+            
+            // Get current hour and minute
+            let now = NSDate()
+            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
+                NSCalendarUnit.CalendarUnitMinute, fromDate: now)
+            dateComponents!.hour = currentTime.hour
+            dateComponents!.minute = currentTime.minute
+            dateComponents = getNewDateComponents(dateComponents!)
+            // Set initial date choice on date picker as selected date, at current hour and minute
             let initialDate = calendar.dateFromComponents(dateComponents!)
-            println("Initial date: \(initialDate)")
+            println("Initial date: \(initialDate!)")
             addEventViewController.setInitialDate(initialDate!)
         }
     }
@@ -150,10 +156,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
             
             dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
             dateComponents = getNewDateComponents(dateComponents!)
-            
-            /*let selectedComponents = calendar.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
-            selectedComponents.day = selectedCell!.dayLabel.text!.toInt()!
-            let selectedDate = calendar.dateFromComponents(selectedComponents)*/
+
             let selectedDate = calendar.dateFromComponents(dateComponents!)
             ShowEvents(selectedDate!)
         }
@@ -162,11 +165,10 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
             cell.backgroundColor = selectedColor
             selectedCell = cell as CalendarCollectionViewCell
             
+            // Change selected date
             dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
             dateComponents = getNewDateComponents(dateComponents!)
             
-            /*let selectedComponents = calendar.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
-            selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!*/
             let selectedDate = calendar.dateFromComponents(dateComponents!)
             ShowEvents(selectedDate!)
         }
@@ -180,7 +182,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     
     // Shows events for a date
     func ShowEvents(date: NSDate) {
-        println(date)
+        //println(date)
     }
 }
 
