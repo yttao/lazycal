@@ -26,17 +26,20 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         dateComponents = calendar!.components(units, fromDate: today!)
     }
     
+    // On load, create page view controller with initial view
     override func viewDidLoad() {
         super.viewDidLoad()
         createPageViewController()
     }
     
+    // Moves to the next month
     func goToNextMonth() {
         dateComponents!.month++
         dateComponents!.day = 1
         dateComponents = getNewDateComponents(dateComponents!)
     }
     
+    // Moves to the previous month
     func goToPrevMonth() {
         dateComponents!.month--
         dateComponents!.day = 1
@@ -54,14 +57,14 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         // Dispose of any resources that can be recreated.
     }
     
-    // Creates first page view controller
+    // Creates first page view controller with month item controller
     private func createPageViewController() {
         let pageController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthPageViewController") as! UIPageViewController
         // Set data source and delegate
         pageController.dataSource = self
         pageController.delegate = self
         // Make first view controller
-        let firstController = getMonthController(dateComponents!)!
+        let firstController = getMonthItemViewController(dateComponents!)!
         let startingViewController = [firstController]
         // Set initial view controller
         pageController.setViewControllers(startingViewController, direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
@@ -79,7 +82,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         components.month--
         let newComponents = getNewDateComponents(components)
 
-        return getMonthController(newComponents)
+        return getMonthItemViewController(newComponents)
     }
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
@@ -87,7 +90,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         components.month++
         let newComponents = getNewDateComponents(components)
         
-        return getMonthController(newComponents)
+        return getMonthItemViewController(newComponents)
     }
     
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
@@ -108,7 +111,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     }
     
     // Creates month view controller
-    private func getMonthController(components: NSDateComponents) -> MonthItemNavigationController? {
+    private func getMonthItemViewController(components: NSDateComponents) -> MonthItemNavigationController? {
         // Instantiate copy of prefab view controller
         let monthItemNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemNavigationController") as! MonthItemNavigationController
         // Load data

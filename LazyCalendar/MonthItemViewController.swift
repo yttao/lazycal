@@ -67,7 +67,12 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
             daysInMonth[i] = i - (monthStartWeekday - 2)
         }
         
-        self.navigationItem.title = String(dateComponents.month)
+        // Gets month in string format
+        let dateFormatter = NSDateFormatter()
+        let months = dateFormatter.monthSymbols
+        let monthSymbol = months[dateComponents.month - 1] as! String
+        // Sets title as month year
+        self.navigationItem.title = "\(monthSymbol) \(dateComponents.year)"
     }
     
     // Clears current selection
