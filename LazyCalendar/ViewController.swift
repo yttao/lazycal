@@ -12,18 +12,17 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     private var pageViewController: UIPageViewController?
 
     private var calendar: NSCalendar?
-    private var today: NSDate?
     // Keeps track of current date view
     private var dateComponents: NSDateComponents?
-    // NSCalendarUnits to keep track of
+    // Calendar units to keep track of
     private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
         NSCalendarUnit.CalendarUnitYear
     
+    // Initialize calendar, start date, and date components for start date
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         calendar = NSCalendar.currentCalendar()
-        today = NSDate()
-        dateComponents = calendar!.components(units, fromDate: today!)
+        dateComponents = calendar!.components(units, fromDate: NSDate())
     }
     
     // On load, create page view controller with initial view
@@ -32,14 +31,14 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         createPageViewController()
     }
     
-    // Moves to the next month
+    // Moves date components to the next month
     func goToNextMonth() {
         dateComponents!.month++
         dateComponents!.day = 1
         dateComponents = getNewDateComponents(dateComponents!)
     }
     
-    // Moves to the previous month
+    // Moves date components to the previous month
     func goToPrevMonth() {
         dateComponents!.month--
         dateComponents!.day = 1
@@ -52,12 +51,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         return calendar!.components(units, fromDate: newDate!)
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    // Creates first page view controller with month item controller
+    // Creates first page view controller with month as this month
     private func createPageViewController() {
         let pageController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthPageViewController") as! UIPageViewController
         // Set data source and delegate
@@ -74,10 +68,10 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         self.view.addSubview(pageViewController!.view)
         /*pageViewController!.didMoveToParentViewController(self)*/
     }
-    
-    // Function to handle direction change - call goToNextMonth/goToPrevMonth twice instead of once
 
+    // Previous view controller is for previous month
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
+        // Create components for previous month
         let components = dateComponents!.copy() as! NSDateComponents
         components.month--
         let newComponents = getNewDateComponents(components)
@@ -85,7 +79,9 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         return getMonthItemViewController(newComponents)
     }
     
+    // Next view controller is for next month
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
+        // Create components for next month
         let components = dateComponents!.copy() as! NSDateComponents
         components.month++
         let newComponents = getNewDateComponents(components)
@@ -93,11 +89,12 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         return getMonthItemViewController(newComponents)
     }
     
+    // On month switch, change date components to reflect current month and clear selections from past months.
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
-        let newMonth = pageViewController.viewControllers[0].childViewControllers[0] as! MonthItemViewController
-        let oldMonth = previousViewControllers[0].childViewControllers[0] as! MonthItemViewController
+        let newMonth = pageViewController.viewControllers.first!.childViewControllers.first! as! MonthItemViewController
+        let oldMonth = previousViewControllers.first!.childViewControllers.first! as! MonthItemViewController
         
-        // Change current month
+        // Change current month based on whether you went to previous or next month
         if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) ==
             NSComparisonResult.OrderedAscending) {
                 goToNextMonth()
@@ -115,7 +112,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         // Instantiate copy of prefab view controller
         let monthItemNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemNavigationController") as! MonthItemNavigationController
         // Load data
-        monthItemNavigationController.loadData(calendar!, today: today!, components: components)
+        monthItemNavigationController.loadData(calendar!, components: components)
 
         return monthItemNavigationController
     }

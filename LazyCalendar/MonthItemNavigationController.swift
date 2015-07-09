@@ -12,18 +12,15 @@ class MonthItemNavigationController: UINavigationController {
     private var dateComponents: NSDateComponents?
     private var monthItemViewController: MonthItemViewController?
     
+    // Initialize with embedded month item view controller
     required init(coder: NSCoder) {
         super.init(coder: coder)
         monthItemViewController = self.viewControllers.first as? MonthItemViewController
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
-    }
-    
-    func loadData(calendar: NSCalendar, today: NSDate, components: NSDateComponents) {
+    // Loads data into month item view controller
+    func loadData(calendar: NSCalendar, components: NSDateComponents) {
         dateComponents = components
-        monthItemViewController!.loadData(calendar, today: today, dateComponents: components)
+        monthItemViewController!.loadData(calendar, dateComponents: components)
     }
 }

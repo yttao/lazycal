@@ -53,7 +53,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     }
 
     
-    func loadData(calendar: NSCalendar, today: NSDate, dateComponents: NSDateComponents) {
+    func loadData(calendar: NSCalendar, dateComponents: NSDateComponents) {
         self.calendar = calendar
         self.dateComponents = dateComponents
         
@@ -137,6 +137,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
         }
     }
     
+    // Shows events for a date
     func ShowEvents(date: NSDate) {
         println(date)
     }
@@ -155,15 +156,17 @@ extension MonthItemViewController: UICollectionViewDelegateFlowLayout {
                 CGFloat(MonthItemViewController.numWeeksInMonth))
     }
     
-    // Determines spacing between cells (none)
+    // Determines spacing between cells
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
         return CGFloat(0)
     }
     
+    // Determines sizing between sections
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
         return CGFloat(0)
     }
     
+    // Determines inset for section
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
         return UIEdgeInsetsZero
     }
