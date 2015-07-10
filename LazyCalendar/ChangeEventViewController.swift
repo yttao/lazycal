@@ -28,6 +28,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        
         eventDateStartPicker.date = date!
         
         let hour = NSTimeInterval(3600)
@@ -53,88 +56,70 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println("Selected: \(indexPath)")
+        println("***Selected: \(indexPath)***")
         println("Selected index: \(selectedIndexPath)")
-        println("Case \(indexPath.section)")
         switch indexPath.section {
         case 0:
-            if selectedIndexPath != nil && selectedIndexPath != indexPath {
-                println("Deselecting \(selectedIndexPath)")
-                tableView.deselectRowAtIndexPath(selectedIndexPath!, animated: false)
-                
-                let oldIndexPath = selectedIndexPath
-                selectedIndexPath = indexPath
-                tableView.reloadRowsAtIndexPaths([oldIndexPath!], withRowAnimation: .None)
+            if selectedIndexPath != nil {
+                tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
             }
-            else {
-                selectedIndexPath = indexPath
-            }
+            selectedIndexPath = indexPath
             
-            //println("Selecting...")
             eventNameTextField.userInteractionEnabled = true
             eventNameTextField.becomeFirstResponder()
+            //tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+            tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
             /*tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
             tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition:
                 .None)*/
         case 1:
-            if selectedIndexPath != nil && selectedIndexPath != indexPath {
-                println("Deselecting \(selectedIndexPath)")
-                tableView.deselectRowAtIndexPath(selectedIndexPath!, animated: false)
-                
-                let oldIndexPath = selectedIndexPath
-                selectedIndexPath = indexPath
-                tableView.reloadRowsAtIndexPaths([oldIndexPath!], withRowAnimation: .None)
+            if selectedIndexPath != nil {
+                tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
             }
-            else {
-                selectedIndexPath = indexPath
-            }
+            selectedIndexPath = indexPath
             
             // Add date picker
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
             cell.contentView.addSubview(eventDateStartPicker)
+            cell.contentView.didAddSubview(eventDateStartPicker)
             
             // Recalculate height to display date picker
+            println("Reloading data")
             tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
-            tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition:
-                .None)
+            tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
+            println("Cell height at end: \(cell.frame.height)")
         case 2:
-            if selectedIndexPath != nil && selectedIndexPath != indexPath {
-                println("Deselecting \(selectedIndexPath)")
-                tableView.deselectRowAtIndexPath(selectedIndexPath!, animated: false)
+            if selectedIndexPath != nil {
+                tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
             }
             selectedIndexPath = indexPath
             
             // Add date picker
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
             cell.contentView.addSubview(eventDateEndPicker)
+            cell.contentView.didAddSubview(eventDateEndPicker)
             
+            println("Reloading data")
             tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
-            tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition:
-                .None)
-            // Recalculate height to display date picker
+            tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
+            println("Cell height at end: \(cell.frame.height)")
         default:
             break
         }
     }
     
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
-        println("Deselecting...")
+        println("***Deselected: \(indexPath)***")
+        println("Selected: \(selectedIndexPath)")
         switch indexPath.section {
         case 0:
             eventNameTextField.userInteractionEnabled = false
             eventNameTextField.resignFirstResponder()
         case 1:
-            // Recalculate height to hide date picker
-            let cell = tableView.cellForRowAtIndexPath(indexPath)!
-            let subviews = cell.contentView.subviews
             eventDateStartPicker.removeFromSuperview()
-            //println("Reloading after removing: \(indexPath)")
             //tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
         case 2:
-            let cell = tableView.cellForRowAtIndexPath(indexPath)!
-            let subviews = cell.contentView.subviews
             eventDateEndPicker.removeFromSuperview()
-            //println("Reloading after removing: \(indexPath)")
             //tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
         default:
             break
@@ -144,27 +129,35 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         switch indexPath.section {
         case 0:
-            let cell = UITableViewCell()
-            return cell.frame.height
+            if selectedIndexPath == indexPath {
+                println("Selected height: \(indexPath)")
+                let cell = UITableViewCell()
+                return cell.frame.height
+            }
+            else {
+                println("Unselected height: \(indexPath)")
+                let cell = UITableViewCell()
+                return cell.frame.height
+            }
         case 1:
-            if (selectedIndexPath == indexPath) {
-                //println("Calculating selected height for \(indexPath.section)")
+            if selectedIndexPath == indexPath {
+                println("Selected height: \(indexPath)")
                 let datePickerHeight = eventDateStartPicker.frame.size.height
                 return CGFloat(datePickerHeight)
             }
             else {
-                //println("Calculating unselected height for \(indexPath.section)")
+                println("Unselected height: \(indexPath)")
                 let cell = UITableViewCell()
                 return cell.frame.height
             }
         case 2:
-            if (selectedIndexPath == indexPath) {
-                //println("Calculating selected height for \(indexPath.section)")
+            if selectedIndexPath == indexPath {
+                println("Selected height: \(indexPath)")
                 let datePickerHeight = eventDateEndPicker.frame.size.height
                 return CGFloat(datePickerHeight)
             }
             else {
-                //println("Calculating unselected height for \(indexPath.section)")
+                println("Unselected height: \(indexPath)")
                 let cell = UITableViewCell()
                 return cell.frame.height
             }
