@@ -78,7 +78,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             if selectedIndexPath != nil {
                 let oldIndexPath = selectedIndexPath
                 selectedIndexPath = indexPath
-                tableView.reloadRowsAtIndexPaths([oldIndexPath!], withRowAnimation: .None)
+                tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
             }
             selectedIndexPath = indexPath
             
@@ -110,7 +110,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
             println("Cell height at end: \(cell.frame.height)")
         default:
-            println("Nothing")
             break
         }
     }
