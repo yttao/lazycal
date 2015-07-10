@@ -15,9 +15,21 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     private var date: NSDate?
     
     @IBOutlet weak var eventNameTextField: UITextField!
+    @IBOutlet weak var eventDateStartMainLabel: UILabel!
+    
+    @IBOutlet weak var eventDateStartDetailsLabel: UILabel!
     
     private let eventDateStartPicker = UIDatePicker()
+    /*private let eventDateStartLabelMain = UILabel()
+    private let eventDateStartLabelDetails = UILabel()*/
     private let eventDateEndPicker = UIDatePicker()
+    
+    @IBOutlet weak var eventDateEndMainLabel: UILabel!
+    
+    @IBOutlet weak var eventDateEndDetailsLabel: UILabel!
+    
+    /*private let eventDateEndLabelMain = UILabel()
+    private let eventDateEndLabelDetails = UILabel()*/
     
     private var selectedIndexPath: NSIndexPath?
     
@@ -31,23 +43,29 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         self.tableView.delegate = self
         self.tableView.dataSource = self
         
+        eventNameTextField.userInteractionEnabled = false
+        
         eventDateStartPicker.date = date!
+        
+        let eventDateFormatter = NSDateFormatter()
+        eventDateFormatter.dateFormat = "MMM dd, yyyy"
+        eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(date!)
+        //println(eventDateStartMainLabel.text)
         
         let hour = NSTimeInterval(3600)
         let nextHourDate = date!.dateByAddingTimeInterval(hour)
         eventDateEndPicker.date = nextHourDate
         
-        eventNameTextField.userInteractionEnabled = false
+        eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(date!)
+        //println(eventDateEndMainLabel.text)
         
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        // Format details labels
+        eventDateFormatter.dateFormat = "h:m a"
+        eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(date!)
+        eventDateEndDetailsLabel.text = eventDateFormatter.stringFromDate(nextHourDate)
     }
     
     func setInitialDate(date: NSDate) {
-        println("Set date to: \(date)")
         self.date = date
     }
 
@@ -60,61 +78,40 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         println("Selected index: \(selectedIndexPath)")
         switch indexPath.section {
         case 0:
-            /*if selectedIndexPath != nil {
-                let oldIndexPath = selectedIndexPath
-                selectedIndexPath = indexPath
-                //tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
-                tableView.reloadData()
-            }*/
             selectedIndexPath = indexPath
             
             tableView.reloadData()
             eventNameTextField.userInteractionEnabled = true
             eventNameTextField.becomeFirstResponder()
-            //tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
-            tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
-            /*tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
-            tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition:
-                .None)*/
+            tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
         case 1:
-            /*if selectedIndexPath != nil {
-                let oldIndexPath = selectedIndexPath
-                selectedIndexPath = indexPath
-                tableView.reloadData()
-                //tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
-            }*/
             selectedIndexPath = indexPath
             
             // Add date picker
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
+            //dateFromLabel.removeFromSuperview()
+            
             cell.contentView.addSubview(eventDateStartPicker)
             cell.contentView.didAddSubview(eventDateStartPicker)
             
             // Recalculate height to display date picker
-            println("Reloading data")
             tableView.reloadData()
-            tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
-            println("Cell height at end: \(cell.frame.height)")
+            tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
         case 2:
-            /*if selectedIndexPath != nil {
-                let oldIndexPath = selectedIndexPath
-                selectedIndexPath = indexPath
-                tableView.reloadData()
-            }*/
             selectedIndexPath = indexPath
             
             // Add date picker
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
+            //dateToLabel.removeFromSuperview()
             cell.contentView.addSubview(eventDateEndPicker)
             cell.contentView.didAddSubview(eventDateEndPicker)
             
-            println("Reloading data")
             tableView.reloadData()
-            tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
-            println("Cell height at end: \(cell.frame.height)")
+            tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
         default:
             break
         }
+        println(tableView.cellForRowAtIndexPath(indexPath)!.contentView.subviews)
     }
     
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
@@ -124,9 +121,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             eventNameTextField.userInteractionEnabled = false
             eventNameTextField.resignFirstResponder()
         case 1:
+            let cell = tableView.cellForRowAtIndexPath(indexPath)!
             eventDateStartPicker.removeFromSuperview()
+            //cell.contentView.addSubview(dateFromLabel)
+            //cell.contentView.didAddSubview(dateFromLabel)
         case 2:
+            let cell = tableView.cellForRowAtIndexPath(indexPath)!
             eventDateEndPicker.removeFromSuperview()
+            //cell.contentView.addSubview(dateToLabel)
+            //cell.contentView.didAddSubview(dateToLabel)
         default:
             break
         }
@@ -136,34 +139,28 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         switch indexPath.section {
         case 0:
             if selectedIndexPath == indexPath {
-                println("Selected height: \(indexPath)")
                 let cell = UITableViewCell()
                 return cell.frame.height
             }
             else {
-                println("Unselected height: \(indexPath)")
                 let cell = UITableViewCell()
                 return cell.frame.height
             }
         case 1:
             if selectedIndexPath == indexPath {
-                println("Selected height: \(indexPath)")
                 let datePickerHeight = eventDateStartPicker.frame.size.height
                 return CGFloat(datePickerHeight)
             }
             else {
-                println("Unselected height: \(indexPath)")
                 let cell = UITableViewCell()
                 return cell.frame.height
             }
         case 2:
             if selectedIndexPath == indexPath {
-                println("Selected height: \(indexPath)")
                 let datePickerHeight = eventDateEndPicker.frame.size.height
                 return CGFloat(datePickerHeight)
             }
             else {
-                println("Unselected height: \(indexPath)")
                 let cell = UITableViewCell()
                 return cell.frame.height
             }

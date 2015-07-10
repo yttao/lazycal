@@ -23,3 +23,8 @@ var sevenDaysAgo = today.dateByAddingTimeInterval(-7 * 24 * 60 * 60)
 var components = calendar.components(NSCalendarUnit.CalendarUnitWeekday | .CalendarUnitMonth | .CalendarUnitYear, fromDate: NSDate())
 var firstDay = calendar.dateFromComponents(components)
 var firstDayComponents = calendar.components(NSCalendarUnit.CalendarUnitWeekday, fromDate: firstDay!)
+
+let label = UILabel()
+let date = NSDate()
+label.text = String(_cocoaString: date)
+println(label.text!)
