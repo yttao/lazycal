@@ -60,13 +60,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         println("Selected index: \(selectedIndexPath)")
         switch indexPath.section {
         case 0:
-            if selectedIndexPath != nil {
+            /*if selectedIndexPath != nil {
                 let oldIndexPath = selectedIndexPath
                 selectedIndexPath = indexPath
-                tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
-            }
+                //tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
+                tableView.reloadData()
+            }*/
             selectedIndexPath = indexPath
             
+            tableView.reloadData()
             eventNameTextField.userInteractionEnabled = true
             eventNameTextField.becomeFirstResponder()
             //tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
@@ -75,11 +77,12 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition:
                 .None)*/
         case 1:
-            if selectedIndexPath != nil {
+            /*if selectedIndexPath != nil {
                 let oldIndexPath = selectedIndexPath
                 selectedIndexPath = indexPath
-                tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
-            }
+                tableView.reloadData()
+                //tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
+            }*/
             selectedIndexPath = indexPath
             
             // Add date picker
@@ -89,15 +92,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             
             // Recalculate height to display date picker
             println("Reloading data")
-            tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+            tableView.reloadData()
             tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
             println("Cell height at end: \(cell.frame.height)")
         case 2:
-            if selectedIndexPath != nil {
+            /*if selectedIndexPath != nil {
                 let oldIndexPath = selectedIndexPath
                 selectedIndexPath = indexPath
-                tableView.reloadRowsAtIndexPaths([oldIndexPath!], withRowAnimation: .None)
-            }
+                tableView.reloadData()
+            }*/
             selectedIndexPath = indexPath
             
             // Add date picker
@@ -106,7 +109,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             cell.contentView.didAddSubview(eventDateEndPicker)
             
             println("Reloading data")
-            tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+            tableView.reloadData()
             tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
             println("Cell height at end: \(cell.frame.height)")
         default:
