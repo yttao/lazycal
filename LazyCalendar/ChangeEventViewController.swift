@@ -61,6 +61,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         switch indexPath.section {
         case 0:
             if selectedIndexPath != nil {
+                let oldIndexPath = selectedIndexPath
+                selectedIndexPath = indexPath
                 tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
             }
             selectedIndexPath = indexPath
@@ -74,7 +76,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 .None)*/
         case 1:
             if selectedIndexPath != nil {
-                tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
+                let oldIndexPath = selectedIndexPath
+                selectedIndexPath = indexPath
+                tableView.reloadRowsAtIndexPaths([oldIndexPath!], withRowAnimation: .None)
             }
             selectedIndexPath = indexPath
             
@@ -90,7 +94,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             println("Cell height at end: \(cell.frame.height)")
         case 2:
             if selectedIndexPath != nil {
-                tableView.reloadRowsAtIndexPaths([selectedIndexPath!], withRowAnimation: .None)
+                let oldIndexPath = selectedIndexPath
+                selectedIndexPath = indexPath
+                tableView.reloadRowsAtIndexPaths([oldIndexPath!], withRowAnimation: .None)
             }
             selectedIndexPath = indexPath
             
@@ -104,23 +110,21 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
             println("Cell height at end: \(cell.frame.height)")
         default:
+            println("Nothing")
             break
         }
     }
     
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
         println("***Deselected: \(indexPath)***")
-        println("Selected: \(selectedIndexPath)")
         switch indexPath.section {
         case 0:
             eventNameTextField.userInteractionEnabled = false
             eventNameTextField.resignFirstResponder()
         case 1:
             eventDateStartPicker.removeFromSuperview()
-            //tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
         case 2:
             eventDateEndPicker.removeFromSuperview()
-            //tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
         default:
             break
         }
