@@ -14,22 +14,19 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     private var date: NSDate?
     
+    private let eventDateFormatter = NSDateFormatter()
+    
     @IBOutlet weak var eventNameTextField: UITextField!
     @IBOutlet weak var eventDateStartMainLabel: UILabel!
     
     @IBOutlet weak var eventDateStartDetailsLabel: UILabel!
     
     private let eventDateStartPicker = UIDatePicker()
-    /*private let eventDateStartLabelMain = UILabel()
-    private let eventDateStartLabelDetails = UILabel()*/
     private let eventDateEndPicker = UIDatePicker()
     
     @IBOutlet weak var eventDateEndMainLabel: UILabel!
-    
     @IBOutlet weak var eventDateEndDetailsLabel: UILabel!
     
-    /*private let eventDateEndLabelMain = UILabel()
-    private let eventDateEndLabelDetails = UILabel()*/
     
     private var selectedIndexPath: NSIndexPath?
     
@@ -47,17 +44,17 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         
         eventDateStartPicker.date = date!
         
-        let eventDateFormatter = NSDateFormatter()
         eventDateFormatter.dateFormat = "MMM dd, yyyy"
         eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(date!)
-        //println(eventDateStartMainLabel.text)
+        eventDateStartPicker.addTarget(self, action: "updateEventDateStartLabels", forControlEvents:
+            .ValueChanged)
         
         let hour = NSTimeInterval(3600)
         let nextHourDate = date!.dateByAddingTimeInterval(hour)
         eventDateEndPicker.date = nextHourDate
+        eventDateEndPicker.addTarget(self, action: "updateEventDateEndLabels", forControlEvents: .ValueChanged)
         
         eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(date!)
-        //println(eventDateEndMainLabel.text)
         
         // Format details labels
         eventDateFormatter.dateFormat = "h:mm a"
@@ -69,6 +66,24 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         self.date = date
     }
 
+    func updateEventDateStartLabels() {
+        println("Updating all start labels")
+        eventDateFormatter.dateFormat = "MMM dd, yyyy"
+        eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
+        
+        eventDateFormatter.dateFormat = "h:mm a"
+        eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
+    }
+    
+    func updateEventDateEndLabels() {
+        println("Updating all end labels")
+        eventDateFormatter.dateFormat = "MMM dd, yyyy"
+        eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(eventDateEndPicker.date)
+        
+        eventDateFormatter.dateFormat = "h:mm a"
+        eventDateEndDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateEndPicker.date)
+    }
+    
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 3
     }
@@ -113,7 +128,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         default:
             break
         }
-        println(tableView.cellForRowAtIndexPath(indexPath)!.contentView.subviews)
     }
     
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
@@ -127,15 +141,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             eventDateStartPicker.removeFromSuperview()
             eventDateStartMainLabel.hidden = false
             eventDateStartDetailsLabel.hidden = false
-            //cell.contentView.addSubview(dateFromLabel)
-            //cell.contentView.didAddSubview(dateFromLabel)
         case 2:
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
             eventDateEndPicker.removeFromSuperview()
             eventDateEndMainLabel.hidden = false
             eventDateEndDetailsLabel.hidden = false
-            //cell.contentView.addSubview(dateToLabel)
-            //cell.contentView.didAddSubview(dateToLabel)
         default:
             break
         }
