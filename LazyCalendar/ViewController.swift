@@ -96,6 +96,8 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         let newMonth = pageViewController.viewControllers.first!.childViewControllers.first! as! MonthItemViewController
         let oldMonth = previousViewControllers.first!.childViewControllers.first! as! MonthItemViewController
         
+        println("Current month is: \(newMonth.dateIndex)")
+        
         // Change current month based on whether you went to previous or next month
         if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) ==
             NSComparisonResult.OrderedAscending) {

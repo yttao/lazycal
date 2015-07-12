@@ -26,7 +26,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     
     // Colors used
     private let backgroundColor = UIColor(red: 125, green: 255, blue: 125, alpha: 0)
-    private let selectedColor = UIColor.whiteColor()
+    private let selectedColor = UIColor.yellowColor()
     
     // Calendar cell reuse identifier
     private let reuseIdentifier = "DayCell"
@@ -41,63 +41,34 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     private let calendar = NSCalendar.currentCalendar()
     // Currently selected cell
     private var selectedCell: CalendarCollectionViewCell?
-    
     // Start weekday
     private var monthStartWeekday = 0
     // Keeps track of current date view components
     private var dateComponents: NSDateComponents?
     
-    // Sets up necessary data when changing to different view
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        super.prepareForSegue(segue, sender: sender)
-        
-        // True if adding an event
-        if segue.identifier == addEventSegueIdentifier {
-            // Get current hour and minute
-            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
-                NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
-            
-            let initialDateComponents = dateComponents!.copy() as! NSDateComponents
-            initialDateComponents.hour = currentTime.hour
-            initialDateComponents.minute = currentTime.minute
-
-            // Set initial date choice on date picker as selected date, at current hour and minute
-            let initialDate = calendar.dateFromComponents(initialDateComponents)
-            println(initialDate)
-            
-            // Find view controller for adding events
-            let navigationController = segue.destinationViewController as! UINavigationController
-            let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
-            // Set initial date information for event
-            addEventViewController.setInitialDate(initialDate!)
-        }
-    }
     
-    @IBAction func cancelEvent(segue: UIStoryboardSegue) {
-        println("Cancelled event")
-    }
-    
-    @IBAction func saveEvent(segue: UIStoryboardSegue) {
-        println("Saved event")
-    }
-
-    
+    // Initializer
     required init(coder: NSCoder) {
         super.init(coder: coder)
     }
     
+    
+    // Loads initial data
     override func viewDidLoad() {
         super.viewDidLoad()
         monthItemCollectionView.delegate = self
         monthItemCollectionView.dataSource = self
         
+        // Add height constraint determined by device size
         let heightConstraint = NSLayoutConstraint(item: monthItemCollectionView, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
         monthItemCollectionView.addConstraint(heightConstraint)
     }
 
     
+    // Loads initial data to use
     func loadData(dateComponents: NSDateComponents) {
-        self.dateComponents = dateComponents
+        // Copy datecomponents to prevent unexpected changes
+        self.dateComponents = dateComponents.copy() as? NSDateComponents
         
         monthStartWeekday = getMonthStartWeekday(self.dateComponents!)
         
@@ -118,28 +89,12 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
         self.navigationItem.title = "\(monthSymbol) \(dateComponents.year)"
     }
     
-    // Clears current selection
-    func clearSelected() {
-        if selectedCell != nil {
-            selectedCell!.backgroundColor = backgroundColor
-        }
-        
-        selectedCell = nil
-    }
-    
-    // Gets the first weekday of the month
-    func getMonthStartWeekday(components: NSDateComponents) -> Int {
-        let componentsCopy = components.copy() as! NSDateComponents
-        componentsCopy.day = 1
-        let startMonthDate = calendar.dateFromComponents(componentsCopy)
-        let startMonthDateComponents = calendar.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
-        return startMonthDateComponents.weekday
-    }
     
     // Determines number of items in month
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return MonthItemViewController.numCellsInMonth
     }
+    
     
     // Makes cell with day number shown
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -157,6 +112,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
         return cell
     }
     
+    
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         
@@ -167,7 +123,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
             
             dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
             dateComponents = getNewDateComponents(dateComponents!)
-
+            
             let selectedDate = calendar.dateFromComponents(dateComponents!)
             ShowEvents(selectedDate!)
         }
@@ -185,6 +141,30 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
         }
     }
     
+    
+    // Clears current selection
+    func clearSelected() {
+        if selectedCell != nil {
+            selectedCell!.backgroundColor = backgroundColor
+        }
+        
+        selectedCell = nil
+        // Reset date components to day 1
+        dateComponents!.day = 1
+        dateComponents = getNewDateComponents(dateComponents!)
+    }
+    
+    
+    // Gets the first weekday of the month
+    func getMonthStartWeekday(components: NSDateComponents) -> Int {
+        let componentsCopy = components.copy() as! NSDateComponents
+        componentsCopy.day = 1
+        let startMonthDate = calendar.dateFromComponents(componentsCopy)
+        let startMonthDateComponents = calendar.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
+        return startMonthDateComponents.weekday
+    }
+    
+    
     // Recalculates components after fields have been changed in components
     func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
         let newDate = calendar.dateFromComponents(components)
@@ -194,6 +174,46 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     // Shows events for a date
     func ShowEvents(date: NSDate) {
         println(date)
+    }
+    
+    
+    // Sets up necessary data when changing to different view
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        super.prepareForSegue(segue, sender: sender)
+        
+        // True if adding an event
+        if segue.identifier == addEventSegueIdentifier {
+            // Get current hour and minute
+            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
+                NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
+            
+            let initialDateComponents = dateComponents!.copy() as! NSDateComponents
+            initialDateComponents.hour = currentTime.hour
+            initialDateComponents.minute = currentTime.minute
+            
+            // Set initial date choice on date picker as selected date, at current hour and minute
+            let initialDate = calendar.dateFromComponents(initialDateComponents)
+            println("Preparing segue for month: \(dateIndex)")
+            println("Date components: \(dateComponents!)")
+            
+            // Find view controller for adding events
+            let navigationController = segue.destinationViewController as! UINavigationController
+            let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
+            // Set initial date information for event
+            addEventViewController.setInitialDate(initialDate!)
+        }
+    }
+    
+    
+    // Called on event cancel, returns to current month view
+    @IBAction func cancelEvent(segue: UIStoryboardSegue) {
+        println("Cancelled event")
+    }
+    
+    
+    // Called on event save
+    @IBAction func saveEvent(segue: UIStoryboardSegue) {
+        println("Saved event")
     }
 }
 

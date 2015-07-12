@@ -40,7 +40,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     private let NUM_FIELDS = 3
     
     
-    
     // Initialization
     required init(coder: NSCoder) {
         super.init(coder: coder)
