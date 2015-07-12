@@ -100,9 +100,8 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CalendarCollectionViewCell
         
-        // Set day number for cell
+        // Set day number for cell (if it is a valid cell in that month
         if let day = daysInMonth[indexPath.row] {
-            
             cell.dayLabel.text = String(day)
         }
         else {
@@ -113,32 +112,43 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     }
     
     
+    // Called on selection of day cell in month
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        // Get cell
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         
-        if cell.dayLabel.text != nil && !(cell == selectedCell) && selectedCell != nil {
-            selectedCell!.backgroundColor = backgroundColor
-            cell.backgroundColor = selectedColor
-            selectedCell = cell as CalendarCollectionViewCell
+        // Select cell
+        cell.backgroundColor = selectedColor
+        selectedCell = cell
             
-            dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
-            dateComponents = getNewDateComponents(dateComponents!)
+        // Update selected date components
+        dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
+        dateComponents = getNewDateComponents(dateComponents!)
             
-            let selectedDate = calendar.dateFromComponents(dateComponents!)
-            ShowEvents(selectedDate!)
+        // Show events for date
+        let selectedDate = calendar.dateFromComponents(dateComponents!)
+        ShowEvents(selectedDate!)
+    }
+    
+    
+    // Day cells are selectable only if they are a valid day cell
+    func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
+        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
+        
+        if cell.dayLabel.text != nil {
+            return true
         }
-            
-        else if selectedCell == nil && cell.dayLabel.text != nil {
-            cell.backgroundColor = selectedColor
-            selectedCell = cell as CalendarCollectionViewCell
-            
-            // Change selected date
-            dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
-            dateComponents = getNewDateComponents(dateComponents!)
-            
-            let selectedDate = calendar.dateFromComponents(dateComponents!)
-            ShowEvents(selectedDate!)
-        }
+        return false
+    }
+    
+    
+    // Called on deselection of day cell in month
+    func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
+        // Reset cell color and clear selectedCell
+        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
+
+        cell.backgroundColor = backgroundColor
+        selectedCell = nil
     }
     
     
@@ -146,9 +156,9 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     func clearSelected() {
         if selectedCell != nil {
             selectedCell!.backgroundColor = backgroundColor
+            selectedCell = nil
         }
-        
-        selectedCell = nil
+
         // Reset date components to day 1
         dateComponents!.day = 1
         dateComponents = getNewDateComponents(dateComponents!)
@@ -193,8 +203,6 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
             
             // Set initial date choice on date picker as selected date, at current hour and minute
             let initialDate = calendar.dateFromComponents(initialDateComponents)
-            println("Preparing segue for month: \(dateIndex)")
-            println("Date components: \(dateComponents!)")
             
             // Find view controller for adding events
             let navigationController = segue.destinationViewController as! UINavigationController
