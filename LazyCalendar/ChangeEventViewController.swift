@@ -33,15 +33,22 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     @IBOutlet weak var eventDateEndMainLabel: UILabel!
     @IBOutlet weak var eventDateEndDetailsLabel: UILabel!
     
-    // Index path of currently selected field
-    private var selectedIndexPath: NSIndexPath?
-    
     // Number of fields to fill in for event info
     private let NUM_FIELDS = 3
     
+    // Heights of fields\
+    private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
+    private var eventNameCellHeight: CGFloat
+    private var eventDateStartCellHeight: CGFloat
+    private var eventDateEndCellHeight: CGFloat
     
-    // Initialization
+    
+    // Initialization, set default heights
     required init(coder: NSCoder) {
+        eventNameCellHeight = DEFAULT_CELL_HEIGHT
+        eventDateStartCellHeight = DEFAULT_CELL_HEIGHT
+        eventDateEndCellHeight = DEFAULT_CELL_HEIGHT
+        
         super.init(coder: coder)
     }
     
@@ -113,46 +120,47 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println("***Selected: \(indexPath)***")
-        println("Selected index: \(selectedIndexPath)")
         // Take action based on what section was chosen
         switch indexPath.section {
         case 0:
-            selectedIndexPath = indexPath
-            
             tableView.reloadData()
             eventNameTextField.userInteractionEnabled = true
             eventNameTextField.becomeFirstResponder()
             tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
         case 1:
-            selectedIndexPath = indexPath
-            
             // Hide date start labels
             eventDateStartMainLabel.hidden = true
             eventDateStartDetailsLabel.hidden = true
             
             // Show date start picker
+            tableView.beginUpdates()
+            
+            // Recalculate height to show date start picker
+            eventDateStartCellHeight = eventDateStartPicker.frame.height
+            
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
             cell.contentView.addSubview(eventDateStartPicker)
             cell.contentView.didAddSubview(eventDateStartPicker)
             
-            // Recalculate height to display date picker
-            tableView.reloadData()
-            tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
+            tableView.endUpdates()
+            //tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
         case 2:
-            selectedIndexPath = indexPath
-            
             // Hide date end labels
             eventDateEndMainLabel.hidden = true
             eventDateEndDetailsLabel.hidden = true
             
             // Show date end picker
+            tableView.beginUpdates()
+            
+            // Recalculate height to show date end picker
+            eventDateEndCellHeight = eventDateEndPicker.frame.height
+            
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
             cell.contentView.addSubview(eventDateEndPicker)
             cell.contentView.didAddSubview(eventDateEndPicker)
             
-            tableView.reloadData()
-            tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
+            tableView.endUpdates()
+            //tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
         default:
             break
         }
@@ -170,16 +178,28 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 eventNameTextField.resignFirstResponder()
             // If deselecting date start field, hide date start picker and show labels
             case 1:
+                tableView.beginUpdates()
+                
                 let cell = tableView.cellForRowAtIndexPath(indexPath)!
                 eventDateStartPicker.removeFromSuperview()
+                eventDateStartCellHeight = DEFAULT_CELL_HEIGHT
+                
                 eventDateStartMainLabel.hidden = false
                 eventDateStartDetailsLabel.hidden = false
+                
+                tableView.endUpdates()
             // If deselecting date end field, hide date end picker and show labels
             case 2:
+                tableView.beginUpdates()
+                
                 let cell = tableView.cellForRowAtIndexPath(indexPath)!
                 eventDateEndPicker.removeFromSuperview()
+                eventDateEndCellHeight = DEFAULT_CELL_HEIGHT
+                
                 eventDateEndMainLabel.hidden = false
                 eventDateEndDetailsLabel.hidden = false
+                
+                tableView.endUpdates()
             default:
                 break
         }
@@ -191,35 +211,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         switch indexPath.section {
             // Event name field has default height
             case 0:
-                let cell = UITableViewCell()
-                return cell.frame.height
+                return eventNameCellHeight
             // Event date start field changes height based on if it is selected or not
             case 1:
-                // If selected, height is date picker height
-                if selectedIndexPath == indexPath {
-                    let datePickerHeight = eventDateStartPicker.frame.size.height
-                    return CGFloat(datePickerHeight)
-                }
-                // Otherwise default height
-                else {
-                    let cell = UITableViewCell()
-                    return cell.frame.height
-                }
+                return eventDateStartCellHeight
             // Event date end field changes height based on if it is selected or not
             case 2:
-                // If selected, height is date picker height
-                if selectedIndexPath == indexPath {
-                    let datePickerHeight = eventDateEndPicker.frame.size.height
-                    return CGFloat(datePickerHeight)
-                }
-                // Otherwise default height
-                else {
-                    let cell = UITableViewCell()
-                    return cell.frame.height
-                }
+                return eventDateEndCellHeight
             default:
-                let cell = UITableViewCell()
-                return cell.frame.height
+                return DEFAULT_CELL_HEIGHT
         }
     }
 }
