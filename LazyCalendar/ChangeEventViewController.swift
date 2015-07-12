@@ -33,8 +33,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     @IBOutlet weak var eventDateEndMainLabel: UILabel!
     @IBOutlet weak var eventDateEndDetailsLabel: UILabel!
     
-    // Number of fields to fill in for event info
-    private let NUM_FIELDS = 3
+    // Toggles alarm option on/off
+    @IBOutlet weak var alarmSwitch: UISwitch!
+    
+    // Section headers associated with section numbers
+    private let sections = ["Name": 0, "From": 1, "To": 2, "Alarm": 3]
     
     // Heights of fields\
     private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
@@ -115,19 +118,22 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     // Number of fields to fill in
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return NUM_FIELDS
+        return sections.count
     }
     
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        println("***Selected: \(indexPath.section)\t\(indexPath.row)")
+        let cell = tableView.cellForRowAtIndexPath(indexPath)!
+        
         // Take action based on what section was chosen
         switch indexPath.section {
-        case 0:
+        case sections["Name"]!:
             tableView.reloadData()
             eventNameTextField.userInteractionEnabled = true
             eventNameTextField.becomeFirstResponder()
             tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
-        case 1:
+        case sections["From"]!:
             // Hide date start labels
             eventDateStartMainLabel.hidden = true
             eventDateStartDetailsLabel.hidden = true
@@ -138,13 +144,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             // Recalculate height to show date start picker
             eventDateStartCellHeight = eventDateStartPicker.frame.height
             
-            let cell = tableView.cellForRowAtIndexPath(indexPath)!
             cell.contentView.addSubview(eventDateStartPicker)
             cell.contentView.didAddSubview(eventDateStartPicker)
             
             tableView.endUpdates()
-            //tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
-        case 2:
+        case sections["To"]!:
             // Hide date end labels
             eventDateEndMainLabel.hidden = true
             eventDateEndDetailsLabel.hidden = true
@@ -155,12 +159,12 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             // Recalculate height to show date end picker
             eventDateEndCellHeight = eventDateEndPicker.frame.height
             
-            let cell = tableView.cellForRowAtIndexPath(indexPath)!
             cell.contentView.addSubview(eventDateEndPicker)
             cell.contentView.didAddSubview(eventDateEndPicker)
             
             tableView.endUpdates()
-            //tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
+        case sections["Alarm"]!:
+            println("Alarm")
         default:
             break
         }
@@ -169,15 +173,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     // Called on cell deselection (when a different cell is selected)
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
-        println("***Deselected: \(indexPath)***")
+        println("***Deselected: \(indexPath.section)\t\(indexPath.row)***")
         switch indexPath.section {
             // If deselecting event name field, text field stops being first responder and disables
             // user interaction with it.
-            case 0:
+            case sections["Name"]!:
                 eventNameTextField.userInteractionEnabled = false
                 eventNameTextField.resignFirstResponder()
             // If deselecting date start field, hide date start picker and show labels
-            case 1:
+            case sections["From"]!:
                 tableView.beginUpdates()
                 
                 let cell = tableView.cellForRowAtIndexPath(indexPath)!
@@ -189,7 +193,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 
                 tableView.endUpdates()
             // If deselecting date end field, hide date end picker and show labels
-            case 2:
+            case sections["To"]!:
                 tableView.beginUpdates()
                 
                 let cell = tableView.cellForRowAtIndexPath(indexPath)!
@@ -210,13 +214,13 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         switch indexPath.section {
             // Event name field has default height
-            case 0:
+            case sections["Name"]!:
                 return eventNameCellHeight
             // Event date start field changes height based on if it is selected or not
-            case 1:
+            case sections["From"]!:
                 return eventDateStartCellHeight
             // Event date end field changes height based on if it is selected or not
-            case 2:
+            case sections["To"]!:
                 return eventDateEndCellHeight
             default:
                 return DEFAULT_CELL_HEIGHT
