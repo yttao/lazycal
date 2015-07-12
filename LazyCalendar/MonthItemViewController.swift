@@ -11,9 +11,10 @@ import UIKit
 class MonthItemViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     @IBOutlet weak var monthItemCollectionView: UICollectionView!
 
-    // Used to identify month
+    // Used to order months
     var dateIndex: NSDate?
 
+    // Segue identifier to add an event
     private let addEventSegueIdentifier = "AddEventSegue"
     
     // 7 days in a week
@@ -32,34 +33,42 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     
     // NSCalendarUnits to keep track of
     private let units = NSCalendarUnit.CalendarUnitYear | NSCalendarUnit.CalendarUnitMonth |
-        NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitHour |
-        NSCalendarUnit.CalendarUnitMinute
+        NSCalendarUnit.CalendarUnitDay
     
+    // Array indexing table view cells
     private var daysInMonth = [Int?](count: MonthItemViewController.numCellsInMonth, repeatedValue: nil)
+    // Calendar used
     private let calendar = NSCalendar.currentCalendar()
+    // Currently selected cell
     private var selectedCell: CalendarCollectionViewCell?
     
+    // Start weekday
     private var monthStartWeekday = 0
-    // Keeps track of current date view
+    // Keeps track of current date view components
     private var dateComponents: NSDateComponents?
     
+    // Sets up necessary data when changing to different view
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         super.prepareForSegue(segue, sender: sender)
         
-        if segue.identifier != nil && segue.identifier == addEventSegueIdentifier {
+        // True if adding an event
+        if segue.identifier == addEventSegueIdentifier {
+            // Get current hour and minute
+            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
+                NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
+            
+            let initialDateComponents = dateComponents!.copy() as! NSDateComponents
+            initialDateComponents.hour = currentTime.hour
+            initialDateComponents.minute = currentTime.minute
+
+            // Set initial date choice on date picker as selected date, at current hour and minute
+            let initialDate = calendar.dateFromComponents(initialDateComponents)
+            println(initialDate)
+            
+            // Find view controller for adding events
             let navigationController = segue.destinationViewController as! UINavigationController
             let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
-            
-            // Get current hour and minute
-            let now = NSDate()
-            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
-                NSCalendarUnit.CalendarUnitMinute, fromDate: now)
-            dateComponents!.hour = currentTime.hour
-            dateComponents!.minute = currentTime.minute
-            dateComponents = getNewDateComponents(dateComponents!)
-            // Set initial date choice on date picker as selected date, at current hour and minute
-            let initialDate = calendar.dateFromComponents(dateComponents!)
-            println("Initial date: \(initialDate!)")
+            // Set initial date information for event
             addEventViewController.setInitialDate(initialDate!)
         }
     }
@@ -104,6 +113,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
         let dateFormatter = NSDateFormatter()
         let months = dateFormatter.monthSymbols
         let monthSymbol = months[dateComponents.month - 1] as! String
+        
         // Sets title as month year
         self.navigationItem.title = "\(monthSymbol) \(dateComponents.year)"
     }
@@ -149,6 +159,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
+        
         if cell.dayLabel.text != nil && !(cell == selectedCell) && selectedCell != nil {
             selectedCell!.backgroundColor = backgroundColor
             cell.backgroundColor = selectedColor
@@ -182,34 +193,32 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     
     // Shows events for a date
     func ShowEvents(date: NSDate) {
-        //println(date)
+        println(date)
     }
 }
 
-// Handles sizing of cells
+// Handles cell sizing
 extension MonthItemViewController: UICollectionViewDelegateFlowLayout {
+    
     // Determines size of one cell
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        //println(collectionView.frame.size.height)
-        //println(view.frame.size.height)
-        
         return CGSize(width: collectionView.frame.size.width /
             CGFloat(MonthItemViewController.numDaysInWeek),
             height: (collectionView.frame.size.height) /
                 CGFloat(MonthItemViewController.numWeeksInMonth))
     }
     
-    // Determines spacing between cells
+    // Determines spacing between cells (none)
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
         return CGFloat(0)
     }
     
-    // Determines sizing between sections
+    // Determines sizing between sections (none)
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
         return CGFloat(0)
     }
     
-    // Determines inset for section
+    // Determines inset for section (none)
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
         return UIEdgeInsetsZero
     }

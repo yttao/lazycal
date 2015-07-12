@@ -26,7 +26,8 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
         didSet {
             if let selected = selectedCell as? CalendarCollectionViewCell {
                 let selectedComponents = calendar!.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: dateIndex!)
-                selectedComponents.day = (selectedCell as! CalendarCollectionViewCell).dayLabel.text!.toInt()!
+                selectedComponents.day = selected.dayLabel.text!.toInt()!
+                //let selectedComponents = dateComponents!
                 let selectedDate = calendar!.dateFromComponents(selectedComponents)
                 ShowEvents(selectedDate!)
             }
@@ -128,6 +129,7 @@ class CalendarCollectionViewController: UICollectionViewController, UICollection
     }
     
     func ShowEvents(date: NSDate) {
+        println("***")
         println(date)
     }
 }

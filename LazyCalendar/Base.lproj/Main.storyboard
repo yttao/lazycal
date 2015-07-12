@@ -77,7 +77,7 @@
                                             <constraint firstAttribute="centerX" secondItem="tBi-WE-vSe" secondAttribute="centerX" id="eUl-Lw-STG"/>
                                         </constraints>
                                         <connections>
-                                            <outlet property="dayLabel" destination="tBi-WE-vSe" id="5cn-ln-eYL"/>
+                                            <outlet property="dayLabel" destination="tBi-WE-vSe" id="76S-k8-8hZ"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>

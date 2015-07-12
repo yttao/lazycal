@@ -74,6 +74,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         // Create components for previous month
         let components = dateComponents!.copy() as! NSDateComponents
         components.month--
+        components.day = 1
         let newComponents = getNewDateComponents(components)
 
         return getMonthItemViewController(newComponents)
@@ -84,6 +85,7 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         // Create components for next month
         let components = dateComponents!.copy() as! NSDateComponents
         components.month++
+        components.day = 1
         let newComponents = getNewDateComponents(components)
         
         return getMonthItemViewController(newComponents)
@@ -117,5 +119,3 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
         return monthItemNavigationController
     }
 }
-
-
