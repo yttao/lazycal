@@ -60,7 +60,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         //println(eventDateEndMainLabel.text)
         
         // Format details labels
-        eventDateFormatter.dateFormat = "h:m a"
+        eventDateFormatter.dateFormat = "h:mm a"
         eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(date!)
         eventDateEndDetailsLabel.text = eventDateFormatter.stringFromDate(nextHourDate)
     }
@@ -89,8 +89,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             
             // Add date picker
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
-            //dateFromLabel.removeFromSuperview()
             
+            eventDateStartMainLabel.hidden = true
+            eventDateStartDetailsLabel.hidden = true
             cell.contentView.addSubview(eventDateStartPicker)
             cell.contentView.didAddSubview(eventDateStartPicker)
             
@@ -100,7 +101,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         case 2:
             selectedIndexPath = indexPath
             
-            // Add date picker
+            eventDateEndMainLabel.hidden = true
+            eventDateEndDetailsLabel.hidden = true
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
             //dateToLabel.removeFromSuperview()
             cell.contentView.addSubview(eventDateEndPicker)
@@ -123,11 +125,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         case 1:
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
             eventDateStartPicker.removeFromSuperview()
+            eventDateStartMainLabel.hidden = false
+            eventDateStartDetailsLabel.hidden = false
             //cell.contentView.addSubview(dateFromLabel)
             //cell.contentView.didAddSubview(dateFromLabel)
         case 2:
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
             eventDateEndPicker.removeFromSuperview()
+            eventDateEndMainLabel.hidden = false
+            eventDateEndDetailsLabel.hidden = false
             //cell.contentView.addSubview(dateToLabel)
             //cell.contentView.didAddSubview(dateToLabel)
         default:
