@@ -227,8 +227,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         let alarmTimeDisplayCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimeDisplay"]!)
         let alarmTimePickerCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimePicker"]!)
         
-        alarmDateToggleCellHeight = PICKER_CELL_HEIGHT
-        alarmTimeDisplayCellHeight = PICKER_CELL_HEIGHT
+        alarmDateToggleCellHeight = DEFAULT_CELL_HEIGHT
+        alarmTimeDisplayCellHeight = DEFAULT_CELL_HEIGHT
         alarmTimePickerCellHeight = PICKER_CELL_HEIGHT
         
         alarmDateToggleCell!.contentView.hidden = false

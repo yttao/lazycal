@@ -10,7 +10,8 @@ import UIKit
 
 class MonthItemViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     @IBOutlet weak var monthItemCollectionView: UICollectionView!
-
+    @IBOutlet weak var monthItemTableView: UITableView!
+    
     // Used to order months
     var dateIndex: NSDate?
 
@@ -62,6 +63,8 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
         // Add height constraint determined by device size
         let heightConstraint = NSLayoutConstraint(item: monthItemCollectionView, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
         monthItemCollectionView.addConstraint(heightConstraint)
+        println(monthItemCollectionView.frame.height)
+        println(monthItemTableView.frame.height)
     }
 
     
