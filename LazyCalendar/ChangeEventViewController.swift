@@ -231,9 +231,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         alarmTimeDisplayCellHeight = DEFAULT_CELL_HEIGHT
         alarmTimePickerCellHeight = PICKER_CELL_HEIGHT
         
-        alarmDateToggleCell!.contentView.hidden = false
-        alarmTimeDisplayCell!.contentView.hidden = false
-        alarmTimePickerCell!.contentView.hidden = false
+        alarmDateToggleCell!.hidden = false
+        alarmTimeDisplayCell!.hidden = false
+        alarmTimePickerCell!.hidden = false
         
         println(tableView.contentSize)
         //tableView.reloadData()
@@ -259,12 +259,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         alarmTimeDisplayCellHeight = 0
         alarmTimePickerCellHeight = 0
         
-        alarmDateToggleCell!.contentView.hidden = true
-        alarmTimeDisplayCell!.contentView.hidden = true
-        //println(alarmDateToggleCell)
-        //println(alarmTimeDisplayCell)
-        ///println(alarmTimePickerCell)
-        alarmTimePickerCell!.contentView.hidden = true
+        alarmDateToggleCell!.hidden = true
+        alarmTimeDisplayCell!.hidden = true
+        alarmTimePickerCell!.hidden = true
         tableView.endUpdates()
         //tableView.reloadData()
         //println(tableView.contentSize)

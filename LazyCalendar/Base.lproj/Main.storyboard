@@ -153,12 +153,20 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hmy-da-q8Z">
-                                                    <rect key="frame" x="8" y="7" width="584" height="30"/>
+                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hmy-da-q8Z">
+                                                    <rect key="frame" x="8" y="8" width="584" height="27"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits"/>
                                                 </textField>
                                             </subviews>
+                                            <constraints>
+                                                <constraint firstItem="hmy-da-q8Z" firstAttribute="trailing" secondItem="sl7-LQ-EV9" secondAttribute="trailingMargin" id="Fn4-4T-7zT"/>
+                                                <constraint firstItem="hmy-da-q8Z" firstAttribute="leading" secondItem="sl7-LQ-EV9" secondAttribute="leadingMargin" id="QLz-zo-dqo"/>
+                                                <constraint firstItem="hmy-da-q8Z" firstAttribute="centerY" secondItem="sl7-LQ-EV9" secondAttribute="centerY" id="Qro-G1-dKj"/>
+                                                <constraint firstItem="hmy-da-q8Z" firstAttribute="top" secondItem="sl7-LQ-EV9" secondAttribute="topMargin" id="YSe-oo-PkS"/>
+                                                <constraint firstItem="hmy-da-q8Z" firstAttribute="centerX" secondItem="sl7-LQ-EV9" secondAttribute="centerX" id="geL-Wx-13I"/>
+                                                <constraint firstItem="hmy-da-q8Z" firstAttribute="bottom" secondItem="sl7-LQ-EV9" secondAttribute="bottomMargin" id="q3I-zQ-UlB"/>
+                                            </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </cells>
@@ -310,13 +318,17 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="yyY-Mi-MnN" userLabel="AlarmTimePicker">
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="yyY-Mi-MnN" userLabel="AlarmTimePicker">
                                                     <rect key="frame" x="140" y="-60" width="320" height="162"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="458496827.252285">
                                                         <!--2015-07-13 16:13:47 +0000-->
                                                     </date>
                                                 </datePicker>
                                             </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="centerX" secondItem="yyY-Mi-MnN" secondAttribute="centerX" id="GPi-RO-HQj"/>
+                                                <constraint firstAttribute="centerY" secondItem="yyY-Mi-MnN" secondAttribute="centerY" id="KYA-sI-LWn"/>
+                                            </constraints>
                                         </tableViewCellContentView>
                                         <accessibility key="accessibilityConfiguration">
                                             <bool key="isElement" value="YES"/>
