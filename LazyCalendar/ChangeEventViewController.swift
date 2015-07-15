@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class ChangeEventViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
     // Calendar
@@ -21,9 +22,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     // Date start and end pickers to decide time interval
     private let eventDateStartPicker = UIDatePicker()
     private let eventDateEndPicker = UIDatePicker()
-    
-    //private let alarmDateSwitch = UISwitch()
-    
+
     // Text field for event name
     @IBOutlet weak var eventNameTextField: UITextField!
     
@@ -174,7 +173,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             selectedIndexPath = indexPaths["Name"]
             eventNameTextField.userInteractionEnabled = true
             eventNameTextField.becomeFirstResponder()
-            tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
         case sections["Start"]!:
             selectedIndexPath = indexPaths["Start"]
             // Hide date start labels
@@ -315,6 +313,12 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
+    // Performs deselection based on the field
+    func deselectField(field: String) {
+        
+    }
+    
+    
     // Calculates height for rows
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         switch indexPath.section {
@@ -346,6 +350,47 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             }
         default:
             return DEFAULT_CELL_HEIGHT
+        }
+    }
+    
+    
+    func saveEvent() {
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let managedContext = appDelegate.managedObjectContext!
+
+        let entity = NSEntityDescription.entityForName("TestEvent", inManagedObjectContext: managedContext)!
+        
+        let event = NSManagedObject(entity: entity, insertIntoManagedObjectContext: managedContext)
+        
+        let name = eventNameTextField.text
+        let dateStart = eventDateStartPicker.date
+        let dateEnd = eventDateEndPicker.date
+        let alarm = alarmSwitch.on
+        let alarmTime = alarmTimePicker.date
+        
+        event.setValue(name, forKey: "name")
+        event.setValue(dateStart, forKey: "dateStart")
+        event.setValue(dateEnd, forKey: "dateEnd")
+        event.setValue(alarm, forKey: "alarm")
+        if alarm {
+            event.setValue(alarmTime, forKey: "alarmTime")
+        }
+        
+        println(event.valueForKey("name"))
+        println(event.valueForKey("dateStart"))
+        println(event.valueForKey("dateEnd"))
+        println(event.valueForKey("alarm"))
+        println(event.valueForKey("alarmTime"))
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        switch segue.identifier! {
+            case "SaveEvent":
+                saveEvent()
+            case "CancelEvent":
+                break
+        default:
+            break
         }
     }
 }

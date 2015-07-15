@@ -10,17 +10,11 @@ import UIKit
 import CoreData
 
 class MonthItemViewController: UIViewController {
-    //@IBOutlet weak var monthItemCollectionView: UICollectionView!
-    //@IBOutlet weak var monthItemTableView: UITableView!
-    
     @IBOutlet weak var monthItemCollectionViewContainer: UIView!
     @IBOutlet weak var monthItemTableViewContainer: UIView!
     
     var monthItemCollectionViewController: MonthItemCollectionViewController?
-    //var monthItemTableViewController: MonthItemTableViewController?
-    
-    var monthItemCollectionView: UICollectionView?
-    // var monthItemTableView: UITableView
+    var monthItemTableViewController: MonthItemTableViewController?
 
     // Segue identifier to add an event
     private let addEventSegueIdentifier = "AddEventSegue"
@@ -98,37 +92,11 @@ class MonthItemViewController: UIViewController {
             monthItemCollectionViewController = segue.destinationViewController as? MonthItemCollectionViewController
             monthItemCollectionViewController!.loadData(dateComponents!)
         case tableViewSegueIdentifier:
-            //monthItemTableView = segue.destinationViewController as! MonthItemTableViewController
+            monthItemTableViewController = segue.destinationViewController as? MonthItemTableViewController
             break
         default:
             break
         }
-        /*// True if adding an event
-        if segue.identifier == addEventSegueIdentifier {
-            // Get current hour and minute
-            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
-                NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
-            
-            let initialDateComponents = monthItemCollectionViewController!.dateComponents!.copy() as! NSDateComponents
-            initialDateComponents.hour = currentTime.hour
-            initialDateComponents.minute = currentTime.minute
-            
-            // Set initial date choice on date picker as selected date, at current hour and minute
-            let initialDate = calendar.dateFromComponents(initialDateComponents)
-            
-            // Find view controller for adding events
-            let navigationController = segue.destinationViewController as! UINavigationController
-            let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
-            // Set initial date information for event
-            addEventViewController.setInitialDate(initialDate!)
-        }
-        else if segue.identifier == collectionViewSegueIdentifier {
-            monthItemCollectionViewController = segue.destinationViewController as? MonthItemCollectionViewController
-            monthItemCollectionViewController!.loadData(dateComponents!)
-        }
-        else if segue.identifier == tableViewSegueIdentifier {
-            //monthItemTableView = segue.destinationViewController as! MonthItemTableViewController
-        }*/
     }
     
     
@@ -137,13 +105,7 @@ class MonthItemViewController: UIViewController {
     }
     
     
-    
     @IBAction func cancelEvent(segue: UIStoryboardSegue) {
         println("Cancel")
     }
-    
-    
-    // Table view functions for event table view
-    
-    
 }

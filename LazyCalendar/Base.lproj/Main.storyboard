@@ -432,8 +432,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Pick Date and Time" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6dH-zm-7mO">
-                                                    <rect key="frame" x="15" y="11" width="150" height="21"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Pick Specific Date and Time" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6dH-zm-7mO" userLabel="Pick Specific Date and Time">
+                                                    <rect key="frame" x="15" y="11" width="227" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
@@ -511,14 +511,14 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Add Event" id="wLI-Ar-jJU">
-                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="Zzn-7a-6Qk">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="Zzn-7a-6Qk" userLabel="Cancel">
                             <connections>
-                                <segue destination="xNc-MM-so5" kind="unwind" unwindAction="cancelEvent:" id="1kT-3D-eYP"/>
+                                <segue destination="xNc-MM-so5" kind="unwind" identifier="CancelEvent" unwindAction="cancelEvent:" id="1kT-3D-eYP"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="save" id="myN-zM-rAG">
+                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="save" id="myN-zM-rAG" userLabel="Save">
                             <connections>
-                                <segue destination="xNc-MM-so5" kind="unwind" unwindAction="saveEvent:" id="r5U-oS-Vg8"/>
+                                <segue destination="xNc-MM-so5" kind="unwind" identifier="SaveEvent" unwindAction="saveEvent:" id="r5U-oS-Vg8"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
