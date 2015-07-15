@@ -20,7 +20,6 @@ class AlarmPickerView: UIPickerView, UIPickerViewDataSource {
     }
     
     func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        println(fields["Days"]!["component"]!)
         switch component {
         case fields["Days"]!["component"]!:
             return fields["Days"]!["maxValue"]!

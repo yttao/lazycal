@@ -7,13 +7,16 @@
 //
 
 import UIKit
+import CoreData
 
-class MonthItemViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class MonthItemViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var monthItemCollectionView: UICollectionView!
     @IBOutlet weak var monthItemTableView: UITableView!
     
     // Used to order months
     var dateIndex: NSDate?
+    
+    private var events = [NSManagedObject]()
 
     // Segue identifier to add an event
     private let addEventSegueIdentifier = "AddEventSegue"
@@ -31,6 +34,7 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     
     // Calendar cell reuse identifier
     private let reuseIdentifier = "DayCell"
+    private let eventCellReuseIdentifier = "EventCell"
     
     // NSCalendarUnits to keep track of
     private let units = NSCalendarUnit.CalendarUnitYear | NSCalendarUnit.CalendarUnitMonth |
@@ -225,6 +229,23 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     // Called on event save
     @IBAction func saveEvent(segue: UIStoryboardSegue) {
         println("Saved event")
+    }
+    
+    
+    // Table view functions for event table view
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return events.count
+    }
+    
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier(eventCellReuseIdentifier) as! UITableViewCell
+        
+        let event = events[indexPath.row]
+        cell.textLabel!.text = event.valueForKey("name") as? String
+        
+        return cell
     }
 }
 
