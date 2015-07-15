@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class MonthItemViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class MonthItemViewController: UIViewController {
     //@IBOutlet weak var monthItemCollectionView: UICollectionView!
     //@IBOutlet weak var monthItemTableView: UITableView!
     
@@ -21,15 +21,11 @@ class MonthItemViewController: UIViewController, UITableViewDelegate, UITableVie
     
     var monthItemCollectionView: UICollectionView?
     // var monthItemTableView: UITableView
-    
-    private var events = [NSManagedObject]()
 
     // Segue identifier to add an event
     private let addEventSegueIdentifier = "AddEventSegue"
     private let collectionViewSegueIdentifier = "CollectionViewSegue"
     private let tableViewSegueIdentifier = "TableViewSegue"
-    
-    private let eventCellReuseIdentifier = "EventCell"
     
     // NSCalendarUnits to keep track of
     private let units = NSCalendarUnit.CalendarUnitYear | NSCalendarUnit.CalendarUnitMonth |
@@ -80,7 +76,6 @@ class MonthItemViewController: UIViewController, UITableViewDelegate, UITableVie
         
         switch segue.identifier! {
         case addEventSegueIdentifier:
-            
             let calendar = NSCalendar.currentCalendar()
             
             // Get current hour and minute
@@ -136,9 +131,11 @@ class MonthItemViewController: UIViewController, UITableViewDelegate, UITableVie
         }*/
     }
     
+    
     @IBAction func saveEvent(segue: UIStoryboardSegue) {
         println("Save")
     }
+    
     
     
     @IBAction func cancelEvent(segue: UIStoryboardSegue) {
@@ -148,17 +145,5 @@ class MonthItemViewController: UIViewController, UITableViewDelegate, UITableVie
     
     // Table view functions for event table view
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return events.count
-    }
     
-    
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(eventCellReuseIdentifier) as! UITableViewCell
-        
-        let event = events[indexPath.row]
-        cell.textLabel!.text = event.valueForKey("name") as? String
-        
-        return cell
-    }
 }
