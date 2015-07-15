@@ -145,7 +145,7 @@
         <!--MonthItemTableViewController-->
         <scene sceneID="j1l-Jb-yxZ">
             <objects>
-                <tableViewController storyboardIdentifier="MonthItemTableViewController" title="MonthItemTableViewController" id="FJJ-Nz-Px7" userLabel="MonthItemTableViewController" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="MonthItemTableViewController" title="MonthItemTableViewController" id="FJJ-Nz-Px7" userLabel="MonthItemTableViewController" customClass="MonthItemTableViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="z2x-DF-yon">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="236"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>

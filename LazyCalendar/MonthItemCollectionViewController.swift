@@ -10,8 +10,13 @@ import UIKit
 
 class MonthItemCollectionViewController: UICollectionViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
+    var delegate: MonthItemCollectionViewControllerDelegate?
+    
     var dateIndex: NSDate?
     var dateComponents: NSDateComponents?
+    
+    // Parent view controller
+    private var monthItemViewController: MonthItemViewController?
     
     // 7 days in a week
     private static let numDaysInWeek = 7
@@ -38,6 +43,7 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     private let calendar = NSCalendar.currentCalendar()
     // Currently selected cell
     private var selectedCell: CalendarCollectionViewCell?
+    
     // Start weekday
     private var monthStartWeekday = 0
     // Keeps track of current date view components
@@ -55,7 +61,8 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     }
     
     // Loads initial data to use
-    func loadData(components: NSDateComponents) {
+    func loadData(components: NSDateComponents, delegate: MonthItemCollectionViewControllerDelegate) {
+        self.delegate = delegate
         // Copy datecomponents to prevent unexpected changes
         self.dateComponents = components.copy() as? NSDateComponents
         
@@ -115,8 +122,10 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         dateComponents = getNewDateComponents(dateComponents!)
         
         // Show events for date
-        let selectedDate = calendar.dateFromComponents(dateComponents!)
+        let selectedDate = calendar.dateFromComponents(dateComponents!)!
         // Select date function
+        // Alert delegate that collection view did change selected day
+        delegate?.monthItemCollectionViewControllerDidChangeSelectedDate(selectedDate)
     }
     
     
@@ -197,4 +206,10 @@ extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout 
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
         return UIEdgeInsetsZero
     }
+}
+
+
+// Delegate protocol
+protocol MonthItemCollectionViewControllerDelegate {
+    func monthItemCollectionViewControllerDidChangeSelectedDate(date: NSDate)
 }

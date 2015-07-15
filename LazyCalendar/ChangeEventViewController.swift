@@ -376,11 +376,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             event.setValue(alarmTime, forKey: "alarmTime")
         }
         
-        println(event.valueForKey("name"))
-        println(event.valueForKey("dateStart"))
-        println(event.valueForKey("dateEnd"))
-        println(event.valueForKey("alarm"))
-        println(event.valueForKey("alarmTime"))
+        var error: NSError?
+        if !managedContext.save(&error) {
+            assert(false, "Could not save \(error), \(error?.userInfo)")
+        }
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

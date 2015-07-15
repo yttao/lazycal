@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class MonthItemViewController: UIViewController {
+class MonthItemViewController: UIViewController, MonthItemCollectionViewControllerDelegate {
     @IBOutlet weak var monthItemCollectionViewContainer: UIView!
     @IBOutlet weak var monthItemTableViewContainer: UIView!
     
@@ -57,12 +57,7 @@ class MonthItemViewController: UIViewController {
         // Sets title as month year
         self.navigationItem.title = "\(monthSymbol) \(components.year)"
     }
-    
-    // Shows events for a date
-    func ShowEvents(date: NSDate) {
-        println(date)
-    }
-    
+
     
     // Sets up necessary data when changing to different view
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -90,13 +85,19 @@ class MonthItemViewController: UIViewController {
             addEventViewController.setInitialDate(initialDate!)
         case collectionViewSegueIdentifier:
             monthItemCollectionViewController = segue.destinationViewController as? MonthItemCollectionViewController
-            monthItemCollectionViewController!.loadData(dateComponents!)
+            monthItemCollectionViewController!.loadData(dateComponents!, delegate: self)
         case tableViewSegueIdentifier:
             monthItemTableViewController = segue.destinationViewController as? MonthItemTableViewController
             break
         default:
             break
         }
+    }
+    
+    
+    func monthItemCollectionViewControllerDidChangeSelectedDate(date: NSDate) {
+        // On date selection, show events for that date
+        monthItemTableViewController!.showEvents(date)
     }
     
     
