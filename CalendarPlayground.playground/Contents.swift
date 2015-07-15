@@ -27,4 +27,8 @@ var firstDayComponents = calendar.components(NSCalendarUnit.CalendarUnitWeekday,
 let label = UILabel()
 let date = NSDate()
 label.text = String(_cocoaString: date)
-println(label.text!)
+
+
+private let fields = ["Days": ["component": 0, "maxValue": 30], "Hours": 1, "Minutes": 2]
+
+NSLog("%d", fields["Days"]!["component"]!)

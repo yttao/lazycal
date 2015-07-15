@@ -39,14 +39,19 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     @IBOutlet weak var alarmSwitch: UISwitch!
     @IBOutlet weak var alarmDateSwitch: UISwitch!
     
+    // Displays alarm time
     @IBOutlet weak var alarmTimeMainLabel: UILabel!
     @IBOutlet weak var alarmTimeDetailsLabel: UILabel!
+    
+    // Picks alarm time
+    @IBOutlet weak var alarmTimePicker: UIDatePicker!
+    
     // Section headers associated with section numbers
-    private let sections = ["Name": 0, "From": 1, "To": 2, "Alarm": 3]
+    private let sections = ["Name": 0, "Start": 1, "End": 2, "Alarm": 3]
     
     // Keeps track of index paths
     private let indexPaths = ["Name": NSIndexPath(forRow: 0, inSection: 0),
-        "From": NSIndexPath(forRow: 0, inSection: 1), "To": NSIndexPath(forRow: 0, inSection: 2),
+        "Start": NSIndexPath(forRow: 0, inSection: 1), "End": NSIndexPath(forRow: 0, inSection: 2),
         "AlarmToggle": NSIndexPath(forRow: 0, inSection: 3),
         "AlarmDateToggle": NSIndexPath(forRow: 1, inSection: 3),
         "AlarmTimeDisplay": NSIndexPath(forRow: 2, inSection: 3),
@@ -118,14 +123,18 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         eventDateFormatter.dateFormat = "MMM dd, yyyy"
         eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(date!)
         eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(nextHourDate)
+        alarmTimeMainLabel.text = eventDateFormatter.stringFromDate(date!)
         
         // Format and set details labels
         eventDateFormatter.dateFormat = "h:mm a"
         eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(date!)
         eventDateEndDetailsLabel.text = eventDateFormatter.stringFromDate(nextHourDate)
+        alarmTimeDetailsLabel.text = eventDateFormatter.stringFromDate(date!)
         
         alarmSwitch.on = false
         alarmDateSwitch.on = false
+
+        alarmTimePicker.date = date!
     }
     
     
@@ -166,8 +175,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             eventNameTextField.userInteractionEnabled = true
             eventNameTextField.becomeFirstResponder()
             tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .None)
-        case sections["From"]!:
-            selectedIndexPath = indexPaths["From"]
+        case sections["Start"]!:
+            selectedIndexPath = indexPaths["Start"]
             // Hide date start labels
             eventDateStartMainLabel.hidden = true
             eventDateStartDetailsLabel.hidden = true
@@ -182,8 +191,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             cell.contentView.didAddSubview(eventDateStartPicker)
             
             tableView.endUpdates()
-        case sections["To"]!:
-            selectedIndexPath = indexPaths["To"]
+        case sections["End"]!:
+            selectedIndexPath = indexPaths["End"]
             
             // Hide date end labels
             eventDateEndMainLabel.hidden = true
@@ -205,10 +214,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     @IBAction func toggleAlarmOptions(sender: AnyObject) {
-        if selectedIndexPath != nil {
-            tableView.deselectRowAtIndexPath(selectedIndexPath!, animated: false)
-            selectedIndexPath = nil
-        }
         if let alarmToggle = sender as? UISwitch {
             if alarmToggle.on {
                 showMoreAlarmOptions()
@@ -220,9 +225,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
+    // Shows more alarm options
     func showMoreAlarmOptions() {
         println("***MORE***")
         tableView.beginUpdates()
+        
         let alarmDateToggleCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmDateToggle"]!)
         let alarmTimeDisplayCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimeDisplay"]!)
         let alarmTimePickerCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimePicker"]!)
@@ -235,22 +242,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         alarmTimeDisplayCell!.hidden = false
         alarmTimePickerCell!.hidden = false
         
-        println(tableView.contentSize)
-        //tableView.reloadData()
-        //resizeTableViewFrameHeight()
         tableView.endUpdates()
-        //tableView.reloadData()
-        //resizeTableViewFrameHeight()
-        tableView.reloadData()
-        println(tableView.contentSize)
-        NSLog("(%d, %d): (%d, %d)", tableView.bounds.origin.x, tableView.bounds.origin.y,
-        tableView.bounds.width, tableView.bounds.height)
     }
     
     
+    // Shows less alarm options
     func showLessAlarmOptions() {
         println("***LESS***")
         tableView.beginUpdates()
+        
         let alarmDateToggleCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmDateToggle"]!)
         let alarmTimeDisplayCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimeDisplay"]!)
         let alarmTimePickerCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimePicker"]!)
@@ -262,17 +262,18 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         alarmDateToggleCell!.hidden = true
         alarmTimeDisplayCell!.hidden = true
         alarmTimePickerCell!.hidden = true
+        
         tableView.endUpdates()
-        //tableView.reloadData()
-        //println(tableView.contentSize)
     }
     
     
-    func resizeTableViewFrameHeight() {
-        var frame = tableView.frame
-        let size = self.tableView.sizeThatFits(CGSizeMake(frame.size.width, CGFloat(UINT32_MAX)))
-        frame.size.height = size.height
-        tableView.frame = frame
+    @IBAction func updateAlarmTimeDisplay(sender: AnyObject) {
+        // Main label shows format: month day, year
+        eventDateFormatter.dateFormat = "MMM dd, yyyy"
+        alarmTimeMainLabel.text = eventDateFormatter.stringFromDate(alarmTimePicker.date)
+        
+        eventDateFormatter.dateFormat = "h:mm a"
+        alarmTimeDetailsLabel.text = eventDateFormatter.stringFromDate(alarmTimePicker.date)
     }
     
     
@@ -286,7 +287,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 eventNameTextField.userInteractionEnabled = false
                 eventNameTextField.resignFirstResponder()
             // If deselecting date start field, hide date start picker and show labels
-            case sections["From"]!:
+            case sections["Start"]!:
                 tableView.beginUpdates()
                 
                 let cell = tableView.cellForRowAtIndexPath(indexPath)!
@@ -298,7 +299,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 
                 tableView.endUpdates()
             // If deselecting date end field, hide date end picker and show labels
-            case sections["To"]!:
+            case sections["End"]!:
                 tableView.beginUpdates()
                 
                 let cell = tableView.cellForRowAtIndexPath(indexPath)!
@@ -322,10 +323,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         case sections["Name"]!:
             return eventNameCellHeight
         // Event date start field changes height based on if it is selected or not
-        case sections["From"]!:
+        case sections["Start"]!:
             return eventDateStartCellHeight
         // Event date end field changes height based on if it is selected or not
-        case sections["To"]!:
+        case sections["End"]!:
             return eventDateEndCellHeight
         case sections["Alarm"]!:
             switch indexPath.row {
