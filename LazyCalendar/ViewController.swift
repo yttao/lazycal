@@ -93,8 +93,8 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
     
     // On month switch, change date components to reflect current month and clear selections from past months.
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
-        let newMonth = pageViewController.viewControllers.first!.childViewControllers.first! as! MonthItemViewController
-        let oldMonth = previousViewControllers.first!.childViewControllers.first! as! MonthItemViewController
+        let newMonth = (pageViewController.viewControllers.first!.childViewControllers.first! as! MonthItemViewController).monthItemCollectionViewController!
+        let oldMonth = (previousViewControllers.first!.childViewControllers.first! as! MonthItemViewController).monthItemCollectionViewController!
         
         // Change current month based on whether you went to previous or next month
         if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) ==

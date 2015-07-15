@@ -10,9 +10,17 @@ import UIKit
 import CoreData
 
 class MonthItemViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UITableViewDelegate, UITableViewDataSource {
-    @IBOutlet weak var monthItemCollectionView: UICollectionView!
-    @IBOutlet weak var monthItemTableView: UITableView!
+    //@IBOutlet weak var monthItemCollectionView: UICollectionView!
+    //@IBOutlet weak var monthItemTableView: UITableView!
     
+    @IBOutlet weak var monthItemCollectionViewContainer: UIView!
+    @IBOutlet weak var monthItemTableViewContainer: UIView!
+    
+    var monthItemCollectionViewController: MonthItemCollectionViewController?
+    //var monthItemTableViewController: MonthItemTableViewController?
+    
+    var monthItemCollectionView: UICollectionView?
+    // var monthItemTableView: UITableView
     // Used to order months
     var dateIndex: NSDate?
     
@@ -61,14 +69,12 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
     // Loads initial data
     override func viewDidLoad() {
         super.viewDidLoad()
-        monthItemCollectionView.delegate = self
-        monthItemCollectionView.dataSource = self
+        //monthItemCollectionView.delegate = self
+        //monthItemCollectionView.dataSource = self
         
         // Add height constraint determined by device size
-        let heightConstraint = NSLayoutConstraint(item: monthItemCollectionView, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
-        monthItemCollectionView.addConstraint(heightConstraint)
-        println(monthItemCollectionView.frame.height)
-        println(monthItemTableView.frame.height)
+        let heightConstraint = NSLayoutConstraint(item: monthItemCollectionViewContainer, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
+        monthItemCollectionViewContainer.addConstraint(heightConstraint)
     }
 
     
@@ -201,10 +207,29 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
         // True if adding an event
         if segue.identifier == addEventSegueIdentifier {
             // Get current hour and minute
+            /*let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
+                NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
+            
+            //let initialDateComponents = dateComponents!.copy() as! NSDateComponents
+            initialDateComponents.hour = currentTime.hour
+            initialDateComponents.minute = currentTime.minute
+            
+            // Set initial date choice on date picker as selected date, at current hour and minute
+            let initialDate = calendar.dateFromComponents(initialDateComponents)
+            
+            // Find view controller for adding events
+            let navigationController = segue.destinationViewController as! UINavigationController
+            let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
+            // Set initial date information for event
+            addEventViewController.setInitialDate(initialDate!)*/
+            
+            
+            
+            // Get current hour and minute
             let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
                 NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
             
-            let initialDateComponents = dateComponents!.copy() as! NSDateComponents
+            let initialDateComponents = monthItemCollectionViewController!.dateComponents!.copy() as! NSDateComponents
             initialDateComponents.hour = currentTime.hour
             initialDateComponents.minute = currentTime.minute
             
@@ -216,6 +241,13 @@ class MonthItemViewController: UIViewController, UICollectionViewDataSource, UIC
             let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
             // Set initial date information for event
             addEventViewController.setInitialDate(initialDate!)
+        }
+        else if segue.destinationViewController.title == "MonthItemCollectionViewController" {
+            monthItemCollectionViewController = segue.destinationViewController as? MonthItemCollectionViewController
+            monthItemCollectionViewController!.loadData(dateComponents!)
+        }
+        else if segue.destinationViewController.title == "MonthItemTableViewController" {
+            //monthItemTableView = segue.destinationViewController as! MonthItemTableViewController
         }
     }
     
