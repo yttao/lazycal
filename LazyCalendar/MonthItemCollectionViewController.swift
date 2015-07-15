@@ -55,15 +55,15 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     }
     
     // Loads initial data to use
-    func loadData(dateComponents: NSDateComponents) {
+    func loadData(components: NSDateComponents) {
         // Copy datecomponents to prevent unexpected changes
-        self.dateComponents = dateComponents.copy() as? NSDateComponents
+        self.dateComponents = components.copy() as? NSDateComponents
         
-        monthStartWeekday = getMonthStartWeekday(self.dateComponents!)
+        monthStartWeekday = getMonthStartWeekday(components)
         
-        dateIndex = calendar.dateFromComponents(self.dateComponents!)
+        dateIndex = calendar.dateFromComponents(components)
         
-        let numDays = self.calendar.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: self.calendar.dateFromComponents(self.dateComponents!)!).length
+        let numDays = self.calendar.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: self.calendar.dateFromComponents(components)!).length
         
         for (var i = monthStartWeekday - 1; i < numDays + (monthStartWeekday - 1); i++) {
             daysInMonth[i] = i - (monthStartWeekday - 2)
@@ -72,10 +72,10 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         // Gets month in string format
         let dateFormatter = NSDateFormatter()
         let months = dateFormatter.monthSymbols
-        let monthSymbol = months[dateComponents.month - 1] as! String
+        let monthSymbol = months[components.month - 1] as! String
         
         // Sets title as month year
-        self.navigationItem.title = "\(monthSymbol) \(dateComponents.year)"
+        self.navigationItem.title = "\(monthSymbol) \(components.year)"
     }
     
     

@@ -49,13 +49,13 @@
                                     <constraint firstAttribute="height" constant="300" placeholder="YES" id="4Ig-Yw-PQc"/>
                                 </constraints>
                                 <connections>
-                                    <segue destination="pQA-1g-TTb" kind="embed" id="rV5-uN-8Uc"/>
+                                    <segue destination="pQA-1g-TTb" kind="embed" identifier="CollectionViewSegue" id="rV5-uN-8Uc"/>
                                 </connections>
                             </containerView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mfm-EE-QX8">
                                 <rect key="frame" x="0.0" y="300" width="600" height="236"/>
                                 <connections>
-                                    <segue destination="FJJ-Nz-Px7" kind="embed" id="B8s-AW-7TP"/>
+                                    <segue destination="FJJ-Nz-Px7" kind="embed" identifier="TableViewSegue" id="B8s-AW-7TP"/>
                                 </connections>
                             </containerView>
                         </subviews>
@@ -74,7 +74,6 @@
                     <navigationItem key="navigationItem" title="Month" id="qr9-bq-Ai5" userLabel="MonthItemNavigationBar">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="KCg-mh-iyA">
                             <connections>
-                                <action selector="addEvent:" destination="s3a-8X-qOr" id="DCd-8r-jrO"/>
                                 <segue destination="Kpu-RP-WZZ" kind="presentation" identifier="AddEventSegue" id="edf-XK-E42"/>
                             </connections>
                         </barButtonItem>
@@ -514,12 +513,12 @@
                     <navigationItem key="navigationItem" title="Add Event" id="wLI-Ar-jJU">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="Zzn-7a-6Qk">
                             <connections>
-                                <segue destination="xNc-MM-so5" kind="unwind" unwindAction="cancelEvent:" id="jgU-bI-mij"/>
+                                <segue destination="xNc-MM-so5" kind="unwind" unwindAction="cancelEvent:" id="1kT-3D-eYP"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" style="done" systemItem="save" id="myN-zM-rAG">
                             <connections>
-                                <segue destination="xNc-MM-so5" kind="unwind" unwindAction="saveEvent:" id="aGE-TZ-y1l"/>
+                                <segue destination="xNc-MM-so5" kind="unwind" unwindAction="saveEvent:" id="r5U-oS-Vg8"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

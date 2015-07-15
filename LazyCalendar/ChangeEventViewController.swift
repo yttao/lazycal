@@ -136,7 +136,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
 
         alarmTimePicker.date = date!
     }
-    
+
     
     // When date start picker changes, update date start labels
     func updateEventDateStartLabels() {
@@ -275,7 +275,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         eventDateFormatter.dateFormat = "h:mm a"
         alarmTimeDetailsLabel.text = eventDateFormatter.stringFromDate(alarmTimePicker.date)
     }
-    
     
     // Called on cell deselection (when a different cell is selected)
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
