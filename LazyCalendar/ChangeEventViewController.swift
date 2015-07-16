@@ -357,7 +357,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     func saveEvent() {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext!
-
+        
         let entity = NSEntityDescription.entityForName("TestEvent", inManagedObjectContext: managedContext)!
         
         let event = NSManagedObject(entity: entity, insertIntoManagedObjectContext: managedContext)

@@ -10,10 +10,15 @@ import UIKit
 import CoreData
 
 class MonthItemTableViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
-    
+
     private var events = [NSManagedObject]()
     
     private let reuseIdentifier = "EventCell"
+    
+    
+    required init!(coder aDecoder: NSCoder!) {
+        super.init(coder: aDecoder)
+    }
     
     
     override func viewDidLoad() {
@@ -35,12 +40,25 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as? EventTableViewCell
+        println(cell)
         
+        println(events.count)
+        println(indexPath.row)
         let event = events[indexPath.row]
-        cell.textLabel!.text = event.valueForKey("name") as? String
+        println(event)
+        if event.valueForKey("name") as? String != nil {
+            //cell!.textLabel!.text = event.valueForKey("name") as? String
+            cell?.eventNameLabel.text = event.valueForKey("name") as? String
+        }
         
-        return cell
+        
+        return cell!
+    }
+    
+    
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return UITableViewCell().frame.height
     }
     
     
@@ -54,11 +72,16 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let entity = NSEntityDescription.entityForName("TestEvent", inManagedObjectContext: managedContext)!
         
         // Create fetch request for data
-        let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = entity
+        let fetchRequest = NSFetchRequest(entityName: "TestEvent")
         
         // Format for finding data
-        let predicate = NSPredicate(format: "(dateStart LIKE date)", argumentArray: nil)
+        //let predicate = NSPredicate(format: "(dateStart LIKE '\(date)')", argumentArray: nil)
+        //fetchRequest.predicate = predicate
+        
+        
+        // Execute fetch request
+        var error: NSError? = nil
+        events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [NSManagedObject]
         
         // Display events (no order for now)
         tableView.reloadData()
