@@ -94,7 +94,16 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    // Initialize information on view load
+    /*
+        @brief Initialize information on view load.
+        @discussion Provides setup information for the initial data, before the user changes anything.
+        1. Set the table view delegate and data source if they are not already set.
+        2. Disable the event name text field. This is done to allow proper cell selection (which is not possible if the text field can be clicked on within its section).
+        3. Set date start picker date to the selected date (or the first day of the month if none are selected) and the picker time to the current time (in hours and minutes). Set date end picker time to show one hour after the date start picker date and time.
+        4. Add event listeners that are informed when event date start picker or end picker are changed. Update the event start and end labels. Additionally, if the event start time is changed, the minimum time for the event end time is modified if the end time will come before the start time.
+        5. Format the event start and end labels. The main labels show the format: month day, year. The details labels show the format: hour:minutes period.
+        6. Default set the alarm switches off and the alarm time picker to the initial date start.
+    */
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -107,7 +116,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         
         // Set initial picker value to selected date and end picker value to 1 hour later
         eventDateStartPicker.date = date!
-        let hour = NSTimeInterval(3600)
+        let hour = NSTimeInterval(60 * 60)
         let nextHourDate = date!.dateByAddingTimeInterval(hour)
         eventDateEndPicker.date = nextHourDate
         
@@ -115,6 +124,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         eventDateStartPicker.addTarget(self, action: "updateEventDateStartLabels", forControlEvents:
             .ValueChanged)
         eventDateEndPicker.addTarget(self, action: "updateEventDateEndLabels", forControlEvents: .ValueChanged)
+        eventDateStartPicker.addTarget(self, action: "updateEventDateEndPicker", forControlEvents: .ValueChanged)
         
         // Format and set main date labels
         eventDateFormatter.dateFormat = "MMM dd, yyyy"
@@ -135,7 +145,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
 
     
-    // When date start picker changes, update date start labels
+    /*
+        @brief When date start picker changes, update date start labels.
+    */
     func updateEventDateStartLabels() {
         eventDateFormatter.dateFormat = "MMM dd, yyyy"
         eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
@@ -146,7 +158,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    // When date end picker changes, update date end labels
+    /*
+        @brief When date end picker changes, update date end labels
+    */
     func updateEventDateEndLabels() {
         eventDateFormatter.dateFormat = "MMM dd, yyyy"
         eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(eventDateEndPicker.date)
@@ -156,12 +170,32 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    // Number of fields to fill in
+    /*
+        @brief When date start picker is changed, update the minimum date.
+        @discussion The date end picker should not be able to choose a date before the date start, so it 
+        should have a lower limit placed on the date it can choose.
+    */
+    func updateEventDateEndPicker() {
+        if (eventDateEndPicker.date.compare(eventDateStartPicker.date) == .OrderedAscending) {
+            eventDateEndPicker.minimumDate = eventDateStartPicker.date
+            eventDateEndPicker.date = eventDateStartPicker.date
+            updateEventDateEndLabels()
+        }
+        eventDateEndPicker.reloadInputViews()
+    }
+    
+    
+    /*
+        @brief Number of sections in table view.
+    */
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return sections.count
     }
     
 
+    /*
+        @brief Performs actions based on selected index path.
+    */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         println("***Selected: \(indexPath.section)\t\(indexPath.row)")
         let cell = tableView.cellForRowAtIndexPath(indexPath)!
@@ -210,31 +244,40 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         }
     }
     
+    
+    /*
+        @brief On alarm switch toggle, show more or less options.
+    */
     @IBAction func toggleAlarmOptions(sender: AnyObject) {
         if let alarmToggle = sender as? UISwitch {
             if alarmToggle.on {
                 showMoreAlarmOptions()
             }
             else {
-                showLessAlarmOptions()
+                showFewerAlarmOptions()
             }
         }
     }
     
     
-    // Shows more alarm options
+    /*
+        @brief Shows more alarm options
+    */
     func showMoreAlarmOptions() {
         println("***MORE***")
         tableView.beginUpdates()
         
+        // Get alarm options cells
         let alarmDateToggleCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmDateToggle"]!)
         let alarmTimeDisplayCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimeDisplay"]!)
         let alarmTimePickerCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimePicker"]!)
         
+        // Set cell heights
         alarmDateToggleCellHeight = DEFAULT_CELL_HEIGHT
         alarmTimeDisplayCellHeight = DEFAULT_CELL_HEIGHT
         alarmTimePickerCellHeight = PICKER_CELL_HEIGHT
         
+        // Show options
         alarmDateToggleCell!.hidden = false
         alarmTimeDisplayCell!.hidden = false
         alarmTimePickerCell!.hidden = false
@@ -243,19 +286,24 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    // Shows less alarm options
-    func showLessAlarmOptions() {
+    /*
+        @brief Shows fewer alarm options
+    */
+    func showFewerAlarmOptions() {
         println("***LESS***")
         tableView.beginUpdates()
         
+        // Get alarm options cells
         let alarmDateToggleCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmDateToggle"]!)
         let alarmTimeDisplayCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimeDisplay"]!)
         let alarmTimePickerCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimePicker"]!)
         
+        // Set cell heights to 0
         alarmDateToggleCellHeight = 0
         alarmTimeDisplayCellHeight = 0
         alarmTimePickerCellHeight = 0
         
+        // Hide options
         alarmDateToggleCell!.hidden = true
         alarmTimeDisplayCell!.hidden = true
         alarmTimePickerCell!.hidden = true
@@ -264,6 +312,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
+    /*
+        @brief Update alarm time display when alarm time picker is changed.
+    */
     @IBAction func updateAlarmTimeDisplay(sender: AnyObject) {
         // Main label shows format: month day, year
         eventDateFormatter.dateFormat = "MMM dd, yyyy"
@@ -272,6 +323,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         eventDateFormatter.dateFormat = "h:mm a"
         alarmTimeDetailsLabel.text = eventDateFormatter.stringFromDate(alarmTimePicker.date)
     }
+    
     
     // Called on cell deselection (when a different cell is selected)
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
@@ -353,6 +405,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
+    /*
+        @brief Saves an event's data.
+    */
     func saveEvent() {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext!

@@ -74,26 +74,23 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let calendar = NSCalendar.currentCalendar()
         
-        var error: NSError? = nil
-        println("***ALL***")
-        let allEvents = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [NSManagedObject]
-        for (var i = 0; i < allEvents.count; i++) {
-            println(allEvents[i].valueForKey("dateStart"))
-        }
-        
+        // 1 day time interval in seconds
         let fullDay = NSTimeInterval(60 * 60 * 24)
         let components = calendar.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: date)
+        // Lower limit on date of events is midnight of that day (inclusive)
         let lowerDate: NSDate = calendar.dateFromComponents(components)!
+        // Upper limit on date of events is midnight of next day (not inclusive)
         let upperDate: NSDate = lowerDate.dateByAddingTimeInterval(fullDay)
         
+        // Requirements to show an event: the time interval from dateStart to dateEnd must fall between lowerDate and upperDate
         // (dateStart >= lower && dateStart < upper) || (dateEnd >= lower && dateEnd < upper) || (dateStart < lower && dateEnd >= lower) || (dateStart < upper && dateEnd >= upper)
-        let requirements = "(dateStart >= %@ && dateStart < %@) || (dateEnd >= %@ && dateEnd < %@) || (dateStart < %@ && dateEnd >= %@) || (dateStart < %@ && dateEnd >= %@)"
+        let requirements = "(dateStart >= %@ && dateStart < %@) || (dateEnd >= %@ && dateEnd < %@) || (dateStart <= %@ && dateEnd >= %@) || (dateStart <= %@ && dateEnd >= %@)"
         let predicate = NSPredicate(format: requirements, lowerDate, upperDate, lowerDate, upperDate, lowerDate, lowerDate, upperDate, upperDate)
         fetchRequest.predicate = predicate
-        println(fetchRequest.predicate)
         
         
         // Execute fetch request
+        var error: NSError? = nil
         events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [NSManagedObject]
         println("***SELECTED***")
         for (var i = 0; i < events.count; i++) {
