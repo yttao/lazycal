@@ -86,10 +86,11 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let lowerDate: NSDate = calendar.dateFromComponents(components)!
         let upperDate: NSDate = lowerDate.dateByAddingTimeInterval(fullDay)
         
-        let requirements = "(dateStart >= %@) AND (dateStart < %@)"
-        let predicate = NSPredicate(format: requirements, lowerDate, upperDate)
+        // (dateStart >= lower && dateStart < upper) || (dateEnd >= lower && dateEnd < upper) || (dateStart < lower && dateEnd >= lower) || (dateStart < upper && dateEnd >= upper)
+        let requirements = "(dateStart >= %@ && dateStart < %@) || (dateEnd >= %@ && dateEnd < %@) || (dateStart < %@ && dateEnd >= %@) || (dateStart < %@ && dateEnd >= %@)"
+        let predicate = NSPredicate(format: requirements, lowerDate, upperDate, lowerDate, upperDate, lowerDate, lowerDate, upperDate, upperDate)
         fetchRequest.predicate = predicate
-        //println(fetchRequest.predicate)
+        println(fetchRequest.predicate)
         
         
         // Execute fetch request
