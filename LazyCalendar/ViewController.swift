@@ -134,4 +134,19 @@ class ViewController: UIViewController, UIPageViewControllerDataSource, UIPageVi
 
         return monthItemNavigationController
     }
+    
+    
+    /*override func viewWillDisappear(animated: Bool) {
+        view.subviews
+        self.resignFirstResponder()
+        pageViewController?.resignFirstResponder()
+        println("view disappeared")
+        for (var i = 0; i < view.subviews.count; i++) {
+            let v = view.subviews[i] as! UIResponder
+            let c = UIView.isFirstResponder(view.subviews[i] as! UIResponder)
+            if c {
+                println(view.subviews[i] as! UIView)
+            }
+        }
+    }*/
 }

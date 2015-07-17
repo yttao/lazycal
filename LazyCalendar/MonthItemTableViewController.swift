@@ -96,8 +96,6 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         for (var i = 0; i < events.count; i++) {
             var dateStart = events[i].valueForKey("dateStart") as! NSDate
             var name = events[i].valueForKey("name") as! String
-            println(dateStart)
-            println(name)
         }
         
         // Display events (no order for now)
