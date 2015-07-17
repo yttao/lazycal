@@ -142,6 +142,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         
         eventDateFormatter.dateFormat = "h:mm a"
         eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
+        println(eventDateStartPicker.date)
     }
     
     
@@ -365,6 +366,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         let dateEnd = eventDateEndPicker.date
         let alarm = alarmSwitch.on
         let alarmTime = alarmTimePicker.date
+        println("Date saved: \(eventDateStartPicker.date)")
         
         event.setValue(name, forKey: "name")
         event.setValue(dateStart, forKey: "dateStart")

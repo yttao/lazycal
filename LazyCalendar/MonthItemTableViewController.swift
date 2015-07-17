@@ -71,21 +71,36 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         
         // Format for finding data
         let dateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = "MMM dd, yyyy"
+        dateFormatter.dateFormat = "yyyy-MM-dd"
         let calendar = NSCalendar.currentCalendar()
-        let components = calendar.components(.CalendarUnitDay | .CalendarUnitMonth | .CalendarUnitYear, fromDate: date)
-        let day = components.day
-        let month = components.month
-        let year = components.year
         
-        let requirements = "(dateStart LIKE '%d' AND dateStart LIKE '%d')"
-        let predicate = NSPredicate(format: requirements, argumentArray: [day, month])
+        var error: NSError? = nil
+        println("***ALL***")
+        let allEvents = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [NSManagedObject]
+        for (var i = 0; i < allEvents.count; i++) {
+            println(allEvents[i].valueForKey("dateStart"))
+        }
+        
+        let fullDay = NSTimeInterval(60 * 60 * 24)
+        let components = calendar.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: date)
+        let lowerDate: NSDate = calendar.dateFromComponents(components)!
+        let upperDate: NSDate = lowerDate.dateByAddingTimeInterval(fullDay)
+        
+        let requirements = "(dateStart >= %@) AND (dateStart < %@)"
+        let predicate = NSPredicate(format: requirements, lowerDate, upperDate)
         fetchRequest.predicate = predicate
+        //println(fetchRequest.predicate)
         
         
         // Execute fetch request
-        var error: NSError? = nil
         events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [NSManagedObject]
+        println("***SELECTED***")
+        for (var i = 0; i < events.count; i++) {
+            var dateStart = events[i].valueForKey("dateStart") as! NSDate
+            var name = events[i].valueForKey("name") as! String
+            println(dateStart)
+            println(name)
+        }
         
         // Display events (no order for now)
         tableView.reloadData()
