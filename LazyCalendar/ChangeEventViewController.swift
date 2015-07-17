@@ -98,8 +98,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        println(tableView.frame.size.height)
-        
         // Set tableview delegate and data source
         tableView.delegate = self
         tableView.dataSource = self

@@ -41,12 +41,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as? EventTableViewCell
-        println(cell)
-        
-        println(events.count)
-        println(indexPath.row)
         let event = events[indexPath.row]
-        println(event)
         if event.valueForKey("name") as? String != nil {
             //cell!.textLabel!.text = event.valueForKey("name") as? String
             cell?.eventNameLabel.text = event.valueForKey("name") as? String
@@ -75,8 +70,17 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let fetchRequest = NSFetchRequest(entityName: "TestEvent")
         
         // Format for finding data
-        //let predicate = NSPredicate(format: "(dateStart LIKE '\(date)')", argumentArray: nil)
-        //fetchRequest.predicate = predicate
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "MMM dd, yyyy"
+        let calendar = NSCalendar.currentCalendar()
+        let components = calendar.components(.CalendarUnitDay | .CalendarUnitMonth | .CalendarUnitYear, fromDate: date)
+        let day = components.day
+        let month = components.month
+        let year = components.year
+        
+        let requirements = "(dateStart LIKE '%d' AND dateStart LIKE '%d')"
+        let predicate = NSPredicate(format: requirements, argumentArray: [day, month])
+        fetchRequest.predicate = predicate
         
         
         // Execute fetch request
