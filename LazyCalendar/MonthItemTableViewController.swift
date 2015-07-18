@@ -209,4 +209,9 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
             // Load ChangeEventViewController with loadData(withPreexistingEvent:)
         }
     }
+    
+    
+    @IBAction func leaveEventDetails(segue: UIStoryboardSegue) {
+        println("Leave")
+    }
 }

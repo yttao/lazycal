@@ -419,7 +419,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     /*
         @brief Saves an event's data.
     */
-    func saveEvent() {
+    func saveEvent() -> NSManagedObject {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext!
         
@@ -449,14 +449,16 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         if !managedContext.save(&error) {
             assert(false, "Could not save \(error), \(error?.userInfo)")
         }
+        
+        return event
     }
     
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         switch segue.identifier! {
             case "SaveEvent":
-                saveEvent()
-                delegate?.changeEventViewControllerDidSaveEvent()
+                let event = saveEvent()
+                delegate?.changeEventViewControllerDidSaveEvent(event)
             case "CancelEvent":
                 break
         default:
