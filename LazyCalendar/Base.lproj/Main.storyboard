@@ -74,7 +74,7 @@
                     <navigationItem key="navigationItem" title="Month" id="qr9-bq-Ai5" userLabel="MonthItemNavigationBar">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="KCg-mh-iyA">
                             <connections>
-                                <segue destination="Kpu-RP-WZZ" kind="presentation" identifier="AddEventSegue" id="edf-XK-E42"/>
+                                <segue destination="Kpu-RP-WZZ" kind="presentation" identifier="ChangeEventSegue" id="edf-XK-E42"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -172,6 +172,7 @@
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="eventNameLabel" destination="rO5-yU-8cd" id="0wp-06-zzz"/>
+                                    <segue destination="Kpu-RP-WZZ" kind="presentation" id="s4C-DP-etu"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -279,7 +280,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UMk-13-Nm3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="873" y="428"/>
+            <point key="canvasLocation" x="840" y="1404"/>
         </scene>
         <!--MonthItemNavigationController-->
         <scene sceneID="3xo-ef-0IO">
@@ -311,7 +312,7 @@
                         <sections>
                             <tableViewSection headerTitle="Event" id="Jxk-rW-Cv4">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="AwU-zA-sIe">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="AwU-zA-sIe" userLabel="EventName">
                                         <rect key="frame" x="0.0" y="114" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AwU-zA-sIe" id="sl7-LQ-EV9">
@@ -540,6 +541,72 @@
             </objects>
             <point key="canvasLocation" x="221" y="428"/>
         </scene>
+        <!--Table View Controller-->
+        <scene sceneID="Q5X-3t-6vG">
+            <objects>
+                <tableViewController id="Zqd-hf-X19" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="ipw-9M-UjL">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <sections>
+                            <tableViewSection headerTitle="Event" id="rNu-aA-pvm" userLabel="Event">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="CXJ-H8-nbk" userLabel="EventName">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CXJ-H8-nbk" id="HwO-A8-JTZ">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Start" id="EiW-H2-nUj" userLabel="Start">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="rnQ-Do-xpw" userLabel="DateStart">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="rnQ-Do-xpw" id="rDt-15-KuH">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="End" id="LbG-El-Mll" userLabel="End">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="nDX-26-i8B" userLabel="DateEnd">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nDX-26-i8B" id="8BK-6j-n6r">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Alarm" id="aDo-JR-gwk" userLabel="Alarm">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="Gx3-4t-m3E" userLabel="Alarm">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Gx3-4t-m3E" id="v2U-XB-TmO">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="lNb-xl-Gh6" userLabel="AlarmTimeDisplay">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lNb-xl-Gh6" id="Hvd-bz-4ew">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="Zqd-hf-X19" id="rom-IP-RV7"/>
+                            <outlet property="delegate" destination="Zqd-hf-X19" id="HQY-WY-74x"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kOz-eU-Jup" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="910" y="428"/>
+        </scene>
         <!--ChangeEventNavigationController-->
         <scene sceneID="3oe-iH-Ngm">
             <objects>
@@ -556,7 +623,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="T5Z-z1-Ho5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-463" y="368.99999999999994"/>
+            <point key="canvasLocation" x="-463" y="428"/>
         </scene>
         <!--Test View Controller-->
         <scene sceneID="TeE-to-oxO">
@@ -588,4 +655,7 @@
             <point key="canvasLocation" x="-981" y="1060"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="edf-XK-E42"/>
+    </inferredMetricsTieBreakers>
 </document>

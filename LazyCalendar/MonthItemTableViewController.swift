@@ -19,6 +19,8 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     // Cell height
     private let cellHeight = UITableViewCell().frame.height
     
+    private let changeEventSegueIdentifier = "ChangeEventSegue"
+    
     
     required init(coder aDecoder: NSCoder!) {
         super.init(coder: aDecoder)
@@ -26,7 +28,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     
     
     /*
-        @brief Initialize view.
+        @brief Initialize table view.
         @discussion Set data source and delegate to self.
     */
     override func viewDidLoad() {
@@ -131,6 +133,9 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     }
     
     
+    /*
+        @brief On cell selection, pull up table view to show more information.
+    */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         // Get cell and associated event
         let cell = tableView.cellForRowAtIndexPath(indexPath)
@@ -140,13 +145,17 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     }
     
     
-    // Heights are standard table view cell heights
+    /*
+        @brief Cell heights are standard table view cell heights.
+    */
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return cellHeight
     }
     
     
-    // Show events in table form for a date
+    /*
+        @brief Show events in table form for a date.
+    */
     func showEvents(date: NSDate) {
         println("Showing events for \(date)")
         // Find events for that date
@@ -178,14 +187,26 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         // Execute fetch request
         var error: NSError? = nil
         events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [NSManagedObject]
-        println("***SELECTED***")
-        /*for (var i = 0; i < events.count; i++) {
-            var dateStart = events[i].valueForKey("dateStart") as! NSDate
-            var name = events[i].valueForKey("name") as! String
-        }*/
         
-        // Display events sorted by dateStart. (Later add an additional alphabetical sort for two dateStarts at the same times.)
+        // Display events sorted by dateStart. 
+        //TODO: Add an additional alphabetical sort for two dateStarts at the same times.
         events.sort({($0.valueForKey("dateStart") as! NSDate).compare(($1.valueForKey("dateStart") as! NSDate)) == .OrderedAscending})
         tableView.reloadData()
+    }
+    
+    
+    /*
+        @brief Initializes information on segue to event details view.
+    */
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == changeEventSegueIdentifier {
+            let calendar = NSCalendar.currentCalendar()
+            
+            // Get current hour and minute
+            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
+                NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
+            
+            // Load ChangeEventViewController with loadData(withPreexistingEvent:)
+        }
     }
 }

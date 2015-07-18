@@ -17,7 +17,7 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
     var monthItemTableViewController: MonthItemTableViewController?
 
     // Segue identifier to add an event
-    private let addEventSegueIdentifier = "AddEventSegue"
+    private let changeEventSegueIdentifier = "ChangeEventSegue"
     private let collectionViewSegueIdentifier = "CollectionViewSegue"
     private let tableViewSegueIdentifier = "TableViewSegue"
     
@@ -64,7 +64,7 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
         super.prepareForSegue(segue, sender: sender)
         
         switch segue.identifier! {
-        case addEventSegueIdentifier:
+        case changeEventSegueIdentifier:
             let calendar = NSCalendar.currentCalendar()
             
             // Get current hour and minute
@@ -105,12 +105,12 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
     /*
         @brief After saving an event, show the new event if it is in the current table view.
     */
-    func changeEventViewControllerDidSaveEvent() {
+    func changeEventViewControllerDidSaveEvent(event: NSManagedObject) {
         let selectedDate = NSCalendar.currentCalendar().dateFromComponents(monthItemCollectionViewController!.dateComponents!)
         monthItemTableViewController!.showEvents(selectedDate!)
     }
     
-    
+
     @IBAction func saveEvent(segue: UIStoryboardSegue) {
         monthItemTableViewController!.tableView!.reloadData()
         println("Save")

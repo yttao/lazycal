@@ -12,6 +12,7 @@ class MonthItemNavigationController: UINavigationController {
     private var dateComponents: NSDateComponents?
     private var monthItemViewController: MonthItemViewController?
     
+    
     // Initialize with embedded month item view controller
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)

@@ -451,6 +451,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         }
     }
     
+    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         switch segue.identifier! {
             case "SaveEvent":
@@ -467,5 +468,5 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
 
 // Delegate protocol
 protocol ChangeEventViewControllerDelegate {
-    func changeEventViewControllerDidSaveEvent()
+    func changeEventViewControllerDidSaveEvent(event: NSManagedObject)
 }
