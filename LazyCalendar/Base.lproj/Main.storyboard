@@ -26,7 +26,7 @@
         <!--MonthPageViewController-->
         <scene sceneID="gG5-VG-ot4">
             <objects>
-                <pageViewController storyboardIdentifier="MonthPageViewController" autoresizesArchivedViewToFullSize="NO" title="MonthPageViewController" transitionStyle="scroll" navigationOrientation="horizontal" spineLocation="none" id="EkH-VZ-V3c" sceneMemberID="viewController"/>
+                <pageViewController storyboardIdentifier="MonthPageViewController" autoresizesArchivedViewToFullSize="NO" title="MonthPageViewController" transitionStyle="scroll" navigationOrientation="vertical" spineLocation="none" id="EkH-VZ-V3c" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="69i-VH-ED5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="221" y="-999.99999999999989"/>

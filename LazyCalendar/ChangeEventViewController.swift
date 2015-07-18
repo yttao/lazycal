@@ -425,15 +425,17 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         
         let entity = NSEntityDescription.entityForName("TestEvent", inManagedObjectContext: managedContext)!
         
+        // Create event
         let event = NSManagedObject(entity: entity, insertIntoManagedObjectContext: managedContext)
         
+        // Get data
         let name = eventNameTextField.text
         let dateStart = eventDateStartPicker.date
         let dateEnd = eventDateEndPicker.date
         let alarm = alarmSwitch.on
         let alarmTime = alarmTimePicker.date
-        println("Date saved: \(eventDateStartPicker.date)")
         
+        // Set data
         event.setValue(name, forKey: "name")
         event.setValue(dateStart, forKey: "dateStart")
         event.setValue(dateEnd, forKey: "dateEnd")
@@ -442,6 +444,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             event.setValue(alarmTime, forKey: "alarmTime")
         }
         
+        // Save event
         var error: NSError?
         if !managedContext.save(&error) {
             assert(false, "Could not save \(error), \(error?.userInfo)")

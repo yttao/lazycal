@@ -10,9 +10,14 @@ import UIKit
 import CoreData
 
 class MonthItemTableViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
-
+    // The events for selected day
     private var events = [NSManagedObject]()
+    // Reuse identifier for cells
     private let reuseIdentifier = "EventCell"
+    // Name of entity to retrieve data from.
+    private let entityName = "TestEvent"
+    // Cell height
+    private let cellHeight = UITableViewCell().frame.height
     
     
     required init(coder aDecoder: NSCoder!) {
@@ -20,6 +25,10 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     }
     
     
+    /*
+        @brief Initialize view.
+        @discussion Set data source and delegate to self.
+    */
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -28,16 +37,26 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     }
     
 
+    /*
+        @brief Determines the number of sections in the table.
+    */
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
     
 
+    /*
+        @brief Determines the number of rows in the table (equals the number of events on that day).
+    */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return events.count
     }
     
     
+    /*
+        @brief Shows the event name and date start to date end.
+        @discussion The event name appears in the event main label and the date in the details label.
+    */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as? EventTableViewCell
         let event = events[indexPath.row]
@@ -45,13 +64,85 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
             cell?.eventNameLabel.text = event.valueForKey("name") as? String
         }
         
-        
         return cell!
     }
     
     
+    /*
+        @brief Allow table cells to be deleted.
+        @discussion Note: If tableView.editing = true, the left circular edit option will appear.
+    */
+    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+    
+    
+    /*
+        @brief
+    */
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        println("Editing")
+        if editingStyle == UITableViewCellEditingStyle.Delete {
+            println("Deleting")
+            
+            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            let managedContext = appDelegate.managedObjectContext!
+            
+            let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
+            let event = events[indexPath.row]
+
+            // Delete event
+            managedContext.deleteObject(event)
+            
+            // Save changes
+            var error: NSError?
+            if !managedContext.save(&error) {
+                assert(false, "Could not save \(error), \(error?.userInfo)")
+            }
+            
+            // Remove event from list and reload
+            events.removeAtIndex(indexPath.row)
+            tableView.reloadData()
+        }
+    }
+    
+    
+    /*
+        @brief Gives option to delete event.
+    */
+    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
+        return UITableViewCellEditingStyle.Delete
+    }
+    
+    
+    /*
+        @brief Prevents indenting for showing circular edit button on the left when editing.
+    */
+    override func tableView(tableView: UITableView, shouldIndentWhileEditingRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return false
+    }
+    
+    
+    /*
+        @brief Cells cannot be reordered (set to chronological order for now).
+    */
+    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return false
+    }
+    
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        // Get cell and associated event
+        let cell = tableView.cellForRowAtIndexPath(indexPath)
+        let event = events[indexPath.row]
+        
+        // Pull up more event info
+    }
+    
+    
+    // Heights are standard table view cell heights
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return UITableViewCell().frame.height
+        return cellHeight
     }
     
     
@@ -62,10 +153,10 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext!
         
-        let entity = NSEntityDescription.entityForName("TestEvent", inManagedObjectContext: managedContext)!
+        let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
         
         // Create fetch request for data
-        let fetchRequest = NSFetchRequest(entityName: "TestEvent")
+        let fetchRequest = NSFetchRequest(entityName: entityName)
         
         let calendar = NSCalendar.currentCalendar()
         
