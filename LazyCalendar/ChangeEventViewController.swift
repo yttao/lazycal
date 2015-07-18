@@ -10,11 +10,14 @@ import UIKit
 import CoreData
 
 class ChangeEventViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    var delegate: ChangeEventViewControllerDelegate?
+    
     // Calendar
     private let calendar = NSCalendar.currentCalendar()
     
     // Date used for initialization info
-    private var date: NSDate?
+    var date: NSDate?
     
     // Date formatter to control date appearances
     private let eventDateFormatter = NSDateFormatter()
@@ -449,10 +452,17 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         switch segue.identifier! {
             case "SaveEvent":
                 saveEvent()
+                delegate?.changeEventViewControllerDidSaveEvent()
             case "CancelEvent":
                 break
         default:
             break
         }
     }
+}
+
+
+// Delegate protocol
+protocol ChangeEventViewControllerDelegate {
+    func changeEventViewControllerDidSaveEvent()
 }

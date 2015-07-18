@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class MonthItemViewController: UIViewController, MonthItemCollectionViewControllerDelegate {
+class MonthItemViewController: UIViewController, MonthItemCollectionViewControllerDelegate, ChangeEventViewControllerDelegate {
     @IBOutlet weak var monthItemCollectionViewContainer: UIView!
     @IBOutlet weak var monthItemTableViewContainer: UIView!
     
@@ -82,7 +82,8 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
             let navigationController = segue.destinationViewController as! UINavigationController
             let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
             // Set initial date information for event
-            addEventViewController.setInitialDate(initialDate!)
+            addEventViewController.date = initialDate
+            addEventViewController.delegate = self
         case collectionViewSegueIdentifier:
             monthItemCollectionViewController = segue.destinationViewController as? MonthItemCollectionViewController
             monthItemCollectionViewController!.loadData(dateComponents!, delegate: self)
@@ -101,8 +102,18 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
     }
     
     
+    /*
+        @brief After saving an event, show the new event if it is in the current table view.
+    */
+    func changeEventViewControllerDidSaveEvent() {
+        let selectedDate = NSCalendar.currentCalendar().dateFromComponents(monthItemCollectionViewController!.dateComponents!)
+        monthItemTableViewController!.showEvents(selectedDate!)
+    }
+    
+    
     @IBAction func saveEvent(segue: UIStoryboardSegue) {
         monthItemTableViewController!.tableView!.reloadData()
+        println("Save")
     }
     
     
