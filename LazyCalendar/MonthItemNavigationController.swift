@@ -13,8 +13,8 @@ class MonthItemNavigationController: UINavigationController {
     private var monthItemViewController: MonthItemViewController?
     
     // Initialize with embedded month item view controller
-    required init(coder: NSCoder) {
-        super.init(coder: coder)
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
         monthItemViewController = self.viewControllers.first as? MonthItemViewController
     }
     

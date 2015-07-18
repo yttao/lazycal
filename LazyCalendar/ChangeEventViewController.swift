@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class ChangeEventViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
+class ChangeEventViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
     // Calendar
     private let calendar = NSCalendar.currentCalendar()
     
@@ -73,7 +73,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     private var selectedIndexPath: NSIndexPath?
     
     // Initialization, set default heights
-    required init(coder: NSCoder) {
+    required init(coder aDecoder: NSCoder) {
         eventNameCellHeight = DEFAULT_CELL_HEIGHT
         
         eventDateStartCellHeight = DEFAULT_CELL_HEIGHT
@@ -84,7 +84,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         alarmTimeDisplayCellHeight = 0
         alarmTimePickerCellHeight = 0
         
-        super.init(coder: coder)
+        super.init(coder: aDecoder)
     }
     
     
@@ -176,8 +176,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         should have a lower limit placed on the date it can choose.
     */
     func updateEventDateEndPicker() {
-        if (eventDateEndPicker.date.compare(eventDateStartPicker.date) == .OrderedAscending) {
-            eventDateEndPicker.minimumDate = eventDateStartPicker.date
+        let originalDate = eventDateEndPicker.date
+        eventDateEndPicker.minimumDate = eventDateStartPicker.date
+
+        // If the old date end comes after the new date start, change the old date end to equal the new date start.
+        if (originalDate.compare(eventDateStartPicker.date) == .OrderedAscending) {
             eventDateEndPicker.date = eventDateStartPicker.date
             updateEventDateEndLabels()
         }
@@ -247,6 +250,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     */
     @IBAction func toggleAlarmOptions(sender: AnyObject) {
         if let alarmToggle = sender as? UISwitch {
+            // On alarm switch press, deselect current selection
             if selectedIndexPath != nil && selectedIndexPath != indexPaths["AlarmToggle"] {
                 deselectRowAtIndexPath(selectedIndexPath!)
             }
@@ -370,6 +374,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         default:
             break
         }
+        selectedIndexPath = nil
     }
     
     

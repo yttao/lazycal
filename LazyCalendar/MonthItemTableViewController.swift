@@ -12,11 +12,10 @@ import CoreData
 class MonthItemTableViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
 
     private var events = [NSManagedObject]()
-    
     private let reuseIdentifier = "EventCell"
     
     
-    required init!(coder aDecoder: NSCoder!) {
+    required init(coder aDecoder: NSCoder!) {
         super.init(coder: aDecoder)
     }
     
@@ -43,7 +42,6 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as? EventTableViewCell
         let event = events[indexPath.row]
         if event.valueForKey("name") as? String != nil {
-            //cell!.textLabel!.text = event.valueForKey("name") as? String
             cell?.eventNameLabel.text = event.valueForKey("name") as? String
         }
         
@@ -69,9 +67,6 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         // Create fetch request for data
         let fetchRequest = NSFetchRequest(entityName: "TestEvent")
         
-        // Format for finding data
-        let dateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
         let calendar = NSCalendar.currentCalendar()
         
         // 1 day time interval in seconds
@@ -93,12 +88,13 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         var error: NSError? = nil
         events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [NSManagedObject]
         println("***SELECTED***")
-        for (var i = 0; i < events.count; i++) {
+        /*for (var i = 0; i < events.count; i++) {
             var dateStart = events[i].valueForKey("dateStart") as! NSDate
             var name = events[i].valueForKey("name") as! String
-        }
+        }*/
         
-        // Display events (no order for now)
+        // Display events sorted by dateStart. (Later add an additional alphabetical sort for two dateStarts at the same times.)
+        events.sort({($0.valueForKey("dateStart") as! NSDate).compare(($1.valueForKey("dateStart") as! NSDate)) == .OrderedAscending})
         tableView.reloadData()
     }
 }
