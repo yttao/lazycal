@@ -8,44 +8,66 @@
 
 import UIKit
 
-class SelectEventTableViewController: UITableViewController {
+class SelectEventTableViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource {
     
     // Calendar
     private let calendar = NSCalendar.currentCalendar()
     
     // Date formatter to control date appearances
-    private let eventDateFormatter = NSDateFormatter()
+    private let dateFormatter = NSDateFormatter()
     
-    // Text field for event name
-    @IBOutlet weak var eventNameTextField: UITextField!
-    
-    // Labels to display event start info
-    @IBOutlet weak var eventDateStartMainLabel: UILabel!
-    @IBOutlet weak var eventDateStartDetailsLabel: UILabel!
-    
-    // Labels to display event end info
-    @IBOutlet weak var eventDateEndMainLabel: UILabel!
-    @IBOutlet weak var eventDateEndDetailsLabel: UILabel!
-    
-    // Displays alarm time
+    @IBOutlet weak var eventNameLabel: UILabel!
+    @IBOutlet weak var eventTimeLabel: UILabel!
+    @IBOutlet weak var alarmLabel: UILabel!
     @IBOutlet weak var alarmTimeMainLabel: UILabel!
     @IBOutlet weak var alarmTimeDetailsLabel: UILabel!
     
+    private var name: String?
+    private var dateStart: NSDate?
+    private var dateEnd: NSDate?
+    private var alarm: Bool?
+    private var alarmTime: NSDate?
+    
     // Section headers associated with section numbers
-    private let sections = ["Name": 0, "Start": 1, "End": 2, "Alarm": 3]
+    private let sections = ["Details": 0, "Alarm": 1]
     
     // Keeps track of index paths
     private let indexPaths = ["Name": NSIndexPath(forRow: 0, inSection: 0),
-        "Start": NSIndexPath(forRow: 0, inSection: 1), "End": NSIndexPath(forRow: 0, inSection: 2),
-        "AlarmToggle": NSIndexPath(forRow: 0, inSection: 3),
-        "AlarmDateToggle": NSIndexPath(forRow: 1, inSection: 3),
-        "AlarmTimeDisplay": NSIndexPath(forRow: 2, inSection: 3),
-        "AlarmTimePicker": NSIndexPath(forRow: 3, inSection: 3)]
+        "Time": NSIndexPath(forRow: 1, inSection: 0),
+        "AlarmToggle": NSIndexPath(forRow: 0, inSection: 1),
+        "AlarmTimeDisplay": NSIndexPath(forRow: 1, inSection: 1)]
     
     private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
     
     
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        
+        eventNameLabel.text = name
+        dateFormatter.dateFormat = "h:mm a MM/dd/yy"
+        eventTimeLabel.text = "\(dateFormatter.stringFromDate(dateStart!)) to \(dateFormatter.stringFromDate(dateEnd!))"
+        if alarm! {
+            alarmLabel.text = "On"
+        }
+        else {
+            alarmLabel.text = "Off"
+        }
+    }
+    
+    
+    func loadData(name: String, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
+        self.name = name
+        self.dateStart = dateStart
+        self.dateEnd = dateEnd
+        self.alarm = alarm
+        self.alarmTime = alarmTime
     }
 }

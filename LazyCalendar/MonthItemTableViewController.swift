@@ -12,6 +12,8 @@ import CoreData
 class MonthItemTableViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
     // The events for selected day
     private var events = [NSManagedObject]()
+    
+    private var selectedEvent: NSManagedObject?
     // Reuse identifier for cells
     private let reuseIdentifier = "EventCell"
     // Name of entity to retrieve data from.
@@ -19,7 +21,9 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     // Cell height
     private let cellHeight = UITableViewCell().frame.height
     
-    private let changeEventSegueIdentifier = "ChangeEventSegue"
+    private var selectEventTableViewController: SelectEventTableViewController?
+    
+    private let selectEventSegueIdentifier = "SelectEventSegue"
     
     
     required init(coder aDecoder: NSCoder!) {
@@ -137,11 +141,17 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         @brief On cell selection, pull up table view to show more information.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        // Get cell and associated event
-        let cell = tableView.cellForRowAtIndexPath(indexPath)
+        println("Selected")
         let event = events[indexPath.row]
+        selectedEvent = event
         
-        // Pull up more event info
+        let eventName = selectedEvent!.valueForKey("name") as! String
+        let dateStart = selectedEvent!.valueForKey("dateStart") as! NSDate
+        let dateEnd = selectedEvent!.valueForKey("dateEnd") as! NSDate
+        let alarm = selectedEvent!.valueForKey("alarm") as! Bool
+        let alarmTime = selectedEvent!.valueForKey("alarmTime") as? NSDate
+        
+        selectEventTableViewController!.loadData(eventName, dateStart: dateStart, dateEnd: dateEnd, alarm: alarm, alarmTime: alarmTime)
     }
     
     
@@ -199,19 +209,18 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         @brief Initializes information on segue to event details view.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == changeEventSegueIdentifier {
-            let calendar = NSCalendar.currentCalendar()
-            
-            // Get current hour and minute
-            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
-                NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
-            
-            // Load ChangeEventViewController with loadData(withPreexistingEvent:)
+        switch segue.identifier! {
+        case selectEventSegueIdentifier:
+            let selectEventNavigationController = segue.destinationViewController as! UINavigationController
+            selectEventTableViewController = selectEventNavigationController.viewControllers.first as? SelectEventTableViewController
+            println("Segue initiated")
+        default:
+            break
         }
     }
     
     
     @IBAction func leaveEventDetails(segue: UIStoryboardSegue) {
-        println("Leave")
+        println("Leave details view")
     }
 }
