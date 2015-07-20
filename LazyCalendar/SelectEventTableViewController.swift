@@ -10,9 +10,6 @@ import UIKit
 
 class SelectEventTableViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource {
     
-    // Calendar
-    private let calendar = NSCalendar.currentCalendar()
-    
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
     
@@ -38,6 +35,8 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
         "AlarmTimeDisplay": NSIndexPath(forRow: 1, inSection: 1)]
     
     private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
+    
+    private let editEventSegueIdentifier = "EditEventSegue"
     
     
     required init(coder aDecoder: NSCoder) {
@@ -69,5 +68,20 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
         self.dateEnd = dateEnd
         self.alarm = alarm
         self.alarmTime = alarmTime
+    }
+    
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        switch segue.identifier! {
+        case editEventSegueIdentifier:
+            break
+        default:
+            break
+        }
+    }
+    
+    
+    @IBAction func editEvent(segue: UIStoryboardSegue) {
+        println("Event edited")
     }
 }

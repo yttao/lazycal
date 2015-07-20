@@ -75,6 +75,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     private var selectedIndexPath: NSIndexPath?
     
+    private var event: NSManagedObject?
+    
+    
     // Initialization, set default heights
     required init(coder aDecoder: NSCoder) {
         eventNameCellHeight = DEFAULT_CELL_HEIGHT
@@ -425,8 +428,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         
         let entity = NSEntityDescription.entityForName("TestEvent", inManagedObjectContext: managedContext)!
         
-        // Create event
-        let event = NSManagedObject(entity: entity, insertIntoManagedObjectContext: managedContext)
+        // Create event if it is a new event being created, otherwise just overwrite old data.
+        if event == nil {
+            event = NSManagedObject(entity: entity, insertIntoManagedObjectContext: managedContext)
+        }
         
         // Get data
         let name = eventNameTextField.text
@@ -436,12 +441,12 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         let alarmTime = alarmTimePicker.date
         
         // Set data
-        event.setValue(name, forKey: "name")
-        event.setValue(dateStart, forKey: "dateStart")
-        event.setValue(dateEnd, forKey: "dateEnd")
-        event.setValue(alarm, forKey: "alarm")
+        event!.setValue(name, forKey: "name")
+        event!.setValue(dateStart, forKey: "dateStart")
+        event!.setValue(dateEnd, forKey: "dateEnd")
+        event!.setValue(alarm, forKey: "alarm")
         if alarm {
-            event.setValue(alarmTime, forKey: "alarmTime")
+            event!.setValue(alarmTime, forKey: "alarmTime")
         }
         
         // Save event
@@ -450,7 +455,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             assert(false, "Could not save \(error), \(error?.userInfo)")
         }
         
-        return event
+        return event!
     }
     
     

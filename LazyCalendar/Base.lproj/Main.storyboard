@@ -519,7 +519,7 @@
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" style="done" systemItem="save" id="myN-zM-rAG" userLabel="Save">
                             <connections>
-                                <segue destination="xNc-MM-so5" kind="unwind" identifier="SaveEvent" unwindAction="saveEvent:" id="r5U-oS-Vg8"/>
+                                <segue destination="xNc-MM-so5" kind="unwind" unwindAction="saveEvent:" id="Ydc-sP-Z2P"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -629,7 +629,11 @@
                         </sections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Event Details" id="qhp-AT-Ij3">
-                        <barButtonItem key="leftBarButtonItem" systemItem="edit" id="bfL-Xb-QjR"/>
+                        <barButtonItem key="leftBarButtonItem" systemItem="edit" id="bfL-Xb-QjR">
+                            <connections>
+                                <segue destination="Kpu-RP-WZZ" kind="presentation" id="mB1-ER-EeW"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="done" id="yci-HX-wfd">
                             <connections>
                                 <segue destination="dyV-CA-x8w" kind="unwind" identifier="LeaveEventDetails" unwindAction="leaveEventDetails:" id="hGt-eM-4gG"/>
@@ -715,4 +719,7 @@
             <point key="canvasLocation" x="910" y="428"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="mB1-ER-EeW"/>
+    </inferredMetricsTieBreakers>
 </document>
