@@ -9,7 +9,8 @@
 import UIKit
 import CoreData
 
-class MonthItemTableViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
+class MonthItemTableViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate, SelectEventTableViewControllerDelegate {
+    var date: NSDate?
     // The events for selected day
     private var events = [NSManagedObject]()
     
@@ -40,6 +41,8 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         
         tableView.dataSource = self
         tableView.delegate = self
+        
+        showEvents(date!)
     }
     
 
@@ -151,7 +154,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let alarm = selectedEvent!.valueForKey("alarm") as! Bool
         let alarmTime = selectedEvent!.valueForKey("alarmTime") as? NSDate
         
-        selectEventTableViewController!.loadData(eventName, dateStart: dateStart, dateEnd: dateEnd, alarm: alarm, alarmTime: alarmTime)
+        selectEventTableViewController!.loadEventDetails(event, name: eventName, dateStart: dateStart, dateEnd: dateEnd, alarm: alarm, alarmTime: alarmTime)
     }
     
     
@@ -167,6 +170,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         @brief Show events in table form for a date.
     */
     func showEvents(date: NSDate) {
+        self.date = date
         println("Showing events for \(date)")
         // Find events for that date
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -213,6 +217,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         case selectEventSegueIdentifier:
             let selectEventNavigationController = segue.destinationViewController as! UINavigationController
             selectEventTableViewController = selectEventNavigationController.viewControllers.first as? SelectEventTableViewController
+            selectEventTableViewController!.delegate = self
             println("Segue initiated")
         default:
             break
@@ -222,5 +227,10 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     
     @IBAction func leaveEventDetails(segue: UIStoryboardSegue) {
         println("Leave details view")
+    }
+    
+    
+    func selectEventTableViewControllerDidChangeEvent(event: NSManagedObject) {
+        showEvents(date!)
     }
 }

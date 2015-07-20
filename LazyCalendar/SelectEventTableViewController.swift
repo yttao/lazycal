@@ -7,8 +7,11 @@
 //
 
 import UIKit
+import CoreData
 
-class SelectEventTableViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource {
+class SelectEventTableViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource, ChangeEventViewControllerDelegate {
+    
+    var delegate: SelectEventTableViewControllerDelegate?
     
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
@@ -19,6 +22,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     @IBOutlet weak var alarmTimeMainLabel: UILabel!
     @IBOutlet weak var alarmTimeDetailsLabel: UILabel!
     
+    private var event: NSManagedObject?
     private var name: String?
     private var dateStart: NSDate?
     private var dateEnd: NSDate?
@@ -50,6 +54,17 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
         tableView.delegate = self
         tableView.dataSource = self
         
+        reloadData()
+    }
+    
+    
+    func reloadData() {
+        name = event!.valueForKey("name") as? String
+        dateStart = event!.valueForKey("dateStart") as? NSDate
+        dateEnd = event!.valueForKey("dateEnd") as? NSDate
+        alarm = event!.valueForKey("alarm") as? Bool
+        alarmTime = event!.valueForKey("alarmTime") as? NSDate
+        
         eventNameLabel.text = name
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
         eventTimeLabel.text = "\(dateFormatter.stringFromDate(dateStart!)) to \(dateFormatter.stringFromDate(dateEnd!))"
@@ -62,7 +77,8 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
     
     
-    func loadData(name: String, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
+    func loadEventDetails(event: NSManagedObject, name: String, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
+        self.event = event
         self.name = name
         self.dateStart = dateStart
         self.dateEnd = dateEnd
@@ -74,14 +90,35 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         switch segue.identifier! {
         case editEventSegueIdentifier:
-            break
+            // Find view controller for editing events
+            let navigationController = segue.destinationViewController as! UINavigationController
+            let editEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
+            // Set pre-existing event
+            editEventViewController.event = event
+            editEventViewController.delegate = self
         default:
             break
         }
     }
     
     
-    @IBAction func editEvent(segue: UIStoryboardSegue) {
+    @IBAction func saveEventEdit(segue: UIStoryboardSegue) {
         println("Event edited")
     }
+    
+    
+    @IBAction func cancelEventEdit(segue: UIStoryboardSegue) {
+        println("Event edit cancelled")
+    }
+    
+    
+    func changeEventViewControllerDidSaveEvent(event: NSManagedObject) {
+        // Update info that was just edited
+        reloadData()
+        delegate?.selectEventTableViewControllerDidChangeEvent(event)
+    }
+}
+
+protocol SelectEventTableViewControllerDelegate {
+    func selectEventTableViewControllerDidChangeEvent(event: NSManagedObject)
 }

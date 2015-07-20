@@ -89,6 +89,7 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
             monthItemCollectionViewController!.loadData(dateComponents!, delegate: self)
         case tableViewSegueIdentifier:
             monthItemTableViewController = segue.destinationViewController as? MonthItemTableViewController
+            monthItemTableViewController!.date = NSCalendar.currentCalendar().dateFromComponents(dateComponents!)
             break
         default:
             break

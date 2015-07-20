@@ -75,7 +75,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     private var selectedIndexPath: NSIndexPath?
     
-    private var event: NSManagedObject?
+    var event: NSManagedObject?
     
     
     // Initialization, set default heights
@@ -91,12 +91,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         alarmTimePickerCellHeight = 0
         
         super.init(coder: aDecoder)
-    }
-    
-    
-    // Sets initial date for initialization information
-    func setInitialDate(date: NSDate) {
-        self.date = date
     }
     
     
@@ -120,34 +114,62 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         // Disable text field user interaction, needed to allow proper table view row selection
         eventNameTextField.userInteractionEnabled = false
         
-        // Set initial picker value to selected date and end picker value to 1 hour later
-        eventDateStartPicker.date = date!
-        let hour = NSTimeInterval(60 * 60)
-        let nextHourDate = date!.dateByAddingTimeInterval(hour)
-        eventDateEndPicker.date = nextHourDate
-        
         // Add listener for when date start and end pickers update
-        eventDateStartPicker.addTarget(self, action: "updateEventDateStartLabels", forControlEvents:
-            .ValueChanged)
-        eventDateEndPicker.addTarget(self, action: "updateEventDateEndLabels", forControlEvents: .ValueChanged)
+        eventDateStartPicker.addTarget(self, action: "updateEventDateStartLabels", forControlEvents: .ValueChanged)
         eventDateStartPicker.addTarget(self, action: "updateEventDateEndPicker", forControlEvents: .ValueChanged)
+        eventDateEndPicker.addTarget(self, action: "updateEventDateEndLabels", forControlEvents: .ValueChanged)
         
-        // Format and set main date labels
-        eventDateFormatter.dateFormat = "MMM dd, yyyy"
-        eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(date!)
-        eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(nextHourDate)
-        alarmTimeMainLabel.text = eventDateFormatter.stringFromDate(date!)
-        
-        // Format and set details labels
-        eventDateFormatter.dateFormat = "h:mm a"
-        eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(date!)
-        eventDateEndDetailsLabel.text = eventDateFormatter.stringFromDate(nextHourDate)
-        alarmTimeDetailsLabel.text = eventDateFormatter.stringFromDate(date!)
-        
-        alarmSwitch.on = false
-        alarmDateSwitch.on = false
-
-        alarmTimePicker.date = date!
+        // If using a pre-existing event, load data from event.
+        if (event != nil) {
+            eventNameTextField.text = event!.valueForKey("name") as! String
+            eventDateStartPicker.date = event!.valueForKey("dateStart") as! NSDate
+            eventDateEndPicker.date = event!.valueForKey("dateEnd") as! NSDate
+            alarmSwitch.on = event!.valueForKey("alarm") as! Bool
+            alarmDateSwitch.on = false
+            if let alarmTime = event!.valueForKey("alarmTime") as? NSDate {
+                alarmTimePicker.date = alarmTime
+            }
+            else {
+                alarmTimePicker.date = eventDateStartPicker.date
+            }
+            
+            // Format and set main date labels
+            eventDateFormatter.dateFormat = "MMM dd, yyyy"
+            eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
+            eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(eventDateEndPicker.date)
+            alarmTimeMainLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
+            
+            // Format and set details labels
+            eventDateFormatter.dateFormat = "h:mm a"
+            eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
+            eventDateEndDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateEndPicker.date)
+            alarmTimeDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
+        }
+        // If creating a new event, create initial data.
+        else {
+            // Set initial picker value to selected date and end picker value to 1 hour later
+            eventDateStartPicker.date = date!
+            let hour = NSTimeInterval(60 * 60)
+            let nextHourDate = date!.dateByAddingTimeInterval(hour)
+            eventDateEndPicker.date = nextHourDate
+            
+            // Format and set main date labels
+            eventDateFormatter.dateFormat = "MMM dd, yyyy"
+            eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(date!)
+            eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(nextHourDate)
+            alarmTimeMainLabel.text = eventDateFormatter.stringFromDate(date!)
+            
+            // Format and set details labels
+            eventDateFormatter.dateFormat = "h:mm a"
+            eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(date!)
+            eventDateEndDetailsLabel.text = eventDateFormatter.stringFromDate(nextHourDate)
+            alarmTimeDetailsLabel.text = eventDateFormatter.stringFromDate(date!)
+            
+            alarmSwitch.on = false
+            alarmDateSwitch.on = false
+            
+            alarmTimePicker.date = date!
+        }
     }
 
     
@@ -160,7 +182,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         
         eventDateFormatter.dateFormat = "h:mm a"
         eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
-        println(eventDateStartPicker.date)
     }
     
     
@@ -459,12 +480,20 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
+    /*
+        @brief Prepares information for unwind segues.
+    */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         switch segue.identifier! {
-            case "SaveEvent":
+            case "SaveEventSegue":
                 let event = saveEvent()
                 delegate?.changeEventViewControllerDidSaveEvent(event)
-            case "CancelEvent":
+            case "CancelEventSegue":
+                break
+            case "SaveEventEditSegue":
+                let event = saveEvent()
+                delegate?.changeEventViewControllerDidSaveEvent(event)
+            case "CancelEventEditSegue":
                 break
         default:
             break
