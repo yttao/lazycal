@@ -88,16 +88,18 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        switch segue.identifier! {
-        case editEventSegueIdentifier:
-            // Find view controller for editing events
-            let navigationController = segue.destinationViewController as! UINavigationController
-            let editEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
-            // Set pre-existing event
-            editEventViewController.event = event
-            editEventViewController.delegate = self
-        default:
-            break
+        if let identifier = segue.identifier {
+            switch identifier {
+            case editEventSegueIdentifier:
+                // Find view controller for editing events
+                let navigationController = segue.destinationViewController as! UINavigationController
+                let editEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
+                // Set pre-existing event
+                editEventViewController.loadData(event: event!)
+                editEventViewController.delegate = self
+            default:
+                break
+            }
         }
     }
     

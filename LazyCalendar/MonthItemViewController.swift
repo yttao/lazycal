@@ -63,37 +63,40 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         super.prepareForSegue(segue, sender: sender)
         
-        switch segue.identifier! {
-        case changeEventSegueIdentifier:
-            let calendar = NSCalendar.currentCalendar()
-            
-            // Get current hour and minute
-            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
-                NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
-            
-            let initialDateComponents = monthItemCollectionViewController!.dateComponents!.copy() as! NSDateComponents
-            initialDateComponents.hour = currentTime.hour
-            initialDateComponents.minute = currentTime.minute
-            
-            // Set initial date choice on date picker as selected date, at current hour and minute
-            let initialDate = calendar.dateFromComponents(initialDateComponents)
-            
-            // Find view controller for adding events
-            let navigationController = segue.destinationViewController as! UINavigationController
-            let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
-            // Set initial date information for event
-            addEventViewController.date = initialDate
-            addEventViewController.delegate = self
-        case collectionViewSegueIdentifier:
-            monthItemCollectionViewController = segue.destinationViewController as? MonthItemCollectionViewController
-            monthItemCollectionViewController!.loadData(dateComponents!, delegate: self)
-        case tableViewSegueIdentifier:
-            monthItemTableViewController = segue.destinationViewController as? MonthItemTableViewController
-            monthItemTableViewController!.date = NSCalendar.currentCalendar().dateFromComponents(dateComponents!)
-            break
-        default:
-            break
+        if let identifier = segue.identifier {
+            switch identifier {
+            case changeEventSegueIdentifier:
+                let calendar = NSCalendar.currentCalendar()
+                
+                // Get current hour and minute
+                let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
+                    NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
+                
+                let initialDateComponents = monthItemCollectionViewController!.dateComponents!.copy() as! NSDateComponents
+                initialDateComponents.hour = currentTime.hour
+                initialDateComponents.minute = currentTime.minute
+                
+                // Set initial date choice on date picker as selected date, at current hour and minute
+                let initialDate = calendar.dateFromComponents(initialDateComponents)
+                
+                // Find view controller for adding events
+                let navigationController = segue.destinationViewController as! UINavigationController
+                let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
+                // Set initial date information for event
+                addEventViewController.loadData(dateStart: initialDate!)
+                addEventViewController.delegate = self
+            case collectionViewSegueIdentifier:
+                monthItemCollectionViewController = segue.destinationViewController as? MonthItemCollectionViewController
+                monthItemCollectionViewController!.loadData(dateComponents!, delegate: self)
+            case tableViewSegueIdentifier:
+                monthItemTableViewController = segue.destinationViewController as? MonthItemTableViewController
+                monthItemTableViewController!.date = NSCalendar.currentCalendar().dateFromComponents(dateComponents!)
+                break
+            default:
+                break
+            }
         }
+        
     }
     
     

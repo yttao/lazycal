@@ -13,29 +13,30 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     var delegate: ChangeEventViewControllerDelegate?
     
-    // Calendar
-    private let calendar = NSCalendar.currentCalendar()
-    
     // Date used for initialization info
-    var date: NSDate?
+    private var name: String?
+    private var dateStart: NSDate?
+    private var dateEnd: NSDate?
+    private var alarm: Bool?
+    private var alarmTime: NSDate?
     
     // Date formatter to control date appearances
-    private let eventDateFormatter = NSDateFormatter()
+    private let dateFormatter = NSDateFormatter()
     
     // Date start and end pickers to decide time interval
-    private let eventDateStartPicker = UIDatePicker()
-    private let eventDateEndPicker = UIDatePicker()
+    private let dateStartPicker = UIDatePicker()
+    private let dateEndPicker = UIDatePicker()
 
     // Text field for event name
-    @IBOutlet weak var eventNameTextField: UITextField!
+    @IBOutlet weak var nameTextField: UITextField!
     
     // Labels to display event start info
-    @IBOutlet weak var eventDateStartMainLabel: UILabel!
-    @IBOutlet weak var eventDateStartDetailsLabel: UILabel!
+    @IBOutlet weak var dateStartMainLabel: UILabel!
+    @IBOutlet weak var dateStartDetailsLabel: UILabel!
     
     // Labels to display event end info
-    @IBOutlet weak var eventDateEndMainLabel: UILabel!
-    @IBOutlet weak var eventDateEndDetailsLabel: UILabel!
+    @IBOutlet weak var dateEndMainLabel: UILabel!
+    @IBOutlet weak var dateEndDetailsLabel: UILabel!
     
     // Toggles alarm option on/off
     @IBOutlet weak var alarmSwitch: UISwitch!
@@ -47,6 +48,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     // Picks alarm time
     @IBOutlet weak var alarmTimePicker: UIDatePicker!
+    
+    @IBOutlet weak var alarmDateToggleCell: UITableViewCell!
+    @IBOutlet weak var alarmTimeDisplayCell: UITableViewCell!
+    @IBOutlet weak var alarmTimePickerCell: UITableViewCell!
     
     // Section headers associated with section numbers
     private let sections = ["Name": 0, "Start": 1, "End": 2, "Alarm": 3]
@@ -75,7 +80,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     private var selectedIndexPath: NSIndexPath?
     
-    var event: NSManagedObject?
+    private var event: NSManagedObject?
     
     
     // Initialization, set default heights
@@ -112,106 +117,170 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         tableView.dataSource = self
         
         // Disable text field user interaction, needed to allow proper table view row selection
-        eventNameTextField.userInteractionEnabled = false
+        nameTextField.userInteractionEnabled = false
         
         // Add listener for when date start and end pickers update
-        eventDateStartPicker.addTarget(self, action: "updateEventDateStartLabels", forControlEvents: .ValueChanged)
-        eventDateStartPicker.addTarget(self, action: "updateEventDateEndPicker", forControlEvents: .ValueChanged)
-        eventDateEndPicker.addTarget(self, action: "updateEventDateEndLabels", forControlEvents: .ValueChanged)
+        dateStartPicker.addTarget(self, action: "updateDateStart", forControlEvents: .ValueChanged)
+        dateEndPicker.addTarget(self, action: "updateDateEnd", forControlEvents: .ValueChanged)
         
         // If using a pre-existing event, load data from event.
         if (event != nil) {
-            eventNameTextField.text = event!.valueForKey("name") as! String
-            eventDateStartPicker.date = event!.valueForKey("dateStart") as! NSDate
-            eventDateEndPicker.date = event!.valueForKey("dateEnd") as! NSDate
-            alarmSwitch.on = event!.valueForKey("alarm") as! Bool
+            nameTextField.text = name
+            dateStartPicker.date = dateStart!
+            dateEndPicker.date = dateEnd!
+            alarmSwitch.on = alarm!
             alarmDateSwitch.on = false
-            if let alarmTime = event!.valueForKey("alarmTime") as? NSDate {
-                alarmTimePicker.date = alarmTime
+            if alarmTime != nil {
+                alarmTimePicker.date = alarmTime!
+                showMoreAlarmOptions()
             }
             else {
-                alarmTimePicker.date = eventDateStartPicker.date
+                alarmTimePicker.date = dateStart!
             }
             
             // Format and set main date labels
-            eventDateFormatter.dateFormat = "MMM dd, yyyy"
-            eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
-            eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(eventDateEndPicker.date)
-            alarmTimeMainLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
+            dateFormatter.dateFormat = "MMM dd, yyyy"
+            dateStartMainLabel.text = dateFormatter.stringFromDate(dateStart!)
+            dateEndMainLabel.text = dateFormatter.stringFromDate(dateEnd!)
+            if alarmTime != nil {
+                alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTime!)
+            }
+            else {
+                alarmTimeMainLabel.text = dateFormatter.stringFromDate(dateStart!)
+            }
             
             // Format and set details labels
-            eventDateFormatter.dateFormat = "h:mm a"
-            eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
-            eventDateEndDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateEndPicker.date)
-            alarmTimeDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
+            dateFormatter.dateFormat = "h:mm a"
+            dateStartDetailsLabel.text = dateFormatter.stringFromDate(dateStart!)
+            dateEndDetailsLabel.text = dateFormatter.stringFromDate(dateEnd!)
+            if alarmTime != nil {
+                alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTime!)
+            }
+            else {
+                alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(dateStart!)
+            }
         }
-        // If creating a new event, create initial data.
+        // If creating a new event, load initial data.
         else {
             // Set initial picker value to selected date and end picker value to 1 hour later
-            eventDateStartPicker.date = date!
-            let hour = NSTimeInterval(60 * 60)
-            let nextHourDate = date!.dateByAddingTimeInterval(hour)
-            eventDateEndPicker.date = nextHourDate
+            dateStartPicker.date = dateStart!
+            dateEndPicker.date = dateEnd!
             
             // Format and set main date labels
-            eventDateFormatter.dateFormat = "MMM dd, yyyy"
-            eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(date!)
-            eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(nextHourDate)
-            alarmTimeMainLabel.text = eventDateFormatter.stringFromDate(date!)
+            dateFormatter.dateFormat = "MMM dd, yyyy"
+            dateStartMainLabel.text = dateFormatter.stringFromDate(dateStart!)
+            dateEndMainLabel.text = dateFormatter.stringFromDate(dateEnd!)
+            alarmTimeMainLabel.text = dateFormatter.stringFromDate(dateStart!)
             
             // Format and set details labels
-            eventDateFormatter.dateFormat = "h:mm a"
-            eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(date!)
-            eventDateEndDetailsLabel.text = eventDateFormatter.stringFromDate(nextHourDate)
-            alarmTimeDetailsLabel.text = eventDateFormatter.stringFromDate(date!)
+            dateFormatter.dateFormat = "h:mm a"
+            dateStartDetailsLabel.text = dateFormatter.stringFromDate(dateStart!)
+            dateEndDetailsLabel.text = dateFormatter.stringFromDate(dateEnd!)
+            alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(dateStart!)
             
-            alarmSwitch.on = false
+            alarmSwitch.on = alarm!
             alarmDateSwitch.on = false
             
-            alarmTimePicker.date = date!
+            alarmTimePicker.date = alarmTime!
         }
     }
-
+    
     
     /*
-        @brief When date start picker changes, update date start labels.
+        @brief Initializes data with a start date.
     */
-    func updateEventDateStartLabels() {
-        eventDateFormatter.dateFormat = "MMM dd, yyyy"
-        eventDateStartMainLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
-        
-        eventDateFormatter.dateFormat = "h:mm a"
-        eventDateStartDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateStartPicker.date)
+    func loadData(#dateStart: NSDate) {
+        name = nil
+        self.dateStart = dateStart
+        let hour = NSTimeInterval(3600)
+        dateEnd = dateStart.dateByAddingTimeInterval(hour)
+        alarm = false
+        alarmTime = dateStart
     }
     
     
     /*
-        @brief When date end picker changes, update date end labels
+        @brief Initializes data with a pre-existing event.
     */
-    func updateEventDateEndLabels() {
-        eventDateFormatter.dateFormat = "MMM dd, yyyy"
-        eventDateEndMainLabel.text = eventDateFormatter.stringFromDate(eventDateEndPicker.date)
+    func loadData(#event: NSManagedObject) {
+        self.event = event
+        name = event.valueForKey("name") as? String
+        dateStart = event.valueForKey("dateStart") as? NSDate
+        dateEnd = event.valueForKey("dateEnd") as? NSDate
+        alarm = event.valueForKey("alarm") as? Bool
+        alarmTime = event.valueForKey("alarmTime") as? NSDate
+    }
+    
+    
+    /*
+        @brief Update date start info.
+    */
+    func updateDateStart() {
+        dateStart = dateStartPicker.date
+        updateDateStartLabels()
+        updateDateEndPicker()
+        updateAlarmTimePicker()
+    }
+    
+    
+    /*
+        @brief Update date start labels.
+    */
+    func updateDateStartLabels() {
+        dateFormatter.dateFormat = "MMM dd, yyyy"
+        dateStartMainLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
         
-        eventDateFormatter.dateFormat = "h:mm a"
-        eventDateEndDetailsLabel.text = eventDateFormatter.stringFromDate(eventDateEndPicker.date)
+        dateFormatter.dateFormat = "h:mm a"
+        dateStartDetailsLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
+    }
+    
+    
+    /*
+        @brief Update date end info.
+    */
+    func updateDateEnd() {
+        dateEnd = dateEndPicker.date
+        updateDateEndLabels()
+    }
+    
+    
+    /*
+        @brief Update date end labels.
+    */
+    func updateDateEndLabels() {
+        dateFormatter.dateFormat = "MMM dd, yyyy"
+        dateEndMainLabel.text = dateFormatter.stringFromDate(dateEndPicker.date)
+        
+        dateFormatter.dateFormat = "h:mm a"
+        dateEndDetailsLabel.text = dateFormatter.stringFromDate(dateEndPicker.date)
     }
     
     
     /*
         @brief When date start picker is changed, update the minimum date.
-        @discussion The date end picker should not be able to choose a date before the date start, so it 
-        should have a lower limit placed on the date it can choose.
+        @discussion The date end picker should not be able to choose a date before the date start, so it should have a lower limit placed on the date it can choose.
     */
-    func updateEventDateEndPicker() {
-        let originalDate = eventDateEndPicker.date
-        eventDateEndPicker.minimumDate = eventDateStartPicker.date
+    func updateDateEndPicker() {
+        let originalDate = dateEndPicker.date
+        dateEndPicker.minimumDate = dateStartPicker.date
 
         // If the old date end comes after the new date start, change the old date end to equal the new date start.
-        if (originalDate.compare(eventDateStartPicker.date) == .OrderedAscending) {
-            eventDateEndPicker.date = eventDateStartPicker.date
-            updateEventDateEndLabels()
+        if (originalDate.compare(dateStartPicker.date) == .OrderedAscending) {
+            dateEndPicker.date = dateStartPicker.date
+            updateDateEndLabels()
         }
-        eventDateEndPicker.reloadInputViews()
+        dateEndPicker.reloadInputViews()
+    }
+    
+    
+    /*
+        @brief Update the alarm time if the alarm is not already set.
+    */
+    func updateAlarmTimePicker() {
+        if !alarm! {
+            alarmTimePicker.date = dateStart!
+            updateAlarmTimeDisplay()
+        }
     }
     
     
@@ -234,36 +303,36 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         // Take action based on what section was chosen
         switch indexPath.section {
         case sections["Name"]!:
-            eventNameTextField.userInteractionEnabled = true
-            eventNameTextField.becomeFirstResponder()
+            nameTextField.userInteractionEnabled = true
+            nameTextField.becomeFirstResponder()
         case sections["Start"]!:
             tableView.beginUpdates()
             
             // Hide date start labels
-            eventDateStartMainLabel.hidden = true
-            eventDateStartDetailsLabel.hidden = true
+            dateStartMainLabel.hidden = true
+            dateStartDetailsLabel.hidden = true
             
             // Recalculate height to show date start picker
-            eventDateStartCellHeight = eventDateStartPicker.frame.height
+            eventDateStartCellHeight = dateStartPicker.frame.height
             
             // Show date start picker
-            cell.contentView.addSubview(eventDateStartPicker)
-            cell.contentView.didAddSubview(eventDateStartPicker)
+            cell.contentView.addSubview(dateStartPicker)
+            cell.contentView.didAddSubview(dateStartPicker)
             
             tableView.endUpdates()
         case sections["End"]!:
             tableView.beginUpdates()
             
             // Hide date end labels
-            eventDateEndMainLabel.hidden = true
-            eventDateEndDetailsLabel.hidden = true
+            dateEndMainLabel.hidden = true
+            dateEndDetailsLabel.hidden = true
             
             // Recalculate height to show date end picker
-            eventDateEndCellHeight = eventDateEndPicker.frame.height
+            eventDateEndCellHeight = dateEndPicker.frame.height
             
             // Show date end picker
-            cell.contentView.addSubview(eventDateEndPicker)
-            cell.contentView.didAddSubview(eventDateEndPicker)
+            cell.contentView.addSubview(dateEndPicker)
+            cell.contentView.didAddSubview(dateEndPicker)
             
             tableView.endUpdates()
         default:
@@ -298,11 +367,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     func showMoreAlarmOptions() {
         println("***MORE***")
         tableView.beginUpdates()
-        
-        // Get alarm options cells
-        let alarmDateToggleCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmDateToggle"]!)
-        let alarmTimeDisplayCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimeDisplay"]!)
-        let alarmTimePickerCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimePicker"]!)
         
         // Set cell heights
         alarmDateToggleCellHeight = DEFAULT_CELL_HEIGHT
@@ -349,11 +413,21 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     */
     @IBAction func updateAlarmTimeDisplay(sender: AnyObject) {
         // Main label shows format: month day, year
-        eventDateFormatter.dateFormat = "MMM dd, yyyy"
-        alarmTimeMainLabel.text = eventDateFormatter.stringFromDate(alarmTimePicker.date)
+        dateFormatter.dateFormat = "MMM dd, yyyy"
+        alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
         
-        eventDateFormatter.dateFormat = "h:mm a"
-        alarmTimeDetailsLabel.text = eventDateFormatter.stringFromDate(alarmTimePicker.date)
+        dateFormatter.dateFormat = "h:mm a"
+        alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
+    }
+    
+    
+    func updateAlarmTimeDisplay() {
+        // Main label shows format: month day, year
+        dateFormatter.dateFormat = "MMM dd, yyyy"
+        alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
+        
+        dateFormatter.dateFormat = "h:mm a"
+        alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
     }
     
     
@@ -372,18 +446,18 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             // If deselecting event name field, text field stops being first responder and disables
             // user interaction with it.
         case sections["Name"]!:
-            eventNameTextField.userInteractionEnabled = false
-            eventNameTextField.resignFirstResponder()
+            nameTextField.userInteractionEnabled = false
+            nameTextField.resignFirstResponder()
             // If deselecting date start field, hide date start picker and show labels
         case sections["Start"]!:
             tableView.beginUpdates()
             
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
-            eventDateStartPicker.removeFromSuperview()
+            dateStartPicker.removeFromSuperview()
             eventDateStartCellHeight = DEFAULT_CELL_HEIGHT
             
-            eventDateStartMainLabel.hidden = false
-            eventDateStartDetailsLabel.hidden = false
+            dateStartMainLabel.hidden = false
+            dateStartDetailsLabel.hidden = false
             
             tableView.endUpdates()
             // If deselecting date end field, hide date end picker and show labels
@@ -391,11 +465,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             tableView.beginUpdates()
             
             let cell = tableView.cellForRowAtIndexPath(indexPath)!
-            eventDateEndPicker.removeFromSuperview()
+            dateEndPicker.removeFromSuperview()
             eventDateEndCellHeight = DEFAULT_CELL_HEIGHT
             
-            eventDateEndMainLabel.hidden = false
-            eventDateEndDetailsLabel.hidden = false
+            dateEndMainLabel.hidden = false
+            dateEndDetailsLabel.hidden = false
             
             tableView.endUpdates()
         default:
@@ -455,9 +529,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         }
         
         // Get data
-        let name = eventNameTextField.text
-        let dateStart = eventDateStartPicker.date
-        let dateEnd = eventDateEndPicker.date
+        let name = nameTextField.text
+        let dateStart = dateStartPicker.date
+        let dateEnd = dateEndPicker.date
         let alarm = alarmSwitch.on
         let alarmTime = alarmTimePicker.date
         
@@ -484,7 +558,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         @brief Prepares information for unwind segues.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        switch segue.identifier! {
+        if let identifier = segue.identifier {
+            switch identifier {
             case "SaveEventSegue":
                 let event = saveEvent()
                 delegate?.changeEventViewControllerDidSaveEvent(event)
@@ -495,8 +570,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 delegate?.changeEventViewControllerDidSaveEvent(event)
             case "CancelEventEditSegue":
                 break
-        default:
-            break
+            default:
+                break
+            }
         }
     }
 }

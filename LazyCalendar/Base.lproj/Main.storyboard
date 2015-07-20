@@ -525,15 +525,18 @@
                     </navigationItem>
                     <connections>
                         <outlet property="alarmDateSwitch" destination="M7E-Ai-qkC" id="nHX-xn-BzY"/>
+                        <outlet property="alarmDateToggleCell" destination="c08-D8-MfJ" id="EB1-RM-AT9"/>
                         <outlet property="alarmSwitch" destination="SiC-Zy-YtO" id="l6O-8T-O5N"/>
                         <outlet property="alarmTimeDetailsLabel" destination="iEh-Ic-6fb" id="REx-zZ-w3n"/>
+                        <outlet property="alarmTimeDisplayCell" destination="bTK-Ej-BTD" id="tBl-lq-CZj"/>
                         <outlet property="alarmTimeMainLabel" destination="Vfv-Ml-dDh" id="Z3X-SV-ivV"/>
                         <outlet property="alarmTimePicker" destination="yyY-Mi-MnN" id="7mj-yw-E3K"/>
-                        <outlet property="eventDateEndDetailsLabel" destination="RI1-Hc-M5s" id="hif-AM-hGO"/>
-                        <outlet property="eventDateEndMainLabel" destination="RBF-96-ZwI" id="4Z7-wx-Vv9"/>
-                        <outlet property="eventDateStartDetailsLabel" destination="Vpb-DU-M9h" id="QHj-4F-UuS"/>
-                        <outlet property="eventDateStartMainLabel" destination="Wql-f1-NyL" id="wQM-Mz-BG8"/>
-                        <outlet property="eventNameTextField" destination="hmy-da-q8Z" id="As1-As-gd0"/>
+                        <outlet property="alarmTimePickerCell" destination="cVw-iZ-pNP" id="4yh-ry-gDm"/>
+                        <outlet property="dateEndDetailsLabel" destination="RI1-Hc-M5s" id="bx1-Ba-Qd7"/>
+                        <outlet property="dateEndMainLabel" destination="RBF-96-ZwI" id="jQn-Oc-Txy"/>
+                        <outlet property="dateStartDetailsLabel" destination="Vpb-DU-M9h" id="Hfa-7q-sfu"/>
+                        <outlet property="dateStartMainLabel" destination="Wql-f1-NyL" id="xu3-tu-ErZ"/>
+                        <outlet property="nameTextField" destination="hmy-da-q8Z" id="yQL-kb-xtI"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jh7-wV-qEo" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -942,15 +945,18 @@
                     </navigationItem>
                     <connections>
                         <outlet property="alarmDateSwitch" destination="2mp-hf-WWg" id="ghg-z0-fgu"/>
+                        <outlet property="alarmDateToggleCell" destination="bu7-Ol-iRX" id="Hui-hh-go1"/>
                         <outlet property="alarmSwitch" destination="8rq-Av-dwN" id="QRf-Ag-6AW"/>
                         <outlet property="alarmTimeDetailsLabel" destination="c3A-gU-fLz" id="rqx-lb-bAA"/>
+                        <outlet property="alarmTimeDisplayCell" destination="9rW-qa-4iV" id="Uge-XT-gXg"/>
                         <outlet property="alarmTimeMainLabel" destination="y6A-4J-vUt" id="GOE-uZ-z26"/>
                         <outlet property="alarmTimePicker" destination="DJ3-vK-mdW" id="WTG-hR-Z8N"/>
-                        <outlet property="eventDateEndDetailsLabel" destination="T3v-zK-MqL" id="fFI-ax-g3e"/>
-                        <outlet property="eventDateEndMainLabel" destination="Dpl-jU-l7d" id="rej-J8-oQl"/>
-                        <outlet property="eventDateStartDetailsLabel" destination="Hzn-E8-NVL" id="USB-Kr-CeG"/>
-                        <outlet property="eventDateStartMainLabel" destination="9Np-jS-dhf" id="Sdm-NQ-NJv"/>
-                        <outlet property="eventNameTextField" destination="YXX-Eo-oqm" id="xnZ-OH-TZ6"/>
+                        <outlet property="alarmTimePickerCell" destination="49M-Cs-C2U" id="Vs6-Wc-CLo"/>
+                        <outlet property="dateEndDetailsLabel" destination="T3v-zK-MqL" id="GLV-AG-ibr"/>
+                        <outlet property="dateEndMainLabel" destination="Dpl-jU-l7d" id="3FF-iC-VI9"/>
+                        <outlet property="dateStartDetailsLabel" destination="Hzn-E8-NVL" id="7s2-Oh-8qS"/>
+                        <outlet property="dateStartMainLabel" destination="9Np-jS-dhf" id="Cut-J9-ybA"/>
+                        <outlet property="nameTextField" destination="YXX-Eo-oqm" id="2Wc-4j-POs"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qvW-5I-FRZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
