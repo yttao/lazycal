@@ -190,7 +190,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         @brief Initializes data with a start date.
     */
     func loadData(#dateStart: NSDate) {
-        name = nil
+        name = ""
         self.dateStart = dateStart
         let hour = NSTimeInterval(3600)
         dateEnd = dateStart.dateByAddingTimeInterval(hour)
@@ -217,16 +217,16 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     */
     func updateDateStart() {
         dateStart = dateStartPicker.date
-        updateDateStartLabels()
-        updateDateEndPicker()
-        updateAlarmTimePicker()
+        updateDateStartLabels(dateStart!)
+        updateDateEndPicker(dateStart!)
+        updateAlarmTimePicker(dateStart!)
     }
     
     
     /*
         @brief Update date start labels.
     */
-    func updateDateStartLabels() {
+    func updateDateStartLabels(date: NSDate) {
         dateFormatter.dateFormat = "MMM dd, yyyy"
         dateStartMainLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
         
@@ -240,19 +240,19 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     */
     func updateDateEnd() {
         dateEnd = dateEndPicker.date
-        updateDateEndLabels()
+        updateDateEndLabels(dateEnd!)
     }
     
     
     /*
         @brief Update date end labels.
     */
-    func updateDateEndLabels() {
+    func updateDateEndLabels(date: NSDate) {
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        dateEndMainLabel.text = dateFormatter.stringFromDate(dateEndPicker.date)
+        dateEndMainLabel.text = dateFormatter.stringFromDate(date)
         
         dateFormatter.dateFormat = "h:mm a"
-        dateEndDetailsLabel.text = dateFormatter.stringFromDate(dateEndPicker.date)
+        dateEndDetailsLabel.text = dateFormatter.stringFromDate(date)
     }
     
     
@@ -260,14 +260,14 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         @brief When date start picker is changed, update the minimum date.
         @discussion The date end picker should not be able to choose a date before the date start, so it should have a lower limit placed on the date it can choose.
     */
-    func updateDateEndPicker() {
+    func updateDateEndPicker(date: NSDate) {
         let originalDate = dateEndPicker.date
-        dateEndPicker.minimumDate = dateStartPicker.date
+        dateEndPicker.minimumDate = date
 
         // If the old date end comes after the new date start, change the old date end to equal the new date start.
         if (originalDate.compare(dateStartPicker.date) == .OrderedAscending) {
             dateEndPicker.date = dateStartPicker.date
-            updateDateEndLabels()
+            updateDateEnd()
         }
         dateEndPicker.reloadInputViews()
     }
@@ -276,10 +276,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     /*
         @brief Update the alarm time if the alarm is not already set.
     */
-    func updateAlarmTimePicker() {
+    func updateAlarmTimePicker(date: NSDate) {
         if !alarm! {
-            alarmTimePicker.date = dateStart!
-            updateAlarmTimeDisplay()
+            alarmTimePicker.date = date
+            updateAlarmTime(date: date)
         }
     }
     
@@ -351,6 +351,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 deselectRowAtIndexPath(selectedIndexPath!)
             }
             selectedIndexPath = indexPaths["AlarmToggle"]
+            
+            alarm = alarmToggle.on
             if alarmToggle.on {
                 showMoreAlarmOptions()
             }
@@ -408,26 +410,33 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Update alarm time display when alarm time picker is changed.
-    */
-    @IBAction func updateAlarmTimeDisplay(sender: AnyObject) {
-        // Main label shows format: month day, year
-        dateFormatter.dateFormat = "MMM dd, yyyy"
-        alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
-        
-        dateFormatter.dateFormat = "h:mm a"
-        alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
+    @IBAction func updateName() {
+        name = nameTextField.text
     }
     
     
-    func updateAlarmTimeDisplay() {
+    @IBAction func updateAlarmTime(sender: AnyObject) {
+        alarmTime = alarmTimePicker.date
+        updateAlarmTimeDisplay(alarmTime!)
+    }
+    
+    
+    func updateAlarmTime(#date: NSDate) {
+        alarmTime = alarmTimePicker.date
+        updateAlarmTimeDisplay(alarmTime!)
+    }
+
+    
+    /*
+        @brief Update alarm time display.
+    */
+    func updateAlarmTimeDisplay(date: NSDate) {
         // Main label shows format: month day, year
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
+        alarmTimeMainLabel.text = dateFormatter.stringFromDate(date)
         
         dateFormatter.dateFormat = "h:mm a"
-        alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
+        alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(date)
     }
     
     
@@ -528,19 +537,18 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             event = NSManagedObject(entity: entity, insertIntoManagedObjectContext: managedContext)
         }
         
-        // Get data
-        let name = nameTextField.text
-        let dateStart = dateStartPicker.date
-        let dateEnd = dateEndPicker.date
-        let alarm = alarmSwitch.on
-        let alarmTime = alarmTimePicker.date
+        println("NAME: \(name)")
+        println("START: \(dateStart)")
+        println("END: \(dateEnd)")
+        println("ALARM: \(alarm)")
+        println("ALARMTIME: \(alarmTime)")
         
         // Set data
         event!.setValue(name, forKey: "name")
         event!.setValue(dateStart, forKey: "dateStart")
         event!.setValue(dateEnd, forKey: "dateEnd")
         event!.setValue(alarm, forKey: "alarm")
-        if alarm {
+        if alarm! {
             event!.setValue(alarmTime, forKey: "alarmTime")
         }
         

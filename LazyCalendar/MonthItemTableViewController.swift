@@ -72,6 +72,9 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         if event.valueForKey("name") as? String != nil {
             cell?.eventNameLabel.text = event.valueForKey("name") as? String
         }
+        else {
+            cell?.eventNameLabel.text = nil
+        }
         
         return cell!
     }
@@ -148,7 +151,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let event = events[indexPath.row]
         selectedEvent = event
         
-        let eventName = selectedEvent!.valueForKey("name") as! String
+        let eventName = selectedEvent!.valueForKey("name") as? String
         let dateStart = selectedEvent!.valueForKey("dateStart") as! NSDate
         let dateEnd = selectedEvent!.valueForKey("dateEnd") as! NSDate
         let alarm = selectedEvent!.valueForKey("alarm") as! Bool

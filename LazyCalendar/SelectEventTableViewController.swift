@@ -77,7 +77,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
     
     
-    func loadEventDetails(event: NSManagedObject, name: String, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
+    func loadEventDetails(event: NSManagedObject, name: String?, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
         self.event = event
         self.name = name
         self.dateStart = dateStart

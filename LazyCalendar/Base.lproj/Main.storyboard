@@ -323,6 +323,9 @@
                                                     <rect key="frame" x="8" y="8" width="584" height="27"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits"/>
+                                                    <connections>
+                                                        <action selector="updateName" destination="aIB-mu-9DI" eventType="editingChanged" id="gRE-fL-9hU"/>
+                                                    </connections>
                                                 </textField>
                                             </subviews>
                                             <constraints>
@@ -490,7 +493,7 @@
                                                         <!--2015-07-13 16:13:47 +0000-->
                                                     </date>
                                                     <connections>
-                                                        <action selector="updateAlarmTimeDisplay:" destination="aIB-mu-9DI" eventType="valueChanged" id="eXW-fF-RIA"/>
+                                                        <action selector="updateAlarmTime:" destination="aIB-mu-9DI" eventType="valueChanged" id="dRC-uh-mHv"/>
                                                     </connections>
                                                 </datePicker>
                                             </subviews>
@@ -743,6 +746,9 @@
                                                     <rect key="frame" x="8" y="8" width="584" height="27"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits"/>
+                                                    <connections>
+                                                        <action selector="updateName" destination="5kC-gB-dnz" eventType="editingChanged" id="aKk-S6-QVQ"/>
+                                                    </connections>
                                                 </textField>
                                             </subviews>
                                             <constraints>
@@ -910,7 +916,7 @@
                                                         <!--2015-07-13 16:13:47 +0000-->
                                                     </date>
                                                     <connections>
-                                                        <action selector="updateAlarmTimeDisplay:" destination="5kC-gB-dnz" eventType="valueChanged" id="Amp-xs-o4M"/>
+                                                        <action selector="updateAlarmTime:" destination="5kC-gB-dnz" eventType="valueChanged" id="nUJ-kW-Iek"/>
                                                     </connections>
                                                 </datePicker>
                                             </subviews>
