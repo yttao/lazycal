@@ -105,12 +105,10 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     
     
     @IBAction func saveEventEdit(segue: UIStoryboardSegue) {
-        println("Event edited")
     }
     
     
     @IBAction func cancelEventEdit(segue: UIStoryboardSegue) {
-        println("Event edit cancelled")
     }
     
     

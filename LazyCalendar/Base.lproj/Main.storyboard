@@ -970,10 +970,10 @@
             </objects>
             <point key="canvasLocation" x="1562" y="1133"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--EditEventNavigationController-->
         <scene sceneID="5Hu-gw-b8O">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Vvf-TA-EMX" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="EditEventNavigationController" title="EditEventNavigationController" automaticallyAdjustsScrollViewInsets="NO" id="Vvf-TA-EMX" userLabel="EditEventNavigationController" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="zfY-8W-oxp">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>

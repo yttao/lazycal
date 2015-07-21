@@ -117,11 +117,9 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
 
     @IBAction func saveEvent(segue: UIStoryboardSegue) {
         monthItemTableViewController!.tableView!.reloadData()
-        println("Save")
     }
     
     
     @IBAction func cancelEvent(segue: UIStoryboardSegue) {
-        println("Cancel")
     }
 }

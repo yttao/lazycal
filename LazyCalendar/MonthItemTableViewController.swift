@@ -93,9 +93,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         @brief
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        println("Editing")
         if editingStyle == UITableViewCellEditingStyle.Delete {
-            println("Deleting")
             
             let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
             let managedContext = appDelegate.managedObjectContext!
@@ -147,7 +145,6 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         @brief On cell selection, pull up table view to show more information.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println("Selected")
         let event = events[indexPath.row]
         selectedEvent = event
         
@@ -222,7 +219,6 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
                 let selectEventNavigationController = segue.destinationViewController as! UINavigationController
                 selectEventTableViewController = selectEventNavigationController.viewControllers.first as? SelectEventTableViewController
                 selectEventTableViewController!.delegate = self
-                println("Segue initiated")
             default:
                 break
             }
@@ -231,7 +227,6 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     
     
     @IBAction func leaveEventDetails(segue: UIStoryboardSegue) {
-        println("Leave details view")
     }
     
     

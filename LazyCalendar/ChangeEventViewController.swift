@@ -128,6 +128,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             nameTextField.text = name
             dateStartPicker.date = dateStart!
             dateEndPicker.date = dateEnd!
+            dateEndPicker.minimumDate = dateStart!
             alarmSwitch.on = alarm!
             alarmDateSwitch.on = false
             if alarmTime != nil {
@@ -165,6 +166,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             // Set initial picker value to selected date and end picker value to 1 hour later
             dateStartPicker.date = dateStart!
             dateEndPicker.date = dateEnd!
+            dateEndPicker.minimumDate = dateStart!
             
             // Format and set main date labels
             dateFormatter.dateFormat = "MMM dd, yyyy"
@@ -358,6 +360,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             }
             else {
                 showFewerAlarmOptions()
+                updateAlarmTimePicker(dateStart!)
             }
         }
     }
@@ -536,12 +539,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         if event == nil {
             event = NSManagedObject(entity: entity, insertIntoManagedObjectContext: managedContext)
         }
-        
-        println("NAME: \(name)")
-        println("START: \(dateStart)")
-        println("END: \(dateEnd)")
-        println("ALARM: \(alarm)")
-        println("ALARMTIME: \(alarmTime)")
         
         // Set data
         event!.setValue(name, forKey: "name")
