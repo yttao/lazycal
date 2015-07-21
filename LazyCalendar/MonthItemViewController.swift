@@ -9,24 +9,22 @@
 import UIKit
 import CoreData
 
-class MonthItemViewController: UIViewController, MonthItemCollectionViewControllerDelegate, ChangeEventViewControllerDelegate {
-    @IBOutlet weak var monthItemCollectionViewContainer: UIView!
+class MonthItemViewController: UIViewController, MonthItemCollectionViewControllerDelegate, ChangeEventViewControllerDelegate, MonthItemPageViewControllerDelegate {
+    @IBOutlet weak var monthItemPageViewContainer: UIView!
     @IBOutlet weak var monthItemTableViewContainer: UIView!
     
+    var monthItemPageViewController: MonthItemPageViewController?
     var monthItemCollectionViewController: MonthItemCollectionViewController?
     var monthItemTableViewController: MonthItemTableViewController?
 
     // Segue identifier to add an event
     private let changeEventSegueIdentifier = "ChangeEventSegue"
-    private let collectionViewSegueIdentifier = "CollectionViewSegue"
+    private let pageViewSegueIdentifier = "PageViewSegue"
     private let tableViewSegueIdentifier = "TableViewSegue"
     
     // NSCalendarUnits to keep track of
     private let units = NSCalendarUnit.CalendarUnitYear | NSCalendarUnit.CalendarUnitMonth |
         NSCalendarUnit.CalendarUnitDay
-    
-    // Keeps track of current date view components
-    private var dateComponents: NSDateComponents?
     
     
     // Initializer
@@ -40,15 +38,13 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
         super.viewDidLoad()
         
         // Add height constraint determined by device size
-        let heightConstraint = NSLayoutConstraint(item: monthItemCollectionViewContainer, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
-        monthItemCollectionViewContainer.addConstraint(heightConstraint)
+        let heightConstraint = NSLayoutConstraint(item: monthItemPageViewContainer, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
+        monthItemPageViewContainer.addConstraint(heightConstraint)
     }
 
     
     // Loads initial data to use
-    func loadData(components: NSDateComponents) {
-        dateComponents = components
-        
+    func loadNavigationTitle(components: NSDateComponents) {
         // Gets month in string format
         let dateFormatter = NSDateFormatter()
         let months = dateFormatter.monthSymbols
@@ -56,6 +52,7 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
         
         // Sets title as month year
         self.navigationItem.title = "\(monthSymbol) \(components.year)"
+        println("Navigation title loaded")
     }
 
     
@@ -85,18 +82,26 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
                 // Set initial date information for event
                 addEventViewController.loadData(dateStart: initialDate!)
                 addEventViewController.delegate = self
-            case collectionViewSegueIdentifier:
-                monthItemCollectionViewController = segue.destinationViewController as? MonthItemCollectionViewController
-                monthItemCollectionViewController!.loadData(dateComponents!, delegate: self)
+            case pageViewSegueIdentifier:
+                monthItemPageViewController = segue.destinationViewController as? MonthItemPageViewController
+                monthItemPageViewController!.monthItemViewController = self
+                monthItemPageViewController!.customDelegate = self
+                loadNavigationTitle(monthItemPageViewController!.dateComponents!)
             case tableViewSegueIdentifier:
                 monthItemTableViewController = segue.destinationViewController as? MonthItemTableViewController
-                monthItemTableViewController!.date = NSCalendar.currentCalendar().dateFromComponents(dateComponents!)
+                monthItemTableViewController!.date = NSCalendar.currentCalendar().dateFromComponents(monthItemPageViewController!.dateComponents!)
                 break
             default:
                 break
             }
         }
         
+    }
+    
+    
+    func monthItemPageViewControllerDidChangeCurrentViewController(monthItemCollectionViewController: MonthItemCollectionViewController) {
+        self.monthItemCollectionViewController = monthItemCollectionViewController
+        loadNavigationTitle(monthItemCollectionViewController.dateComponents!)
     }
     
     

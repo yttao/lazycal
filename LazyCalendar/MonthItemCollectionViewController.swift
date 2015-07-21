@@ -58,6 +58,8 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         super.viewDidLoad()
         collectionView!.delegate = self
         collectionView!.dataSource = self
+        
+        collectionView!.allowsMultipleSelection = false
     }
     
     // Loads initial data to use
@@ -76,13 +78,13 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
             daysInMonth[i] = i - (monthStartWeekday - 2)
         }
         
-        // Gets month in string format
+        /*// Gets month in string format
         let dateFormatter = NSDateFormatter()
         let months = dateFormatter.monthSymbols
         let monthSymbol = months[components.month - 1] as! String
         
         // Sets title as month year
-        self.navigationItem.title = "\(monthSymbol) \(components.year)"
+        self.navigationItem.title = "\(monthSymbol) \(components.year)"*/
     }
     
     
