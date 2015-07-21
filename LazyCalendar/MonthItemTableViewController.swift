@@ -156,7 +156,6 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let alarmTime = selectedEvent!.valueForKey("alarmTime") as? NSDate
         
         selectEventTableViewController!.loadEventDetails(event, name: eventName, dateStart: dateStart, dateEnd: dateEnd, alarm: alarm, alarmTime: alarmTime)
-        selectEventTableViewController!.loadBackBarText(date!)
     }
     
     
