@@ -70,21 +70,16 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         
         monthStartWeekday = getMonthStartWeekday(components)
         
-        dateIndex = calendar.dateFromComponents(components)
+        // Create date index, ensure it is set to day 1 in the month.
+        let dateIndexComponents = components.copy()  as? NSDateComponents
+        dateIndexComponents!.day = 1
+        dateIndex = calendar.dateFromComponents(dateIndexComponents!)
         
         let numDays = self.calendar.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: self.calendar.dateFromComponents(components)!).length
         
         for (var i = monthStartWeekday - 1; i < numDays + (monthStartWeekday - 1); i++) {
             daysInMonth[i] = i - (monthStartWeekday - 2)
         }
-        
-        /*// Gets month in string format
-        let dateFormatter = NSDateFormatter()
-        let months = dateFormatter.monthSymbols
-        let monthSymbol = months[components.month - 1] as! String
-        
-        // Sets title as month year
-        self.navigationItem.title = "\(monthSymbol) \(components.year)"*/
     }
     
     

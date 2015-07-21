@@ -52,7 +52,6 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
         
         // Sets title as month year
         self.navigationItem.title = "\(monthSymbol) \(components.year)"
-        println("Navigation title loaded")
     }
 
     
@@ -102,6 +101,10 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
     func monthItemPageViewControllerDidChangeCurrentViewController(monthItemCollectionViewController: MonthItemCollectionViewController) {
         self.monthItemCollectionViewController = monthItemCollectionViewController
         loadNavigationTitle(monthItemCollectionViewController.dateComponents!)
+        if monthItemTableViewController != nil {
+            monthItemTableViewController!.showEvents(
+                monthItemCollectionViewController.dateIndex!)
+        }
     }
     
     
