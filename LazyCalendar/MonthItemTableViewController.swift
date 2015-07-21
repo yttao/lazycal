@@ -10,6 +10,7 @@ import UIKit
 import CoreData
 
 class MonthItemTableViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate, SelectEventTableViewControllerDelegate {
+    
     var date: NSDate?
     // The events for selected day
     private var events = [NSManagedObject]()
@@ -155,6 +156,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let alarmTime = selectedEvent!.valueForKey("alarmTime") as? NSDate
         
         selectEventTableViewController!.loadEventDetails(event, name: eventName, dateStart: dateStart, dateEnd: dateEnd, alarm: alarm, alarmTime: alarmTime)
+        selectEventTableViewController!.loadBackBarText(date!)
     }
     
     
@@ -225,11 +227,16 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         }
     }
     
-    
+    /*
+        @brief Leaves event details back to main view.
+    */
     @IBAction func leaveEventDetails(segue: UIStoryboardSegue) {
     }
     
     
+    /*
+        @brief On changing event, update events for current table view.
+    */
     func selectEventTableViewControllerDidChangeEvent(event: NSManagedObject) {
         showEvents(date!)
     }

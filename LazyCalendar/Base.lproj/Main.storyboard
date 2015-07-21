@@ -5,32 +5,6 @@
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
-        <!--MainViewController-->
-        <scene sceneID="C3a-aH-E0f">
-            <objects>
-                <viewController storyboardIdentifier="ViewController" title="MainViewController" id="VZ1-Iz-3z0" customClass="ViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="1du-PG-VOe"/>
-                        <viewControllerLayoutGuide type="bottom" id="kDD-f6-e5p"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="svx-Fc-0aG">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="2mM-aW-n5v" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-463" y="-999.99999999999989"/>
-        </scene>
-        <!--MonthPageViewController-->
-        <scene sceneID="gG5-VG-ot4">
-            <objects>
-                <pageViewController storyboardIdentifier="MonthPageViewController" autoresizesArchivedViewToFullSize="NO" title="MonthPageViewController" transitionStyle="scroll" navigationOrientation="vertical" spineLocation="none" id="EkH-VZ-V3c" sceneMemberID="viewController"/>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="69i-VH-ED5" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="221" y="-999.99999999999989"/>
-        </scene>
         <!--MonthItemViewController-->
         <scene sceneID="DiK-Na-GGh">
             <objects>
@@ -79,9 +53,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="monthItemCollectionView" destination="BeG-sY-bqe" id="a35-vO-r5o"/>
                         <outlet property="monthItemPageViewContainer" destination="mwX-at-egv" id="7uu-Gf-lyI"/>
-                        <outlet property="monthItemTableView" destination="MLe-gc-Jb5" id="oKq-2t-Vii"/>
                         <outlet property="monthItemTableViewContainer" destination="mfm-EE-QX8" id="QjP-hb-vlG"/>
                     </connections>
                 </viewController>
@@ -106,7 +78,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" red="0.49019607840000001" green="1" blue="0.49019607840000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="qY6-km-slp">
-                            <size key="itemSize" width="50" height="50"/>
+                            <size key="itemSize" width="75" height="74"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -116,11 +88,11 @@
                                 <rect key="frame" x="0.0" y="0.0" width="80" height="74"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="75" height="74"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Day" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tBi-WE-vSe">
-                                            <rect key="frame" x="10" y="8" width="30" height="21"/>
+                                            <rect key="frame" x="23" y="8" width="30" height="21"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
@@ -180,7 +152,7 @@
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="eventNameLabel" destination="rO5-yU-8cd" id="0wp-06-zzz"/>
-                                    <segue destination="8iP-AM-Jhx" kind="presentation" identifier="SelectEventSegue" id="qZ2-hh-UYV"/>
+                                    <segue destination="8iP-AM-Jhx" kind="show" identifier="SelectEventSegue" id="qZ2-hh-UYV"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -194,101 +166,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cC0-yZ-6HL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="910" y="-144"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="les-0d-OVe">
-            <objects>
-                <viewController id="NX3-rx-zv6" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="iJP-1A-0CU"/>
-                        <viewControllerLayoutGuide type="bottom" id="Cm0-xw-xBf"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="lgS-Lt-sIx">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="BeG-sY-bqe">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
-                                <color key="backgroundColor" red="0.49019607843137253" green="1" blue="0.49019607843137253" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="300" placeholder="YES" id="xMy-Kd-QZ1"/>
-                                </constraints>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="azq-Uf-nrf">
-                                    <size key="itemSize" width="80" height="74"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
-                                <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="DayCell" id="7fy-WO-9ZF" customClass="CalendarCollectionViewCell" customModule="LazyCalendar" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="80" height="74"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="80" height="74"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Day" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UU2-U1-I97">
-                                                    <rect key="frame" x="25" y="8" width="30" height="21"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </view>
-                                        <constraints>
-                                            <constraint firstItem="UU2-U1-I97" firstAttribute="top" secondItem="7fy-WO-9ZF" secondAttribute="topMargin" id="1Zd-qW-uor"/>
-                                            <constraint firstAttribute="centerX" secondItem="UU2-U1-I97" secondAttribute="centerX" id="ezZ-NA-QGo"/>
-                                        </constraints>
-                                        <connections>
-                                            <outlet property="dayLabel" destination="UU2-U1-I97" id="pd1-mh-e7j"/>
-                                        </connections>
-                                    </collectionViewCell>
-                                </cells>
-                            </collectionView>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="MLe-gc-Jb5">
-                                <rect key="frame" x="0.0" y="300" width="600" height="300"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <prototypes>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="EventCell" textLabel="cVQ-7L-noL" detailTextLabel="0jK-ta-B5y" style="IBUITableViewCellStyleSubtitle" id="g3B-Kt-F5S">
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="g3B-Kt-F5S" id="39K-Z0-zhI">
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="cVQ-7L-noL">
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Detail" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="0jK-ta-B5y">
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </prototypes>
-                                <sections/>
-                            </tableView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="BeG-sY-bqe" firstAttribute="top" secondItem="lgS-Lt-sIx" secondAttribute="top" id="4eI-iJ-KR0"/>
-                            <constraint firstAttribute="trailing" secondItem="BeG-sY-bqe" secondAttribute="trailing" id="5VH-4c-hSR"/>
-                            <constraint firstItem="MLe-gc-Jb5" firstAttribute="leading" secondItem="lgS-Lt-sIx" secondAttribute="leading" id="S9U-bu-eVG"/>
-                            <constraint firstItem="Cm0-xw-xBf" firstAttribute="top" secondItem="MLe-gc-Jb5" secondAttribute="bottom" id="lMQ-Ul-LTG"/>
-                            <constraint firstAttribute="trailing" secondItem="MLe-gc-Jb5" secondAttribute="trailing" id="q0q-31-s0g"/>
-                            <constraint firstItem="MLe-gc-Jb5" firstAttribute="top" secondItem="BeG-sY-bqe" secondAttribute="bottom" id="uag-O2-5sR"/>
-                            <constraint firstItem="BeG-sY-bqe" firstAttribute="leading" secondItem="lgS-Lt-sIx" secondAttribute="leading" id="w99-DD-9J9"/>
-                        </constraints>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="UMk-13-Nm3" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1676" y="1888"/>
         </scene>
         <!--MonthItemNavigationController-->
         <scene sceneID="3xo-ef-0IO">
@@ -560,7 +437,7 @@
             <objects>
                 <tableViewController storyboardIdentifier="SelectEventTableViewController" title="SelectEventTableViewController" id="Zqd-hf-X19" userLabel="SelectEventTableViewController" customClass="SelectEventTableViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="ipw-9M-UjL">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="236"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <sections>
@@ -643,14 +520,10 @@
                         </sections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Event Details" id="qhp-AT-Ij3">
-                        <barButtonItem key="leftBarButtonItem" systemItem="edit" id="bfL-Xb-QjR">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="3AX-CK-Acx"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="bfL-Xb-QjR">
                             <connections>
                                 <segue destination="Vvf-TA-EMX" kind="presentation" identifier="EditEventSegue" id="rZS-rF-bjf"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="yci-HX-wfd">
-                            <connections>
-                                <segue destination="dyV-CA-x8w" kind="unwind" identifier="LeaveEventDetails" unwindAction="leaveEventDetails:" id="hGt-eM-4gG"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -658,14 +531,14 @@
                         <outlet property="alarmLabel" destination="KhG-Ie-Wyq" id="oaE-5c-YIl"/>
                         <outlet property="alarmTimeDetailsLabel" destination="Vzg-iG-oT3" id="JXY-w5-hVa"/>
                         <outlet property="alarmTimeMainLabel" destination="gx4-vy-IpG" id="sgH-0a-fiE"/>
+                        <outlet property="backBarButtonItem" destination="3AX-CK-Acx" id="vjb-rn-Izg"/>
                         <outlet property="eventNameLabel" destination="jF5-0l-0Lh" id="aJe-Uz-n5l"/>
                         <outlet property="eventTimeLabel" destination="NhU-cS-MgM" id="qO1-8x-k0s"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kOz-eU-Jup" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="dyV-CA-x8w" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="1562" y="428"/>
+            <point key="canvasLocation" x="1562" y="246"/>
         </scene>
         <!--ChangeEventNavigationController-->
         <scene sceneID="3oe-iH-Ngm">
@@ -685,35 +558,6 @@
             </objects>
             <point key="canvasLocation" x="-463" y="428"/>
         </scene>
-        <!--Test View Controller-->
-        <scene sceneID="TeE-to-oxO">
-            <objects>
-                <viewController id="gXG-zh-iNP" userLabel="Test View Controller" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="PRG-No-85n"/>
-                        <viewControllerLayoutGuide type="bottom" id="9nZ-hV-aMf"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="98P-Ud-BCR">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="countDownTimer" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="2AB-PB-Rmr">
-                                <rect key="frame" x="16" y="20" width="310" height="162"/>
-                                <date key="date" timeIntervalSinceReferenceDate="458611630.76361299">
-                                    <!--2015-07-15 00:07:10 +0000-->
-                                </date>
-                            </datePicker>
-                            <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U1J-1S-io4">
-                                <rect key="frame" x="16" y="190" width="382" height="162"/>
-                            </pickerView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="tjx-xO-b9k" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-981" y="1060"/>
-        </scene>
         <!--SelectEventNavigationController-->
         <scene sceneID="gIc-6Z-W0o">
             <objects>
@@ -730,7 +574,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fg5-aU-SWy" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="910" y="428"/>
+            <point key="canvasLocation" x="910" y="246"/>
         </scene>
         <!--EditEventViewController-->
         <scene sceneID="Hh6-zr-xRP">

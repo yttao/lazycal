@@ -16,6 +16,8 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
     
+    @IBOutlet weak var backBarButtonItem: UIBarButtonItem!
+    
     @IBOutlet weak var eventNameLabel: UILabel!
     @IBOutlet weak var eventTimeLabel: UILabel!
     @IBOutlet weak var alarmLabel: UILabel!
