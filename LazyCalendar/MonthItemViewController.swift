@@ -40,8 +40,6 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
         // Add height constraint determined by device size
         let heightConstraint = NSLayoutConstraint(item: monthItemPageViewContainer, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
         monthItemPageViewContainer.addConstraint(heightConstraint)
-        println(monthItemPageViewContainer.bounds.size.width)
-        println(view.bounds.size.width)
     }
 
     

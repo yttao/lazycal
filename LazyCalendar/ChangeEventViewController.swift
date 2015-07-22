@@ -664,6 +664,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 delegate?.changeEventViewControllerDidSaveEvent(event)
             case "CancelEventEditSegue":
                 break
+            case "ContactsSegue":
+                let contactsTableViewController = segue.destinationViewController as! ContactsTableViewController
+                contactsTableViewController.addressBookRef = self.addressBookRef
             default:
                 break
             }
