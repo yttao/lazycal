@@ -59,8 +59,9 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         collectionView!.delegate = self
         collectionView!.dataSource = self
         
-        collectionView!.allowsMultipleSelection = false
+        println("Collection view loaded")
     }
+    
     
     // Loads initial data to use
     func loadData(components: NSDateComponents, delegate: MonthItemCollectionViewControllerDelegate) {
@@ -107,6 +108,12 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     
     // Called on selection of day cell in month
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        // Check if old selected cell has been properly deselected (fix to small bug when viewing selected event details)
+        if selectedCell != nil {
+            selectedCell!.backgroundColor = backgroundColor
+            selectedCell = nil
+        }
+        println("Selected a cell")
         // Get cell
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         
@@ -144,6 +151,7 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         
         cell.backgroundColor = backgroundColor
         selectedCell = nil
+        println("Deselected cell")
     }
     
     
