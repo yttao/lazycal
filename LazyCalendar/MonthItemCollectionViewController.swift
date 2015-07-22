@@ -58,8 +58,6 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         super.viewDidLoad()
         collectionView!.delegate = self
         collectionView!.dataSource = self
-        
-        println("Collection view loaded")
     }
     
     
@@ -109,17 +107,13 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     // Called on selection of day cell in month
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         // Check if old selected cell has been properly deselected (fix to small bug when viewing selected event details)
-        if selectedCell != nil {
-            selectedCell!.backgroundColor = backgroundColor
-            selectedCell = nil
-        }
-        println("Selected a cell")
+        deselectSelectedCell()
+
         // Get cell
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         
         // Select cell
-        cell.backgroundColor = selectedColor
-        selectedCell = cell
+        selectCell(cell)
         
         // Update selected date components
         dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
@@ -146,21 +140,14 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     
     // Called on deselection of day cell in month
     override func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
-        // Reset cell color and clear selectedCell
-        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
-        
-        cell.backgroundColor = backgroundColor
-        selectedCell = nil
+        deselectSelectedCell()
         println("Deselected cell")
     }
     
     
     // Clears current selection
     func clearSelected() {
-        if selectedCell != nil {
-            selectedCell!.backgroundColor = backgroundColor
-            selectedCell = nil
-        }
+        deselectSelectedCell()
         
         // Reset date components to day 1
         dateComponents!.day = 1
@@ -168,7 +155,27 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     }
     
     
-    // Gets the first weekday of the month
+    func selectCell(cell: CalendarCollectionViewCell) {
+        cell.backgroundColor = selectedColor
+        selectedCell = cell
+    }
+    
+    
+    /*
+        @brief Deselects the currently selected cell.
+    */
+    func deselectSelectedCell() {
+        if let cell = selectedCell {
+            cell.backgroundColor = backgroundColor
+            selectedCell = nil
+        }
+    }
+    
+    
+    /*
+        @brief Gets the first weekday of the month
+        @param components The date components of the month.
+    */
     func getMonthStartWeekday(components: NSDateComponents) -> Int {
         let componentsCopy = components.copy() as! NSDateComponents
         componentsCopy.day = 1
@@ -178,7 +185,11 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     }
     
     
-    // Recalculates components after fields have been changed in components
+    /*
+        @brief Returns new date components after components have been modified.
+        @param components The components to recalculate
+        @return The new date components.
+    */
     func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
         let newDate = calendar.dateFromComponents(components)
         return calendar.components(units, fromDate: newDate!)
@@ -186,14 +197,20 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
 }
 
 
-// Handles cell sizing
+/*
+    @brief Handles cell sizing and spacing.
+    @discussion The collection view should take up the
+*/
 extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout {
     
-    // Determines size of one cell
+    /*
+        @brief Determines size of one cell.
+        @discussion Note: due to the iOS Simulator, the rightmost cell is cut off slightly because it has a scrollbar. The sizing is correct on an actual device.
+    */
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.size.width /
+        return CGSize(width: collectionView.bounds.size.width /
             CGFloat(MonthItemCollectionViewController.numDaysInWeek),
-            height: (collectionView.frame.size.height) /
+            height: (collectionView.bounds.size.height) /
                 CGFloat(MonthItemCollectionViewController.numWeeksInMonth))
     }
     

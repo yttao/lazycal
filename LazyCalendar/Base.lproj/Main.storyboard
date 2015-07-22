@@ -36,12 +36,12 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="mfm-EE-QX8" firstAttribute="top" secondItem="mwX-at-egv" secondAttribute="bottom" id="2bT-Jf-vN8"/>
-                            <constraint firstAttribute="trailing" secondItem="mwX-at-egv" secondAttribute="trailing" id="3NQ-op-wmv"/>
-                            <constraint firstItem="mwX-at-egv" firstAttribute="leading" secondItem="CM5-Bu-5Hb" secondAttribute="leading" id="CFS-Du-4wm"/>
                             <constraint firstItem="mfm-EE-QX8" firstAttribute="trailing" secondItem="CM5-Bu-5Hb" secondAttribute="trailing" id="MEv-zY-HEv"/>
                             <constraint firstItem="mwX-at-egv" firstAttribute="top" secondItem="aZM-Fm-04h" secondAttribute="bottom" id="VI8-mQ-hXq"/>
                             <constraint firstItem="mfm-EE-QX8" firstAttribute="leading" secondItem="CM5-Bu-5Hb" secondAttribute="leading" id="VT7-88-NGi"/>
                             <constraint firstItem="g3V-1X-Ydw" firstAttribute="top" secondItem="mfm-EE-QX8" secondAttribute="bottom" id="WSV-Rt-Dqb"/>
+                            <constraint firstItem="mwX-at-egv" firstAttribute="trailing" secondItem="CM5-Bu-5Hb" secondAttribute="trailing" id="cMc-8u-Dxi"/>
+                            <constraint firstItem="mwX-at-egv" firstAttribute="leading" secondItem="CM5-Bu-5Hb" secondAttribute="leading" id="fX7-De-q6E"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
@@ -77,18 +77,18 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" red="0.49019607840000001" green="1" blue="0.49019607840000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="qY6-km-slp">
-                            <size key="itemSize" width="75" height="74"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="qY6-km-slp">
+                            <size key="itemSize" width="75" height="75"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
                         <cells>
-                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="DayCell" id="eYf-hv-Hc4" customClass="CalendarCollectionViewCell" customModule="LazyCalendar" customModuleProvider="target">
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" reuseIdentifier="DayCell" id="eYf-hv-Hc4" customClass="CalendarCollectionViewCell" customModule="LazyCalendar" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="80" height="74"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="75" height="74"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="75" height="75"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Day" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tBi-WE-vSe">
@@ -393,6 +393,29 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Contacts" id="CkV-Ye-YdG">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="xbe-eJ-mQ2" style="IBUITableViewCellStyleDefault" id="gUV-1o-nZc" userLabel="ContactsPicker">
+                                        <rect key="frame" x="0.0" y="375" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="gUV-1o-nZc" id="eX3-oO-GvJ">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Choose Contacts" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="xbe-eJ-mQ2" userLabel="Choose Contacts">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <bool key="isElement" value="YES"/>
+                                        </accessibility>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="aIB-mu-9DI" id="eFb-n3-aDf"/>
@@ -436,10 +459,10 @@
         <scene sceneID="Q5X-3t-6vG">
             <objects>
                 <tableViewController storyboardIdentifier="SelectEventTableViewController" title="SelectEventTableViewController" id="Zqd-hf-X19" userLabel="SelectEventTableViewController" customClass="SelectEventTableViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="ipw-9M-UjL">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="ipw-9M-UjL">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="236"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <sections>
                             <tableViewSection headerTitle="Details" id="rNu-aA-pvm" userLabel="EventDetails">
                                 <cells>

@@ -70,8 +70,8 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as? EventTableViewCell
         let event = events[indexPath.row]
-        if event.valueForKey("name") as? String != nil {
-            cell?.eventNameLabel.text = event.valueForKey("name") as? String
+        if let name = event.valueForKey("name") as? String {
+            cell?.eventNameLabel.text = name
         }
         else {
             cell?.eventNameLabel.text = nil
@@ -111,9 +111,11 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
                 assert(false, "Could not save \(error), \(error?.userInfo)")
             }
             
-            // Remove event from list and reload
+            // Remove event from list and table view
+            tableView.beginUpdates()
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
             events.removeAtIndex(indexPath.row)
-            tableView.reloadData()
+            tableView.endUpdates()
         }
     }
     

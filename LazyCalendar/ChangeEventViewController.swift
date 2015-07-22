@@ -8,6 +8,8 @@
 
 import UIKit
 import CoreData
+import AddressBook
+import AddressBookUI
 
 class ChangeEventViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
     
@@ -54,7 +56,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     @IBOutlet weak var alarmTimePickerCell: UITableViewCell!
     
     // Section headers associated with section numbers
-    private let sections = ["Name": 0, "Start": 1, "End": 2, "Alarm": 3]
+    private let sections = ["Name": 0, "Start": 1, "End": 2, "Alarm": 3, "Contacts": 4]
     
     // Keeps track of index paths
     private let indexPaths = ["Name": NSIndexPath(forRow: 0, inSection: 0),
@@ -62,7 +64,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         "AlarmToggle": NSIndexPath(forRow: 0, inSection: 3),
         "AlarmDateToggle": NSIndexPath(forRow: 1, inSection: 3),
         "AlarmTimeDisplay": NSIndexPath(forRow: 2, inSection: 3),
-        "AlarmTimePicker": NSIndexPath(forRow: 3, inSection: 3)]
+        "AlarmTimePicker": NSIndexPath(forRow: 3, inSection: 3),
+        "Contacts": NSIndexPath(forRow: 0, inSection: 4)]
     
     // Heights of fields
     private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
@@ -192,7 +195,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         @brief Initializes data with a start date.
     */
     func loadData(#dateStart: NSDate) {
-        name = ""
+        name = nil
         self.dateStart = dateStart
         let hour = NSTimeInterval(3600)
         dateEnd = dateStart.dateByAddingTimeInterval(hour)
@@ -337,6 +340,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             cell.contentView.didAddSubview(dateEndPicker)
             
             tableView.endUpdates()
+        case sections["Contacts"]!:
+            let contactsViewController = ABPersonViewController()
+            self.navigationController?.pushViewController(contactsViewController, animated: true)
         default:
             break
         }
