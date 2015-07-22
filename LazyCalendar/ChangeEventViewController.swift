@@ -85,9 +85,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     private var event: NSManagedObject?
     
+    private var addressBookRef: ABAddressBookRef?
+    
     
     // Initialization, set default heights
     required init(coder aDecoder: NSCoder) {
+        if ABAddressBookGetAuthorizationStatus() == .Authorized {
+            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
+        }
+        
         eventNameCellHeight = DEFAULT_CELL_HEIGHT
         
         eventDateStartCellHeight = DEFAULT_CELL_HEIGHT
@@ -341,12 +347,89 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             
             tableView.endUpdates()
         case sections["Contacts"]!:
-            let contactsViewController = ABPersonViewController()
-            self.navigationController?.pushViewController(contactsViewController, animated: true)
+            // Create initial alert notification (first time permission request) for data.
+            
+            // Get authorization status
+            let authorizationStatus = ABAddressBookGetAuthorizationStatus()
+            
+            switch authorizationStatus {
+            // If denied, display message for permission.
+            case .Denied, .Restricted:
+                println("Denied")
+                displayContactsAccessDeniedMessage()
+            // If granted, continue to next view controller for contacts.
+            case .Authorized:
+                println("Allowed")
+                // Show next view controller
+                
+            // If undetermined, ask for permission.
+            case .NotDetermined:
+                println("Not determined")
+                displayContactsAccessRequest()
+            }
+            //let contactsViewController = ABPersonViewController()
+            //self.navigationController!.pushViewController(contactsViewController, animated: true)
         default:
             break
         }
     }
+    
+    
+    /*
+        @brief Displays an alert to request access to contacts.
+        @discussion If permission is granted, it adds the address book reference and shows the contacts view controller. If not, it displays an alert to inform the user that access to contacts is denied.
+    */
+    func displayContactsAccessRequest() {
+        ABAddressBookRequestAccessWithCompletion(addressBookRef) {
+            (granted: Bool, error: CFError!) in
+            dispatch_async(dispatch_get_main_queue()) {
+                // If given permission, get address book reference
+                if granted {
+                    println("Just given permission")
+                    self.addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
+                    // Show next view controller
+                }
+                // If denied permission, display access denied message.
+                else {
+                    println("Just denied")
+                    self.displayContactsAccessDeniedMessage()
+                }
+            }
+        }
+    }
+    
+    
+    /*
+        @brief Alerts the user that access to contacts is denied and offers chance to change permissions in settings.
+        @discussion This occurs when the user is first prompted for access and denies access or in future attempts to use contacts when permission is denied.
+    */
+    func displayContactsAccessDeniedMessage() {
+        // Create alert for contacts access denial
+        let contactsAccessDeniedAlert = UIAlertController(title: "Cannot Access Contacts",
+            message: "You must give the app permission to access contacts.",
+            preferredStyle: .Alert)
+        // Add option to open settings and allow contacts access
+        contactsAccessDeniedAlert.addAction(UIAlertAction(title: "Change Settings",
+            style: .Default,
+            handler: { action in
+                self.openSettings()
+        }))
+        // Add option to just continue without contacts access
+        contactsAccessDeniedAlert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+        // Show alert
+        presentViewController(contactsAccessDeniedAlert, animated: true, completion: nil)
+    }
+    
+    
+    /*
+        @brief Opens the settings menu.
+        @discussion This is called when contacts access is explicitly denied and the contacts view controller requires contacts access to continue.
+    */
+    func openSettings() {
+        let url = NSURL(string: UIApplicationOpenSettingsURLString)
+        UIApplication.sharedApplication().openURL(url!)
+    }
+    
     
     
     /*
