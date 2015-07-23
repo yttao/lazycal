@@ -60,7 +60,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         searchController = ({
             let controller = UISearchController(searchResultsController: nil)
             controller.searchResultsUpdater = self
-            controller.dimsBackgroundDuringPresentation = true
+            controller.dimsBackgroundDuringPresentation = false
             controller.searchBar.sizeToFit()
             controller.searchBar.delegate = self
             controller.delegate = self
@@ -172,8 +172,8 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         println("SELECTION")
         if searchController != nil && searchController!.active {
-            println("Contact appended")
             selectedContacts.append(filteredContacts[indexPath.row])
+            searchController!.active = false
         }
     }
     
