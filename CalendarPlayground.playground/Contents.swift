@@ -1,6 +1,7 @@
 //: Playground - noun: a place where people can play
 
 import UIKit
+import AddressBook
 
 var str = "Hello, playground"
 var myDate = NSDate()
@@ -29,6 +30,30 @@ let date = NSDate()
 label.text = String(_cocoaString: date)
 
 
-private let fields = ["Days": ["component": 0, "maxValue": 30], "Hours": 1, "Minutes": 2]
-
-NSLog("%d", fields["Days"]!["component"]!)
+let contactProperties = [kABPersonFirstNameProperty,
+    kABPersonLastNameProperty,
+    kABPersonMiddleNameProperty,
+    kABPersonPrefixProperty,
+    kABPersonSuffixProperty,
+    kABPersonNicknameProperty,
+    kABPersonFirstNamePhoneticProperty,
+    kABPersonLastNamePhoneticProperty,
+    kABPersonMiddleNamePhoneticProperty,
+    
+    kABPersonOrganizationProperty,
+    kABPersonJobTitleProperty,
+    kABPersonDepartmentProperty,
+    kABPersonEmailProperty,
+    kABPersonBirthdayProperty,
+    kABPersonNoteProperty,
+    kABPersonCreationDateProperty,
+    kABPersonModificationDateProperty,
+    
+    kABPersonAddressProperty,
+    kABPersonDateProperty,
+    kABPersonKindProperty,
+    kABPersonPhoneProperty,
+    kABPersonInstantMessageProperty,
+    kABPersonSocialProfileProperty,
+    kABPersonURLProperty,
+    kABPersonRelatedNamesProperty]
