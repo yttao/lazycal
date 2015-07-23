@@ -207,7 +207,12 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         
         // Display events sorted by dateStart. 
         //TODO: Add an additional alphabetical sort for two dateStarts at the same times.
-        events.sort({($0.valueForKey("dateStart") as! NSDate).compare(($1.valueForKey("dateStart") as! NSDate)) == .OrderedAscending})
+        events.sort({
+            let firstDate = $0.valueForKey("dateStart") as! NSDate
+            let secondDate = $1.valueForKey("dateStart") as! NSDate
+            return firstDate.compare(secondDate) == .OrderedAscending
+            })
+            //($0.valueForKey("dateStart") as! NSDate).compare(($1.valueForKey("dateStart") as! NSDate)) == .OrderedAscending})
         tableView.reloadData()
     }
     

@@ -466,14 +466,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <searchBar key="tableHeaderView" contentMode="redraw" placeholder="Search Contacts" id="zbz-Ui-Ain">
-                            <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                            <textInputTraits key="textInputTraits" autocorrectionType="no"/>
-                            <connections>
-                                <outlet property="delegate" destination="r9E-dy-moz" id="8oK-VV-gsY"/>
-                            </connections>
-                        </searchBar>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ContactCell" textLabel="MSY-ja-MEV" detailTextLabel="jcB-1S-E1b" style="IBUITableViewCellStyleSubtitle" id="sCC-Pk-ccW">
                                 <autoresizingMask key="autoresizingMask"/>
@@ -502,20 +494,8 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Contacts" id="bVM-yj-ksK"/>
-                    <connections>
-                        <outlet property="searchDisplayController" destination="0Ua-Jr-vMu" id="Ay6-sP-tM2"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YY6-IP-s8a" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <searchDisplayController id="0Ua-Jr-vMu">
-                    <connections>
-                        <outlet property="delegate" destination="r9E-dy-moz" id="ZBN-kU-mhR"/>
-                        <outlet property="searchBar" destination="zbz-Ui-Ain" id="XZL-Yc-jPb"/>
-                        <outlet property="searchContentsController" destination="r9E-dy-moz" id="GA3-Zb-2km"/>
-                        <outlet property="searchResultsDataSource" destination="r9E-dy-moz" id="5cJ-9R-CKR"/>
-                        <outlet property="searchResultsDelegate" destination="r9E-dy-moz" id="2zZ-xW-pgZ"/>
-                    </connections>
-                </searchDisplayController>
             </objects>
             <point key="canvasLocation" x="221" y="1139"/>
         </scene>

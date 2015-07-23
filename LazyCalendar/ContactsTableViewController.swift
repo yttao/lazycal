@@ -9,7 +9,7 @@
 import UIKit
 import AddressBook
 
-class ContactsTableViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, UISearchDisplayDelegate {
+class ContactsTableViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
     
     /*private let contactProperties = [kABPersonFirstNameProperty,
         kABPersonLastNameProperty,
@@ -41,7 +41,9 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     
     private let reuseIdentifier = "ContactCell"
     
-    var addressBookRef: ABAddressBookRef?
+    private var searchController: UISearchController?
+    
+    var addressBookRef: ABAddressBookRef!
     
     
     required init(coder aDecoder: NSCoder) {
@@ -55,12 +57,28 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         tableView.delegate = self
         tableView.dataSource = self
         
+        searchController = ({
+            let controller = UISearchController(searchResultsController: nil)
+            controller.searchResultsUpdater = self
+            controller.dimsBackgroundDuringPresentation = true
+            controller.searchBar.sizeToFit()
+            controller.searchBar.delegate = self
+            controller.delegate = self
+            
+            self.tableView.tableHeaderView = controller.searchBar
+            
+            return controller
+        })()
+        
         allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
         let totalContacts = ABAddressBookGetPersonCount(addressBookRef)
-        filterContentForSearchText("j")
     }
     
     
+    /*
+        @brief Filters the search results by the text entered in the search bar.
+        @param searchText The text to filter the results.
+    */
     func filterContentForSearchText(searchText: String) {
         let block = {
             (record: AnyObject!, bindings: [NSObject: AnyObject]!) -> Bool in
@@ -118,9 +136,17 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         }
         let predicate = NSPredicate(block: block)
         filteredContacts = allContacts!.filteredArrayUsingPredicate(predicate)
-        for (var i = 0; i < filteredContacts.count; i++) {
-            println(ABRecordCopyCompositeName(filteredContacts[i]).takeRetainedValue())
-        }
+        filteredContacts.sort({
+            let firstFullName = ABRecordCopyValue($0 as ABRecordRef, kABSourceNameProperty).takeRetainedValue() as! String
+            let secondFullName = ABRecordCopyValue($1 as ABRecordRef, kABSourceNameProperty).takeRetainedValue() as! String
+            return firstFullName.compare(secondFullName) == .OrderedAscending
+        })
+    }
+    
+    
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
+        filterContentForSearchText(searchController.searchBar.text)
+        tableView.reloadData()
     }
     
     
@@ -136,9 +162,21 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         @brief The number of rows is determined by the number of contacts.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if searchController != nil && searchController!.active {
+            return filteredContacts.count
+        }
         return selectedContacts.count
     }
-
+    
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        println("SELECTION")
+        if searchController != nil && searchController!.active {
+            println("Contact appended")
+            selectedContacts.append(filteredContacts[indexPath.row])
+        }
+    }
+    
     
     /*
         @brief Configures each cell in table view with contact information.
@@ -146,12 +184,16 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
-
-        // Show name in main label, main phone number in detail label
-        //let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row]).takeRetainedValue() as String
         
-        //cell.textLabel?.text = fullName
-        //cell.detailTextLabel?.text = contacts[indexPath.row]
+        if searchController != nil && searchController!.active {
+            let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row]).takeRetainedValue() as String
+            cell.textLabel?.text = fullName
+        }
+        else {
+            let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row]).takeRetainedValue() as String
+            
+            cell.textLabel?.text = fullName
+        }
 
         return cell
     }
