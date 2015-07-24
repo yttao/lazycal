@@ -83,6 +83,13 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         let block = {
             (record: AnyObject!, bindings: [NSObject: AnyObject]!) -> Bool in
             let recordRef: ABRecordRef = record as ABRecordRef
+            
+            for (var i = 0; i < self.selectedContacts.count; i++) {
+                if ABRecordGetRecordID(recordRef) == ABRecordGetRecordID(self.selectedContacts[i]) {
+                    return false
+                }
+            }
+            
             let name = ABRecordCopyCompositeName(recordRef)?.takeRetainedValue() as? String
             let phoneNumbersMultivalue: AnyObject? = ABRecordCopyValue(recordRef, kABPersonPhoneProperty)?.takeRetainedValue()
             let emailsMultivalue: AnyObject? = ABRecordCopyValue(recordRef, kABPersonEmailProperty)?.takeRetainedValue()
@@ -170,9 +177,19 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println("SELECTION")
         if searchController != nil && searchController!.active {
-            selectedContacts.append(filteredContacts[indexPath.row])
+            // Add selected contact if it isn't already in the selected contacts list.
+            var alreadySelected = false
+            for (var i = 0; i < selectedContacts.count; i++) {
+                if ABRecordGetRecordID(selectedContacts[i]) == ABRecordGetRecordID(filteredContacts[indexPath.row]) {
+                    alreadySelected = true
+                    break
+                }
+            }
+            if !alreadySelected {
+                selectedContacts.append(filteredContacts[indexPath.row])
+            }
+            
             searchController!.active = false
         }
     }
@@ -196,5 +213,11 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         }
 
         return cell
+    }
+    
+    
+    override func viewWillDisappear(animated: Bool) {
+        let changeEventViewController = self.navigationController?.viewControllers.first as! ChangeEventViewController
+        changeEventViewController.updateContacts(selectedContacts)
     }
 }

@@ -68,16 +68,16 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         @discussion The event name appears in the event main label and the date in the details label.
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as? EventTableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         let event = events[indexPath.row]
         if let name = event.valueForKey("name") as? String {
-            cell?.eventNameLabel.text = name
+            cell.textLabel?.text = name
         }
         else {
-            cell?.eventNameLabel.text = nil
+            cell.textLabel?.text = nil
         }
         
-        return cell!
+        return cell
     }
     
     

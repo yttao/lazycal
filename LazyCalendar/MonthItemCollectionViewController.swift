@@ -141,7 +141,6 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     // Called on deselection of day cell in month
     override func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
         deselectSelectedCell()
-        println("Deselected cell")
     }
     
     

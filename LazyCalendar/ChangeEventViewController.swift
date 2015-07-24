@@ -21,6 +21,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     private var dateEnd: NSDate?
     private var alarm: Bool?
     private var alarmTime: NSDate?
+    private var contacts: [ABRecordRef]?
     
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
@@ -645,6 +646,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         }
         
         return event!
+    }
+    
+    
+    func updateContacts(contacts: [ABRecordRef]) {
+        self.contacts = contacts
     }
     
     
