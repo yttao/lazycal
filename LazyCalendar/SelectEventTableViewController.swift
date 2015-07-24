@@ -24,7 +24,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     @IBOutlet weak var alarmTimeMainLabel: UILabel!
     @IBOutlet weak var alarmTimeDetailsLabel: UILabel!
     
-    private var event: NSManagedObject?
+    private var event: TestEvent?
     private var name: String?
     private var dateStart: NSDate?
     private var dateEnd: NSDate?
@@ -79,7 +79,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
     
     
-    func loadEventDetails(event: NSManagedObject, name: String?, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
+    func loadEventDetails(event: TestEvent, name: String?, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
         self.event = event
         self.name = name
         self.dateStart = dateStart
@@ -114,7 +114,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
     
     
-    func changeEventViewControllerDidSaveEvent(event: NSManagedObject) {
+    func changeEventViewControllerDidSaveEvent(event: TestEvent) {
         // Update info that was just edited
         reloadData()
         delegate?.selectEventTableViewControllerDidChangeEvent(event)
@@ -122,5 +122,5 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
 }
 
 protocol SelectEventTableViewControllerDelegate {
-    func selectEventTableViewControllerDidChangeEvent(event: NSManagedObject)
+    func selectEventTableViewControllerDidChangeEvent(event: TestEvent)
 }

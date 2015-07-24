@@ -84,7 +84,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     private var selectedIndexPath: NSIndexPath?
     
-    private var event: NSManagedObject?
+    private var event: TestEvent?
     
     private var addressBookRef: ABAddressBookRef?
     
@@ -214,13 +214,13 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     /*
         @brief Initializes data with a pre-existing event.
     */
-    func loadData(#event: NSManagedObject) {
+    func loadData(#event: TestEvent) {
         self.event = event
-        name = event.valueForKey("name") as? String
-        dateStart = event.valueForKey("dateStart") as? NSDate
-        dateEnd = event.valueForKey("dateEnd") as? NSDate
-        alarm = event.valueForKey("alarm") as? Bool
-        alarmTime = event.valueForKey("alarmTime") as? NSDate
+        name = self.event!.name
+        dateStart = self.event!.dateStart
+        dateEnd = self.event!.dateEnd
+        alarm = self.event!.alarm
+        alarmTime = self.event!.alarmTime
     }
     
     
@@ -619,7 +619,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     /*
         @brief Saves an event's data.
     */
-    func saveEvent() -> NSManagedObject {
+    func saveEvent() -> TestEvent {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext!
         
@@ -627,7 +627,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         
         // Create event if it is a new event being created, otherwise just overwrite old data.
         if event == nil {
-            event = NSManagedObject(entity: entity, insertIntoManagedObjectContext: managedContext)
+            event = TestEvent(entity: entity, insertIntoManagedObjectContext: managedContext)
         }
         
         // Set data
@@ -683,5 +683,5 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
 
 // Delegate protocol
 protocol ChangeEventViewControllerDelegate {
-    func changeEventViewControllerDidSaveEvent(event: NSManagedObject)
+    func changeEventViewControllerDidSaveEvent(event: TestEvent)
 }

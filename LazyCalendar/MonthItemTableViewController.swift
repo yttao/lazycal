@@ -13,9 +13,9 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     
     var date: NSDate?
     // The events for selected day
-    private var events = [NSManagedObject]()
+    private var events = [TestEvent]()
     
-    private var selectedEvent: NSManagedObject?
+    private var selectedEvent: TestEvent?
     // Reuse identifier for cells
     private let reuseIdentifier = "EventCell"
     // Name of entity to retrieve data from.
@@ -70,7 +70,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         let event = events[indexPath.row]
-        if let name = event.valueForKey("name") as? String {
+        if let name = event.name {
             cell.textLabel?.text = name
         }
         else {
@@ -148,14 +148,15 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         @brief On cell selection, pull up table view to show more information.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
         let event = events[indexPath.row]
         selectedEvent = event
         
-        let eventName = selectedEvent!.valueForKey("name") as? String
-        let dateStart = selectedEvent!.valueForKey("dateStart") as! NSDate
-        let dateEnd = selectedEvent!.valueForKey("dateEnd") as! NSDate
-        let alarm = selectedEvent!.valueForKey("alarm") as! Bool
-        let alarmTime = selectedEvent!.valueForKey("alarmTime") as? NSDate
+        let eventName = event.name
+        let dateStart = event.dateStart
+        let dateEnd = event.dateEnd
+        let alarm = event.alarm
+        let alarmTime = event.alarmTime
         
         selectEventTableViewController!.loadEventDetails(event, name: eventName, dateStart: dateStart, dateEnd: dateEnd, alarm: alarm, alarmTime: alarmTime)
     }
@@ -200,19 +201,20 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let predicate = NSPredicate(format: requirements, lowerDate, upperDate, lowerDate, upperDate, lowerDate, lowerDate, upperDate, upperDate)
         fetchRequest.predicate = predicate
         
-        
+        println("Predicate made")
         // Execute fetch request
         var error: NSError? = nil
-        events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [NSManagedObject]
+        events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [TestEvent]
+        println("Events found: \(events.count)")
         
-        // Display events sorted by dateStart. 
+        // Display events sorted by dateStart.
         //TODO: Add an additional alphabetical sort for two dateStarts at the same times.
         events.sort({
-            let firstDate = $0.valueForKey("dateStart") as! NSDate
-            let secondDate = $1.valueForKey("dateStart") as! NSDate
+            let firstDate = $0.dateStart
+            let secondDate = $1.dateStart
             return firstDate.compare(secondDate) == .OrderedAscending
             })
-            //($0.valueForKey("dateStart") as! NSDate).compare(($1.valueForKey("dateStart") as! NSDate)) == .OrderedAscending})
+        println("Events sorted")
         tableView.reloadData()
     }
     
@@ -243,7 +245,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     /*
         @brief On changing event, update events for current table view.
     */
-    func selectEventTableViewControllerDidChangeEvent(event: NSManagedObject) {
+    func selectEventTableViewControllerDidChangeEvent(event: TestEvent) {
         showEvents(date!)
     }
 }

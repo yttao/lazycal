@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7701" systemVersion="14C109" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
-    <entity name="TestEvent" syncable="YES">
+    <entity name="Contact" representedClassName="LazyCalendar.Contact" syncable="YES"/>
+    <entity name="Event" representedClassName="LazyCalendar.EventData" syncable="YES"/>
+    <entity name="TestEvent" representedClassName="LazyCalendar.TestEvent" syncable="YES">
         <attribute name="alarm" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="alarmTime" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="dateEnd" optional="YES" attributeType="Date" syncable="YES"/>
@@ -8,6 +10,8 @@
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="TestEvent" positionX="-63" positionY="-18" width="128" height="120"/>
+        <element name="TestEvent" positionX="-243" positionY="-117" width="128" height="118"/>
+        <element name="Event" positionX="-54" positionY="-306" width="128" height="43"/>
+        <element name="Contact" positionX="-36" positionY="-72" width="128" height="43"/>
     </elements>
 </model>
