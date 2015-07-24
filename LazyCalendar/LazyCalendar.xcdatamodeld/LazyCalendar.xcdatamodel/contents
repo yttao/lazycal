@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7701" systemVersion="14C109" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
-    <entity name="Contact" representedClassName="LazyCalendar.Contact" syncable="YES"/>
-    <entity name="Event" representedClassName="LazyCalendar.EventData" syncable="YES"/>
+    <entity name="Contact" representedClassName="LazyCalendar.Contact" syncable="YES">
+        <attribute name="firstName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="lastName" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="contactToEventRelation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FullEvent" inverseName="eventToContactRelationship" inverseEntity="FullEvent" syncable="YES"/>
+    </entity>
+    <entity name="FullEvent" representedClassName="LazyCalendar.FullEvent" syncable="YES">
+        <attribute name="alarm" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="alarmTime" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="dateEnd" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="dateStart" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="eventToContactRelationship" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Contact" inverseName="contactToEventRelation" inverseEntity="Contact" syncable="YES"/>
+    </entity>
     <entity name="TestEvent" representedClassName="LazyCalendar.TestEvent" syncable="YES">
         <attribute name="alarm" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="alarmTime" optional="YES" attributeType="Date" syncable="YES"/>
@@ -10,8 +22,8 @@
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
+        <element name="Contact" positionX="-36" positionY="-72" width="128" height="103"/>
+        <element name="FullEvent" positionX="-54" positionY="-306" width="128" height="133"/>
         <element name="TestEvent" positionX="-243" positionY="-117" width="128" height="118"/>
-        <element name="Event" positionX="-54" positionY="-306" width="128" height="43"/>
-        <element name="Contact" positionX="-36" positionY="-72" width="128" height="43"/>
     </elements>
 </model>

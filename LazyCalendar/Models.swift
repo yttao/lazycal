@@ -1,5 +1,5 @@
 //
-//  EventData.swift
+//  Models.swift
 //  LazyCalendar
 //
 //  Created by Ying Tao on 7/24/15.
@@ -10,11 +10,11 @@ import Foundation
 import CoreData
 import AddressBook
 
-class EventData: NSManagedObject {
+class FullEvent: NSManagedObject {
     @NSManaged var name: String?
     
-    @NSManaged var dateStart: NSDate!
-    @NSManaged var dateEnd: NSDate!
+    @NSManaged var dateStart: NSDate
+    @NSManaged var dateEnd: NSDate
     
     @NSManaged var alarm: Bool
     @NSManaged var alarmTime: NSDate?
@@ -22,9 +22,21 @@ class EventData: NSManagedObject {
     @NSManaged var contacts: [Contact]
 }
 
+
 class Contact: NSManagedObject {
-    @NSManaged var id: Int
+    @NSManaged var id: Int32
     
     @NSManaged var firstName: String?
     @NSManaged var lastName: String?
+}
+
+
+class TestEvent: NSManagedObject {
+    @NSManaged var name: String?
+    
+    @NSManaged var dateStart: NSDate
+    @NSManaged var dateEnd: NSDate
+    
+    @NSManaged var alarm: Bool
+    @NSManaged var alarmTime: NSDate?
 }

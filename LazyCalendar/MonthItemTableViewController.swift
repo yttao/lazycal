@@ -13,13 +13,13 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     
     var date: NSDate?
     // The events for selected day
-    private var events = [TestEvent]()
+    private var events = [FullEvent]()
     
-    private var selectedEvent: TestEvent?
+    private var selectedEvent: FullEvent?
     // Reuse identifier for cells
     private let reuseIdentifier = "EventCell"
     // Name of entity to retrieve data from.
-    private let entityName = "TestEvent"
+    private let entityName = "FullEvent"
     // Cell height
     private let cellHeight = UITableViewCell().frame.height
     
@@ -148,17 +148,11 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         @brief On cell selection, pull up table view to show more information.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
+        println("Select")
         let event = events[indexPath.row]
         selectedEvent = event
         
-        let eventName = event.name
-        let dateStart = event.dateStart
-        let dateEnd = event.dateEnd
-        let alarm = event.alarm
-        let alarmTime = event.alarmTime
-        
-        selectEventTableViewController!.loadEventDetails(event, name: eventName, dateStart: dateStart, dateEnd: dateEnd, alarm: alarm, alarmTime: alarmTime)
+        selectEventTableViewController!.loadEvent(event)
     }
     
     
@@ -195,6 +189,9 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         // Upper limit on date of events is midnight of next day (not inclusive)
         let upperDate: NSDate = lowerDate.dateByAddingTimeInterval(fullDay)
         
+        let allEvents = managedContext.executeFetchRequest(fetchRequest, error: nil)
+        println("Total events: \(allEvents!.count)")
+        
         // Requirements to show an event: the time interval from dateStart to dateEnd must fall between lowerDate and upperDate
         // (dateStart >= lower && dateStart < upper) || (dateEnd >= lower && dateEnd < upper) || (dateStart < lower && dateEnd >= lower) || (dateStart < upper && dateEnd >= upper)
         let requirements = "(dateStart >= %@ && dateStart < %@) || (dateEnd >= %@ && dateEnd < %@) || (dateStart <= %@ && dateEnd >= %@) || (dateStart <= %@ && dateEnd >= %@)"
@@ -204,7 +201,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         println("Predicate made")
         // Execute fetch request
         var error: NSError? = nil
-        events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [TestEvent]
+        events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [FullEvent]
         println("Events found: \(events.count)")
         
         // Display events sorted by dateStart.
@@ -245,7 +242,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     /*
         @brief On changing event, update events for current table view.
     */
-    func selectEventTableViewControllerDidChangeEvent(event: TestEvent) {
+    func selectEventTableViewControllerDidChangeEvent(event: FullEvent) {
         showEvents(date!)
     }
 }

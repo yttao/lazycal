@@ -69,9 +69,12 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
             
             return controller
         })()
+
+        if addressBookRef != nil {
+            println("Address book ref exists")
+        }
         
         allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
-        let totalContacts = ABAddressBookGetPersonCount(addressBookRef)
     }
     
     

@@ -24,7 +24,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     @IBOutlet weak var alarmTimeMainLabel: UILabel!
     @IBOutlet weak var alarmTimeDetailsLabel: UILabel!
     
-    private var event: TestEvent?
+    private var event: FullEvent?
     private var name: String?
     private var dateStart: NSDate?
     private var dateEnd: NSDate?
@@ -61,11 +61,11 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     
     
     func reloadData() {
-        name = event!.valueForKey("name") as? String
-        dateStart = event!.valueForKey("dateStart") as? NSDate
-        dateEnd = event!.valueForKey("dateEnd") as? NSDate
-        alarm = event!.valueForKey("alarm") as? Bool
-        alarmTime = event!.valueForKey("alarmTime") as? NSDate
+        name = event!.name
+        dateStart = event!.dateStart
+        dateEnd = event!.dateEnd
+        alarm = event!.alarm
+        alarmTime = event!.alarmTime
         
         eventNameLabel.text = name
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
@@ -79,13 +79,8 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
     
     
-    func loadEventDetails(event: TestEvent, name: String?, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
+    func loadEvent(event: FullEvent) {
         self.event = event
-        self.name = name
-        self.dateStart = dateStart
-        self.dateEnd = dateEnd
-        self.alarm = alarm
-        self.alarmTime = alarmTime
     }
     
     
@@ -114,7 +109,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
     
     
-    func changeEventViewControllerDidSaveEvent(event: TestEvent) {
+    func changeEventViewControllerDidSaveEvent(event: FullEvent) {
         // Update info that was just edited
         reloadData()
         delegate?.selectEventTableViewControllerDidChangeEvent(event)
@@ -122,5 +117,5 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
 }
 
 protocol SelectEventTableViewControllerDelegate {
-    func selectEventTableViewControllerDidChangeEvent(event: TestEvent)
+    func selectEventTableViewControllerDidChangeEvent(event: FullEvent)
 }

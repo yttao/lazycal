@@ -84,7 +84,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     private var selectedIndexPath: NSIndexPath?
     
-    private var event: TestEvent?
+    private var event: FullEvent?
     
     private var addressBookRef: ABAddressBookRef?
     
@@ -214,7 +214,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     /*
         @brief Initializes data with a pre-existing event.
     */
-    func loadData(#event: TestEvent) {
+    func loadData(#event: FullEvent) {
         self.event = event
         name = self.event!.name
         dateStart = self.event!.dateStart
@@ -361,7 +361,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             // If granted, continue to next view controller for contacts.
             case .Authorized:
                 println("Allowed")
-                // Show next view controller
+                let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+                contactsTableViewController.addressBookRef = addressBookRef
+                self.navigationController?.showViewController(contactsTableViewController, sender: self)
                 
             // If undetermined, ask for permission.
             case .NotDetermined:
@@ -619,36 +621,68 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     /*
         @brief Saves an event's data.
     */
-    func saveEvent() -> TestEvent {
+    func saveEvent() -> FullEvent {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext!
         
-        let entity = NSEntityDescription.entityForName("TestEvent", inManagedObjectContext: managedContext)!
+        let entity = NSEntityDescription.entityForName("FullEvent", inManagedObjectContext: managedContext)!
         
         // Create event if it is a new event being created, otherwise just overwrite old data.
         if event == nil {
-            event = TestEvent(entity: entity, insertIntoManagedObjectContext: managedContext)
+            event = FullEvent(entity: entity, insertIntoManagedObjectContext: managedContext)
         }
         
-        // Set data
-        event!.setValue(name, forKey: "name")
-        event!.setValue(dateStart, forKey: "dateStart")
-        event!.setValue(dateEnd, forKey: "dateEnd")
-        event!.setValue(alarm, forKey: "alarm")
+        // Set event values
+        event!.name = name
+        event!.dateStart = dateStart!
+        event!.dateEnd = dateEnd!
+        event!.alarm = alarm!
         if alarm! {
-            event!.setValue(alarmTime, forKey: "alarmTime")
+            event!.alarmTime = alarmTime
+        }
+        
+        var allContacts = [Contact]()
+        
+        if contacts != nil {
+            for (var i = 0; i < contacts!.count; i++) {
+                let contactEntity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
+                let contact = Contact(entity: contactEntity, insertIntoManagedObjectContext: managedContext)
+
+                let id = ABRecordGetRecordID(contacts![i]) as Int32
+                let firstNameUnmanaged = ABRecordCopyValue(contacts![i], kABPersonFirstNameProperty)
+                let lastNameUnmanaged = ABRecordCopyValue(contacts![i], kABPersonLastNameProperty)
+                
+                contact.id = id
+                
+                if firstNameUnmanaged != nil {
+                    let firstName = firstNameUnmanaged.takeRetainedValue() as! String
+                    contact.firstName = firstName
+                }
+                
+                if lastNameUnmanaged != nil {
+                    let lastName = lastNameUnmanaged.takeRetainedValue() as! String
+                    contact.lastName = lastName
+                }
+                
+                allContacts.append(contact)
+            }
         }
         
         // Save event
         var error: NSError?
         if !managedContext.save(&error) {
             assert(false, "Could not save \(error), \(error?.userInfo)")
+            println("ERROR")
         }
         
         return event!
     }
     
     
+    /*
+        @brief Updates the contacts.
+        @param contacts The contacts that were selected.
+    */
     func updateContacts(contacts: [ABRecordRef]) {
         self.contacts = contacts
     }
@@ -681,7 +715,14 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
 }
 
 
-// Delegate protocol
+/*
+    @brief Delegate protocol for ChangeEventViewController.
+    @discussion Informs delegates when it saves an event.
+*/
 protocol ChangeEventViewControllerDelegate {
-    func changeEventViewControllerDidSaveEvent(event: TestEvent)
+    /*
+        @brief Informs delegate that ChangeEventViewController saved an event.
+        @param event The saved event.
+    */
+    func changeEventViewControllerDidSaveEvent(event: FullEvent)
 }
