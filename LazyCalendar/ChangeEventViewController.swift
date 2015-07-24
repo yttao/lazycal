@@ -391,6 +391,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                     println("Just given permission")
                     self.addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
                     // Show next view controller
+                    let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+                    contactsTableViewController.addressBookRef = self.addressBookRef
+                
+                    self.navigationController?.showViewController(
+                        contactsTableViewController, sender: self)
                 }
                 // If denied permission, display access denied message.
                 else {
@@ -641,7 +646,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             event!.alarmTime = alarmTime
         }
         
-        var allContacts = [Contact]()
+        var allContacts = event!.mutableSetValueForKey("contacts")
         
         if contacts != nil {
             for (var i = 0; i < contacts!.count; i++) {
@@ -664,7 +669,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                     contact.lastName = lastName
                 }
                 
-                allContacts.append(contact)
+                allContacts.addObject(contact)
             }
         }
         
@@ -672,7 +677,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         var error: NSError?
         if !managedContext.save(&error) {
             assert(false, "Could not save \(error), \(error?.userInfo)")
-            println("ERROR")
         }
         
         return event!
@@ -704,9 +708,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 delegate?.changeEventViewControllerDidSaveEvent(event)
             case "CancelEventEditSegue":
                 break
-            case "ContactsSegue":
+            /*case "ContactsSegue":
                 let contactsTableViewController = segue.destinationViewController as! ContactsTableViewController
-                contactsTableViewController.addressBookRef = self.addressBookRef
+                contactsTableViewController.addressBookRef = self.addressBookRef*/
             default:
                 break
             }
