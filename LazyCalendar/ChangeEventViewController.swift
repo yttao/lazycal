@@ -9,7 +9,6 @@
 import UIKit
 import CoreData
 import AddressBook
-import AddressBookUI
 
 class ChangeEventViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
     
@@ -129,9 +128,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         // Disable text field user interaction, needed to allow proper table view row selection
         nameTextField.userInteractionEnabled = false
         
-        // Add listener for when date start and end pickers update
+        // Add listeners for updates
+        nameTextField.addTarget(self, action: "updateName", forControlEvents: .EditingChanged)
         dateStartPicker.addTarget(self, action: "updateDateStart", forControlEvents: .ValueChanged)
         dateEndPicker.addTarget(self, action: "updateDateEnd", forControlEvents: .ValueChanged)
+        alarmTimePicker.addTarget(self, action: "updateAlarmTime", forControlEvents: .ValueChanged)
         
         // If using a pre-existing event, load data from event.
         if (event != nil) {
@@ -151,8 +152,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             
             // Format and set main date labels
             dateFormatter.dateFormat = "MMM dd, yyyy"
-            dateStartMainLabel.text = dateFormatter.stringFromDate(dateStart!)
-            dateEndMainLabel.text = dateFormatter.stringFromDate(dateEnd!)
             if alarmTime != nil {
                 alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTime!)
             }
@@ -162,8 +161,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             
             // Format and set details labels
             dateFormatter.dateFormat = "h:mm a"
-            dateStartDetailsLabel.text = dateFormatter.stringFromDate(dateStart!)
-            dateEndDetailsLabel.text = dateFormatter.stringFromDate(dateEnd!)
             if alarmTime != nil {
                 alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTime!)
             }
@@ -176,19 +173,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             // Set initial picker value to selected date and end picker value to 1 hour later
             dateStartPicker.date = dateStart!
             dateEndPicker.date = dateEnd!
-            dateEndPicker.minimumDate = dateStart!
-            
-            // Format and set main date labels
-            dateFormatter.dateFormat = "MMM dd, yyyy"
-            dateStartMainLabel.text = dateFormatter.stringFromDate(dateStart!)
-            dateEndMainLabel.text = dateFormatter.stringFromDate(dateEnd!)
-            alarmTimeMainLabel.text = dateFormatter.stringFromDate(dateStart!)
-            
-            // Format and set details labels
-            dateFormatter.dateFormat = "h:mm a"
-            dateStartDetailsLabel.text = dateFormatter.stringFromDate(dateStart!)
-            dateEndDetailsLabel.text = dateFormatter.stringFromDate(dateEnd!)
-            alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(dateStart!)
             
             alarmSwitch.on = alarm!
             alarmDateSwitch.on = false
@@ -198,17 +182,12 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        let contactCell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
-        
-        if contacts != nil && contacts!.count > 0 {
-            contactCell?.detailTextLabel?.text = String(contacts!.count)
-        }
-        else {
-            contactCell?.detailTextLabel?.text = nil
-        }
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        updateDateStart()
+        updateDateEnd()
+        updateAlarmTime()
+        updateContactsDetailsLabel()
     }
     
     
@@ -245,7 +224,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         dateStart = dateStartPicker.date
         updateDateStartLabels(dateStart!)
         updateDateEndPicker(dateStart!)
-        updateAlarmTimePicker(dateStart!)
+        if !alarm! {
+            resetAlarmTime()
+        }
     }
     
     
@@ -302,11 +283,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     /*
         @brief Update the alarm time if the alarm is not already set.
     */
-    func updateAlarmTimePicker(date: NSDate) {
-        if !alarm! {
-            alarmTimePicker.date = date
-            updateAlarmTime(date: date)
-        }
+    func resetAlarmTime() {
+        alarmTimePicker.date = dateStartPicker.date
+        updateAlarmTime()
     }
     
     
@@ -466,7 +445,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             }
             else {
                 showFewerAlarmOptions()
-                updateAlarmTimePicker(dateStart!)
+                resetAlarmTime()
             }
         }
     }
@@ -519,33 +498,27 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    @IBAction func updateName() {
+    func updateName() {
         name = nameTextField.text
     }
     
     
-    @IBAction func updateAlarmTime(sender: AnyObject) {
+    func updateAlarmTime() {
         alarmTime = alarmTimePicker.date
-        updateAlarmTimeDisplay(alarmTime!)
+        updateAlarmTimeLabels()
     }
     
-    
-    func updateAlarmTime(#date: NSDate) {
-        alarmTime = alarmTimePicker.date
-        updateAlarmTimeDisplay(alarmTime!)
-    }
-
     
     /*
         @brief Update alarm time display.
     */
-    func updateAlarmTimeDisplay(date: NSDate) {
+    func updateAlarmTimeLabels() {
         // Main label shows format: month day, year
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        alarmTimeMainLabel.text = dateFormatter.stringFromDate(date)
+        alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
         
         dateFormatter.dateFormat = "h:mm a"
-        alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(date)
+        alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
     }
     
     
@@ -645,7 +618,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         if event == nil {
             event = FullEvent(entity: entity, insertIntoManagedObjectContext: managedContext)
         }
-        
         // Set event values
         event!.name = name
         event!.dateStart = dateStart!
@@ -701,17 +673,20 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    func updateNumContacts() {
-        let contactCell = tableView.cellForRowAtIndexPath(indexPaths["Contact"]!)
-        
-        if contacts != nil {
-            if contacts!.count > 0 {
-                contactCell?.detailTextLabel!.text = String(contacts!.count)
-            }
-            else {
-                contactCell?.detailTextLabel!.text = nil
-            }
+    /*
+        @brief Updates the contacts detail label.
+        @discussion The contacts detail label does not display a number if no contacts have been selected yet or no contacts were selected. Otherwise, if at least one contact is selected, it displays the number of contacts.
+    */
+    func updateContactsDetailsLabel() {
+        let contactCell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
+        if contacts != nil && contacts!.count > 0 {
+            contactCell?.detailTextLabel?.text = "\(contacts!.count)"
         }
+        else {
+            contactCell?.detailTextLabel?.text = nil
+        }
+        contactCell?.detailTextLabel?.sizeToFit()
+        tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
     }
     
     

@@ -8,7 +8,9 @@
 
 import UIKit
 import AddressBook
+import AddressBookUI
 
+// TODO: Put in editing mode. Right swipe = delete. Click below table = add. Select person = view details.
 class ContactsTableViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
     
     /*private let contactProperties = [kABPersonFirstNameProperty,
@@ -49,7 +51,6 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         @discussion The segue to this controller is only initiated if
     */
     override func viewDidLoad() {
-        println("View loaded")
         super.viewDidLoad()
         
         // Set table view delegate and data source
@@ -76,6 +77,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
             controller.searchBar.sizeToFit()
             controller.searchBar.delegate = self
             controller.delegate = self
+            //controller.hidesNavigationBarDuringPresentation = false
             
             self.tableView.tableHeaderView = controller.searchBar
             
@@ -202,6 +204,11 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
             selectedContacts.append(filteredContacts[indexPath.row])
             
             searchController!.active = false
+        }
+        else {
+            let personViewController = ABPersonViewController()
+            personViewController.displayedPerson = selectedContacts[indexPath.row]
+            navigationController?.showViewController(personViewController, sender: self)
         }
     }
     

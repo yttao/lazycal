@@ -25,11 +25,6 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     @IBOutlet weak var alarmTimeDetailsLabel: UILabel!
     
     private var event: FullEvent?
-    private var name: String?
-    private var dateStart: NSDate?
-    private var dateEnd: NSDate?
-    private var alarm: Bool?
-    private var alarmTime: NSDate?
     
     // Section headers associated with section numbers
     private let sections = ["Details": 0, "Alarm": 1]
@@ -43,12 +38,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
     
     private let editEventSegueIdentifier = "EditEventSegue"
-    
-    
-    required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,16 +51,12 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     
     
     func reloadData() {
-        name = event!.name
-        dateStart = event!.dateStart
-        dateEnd = event!.dateEnd
-        alarm = event!.alarm
-        alarmTime = event!.alarmTime
+        println("Load selected event")
         
-        eventNameLabel.text = name
+        eventNameLabel.text = event!.name
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
-        eventTimeLabel.text = "\(dateFormatter.stringFromDate(dateStart!)) to \(dateFormatter.stringFromDate(dateEnd!))"
-        if alarm! {
+        eventTimeLabel.text = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
+        if event!.alarm {
             alarmLabel.text = "On"
         }
         else {
