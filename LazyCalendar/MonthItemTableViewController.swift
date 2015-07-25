@@ -189,20 +189,15 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         // Upper limit on date of events is midnight of next day (not inclusive)
         let upperDate: NSDate = lowerDate.dateByAddingTimeInterval(fullDay)
         
-        let allEvents = managedContext.executeFetchRequest(fetchRequest, error: nil)
-        println("Total events: \(allEvents!.count)")
-        
         // Requirements to show an event: the time interval from dateStart to dateEnd must fall between lowerDate and upperDate
         // (dateStart >= lower && dateStart < upper) || (dateEnd >= lower && dateEnd < upper) || (dateStart < lower && dateEnd >= lower) || (dateStart < upper && dateEnd >= upper)
         let requirements = "(dateStart >= %@ && dateStart < %@) || (dateEnd >= %@ && dateEnd < %@) || (dateStart <= %@ && dateEnd >= %@) || (dateStart <= %@ && dateEnd >= %@)"
         let predicate = NSPredicate(format: requirements, lowerDate, upperDate, lowerDate, upperDate, lowerDate, lowerDate, upperDate, upperDate)
         fetchRequest.predicate = predicate
         
-        println("Predicate made")
         // Execute fetch request
         var error: NSError? = nil
         events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [FullEvent]
-        println("Events found: \(events.count)")
         
         // Display events sorted by dateStart.
         //TODO: Add an additional alphabetical sort for two dateStarts at the same times.
@@ -211,7 +206,6 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
             let secondDate = $1.dateStart
             return firstDate.compare(secondDate) == .OrderedAscending
             })
-        println("Events sorted")
         tableView.reloadData()
     }
     

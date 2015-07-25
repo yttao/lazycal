@@ -198,6 +198,20 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        let contactCell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
+        
+        if contacts != nil && contacts!.count > 0 {
+            contactCell?.detailTextLabel?.text = String(contacts!.count)
+        }
+        else {
+            contactCell?.detailTextLabel?.text = nil
+        }
+    }
+    
+    
     /*
         @brief Initializes data with a start date.
     */
@@ -362,7 +376,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             case .Authorized:
                 println("Allowed")
                 let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
-                contactsTableViewController.addressBookRef = addressBookRef
                 self.navigationController?.showViewController(contactsTableViewController, sender: self)
                 
             // If undetermined, ask for permission.
@@ -370,8 +383,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 println("Not determined")
                 displayContactsAccessRequest()
             }
-            //let contactsViewController = ABPersonViewController()
-            //self.navigationController!.pushViewController(contactsViewController, animated: true)
         default:
             break
         }
@@ -392,8 +403,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                     self.addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
                     // Show next view controller
                     let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
-                    contactsTableViewController.addressBookRef = self.addressBookRef
-                
                     self.navigationController?.showViewController(
                         contactsTableViewController, sender: self)
                 }
@@ -692,6 +701,21 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
+    func updateNumContacts() {
+        let contactCell = tableView.cellForRowAtIndexPath(indexPaths["Contact"]!)
+        
+        if contacts != nil {
+            if contacts!.count > 0 {
+                contactCell?.detailTextLabel!.text = String(contacts!.count)
+            }
+            else {
+                contactCell?.detailTextLabel!.text = nil
+            }
+        }
+    }
+    
+    
+    
     /*
         @brief Prepares information for unwind segues.
     */
@@ -708,9 +732,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 delegate?.changeEventViewControllerDidSaveEvent(event)
             case "CancelEventEditSegue":
                 break
-            /*case "ContactsSegue":
-                let contactsTableViewController = segue.destinationViewController as! ContactsTableViewController
-                contactsTableViewController.addressBookRef = self.addressBookRef*/
             default:
                 break
             }

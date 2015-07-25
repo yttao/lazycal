@@ -33,30 +33,42 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         kABPersonSocialProfileProperty,
         kABPersonURLProperty]*/
     
-    private var allContacts: NSArray?
+    private var addressBookRef: ABAddressBookRef!
     
+    private var allContacts: NSArray!
     private var selectedContacts = [ABRecordRef]()
-    
     private var filteredContacts = [ABRecordRef]()
     
     private let reuseIdentifier = "ContactCell"
     
     private var searchController: UISearchController?
     
-    var addressBookRef: ABAddressBookRef!
     
-    
-    required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    
+    /*
+        @brief Set delegates and data sources, load address book, get contacts, and create the search controller.
+        @discussion The segue to this controller is only initiated if
+    */
     override func viewDidLoad() {
+        println("View loaded")
         super.viewDidLoad()
         
+        // Set table view delegate and data source
         tableView.delegate = self
         tableView.dataSource = self
         
+        // Address book must be authorized, otherwise throw exception.
+        if ABAddressBookGetAuthorizationStatus() == .Authorized {
+            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
+        }
+        else {
+            var error: NSError?
+            NSException.raise("AddressBookAccessNotAuthorizedException", format: "Error: %a", arguments: getVaList([error!]))
+        }
+        
+        // Get all contacts
+        allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
+        
+        // Create and configure search controller
         searchController = ({
             let controller = UISearchController(searchResultsController: nil)
             controller.searchResultsUpdater = self
@@ -69,12 +81,6 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
             
             return controller
         })()
-
-        if addressBookRef != nil {
-            println("Address book ref exists")
-        }
-        
-        allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
     }
     
     
@@ -87,33 +93,34 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
             (record: AnyObject!, bindings: [NSObject: AnyObject]!) -> Bool in
             let recordRef: ABRecordRef = record as ABRecordRef
             
+            // Check if record is already recorded in selected contacts, don't show if already a selected contact.
             for (var i = 0; i < self.selectedContacts.count; i++) {
                 if ABRecordGetRecordID(recordRef) == ABRecordGetRecordID(self.selectedContacts[i]) {
                     return false
                 }
             }
             
+            // Get name, phone numbers, and emails
             let name = ABRecordCopyCompositeName(recordRef)?.takeRetainedValue() as? String
             let phoneNumbersMultivalue: AnyObject? = ABRecordCopyValue(recordRef, kABPersonPhoneProperty)?.takeRetainedValue()
             let emailsMultivalue: AnyObject? = ABRecordCopyValue(recordRef, kABPersonEmailProperty)?.takeRetainedValue()
-
+            
+            // Search name for search text
             if name?.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
                 return true
             }
             
-            var phoneNumbers = [String]()
+            // Search phone numbers for search text
             for (var i = 0; i < ABMultiValueGetCount(phoneNumbersMultivalue!); i++) {
                 let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue!, i).takeRetainedValue() as! String
-                phoneNumbers.append(phoneNumber)
                 if phoneNumber.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
                     return true
                 }
             }
             
-            var emails = [String]()
+            // Search emails for search text
             for (var i = 0; i < ABMultiValueGetCount(emailsMultivalue); i++) {
                 let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, i).takeRetainedValue() as! String
-                emails.append(email)
                 if email.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
                     return true
                 }
@@ -144,16 +151,22 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
             }*/
             return false
         }
+        // Create predicate and filter by predicate
         let predicate = NSPredicate(block: block)
-        filteredContacts = allContacts!.filteredArrayUsingPredicate(predicate)
+        filteredContacts = allContacts.filteredArrayUsingPredicate(predicate)
+        
+        // Sort filtered contacts alphabetically
         filteredContacts.sort({
-            let firstFullName = ABRecordCopyValue($0 as ABRecordRef, kABSourceNameProperty).takeRetainedValue() as! String
-            let secondFullName = ABRecordCopyValue($1 as ABRecordRef, kABSourceNameProperty).takeRetainedValue() as! String
+            let firstFullName = ABRecordCopyCompositeName($0).takeRetainedValue() as! String
+            let secondFullName = ABRecordCopyCompositeName($1).takeRetainedValue() as! String
             return firstFullName.compare(secondFullName) == .OrderedAscending
         })
     }
     
     
+    /*
+        @brief Updates search results by filtering by the search bar text.
+    */
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         filterContentForSearchText(searchController.searchBar.text)
         tableView.reloadData()
@@ -170,6 +183,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     
     /*
         @brief The number of rows is determined by the number of contacts.
+        @discussion If the search controller is active, show the filtered contacts. If the search controller is inactive, show the selected contacts.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if searchController != nil && searchController!.active {
@@ -179,19 +193,13 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     }
     
     
+    /*
+        @brief If searching, selection will append to selected contacts and deactive the search controller.
+        @discussion The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
+    */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if searchController != nil && searchController!.active {
-            // Add selected contact if it isn't already in the selected contacts list.
-            var alreadySelected = false
-            for (var i = 0; i < selectedContacts.count; i++) {
-                if ABRecordGetRecordID(selectedContacts[i]) == ABRecordGetRecordID(filteredContacts[indexPath.row]) {
-                    alreadySelected = true
-                    break
-                }
-            }
-            if !alreadySelected {
-                selectedContacts.append(filteredContacts[indexPath.row])
-            }
+            selectedContacts.append(filteredContacts[indexPath.row])
             
             searchController!.active = false
         }
@@ -219,8 +227,13 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     }
     
     
+    /*
+        @brief On view exit, updates the change event view controller contacts.
+    */
     override func viewWillDisappear(animated: Bool) {
-        let changeEventViewController = self.navigationController?.viewControllers.first as! ChangeEventViewController
-        changeEventViewController.updateContacts(selectedContacts)
+        super.viewWillDisappear(animated)
+        
+        let changeEventViewController = self.navigationController?.viewControllers.first as? ChangeEventViewController
+        changeEventViewController?.updateContacts(selectedContacts)
     }
 }

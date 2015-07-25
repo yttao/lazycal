@@ -48,7 +48,7 @@
                     <navigationItem key="navigationItem" title="Month" id="qr9-bq-Ai5" userLabel="MonthItemNavigationBar">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="KCg-mh-iyA">
                             <connections>
-                                <segue destination="Kpu-RP-WZZ" kind="presentation" identifier="ChangeEventSegue" id="edf-XK-E42"/>
+                                <segue destination="Kpu-RP-WZZ" kind="presentation" identifier="ChangeEventSegue" id="Yv8-He-8cL"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -183,7 +183,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aiS-Rz-goW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-463" y="-320"/>
+            <point key="canvasLocation" x="-463" y="-326"/>
         </scene>
         <!--AddEventViewController-->
         <scene sceneID="0S0-v0-qKi">
@@ -394,17 +394,23 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Contacts" id="CkV-Ye-YdG">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="xbe-eJ-mQ2" style="IBUITableViewCellStyleDefault" id="gUV-1o-nZc" userLabel="ContactsPicker">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="xbe-eJ-mQ2" detailTextLabel="JLT-HW-dVP" style="IBUITableViewCellStyleValue1" id="gUV-1o-nZc" userLabel="Contacts">
                                         <rect key="frame" x="0.0" y="375" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="gUV-1o-nZc" id="eX3-oO-GvJ">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Choose Contacts" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="xbe-eJ-mQ2" userLabel="Choose Contacts">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Choose Contacts" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="xbe-eJ-mQ2" userLabel="Contacts">
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="`" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="JLT-HW-dVP" userLabel="Number of Contacts">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -603,10 +609,10 @@
             </objects>
             <point key="canvasLocation" x="1562" y="246"/>
         </scene>
-        <!--ChangeEventNavigationController-->
+        <!--AddEventNavigationController-->
         <scene sceneID="3oe-iH-Ngm">
             <objects>
-                <navigationController storyboardIdentifier="ChangeEventNavigationController" title="ChangeEventNavigationController" automaticallyAdjustsScrollViewInsets="NO" id="Kpu-RP-WZZ" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="AddEventNavigationController" title="AddEventNavigationController" automaticallyAdjustsScrollViewInsets="NO" id="Kpu-RP-WZZ" userLabel="AddEventNavigationController" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="muQ-W1-9zc">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -848,7 +854,7 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Contacts" id="5Ki-Vh-Hzc">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="vjA-bz-VwY" style="IBUITableViewCellStyleDefault" id="Ezz-sn-kZC" userLabel="AlarmToggle">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="vjA-bz-VwY" detailTextLabel="wVU-SB-9Bl" style="IBUITableViewCellStyleValue1" id="Ezz-sn-kZC" userLabel="Contacts">
                                         <rect key="frame" x="0.0" y="375" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Ezz-sn-kZC" id="dkH-1Q-oou">
@@ -859,6 +865,12 @@
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="`" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="wVU-SB-9Bl" userLabel="Number of Contacts">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
