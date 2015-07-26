@@ -24,6 +24,8 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     @IBOutlet weak var alarmTimeMainLabel: UILabel!
     @IBOutlet weak var alarmTimeDetailsLabel: UILabel!
     
+    @IBOutlet weak var alarmTimeDisplayCell: UITableViewCell!
+    
     private var event: FullEvent?
     
     // Section headers associated with section numbers
@@ -51,17 +53,21 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     
     
     func reloadData() {
-        println("Load selected event")
-        
         eventNameLabel.text = event!.name
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
         eventTimeLabel.text = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
         if event!.alarm {
             alarmLabel.text = "On"
+            alarmTimeDisplayCell.hidden = false
+            alarmTimeMainLabel.text = dateFormatter.stringFromDate(event!.alarmTime!)
         }
         else {
             alarmLabel.text = "Off"
+            alarmTimeDisplayCell.hidden = true
+            alarmTimeMainLabel.text = nil
         }
+        alarmTimeMainLabel.sizeToFit()
+        tableView.reloadRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .None)
     }
     
     

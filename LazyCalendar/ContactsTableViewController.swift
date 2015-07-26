@@ -38,7 +38,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     private var addressBookRef: ABAddressBookRef!
     
     private var allContacts: NSArray!
-    private var selectedContacts = [ABRecordRef]()
+    var selectedContacts = [ABRecordRef]()
     private var filteredContacts = [ABRecordRef]()
     
     private let reuseIdentifier = "ContactCell"

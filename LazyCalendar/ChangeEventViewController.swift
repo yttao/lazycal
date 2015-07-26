@@ -72,10 +72,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     private let PICKER_CELL_HEIGHT = UIPickerView().frame.height
     
     private var eventNameCellHeight: CGFloat
-    
     private var eventDateStartCellHeight: CGFloat
     private var eventDateEndCellHeight: CGFloat
-    
     private var alarmToggleCellHeight: CGFloat
     private var alarmDateToggleCellHeight: CGFloat
     private var alarmTimeDisplayCellHeight: CGFloat
@@ -201,6 +199,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         dateEnd = dateStart.dateByAddingTimeInterval(hour)
         alarm = false
         alarmTime = dateStart
+        contacts = nil
     }
     
     
@@ -209,11 +208,21 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     */
     func loadData(#event: FullEvent) {
         self.event = event
-        name = self.event!.name
-        dateStart = self.event!.dateStart
-        dateEnd = self.event!.dateEnd
-        alarm = self.event!.alarm
-        alarmTime = self.event!.alarmTime
+        name = event.name
+        dateStart = event.dateStart
+        dateEnd = event.dateEnd
+        alarm = event.alarm
+        alarmTime = event.alarmTime
+        let contactsSet = event.mutableSetValueForKey("contacts")
+        println(contactsSet.count)
+        if contactsSet.count > 0 && ABAddressBookGetAuthorizationStatus() == .Authorized {
+            contacts = [ABRecordRef]()
+            for contact in contactsSet {
+                let c = contact as! Contact
+                let recordRef: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, c.id).takeRetainedValue() as ABRecordRef
+                contacts!.append(recordRef)
+            }
+        }
     }
     
     
@@ -301,7 +310,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         @brief Performs actions based on selected index path.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println("***Selected: \(indexPath.section)\t\(indexPath.row)")
         let cell = tableView.cellForRowAtIndexPath(indexPath)!
         
         selectedIndexPath = indexPath
@@ -349,12 +357,13 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             switch authorizationStatus {
             // If denied, display message for permission.
             case .Denied, .Restricted:
-                println("Denied")
                 displayContactsAccessDeniedMessage()
             // If granted, continue to next view controller for contacts.
             case .Authorized:
-                println("Allowed")
                 let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+                if contacts != nil {
+                    contactsTableViewController.selectedContacts = contacts!
+                }
                 self.navigationController?.showViewController(contactsTableViewController, sender: self)
                 
             // If undetermined, ask for permission.
@@ -378,16 +387,17 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             dispatch_async(dispatch_get_main_queue()) {
                 // If given permission, get address book reference
                 if granted {
-                    println("Just given permission")
                     self.addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
                     // Show next view controller
                     let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+                    if self.contacts != nil {
+                        contactsTableViewController.selectedContacts = self.contacts!
+                    }
                     self.navigationController?.showViewController(
                         contactsTableViewController, sender: self)
                 }
                 // If denied permission, display access denied message.
                 else {
-                    println("Just denied")
                     self.displayContactsAccessDeniedMessage()
                 }
             }
@@ -455,7 +465,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         @brief Shows more alarm options
     */
     func showMoreAlarmOptions() {
-        println("***MORE***")
         tableView.beginUpdates()
         
         // Set cell heights
@@ -476,7 +485,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         @brief Shows fewer alarm options
     */
     func showFewerAlarmOptions() {
-        println("***LESS***")
         tableView.beginUpdates()
         
         // Get alarm options cells
@@ -524,7 +532,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     // Called on cell deselection (when a different cell is selected)
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
-        println("***Deselected: \(indexPath.section)\t\(indexPath.row)***")
         deselectRowAtIndexPath(indexPath)
     }
     
@@ -626,39 +633,48 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         if alarm! {
             event!.alarmTime = alarmTime
         }
+        else {
+            event!.alarmTime = nil
+        }
         
         var allContacts = event!.mutableSetValueForKey("contacts")
         
         if contacts != nil {
             for (var i = 0; i < contacts!.count; i++) {
-                let contactEntity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
-                let contact = Contact(entity: contactEntity, insertIntoManagedObjectContext: managedContext)
-
                 let id = ABRecordGetRecordID(contacts![i]) as Int32
-                let firstNameUnmanaged = ABRecordCopyValue(contacts![i], kABPersonFirstNameProperty)
-                let lastNameUnmanaged = ABRecordCopyValue(contacts![i], kABPersonLastNameProperty)
+                let firstName = ABRecordCopyValue(contacts![i], kABPersonFirstNameProperty)?.takeRetainedValue() as? String
+                let lastName = ABRecordCopyValue(contacts![i], kABPersonLastNameProperty)?.takeRetainedValue() as? String
                 
-                contact.id = id
+                var contains = false
+                for contact in allContacts {
+                    let c = contact as! Contact
+                    if c.id == id {
+                        contains = true
+                        break
+                    }
+                }
                 
-                if firstNameUnmanaged != nil {
-                    let firstName = firstNameUnmanaged.takeRetainedValue() as! String
+                if !contains {
+                    let contactEntity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
+                    let contact = Contact(entity: contactEntity, insertIntoManagedObjectContext: managedContext)
+                    
+                    contact.id = id
                     contact.firstName = firstName
-                }
-                
-                if lastNameUnmanaged != nil {
-                    let lastName = lastNameUnmanaged.takeRetainedValue() as! String
                     contact.lastName = lastName
+                    
+                    allContacts.addObject(contact)
                 }
-                
-                allContacts.addObject(contact)
             }
         }
+        
+        println(allContacts)
         
         // Save event
         var error: NSError?
         if !managedContext.save(&error) {
             assert(false, "Could not save \(error), \(error?.userInfo)")
         }
+        println("Saved successfully")
         
         return event!
     }
@@ -670,6 +686,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     */
     func updateContacts(contacts: [ABRecordRef]) {
         self.contacts = contacts
+        updateContactsDetailsLabel()
     }
     
     
