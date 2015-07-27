@@ -214,8 +214,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         alarm = event.alarm
         alarmTime = event.alarmTime
         
-        let contactsSet = event.mutableSetValueForKey("contacts")
-        
+        // Load contacts IDs
+        let contactsSet = event.contacts
         if contactsSet.count > 0 && ABAddressBookGetAuthorizationStatus() == .Authorized {
             contactsIDs = [ABRecordID]()
             for contact in contactsSet {
@@ -392,14 +392,14 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 if granted {
                     self.addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
                     // Show next view controller
-                    let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+                    let contactsTableViewController = self.storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
                     // Load contacts IDs if they exist already.
                     
                     if self.contactsIDs != nil {
                         contactsTableViewController.loadData(self.contactsIDs!)
                     }
                     
-                    self.navigationController?.showViewController(
+                    self.navigationController!.showViewController(
                         contactsTableViewController, sender: self)
                 }
                 // If denied permission, display access denied message.
@@ -691,8 +691,22 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                         contactEvents.addObject(event!)
                     }
                 }
-                
             }
+        }
+        
+        // Check for removed contacts for an edited event and remove them.
+        // Find contacts to remove.
+        var removedContacts = [Contact]()
+        for contact in eventContacts {
+            let c = contact as! Contact
+            let id = c.id
+            if !contains(contactsIDs!, id) {
+                removedContacts.append(c)
+            }
+        }
+        // Remove deleted contacts.
+        for (var i = 0; i < removedContacts.count; i++) {
+            eventContacts.removeObject(removedContacts[i])
         }
         
         // Save event

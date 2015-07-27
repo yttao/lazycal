@@ -62,13 +62,14 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
                 controller.searchBar.sizeToFit()
                 controller.searchBar.delegate = self
                 controller.delegate = self
-                //controller.hidesNavigationBarDuringPresentation = false
+                controller.hidesNavigationBarDuringPresentation = false
                 
                 self.tableView.tableHeaderView = controller.searchBar
                 
                 return controller
             })()
         }
+        self.definesPresentationContext = true
         
     }
     
@@ -84,7 +85,6 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
                 selectedContacts.append(person!)
             }
         }
-        println(selectedContacts)
     }
     
     
@@ -154,7 +154,6 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         @brief Updates search results by filtering by the search bar text.
     */
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        println("update")
         filterContentForSearchText(searchController.searchBar.text)
         tableView.reloadData()
     }
@@ -216,6 +215,44 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         }
 
         return cell
+    }
+    
+    
+    /*
+    @brief Allow table cells to be deleted.
+    @discussion Note: If tableView.editing = true, the left circular edit option will appear.
+    */
+    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+    
+    
+    /*
+    @brief If delete is pressed on swipe left, delete the contact.
+    */
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == UITableViewCellEditingStyle.Delete {
+            tableView.beginUpdates()
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+            selectedContacts.removeAtIndex(indexPath.row)
+            tableView.endUpdates()
+        }
+    }
+    
+    
+    /*
+    @brief Gives option to delete event.
+    */
+    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
+        return UITableViewCellEditingStyle.Delete
+    }
+    
+    
+    /*
+    @brief Prevents indenting for showing circular edit button on the left when editing.
+    */
+    override func tableView(tableView: UITableView, shouldIndentWhileEditingRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return false
     }
     
     

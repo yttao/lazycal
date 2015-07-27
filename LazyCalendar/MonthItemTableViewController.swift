@@ -91,7 +91,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     
     
     /*
-        @brief
+        @brief If delete is pressed on swipe left, delete the event.
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == UITableViewCellEditingStyle.Delete {
@@ -148,7 +148,6 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         @brief On cell selection, pull up table view to show more information.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println("Select")
         let event = events[indexPath.row]
         selectedEvent = event
         
