@@ -13,37 +13,17 @@ import AddressBookUI
 // TODO: Put in editing mode. Right swipe = delete. Click below table = add. Select person = view details.
 class ContactsTableViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
     
-    /*private let contactProperties = [kABPersonFirstNameProperty,
-        kABPersonLastNameProperty,
-        kABPersonMiddleNameProperty,
-        kABPersonPrefixProperty,
-        kABPersonSuffixProperty,
-        kABPersonNicknameProperty,
-        kABPersonFirstNamePhoneticProperty,
-        kABPersonLastNamePhoneticProperty,
-        kABPersonMiddleNamePhoneticProperty,
-        
-        kABPersonOrganizationProperty,
-        kABPersonJobTitleProperty,
-        kABPersonDepartmentProperty,
-        kABPersonEmailProperty,
-        
-        kABPersonAddressProperty,
-        kABPersonDateProperty,
-        kABPersonKindProperty,
-        
-        kABPersonSocialProfileProperty,
-        kABPersonURLProperty]*/
-    
     private var addressBookRef: ABAddressBookRef!
     
     private var allContacts: NSArray!
-    var selectedContacts = [ABRecordRef]()
-    private var filteredContacts = [ABRecordRef]()
+    private var selectedContacts: [ABRecordRef]!
+    private var filteredContacts: [ABRecordRef]!
     
     private let reuseIdentifier = "ContactCell"
     
     private var searchController: UISearchController?
+    
+    private var searchEnabled: Bool = true
     
     
     /*
@@ -52,6 +32,10 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     */
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if selectedContacts == nil {
+            selectedContacts = [ABRecordRef]()
+        }
         
         // Set table view delegate and data source
         tableView.delegate = self
@@ -70,19 +54,42 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
         
         // Create and configure search controller
-        searchController = ({
-            let controller = UISearchController(searchResultsController: nil)
-            controller.searchResultsUpdater = self
-            controller.dimsBackgroundDuringPresentation = false
-            controller.searchBar.sizeToFit()
-            controller.searchBar.delegate = self
-            controller.delegate = self
-            //controller.hidesNavigationBarDuringPresentation = false
-            
-            self.tableView.tableHeaderView = controller.searchBar
-            
-            return controller
-        })()
+        if searchEnabled {
+            searchController = ({
+                let controller = UISearchController(searchResultsController: nil)
+                controller.searchResultsUpdater = self
+                controller.dimsBackgroundDuringPresentation = false
+                controller.searchBar.sizeToFit()
+                controller.searchBar.delegate = self
+                controller.delegate = self
+                //controller.hidesNavigationBarDuringPresentation = false
+                
+                self.tableView.tableHeaderView = controller.searchBar
+                
+                return controller
+            })()
+        }
+        
+    }
+    
+    
+    func loadData(contactsIDs: [ABRecordID]) {
+        selectedContacts = [ABRecordRef]()
+        if ABAddressBookGetAuthorizationStatus() == .Authorized {
+            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
+        }
+        for ID in contactsIDs {
+            let person: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, ID)?.takeUnretainedValue()
+            if person != nil {
+                selectedContacts.append(person!)
+            }
+        }
+        println(selectedContacts)
+    }
+    
+    
+    func setSearchEnabled(enabled: Bool) {
+        searchEnabled = enabled
     }
     
     
@@ -127,30 +134,6 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
                     return true
                 }
             }
-            
-            /*for (var i = 0; i < self.contactProperties.count; i++) {
-                let value = ABRecordCopyValue(record as ABRecordRef, self.contactProperties[i])
-                if value != nil {
-                    let retainedValue = value.takeRetainedValue()
-                    println("PROPERTY: \(self.contactProperties[i])")
-                    println(object_getClass(retainedValue).description())
-                    
-                    if (object_getClass(retainedValue).description() == "__NSCFType") {
-                        let multivalue = retainedValue as ABMultiValueRef
-                        for (var j = 0; j < ABMultiValueGetCount(multivalue); j++) {
-                            let multivalueValue = ABMultiValueCopyValueAtIndex(multivalue, j)
-                            
-                            if multivalueValue != nil {
-                                let retainedMultivalue = multivalueValue.takeRetainedValue()
-                                println(retainedMultivalue)
-                            }
-                        }
-                    }
-                    else {
-                        println(retainedValue)
-                    }
-                }
-            }*/
             return false
         }
         // Create predicate and filter by predicate
@@ -171,6 +154,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         @brief Updates search results by filtering by the search bar text.
     */
     func updateSearchResultsForSearchController(searchController: UISearchController) {
+        println("update")
         filterContentForSearchText(searchController.searchBar.text)
         tableView.reloadData()
     }
@@ -189,7 +173,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         @discussion If the search controller is active, show the filtered contacts. If the search controller is inactive, show the selected contacts.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchController != nil && searchController!.active {
+        if searchController != nil && searchController!.active && filteredContacts.count > 0 {
             return filteredContacts.count
         }
         return selectedContacts.count
@@ -201,10 +185,9 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         @discussion The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if searchController != nil && searchController!.active {
+        if searchController != nil && searchController!.active && filteredContacts.count > 0 {
             selectedContacts.append(filteredContacts[indexPath.row])
-            
-            searchController!.active = false
+            searchController?.searchBar.text = nil
         }
         else {
             let personViewController = ABPersonViewController()
@@ -222,7 +205,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
         
         // Show filtered records
-        if searchController != nil && searchController!.active {
+        if searchController != nil && searchController!.active && filteredContacts.count > 0 {
             let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
             cell.textLabel?.text = fullName
         }

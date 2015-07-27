@@ -221,7 +221,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             for contact in contactsSet {
                 let c = contact as! Contact
                 contactsIDs!.append(c.id)
-            }
+            }  
         }
     }
     
@@ -364,8 +364,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 
                 // Load contacts IDs if they exist already.
                 if contactsIDs != nil {
-                    let selectedContacts = convertIDsToRecords(contactsIDs!)
-                    contactsTableViewController.selectedContacts = selectedContacts!
+                    contactsTableViewController.loadData(contactsIDs!)
                 }
                 
                 self.navigationController?.showViewController(
@@ -377,26 +376,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             }
         default:
             break
-        }
-    }
-    
-    
-    /*
-        @brief Converts an array of ABRecordIDs into an array of ABRecordRefs.
-    */
-    func convertIDsToRecords(IDs: [ABRecordID]) -> [ABRecordRef]? {
-        if ABAddressBookGetAuthorizationStatus() == .Authorized {
-            var records = [ABRecordRef]()
-            for ID in IDs {
-                let person: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, ID)?.takeUnretainedValue()
-                if person != nil {
-                    records.append(person!)
-                }
-            }
-            return records
-        }
-        else {
-            return nil
         }
     }
     
@@ -417,8 +396,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                     // Load contacts IDs if they exist already.
                     
                     if self.contactsIDs != nil {
-                        let selectedContacts = self.convertIDsToRecords(self.contactsIDs!)
-                        contactsTableViewController.selectedContacts = selectedContacts!
+                        contactsTableViewController.loadData(self.contactsIDs!)
                     }
                     
                     self.navigationController?.showViewController(

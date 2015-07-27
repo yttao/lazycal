@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import AddressBook
 
 class SelectEventTableViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource, ChangeEventViewControllerDelegate {
     
@@ -31,7 +32,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     private var event: FullEvent?
     
     // Section headers associated with section numbers
-    private let sections = ["Details": 0, "Alarm": 1]
+    private let sections = ["Details": 0, "Alarm": 1, "Contacts": 2]
     
     // Keeps track of index paths
     private let indexPaths = ["Name": NSIndexPath(forRow: 0, inSection: 0),
@@ -50,8 +51,6 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
         
         tableView.delegate = self
         tableView.dataSource = self
-        
-        //reloadData()
     }
     
     
@@ -95,6 +94,35 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     
     func loadEvent(event: FullEvent) {
         self.event = event
+    }
+    
+    
+    /*
+    @brief Number of sections in table view.
+    */
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return sections.count
+    }
+    
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        switch indexPath.section {
+        case indexPaths["Contacts"]!.section:
+            let contactsTableViewController = self.storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+            
+            let contactsSet = event!.contacts
+            var contactsIDs = [ABRecordID]()
+            for contact in contactsSet {
+                let c = contact as! Contact
+                contactsIDs.append(c.id)
+            }
+            contactsTableViewController.loadData(contactsIDs)
+            
+            contactsTableViewController.setSearchEnabled(false)
+            self.navigationController?.showViewController(contactsTableViewController, sender: self)
+        default:
+            break
+        }
     }
     
     
