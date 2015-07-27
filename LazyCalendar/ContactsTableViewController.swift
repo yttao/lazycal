@@ -155,12 +155,13 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         }
         // Create predicate and filter by predicate
         let predicate = NSPredicate(block: block)
-        filteredContacts = allContacts.filteredArrayUsingPredicate(predicate)
+        filteredContacts = allContacts.filteredArrayUsingPredicate(predicate) as [ABRecordRef]
         
-        // Sort filtered contacts alphabetically
+        // Sort filtered contact IDs by alphabetical name
         filteredContacts.sort({
             let firstFullName = ABRecordCopyCompositeName($0).takeRetainedValue() as! String
             let secondFullName = ABRecordCopyCompositeName($1).takeRetainedValue() as! String
+
             return firstFullName.compare(secondFullName) == .OrderedAscending
         })
     }
@@ -220,13 +221,14 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
         
+        // Show filtered records
         if searchController != nil && searchController!.active {
-            let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row]).takeRetainedValue() as String
+            let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
             cell.textLabel?.text = fullName
         }
+        // Show selected records
         else {
-            let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row]).takeRetainedValue() as String
-            
+            let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row])?.takeRetainedValue() as? String
             cell.textLabel?.text = fullName
         }
 
@@ -240,7 +242,14 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         
+        // Keep only IDs of selected contacts
+        var selectedContactIDs = [ABRecordID]()
+        for contact in selectedContacts {
+            selectedContactIDs.append(ABRecordGetRecordID(contact))
+        }
+        
+        // Return selected contacts to change event view controller
         let changeEventViewController = self.navigationController?.viewControllers.first as? ChangeEventViewController
-        changeEventViewController?.updateContacts(selectedContacts)
+        changeEventViewController?.updateContacts(selectedContactIDs)
     }
 }

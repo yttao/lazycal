@@ -26,6 +26,8 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     
     @IBOutlet weak var alarmTimeDisplayCell: UITableViewCell!
     
+    @IBOutlet weak var contactCell: UITableViewCell!
+    
     private var event: FullEvent?
     
     // Section headers associated with section numbers
@@ -35,7 +37,8 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     private let indexPaths = ["Name": NSIndexPath(forRow: 0, inSection: 0),
         "Time": NSIndexPath(forRow: 1, inSection: 0),
         "AlarmToggle": NSIndexPath(forRow: 0, inSection: 1),
-        "AlarmTimeDisplay": NSIndexPath(forRow: 1, inSection: 1)]
+        "AlarmTimeDisplay": NSIndexPath(forRow: 1, inSection: 1),
+        "Contacts": NSIndexPath(forRow: 0, inSection: 2)]
     
     private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
     
@@ -48,14 +51,22 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
         tableView.delegate = self
         tableView.dataSource = self
         
+        //reloadData()
+    }
+    
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         reloadData()
     }
     
     
     func reloadData() {
         eventNameLabel.text = event!.name
+        
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
         eventTimeLabel.text = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
+        
         if event!.alarm {
             alarmLabel.text = "On"
             alarmTimeDisplayCell.hidden = false
@@ -68,6 +79,17 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
         }
         alarmTimeMainLabel.sizeToFit()
         tableView.reloadRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .None)
+        
+        if event!.contacts.count > 0 {
+            contactCell.hidden = false
+            contactCell.detailTextLabel?.text = "\(event!.contacts.count)"
+            contactCell.detailTextLabel?.sizeToFit()
+            tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
+        }
+        else {
+            contactCell.hidden = true
+            contactCell.detailTextLabel?.text = nil
+        }
     }
     
     

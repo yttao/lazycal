@@ -19,7 +19,7 @@ class FullEvent: NSManagedObject {
     @NSManaged var alarm: Bool
     @NSManaged var alarmTime: NSDate?
     
-    @NSManaged var contacts: NSSet?
+    @NSManaged var contacts: NSSet
 }
 
 
@@ -29,7 +29,7 @@ class Contact: NSManagedObject {
     @NSManaged var firstName: String?
     @NSManaged var lastName: String?
     
-    @NSManaged var events: NSSet?
+    @NSManaged var events: NSSet
 }
 
 

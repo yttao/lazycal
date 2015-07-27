@@ -4,7 +4,7 @@
         <attribute name="firstName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="lastName" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="events" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FullEvent" inverseName="contacts" inverseEntity="FullEvent" syncable="YES"/>
+        <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FullEvent" inverseName="contacts" inverseEntity="FullEvent" syncable="YES"/>
     </entity>
     <entity name="FullEvent" representedClassName="LazyCalendar.FullEvent" syncable="YES">
         <attribute name="alarm" optional="YES" attributeType="Boolean" syncable="YES"/>
@@ -22,7 +22,7 @@
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Contact" positionX="-36" positionY="-72" width="128" height="103"/>
+        <element name="Contact" positionX="-36" positionY="-72" width="128" height="105"/>
         <element name="FullEvent" positionX="-54" positionY="-306" width="128" height="133"/>
         <element name="TestEvent" positionX="-243" positionY="-117" width="128" height="118"/>
     </elements>

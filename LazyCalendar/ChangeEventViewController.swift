@@ -20,7 +20,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     private var dateEnd: NSDate?
     private var alarm: Bool?
     private var alarmTime: NSDate?
-    private var contacts: [ABRecordRef]?
+    private var contactsIDs: [ABRecordID]?
     
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
@@ -199,7 +199,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         dateEnd = dateStart.dateByAddingTimeInterval(hour)
         alarm = false
         alarmTime = dateStart
-        contacts = nil
+        contactsIDs = nil
     }
     
     
@@ -213,15 +213,17 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         dateEnd = event.dateEnd
         alarm = event.alarm
         alarmTime = event.alarmTime
+        
         let contactsSet = event.mutableSetValueForKey("contacts")
-        println(contactsSet.count)
+        
         if contactsSet.count > 0 && ABAddressBookGetAuthorizationStatus() == .Authorized {
-            contacts = [ABRecordRef]()
+            // Add contact IDs
+            /*contacts = [ABRecordRef]()
             for contact in contactsSet {
                 let c = contact as! Contact
                 let recordRef: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, c.id).takeRetainedValue() as ABRecordRef
                 contacts!.append(recordRef)
-            }
+            }*/
         }
     }
     
@@ -361,14 +363,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             // If granted, continue to next view controller for contacts.
             case .Authorized:
                 let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
-                if contacts != nil {
-                    contactsTableViewController.selectedContacts = contacts!
-                }
+                // Load contacts IDs if they exist already.
                 self.navigationController?.showViewController(contactsTableViewController, sender: self)
                 
             // If undetermined, ask for permission.
             case .NotDetermined:
-                println("Not determined")
                 displayContactsAccessRequest()
             }
         default:
@@ -390,9 +389,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                     self.addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
                     // Show next view controller
                     let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
-                    if self.contacts != nil {
-                        contactsTableViewController.selectedContacts = self.contacts!
-                    }
+                    // Load contacts IDs if they exist already.
+                    
                     self.navigationController?.showViewController(
                         contactsTableViewController, sender: self)
                 }
@@ -637,55 +635,75 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             event!.alarmTime = nil
         }
         
-        var allContacts = event!.mutableSetValueForKey("contacts")
+        var eventContacts = event!.mutableSetValueForKey("contacts")
         
-        if contacts != nil {
-            for (var i = 0; i < contacts!.count; i++) {
-                let id = ABRecordGetRecordID(contacts![i]) as Int32
-                let firstName = ABRecordCopyValue(contacts![i], kABPersonFirstNameProperty)?.takeRetainedValue() as? String
-                let lastName = ABRecordCopyValue(contacts![i], kABPersonLastNameProperty)?.takeRetainedValue() as? String
+        //let record: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, contactsIDs![0]).takeUnretainedValue()
+        
+        if contactsIDs != nil {
+            NSLog("Address Book: %@", addressBookRef!.description)
+            for (var i = 0; i < contactsIDs!.count; i++) {
+                let contactID = contactsIDs![i]
                 
-                var contains = false
-                for contact in allContacts {
-                    let c = contact as! Contact
-                    if c.id == id {
-                        contains = true
-                        break
-                    }
-                }
+                let record: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, contactsIDs![i])?.takeUnretainedValue()
+                let firstName = ABRecordCopyValue(record, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
+                let lastName = ABRecordCopyValue(record, kABPersonLastNameProperty)?.takeRetainedValue() as? String
                 
-                if !contains {
-                    let contactEntity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
+                // Create fetch request for contacts
+                let fetchRequest = NSFetchRequest(entityName: "Contact")
+                // Create predicate for fetch request
+                let requirements = "(id == %d)"
+                let predicate = NSPredicate(format: requirements, contactID)
+                fetchRequest.predicate = predicate
+                // Execute fetch request for contacts
+                var error: NSError? = nil
+                let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [Contact]
+                
+                let contactEntity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
+                    // Check if contact has already been created before creating this new contact.
+                if results.count == 0 {
                     let contact = Contact(entity: contactEntity, insertIntoManagedObjectContext: managedContext)
                     
-                    contact.id = id
+                    contact.id = contactID
                     contact.firstName = firstName
                     contact.lastName = lastName
                     
-                    allContacts.addObject(contact)
+                    eventContacts.addObject(contact)
+                    
+                    var contactEvents = contact.mutableSetValueForKey("events")
+                    if !contactEvents.containsObject(event!) {
+                        contactEvents.addObject(event!)
+                    }
                 }
+                else {
+                    let contact = results.first!
+                    
+                    eventContacts.addObject(contact)
+                    
+                    var contactEvents = contact.mutableSetValueForKey("events")
+                    if !contactEvents.containsObject(event!) {
+                        contactEvents.addObject(event!)
+                    }
+                }
+                
             }
         }
-        
-        println(allContacts)
         
         // Save event
         var error: NSError?
         if !managedContext.save(&error) {
-            assert(false, "Could not save \(error), \(error?.userInfo)")
+            NSLog("Could not save %@, %@", error!, error!.userInfo!)
         }
-        println("Saved successfully")
         
         return event!
     }
     
     
     /*
-        @brief Updates the contacts.
-        @param contacts The contacts that were selected.
+        @brief Updates the contacts IDs
+        @param contacts The contacts IDs that were selected.
     */
-    func updateContacts(contacts: [ABRecordRef]) {
-        self.contacts = contacts
+    func updateContacts(contactsIDs: [ABRecordID]) {
+        self.contactsIDs = contactsIDs
         updateContactsDetailsLabel()
     }
     
@@ -696,8 +714,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     */
     func updateContactsDetailsLabel() {
         let contactCell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
-        if contacts != nil && contacts!.count > 0 {
-            contactCell?.detailTextLabel?.text = "\(contacts!.count)"
+        if contactsIDs != nil && contactsIDs!.count > 0 {
+            contactCell?.detailTextLabel?.text = "\(contactsIDs!.count)"
         }
         else {
             contactCell?.detailTextLabel?.text = nil
@@ -712,6 +730,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         @brief Prepares information for unwind segues.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        super.prepareForSegue(segue, sender: sender)
         if let identifier = segue.identifier {
             switch identifier {
             case "SaveEventSegue":

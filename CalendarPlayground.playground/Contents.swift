@@ -25,35 +25,6 @@ var components = calendar.components(NSCalendarUnit.CalendarUnitWeekday | .Calen
 var firstDay = calendar.dateFromComponents(components)
 var firstDayComponents = calendar.components(NSCalendarUnit.CalendarUnitWeekday, fromDate: firstDay!)
 
-let label = UILabel()
-let date = NSDate()
-label.text = String(_cocoaString: date)
-
-
-let contactProperties = [kABPersonFirstNameProperty,
-    kABPersonLastNameProperty,
-    kABPersonMiddleNameProperty,
-    kABPersonPrefixProperty,
-    kABPersonSuffixProperty,
-    kABPersonNicknameProperty,
-    kABPersonFirstNamePhoneticProperty,
-    kABPersonLastNamePhoneticProperty,
-    kABPersonMiddleNamePhoneticProperty,
-    
-    kABPersonOrganizationProperty,
-    kABPersonJobTitleProperty,
-    kABPersonDepartmentProperty,
-    kABPersonEmailProperty,
-    kABPersonBirthdayProperty,
-    kABPersonNoteProperty,
-    kABPersonCreationDateProperty,
-    kABPersonModificationDateProperty,
-    
-    kABPersonAddressProperty,
-    kABPersonDateProperty,
-    kABPersonKindProperty,
-    kABPersonPhoneProperty,
-    kABPersonInstantMessageProperty,
-    kABPersonSocialProfileProperty,
-    kABPersonURLProperty,
-    kABPersonRelatedNamesProperty]
+var a: Int32 = 7
+var b: Int32 = 7
+var c: Bool = a == b
