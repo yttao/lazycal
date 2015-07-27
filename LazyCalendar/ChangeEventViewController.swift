@@ -217,13 +217,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         let contactsSet = event.mutableSetValueForKey("contacts")
         
         if contactsSet.count > 0 && ABAddressBookGetAuthorizationStatus() == .Authorized {
-            // Add contact IDs
-            /*contacts = [ABRecordRef]()
+            contactsIDs = [ABRecordID]()
             for contact in contactsSet {
                 let c = contact as! Contact
-                let recordRef: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, c.id).takeRetainedValue() as ABRecordRef
-                contacts!.append(recordRef)
-            }*/
+                contactsIDs!.append(c.id)
+            }
         }
     }
     
@@ -363,8 +361,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             // If granted, continue to next view controller for contacts.
             case .Authorized:
                 let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+                
                 // Load contacts IDs if they exist already.
-                self.navigationController?.showViewController(contactsTableViewController, sender: self)
+                if contactsIDs != nil {
+                    let selectedContacts = convertIDsToRecords(contactsIDs!)
+                    contactsTableViewController.selectedContacts = selectedContacts!
+                }
+                
+                self.navigationController?.showViewController(
+                    contactsTableViewController, sender: self)
                 
             // If undetermined, ask for permission.
             case .NotDetermined:
@@ -372,6 +377,26 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             }
         default:
             break
+        }
+    }
+    
+    
+    /*
+        @brief Converts an array of ABRecordIDs into an array of ABRecordRefs.
+    */
+    func convertIDsToRecords(IDs: [ABRecordID]) -> [ABRecordRef]? {
+        if ABAddressBookGetAuthorizationStatus() == .Authorized {
+            var records = [ABRecordRef]()
+            for ID in IDs {
+                let person: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, ID)?.takeUnretainedValue()
+                if person != nil {
+                    records.append(person!)
+                }
+            }
+            return records
+        }
+        else {
+            return nil
         }
     }
     
@@ -390,6 +415,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                     // Show next view controller
                     let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
                     // Load contacts IDs if they exist already.
+                    
+                    if self.contactsIDs != nil {
+                        let selectedContacts = self.convertIDsToRecords(self.contactsIDs!)
+                        contactsTableViewController.selectedContacts = selectedContacts!
+                    }
                     
                     self.navigationController?.showViewController(
                         contactsTableViewController, sender: self)
@@ -637,14 +667,13 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         
         var eventContacts = event!.mutableSetValueForKey("contacts")
         
-        //let record: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, contactsIDs![0]).takeUnretainedValue()
-        
         if contactsIDs != nil {
             NSLog("Address Book: %@", addressBookRef!.description)
             for (var i = 0; i < contactsIDs!.count; i++) {
                 let contactID = contactsIDs![i]
                 
                 let record: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, contactsIDs![i])?.takeUnretainedValue()
+                
                 let firstName = ABRecordCopyValue(record, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
                 let lastName = ABRecordCopyValue(record, kABPersonLastNameProperty)?.takeRetainedValue() as? String
                 
