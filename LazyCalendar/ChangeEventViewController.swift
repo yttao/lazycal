@@ -79,12 +79,12 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
     private let PICKER_CELL_HEIGHT = UIPickerView().frame.height
 
-    private var dateStartPickerCellHeight: CGFloat
-    private var dateEndPickerCellHeight: CGFloat
+    private var dateStartPickerCellHeight: CGFloat = 0
+    private var dateEndPickerCellHeight: CGFloat = 0
 
-    private var alarmDateToggleCellHeight: CGFloat
-    private var alarmTimeDisplayCellHeight: CGFloat
-    private var alarmTimePickerCellHeight: CGFloat
+    private var alarmDateToggleCellHeight: CGFloat = 0
+    private var alarmTimeDisplayCellHeight: CGFloat = 0
+    private var alarmTimePickerCellHeight: CGFloat = 0
     
     private var selectedIndexPath: NSIndexPath?
     
@@ -93,32 +93,27 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     private var addressBookRef: ABAddressBookRef?
     
     
-    // Initialization, set default heights
+    /**
+        On initialization, get address book.
+    */
     required init(coder aDecoder: NSCoder) {
         if ABAddressBookGetAuthorizationStatus() == .Authorized {
             addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
         }
         
-        dateStartPickerCellHeight = 0
-        dateEndPickerCellHeight = 0
-
-        alarmDateToggleCellHeight = 0
-        alarmTimeDisplayCellHeight = 0
-        alarmTimePickerCellHeight = 0
-        
         super.init(coder: aDecoder)
     }
     
     
-    /*
-        @brief Initialize information on view load.
-        @discussion Provides setup information for the initial data, before the user changes anything.
-        1. Set the table view delegate and data source if they are not already set.
-        2. Disable the event name text field. This is done to allow proper cell selection (which is not possible if the text field can be clicked on within its section).
-        3. Set date start picker date to the selected date (or the first day of the month if none are selected) and the picker time to the current time (in hours and minutes). Set date end picker time to show one hour after the date start picker date and time.
-        4. Add event listeners that are informed when event date start picker or end picker are changed. Update the event start and end labels. Additionally, if the event start time is changed, the minimum time for the event end time is modified if the end time will come before the start time.
-        5. Format the event start and end labels. The main labels show the format: month day, year. The details labels show the format: hour:minutes period.
-        6. Default set the alarm switches off and the alarm time picker to the initial date start.
+    /**
+        Initialize information on view load.
+        Provides setup information for the initial data, before the user changes anything.
+        * Set the table view delegate and data source if they are not already set.
+        * Disable the event name text field. This is done to allow proper cell selection (which is not possible if the text field can be clicked on within its section).
+        * Set date start picker date to the selected date (or the first day of the month if none are selected) and the picker time to the current time (in hours and minutes). Set date end picker time to show one hour after the date start picker date and time.
+        * Add event listeners that are informed when event date start picker or end picker are changed. Update the event start and end labels. Additionally, if the event start time is changed, the minimum time for the event end time is modified if the end time will come before the start time.
+        * Format the event start and end labels. The main labels show the format: month day, year. The details labels show the format: hour:minutes period.
+        * Default set the alarm switches off and the alarm time picker to the initial date start.
     */
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -602,8 +597,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Saves an event's data.
+    /**
+        Saves an event's data.
     */
     func saveEvent() -> FullEvent {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -628,9 +623,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         }
         
         var eventContacts = event!.mutableSetValueForKey("contacts")
-        
         if contactsIDs != nil {
-            NSLog("Address Book: %@", addressBookRef!.description)
             for (var i = 0; i < contactsIDs!.count; i++) {
                 let contactID = contactsIDs![i]
                 
@@ -713,9 +706,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Updates the contacts detail label.
-        @discussion The contacts detail label does not display a number if no contacts have been selected yet or no contacts were selected. Otherwise, if at least one contact is selected, it displays the number of contacts.
+    /**
+        Updates the contacts detail label.
+        
+        The contacts detail label does not display a number if no contacts have been selected yet or if the number of contacts selected is zero. Otherwise, if at least one contact is selected, it displays the number of contacts.
     */
     func updateContactsDetailsLabel() {
         let contactCell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
@@ -725,14 +719,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         else {
             contactCell?.detailTextLabel?.text = nil
         }
+        // Resizes contact cell to fit data.
         contactCell?.detailTextLabel?.sizeToFit()
         tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
     }
     
     
     
-    /*
-        @brief Prepares information for unwind segues.
+    /**
+        On saving events, saves event and informs the delegate that an event was saved.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         super.prepareForSegue(segue, sender: sender)
@@ -756,14 +751,14 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
 }
 
 
-/*
-    @brief Delegate protocol for ChangeEventViewController.
-    @discussion Informs delegates when it saves an event.
+/**
+    Delegate protocol for ChangeEventViewController.
 */
 protocol ChangeEventViewControllerDelegate {
-    /*
-        @brief Informs delegate that ChangeEventViewController saved an event.
-        @param event The saved event.
+    /**
+        Informs the delegate that the `ChangeEventViewController` just saved an event.
+    
+        :param: event The saved event.
     */
     func changeEventViewControllerDidSaveEvent(event: FullEvent)
 }

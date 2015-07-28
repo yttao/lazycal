@@ -82,7 +82,9 @@ class MonthItemPageViewController: UIPageViewController, UIPageViewControllerDat
     }
     
     
-    // Previous view controller is for previous month
+    /**
+        Previous view controller is for previous month.
+    */
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
         // Create components for previous month
         let components = dateComponents!.copy() as! NSDateComponents
@@ -106,9 +108,10 @@ class MonthItemPageViewController: UIPageViewController, UIPageViewControllerDat
     }
 
     
-    /*
-    @brief After scrolling, switch months.
-    @discussion On month switch, change date components to reflect current month and clear selections from past months.
+    /**
+        After scrolling, switch months.
+    
+        On month switch, change date components to reflect current month and clear selections from past months.
     */
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
         let newMonth = pageViewController.viewControllers.first! as! MonthItemCollectionViewController
@@ -130,10 +133,12 @@ class MonthItemPageViewController: UIPageViewController, UIPageViewControllerDat
     }
     
     
-    /*
-    @brief Creates month view controller.
-    @param components The date components used to construct the month and load month data.
-    @return MonthItemCollectionViewController The collection view controller that displays the month view.
+    /**
+        Creates a new `MonthItemCollectionViewController`.
+    
+        :param: components The date components used to construct the month and load month data.
+    
+        :returns: The `MonthItemCollectionViewController` that displays the month view.
     */
     private func getMonthItemCollectionViewController(components: NSDateComponents) -> MonthItemCollectionViewController {
         // Instantiate copy of prefab view controller
@@ -146,6 +151,14 @@ class MonthItemPageViewController: UIPageViewController, UIPageViewControllerDat
 }
 
 
+/**
+    Delegate protocol for `MonthItemPageViewController`.
+*/
 protocol MonthItemPageViewControllerDelegate {
+    /**
+        Informs the delegate that the current `MonthItemPageViewController` changed the current controller.
+    
+        :param: monthItemCollectionViewController The new `MonthItemCollectionViewController` that is used.
+    */
     func monthItemPageViewControllerDidChangeCurrentViewController(monthItemCollectionViewController: MonthItemCollectionViewController)
 }

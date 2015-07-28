@@ -17,8 +17,6 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
     
-    @IBOutlet weak var backBarButtonItem: UIBarButtonItem!
-    
     @IBOutlet weak var eventNameLabel: UILabel!
     @IBOutlet weak var eventTimeLabel: UILabel!
     @IBOutlet weak var alarmLabel: UILabel!
@@ -44,7 +42,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
     
     private let editEventSegueIdentifier = "EditEventSegue"
-
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,6 +58,9 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
     
     
+    /**
+        Refreshes the information displayed.
+    */
     func reloadData() {
         eventNameLabel.text = event!.name
         
@@ -77,52 +78,99 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
             alarmTimeMainLabel.text = nil
         }
         alarmTimeMainLabel.sizeToFit()
-        tableView.reloadRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .None)
-        
-        if event!.contacts.count > 0 {
+
+        if event!.contacts.count != 0 {
             contactCell.hidden = false
             contactCell.detailTextLabel?.text = "\(event!.contacts.count)"
             contactCell.detailTextLabel?.sizeToFit()
-            tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
+            if contactCell.superview == nil && tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!) == nil {
+                var cell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
+                cell = contactCell
+            }
         }
         else {
             contactCell.hidden = true
             contactCell.detailTextLabel?.text = nil
+            contactCell.detailTextLabel?.sizeToFit()
+            if contactCell.superview != nil {
+                contactCell.removeFromSuperview()
+            }
+        }
+        
+        tableView.reloadData()
+        // Must be called after in case the number of rows changes for contacts.
+        if tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!) != nil {
+            tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
         }
     }
     
     
-    func loadEvent(event: FullEvent) {
+    /**
+        Returns title for section headers.
+    
+        If there are no contacts, the contacts header is nil.
+    */
+    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if event!.contacts.count == 0 && section == sections["Contacts"]! {
+            return nil
+        }
+        else {
+            return super.tableView(tableView, titleForHeaderInSection: section)
+        }
+    }
+    
+    
+    /**
+        Returns number of rows for sections.
+    
+        If there are no contacts, the contacts section has no rows.
+    */
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if event!.contacts.count == 0 && section == sections["Contacts"]! {
+            return 0
+        }
+        else {
+            return super.tableView(tableView, numberOfRowsInSection: section)
+        }
+    }
+    
+    
+    /**
+        Loads the event data.
+    
+        :param: event The selected event.
+    */
+    func loadData(event: FullEvent) {
         self.event = event
     }
     
     
-    /*
-    @brief Number of sections in table view.
+    /**
+        Number of sections in the table view.
     */
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        if event!.contacts.count == 0 {
-            return sections.count - 1
-        }
-        else {
-            return sections.count
-        }
+        return sections.count
     }
     
     
+    /**
+        When contacts row is selected, it displays the contacts table view controller that acts as a contact list and contact details view.
+    */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         switch indexPath.section {
         case indexPaths["Contacts"]!.section:
             let contactsTableViewController = self.storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
             
-            let contactsSet = event!.contacts
+            // Get all contact IDs from the event contacts.
+            let contactsSet = event!.contacts as Set
             var contactsIDs = [ABRecordID]()
             for contact in contactsSet {
                 let c = contact as! Contact
                 contactsIDs.append(c.id)
             }
+            // Load contact IDs into contacts table view controller.
             contactsTableViewController.loadData(contactsIDs)
-            
+            // Disable searching for new contacts (only allowed when editing event).
             contactsTableViewController.setSearchEnabled(false)
             self.navigationController?.showViewController(contactsTableViewController, sender: self)
         default:
@@ -131,6 +179,12 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
     
     
+    /**
+        Prepares for segue to event editing.
+    
+        :param: segue The segue object containing information about the view controllers involved in the segue.
+        :param: sender The object that initiated the segue.
+    */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let identifier = segue.identifier {
             switch identifier {
@@ -148,14 +202,29 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
     
     
+    /**
+        The unwind segue for saving event edits.
+    
+        :param: segue The segue object containing information about the view controllers involved in the segue.
+    */
     @IBAction func saveEventEdit(segue: UIStoryboardSegue) {
     }
     
     
+    /**
+        The unwind segue for canceling event edits.
+    
+        :param: segue The segue object containing information about the view controllers involved in the segue.
+    */
     @IBAction func cancelEventEdit(segue: UIStoryboardSegue) {
     }
     
     
+    /**
+        Reloads data on event save and informs table view that event was changed.
+    
+        :param: event The saved event.
+    */
     func changeEventViewControllerDidSaveEvent(event: FullEvent) {
         // Update info that was just edited
         reloadData()
@@ -163,6 +232,14 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
 }
 
+/**
+    Delegate protocol for `SelectEventTableViewController`.
+*/
 protocol SelectEventTableViewControllerDelegate {
+    /**
+    Informs the delegate that the selected event was modified.
+    
+    :param: event The modified event.
+    */
     func selectEventTableViewControllerDidChangeEvent(event: FullEvent)
 }

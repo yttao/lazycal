@@ -10,6 +10,7 @@ import Foundation
 import CoreData
 import AddressBook
 
+
 class FullEvent: NSManagedObject {
     @NSManaged var name: String?
     

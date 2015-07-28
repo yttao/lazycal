@@ -652,26 +652,6 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell hidden="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="MhX-5z-eHw" detailTextLabel="byn-eF-gND" style="IBUITableViewCellStyleValue1" id="A4H-1U-5Ck" userLabel="AlarmTimeDisplay">
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="A4H-1U-5Ck" id="Bo2-WT-AWd">
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="MhX-5z-eHw">
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Time" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="byn-eF-gND">
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -689,7 +669,6 @@
                         <outlet property="alarmTimeDetailsLabel" destination="Vzg-iG-oT3" id="JXY-w5-hVa"/>
                         <outlet property="alarmTimeDisplayCell" destination="lNb-xl-Gh6" id="jly-Fu-rzY"/>
                         <outlet property="alarmTimeMainLabel" destination="gx4-vy-IpG" id="sgH-0a-fiE"/>
-                        <outlet property="backBarButtonItem" destination="3AX-CK-Acx" id="vjb-rn-Izg"/>
                         <outlet property="contactCell" destination="eh4-il-d2d" id="gPp-qo-f2C"/>
                         <outlet property="eventNameLabel" destination="jF5-0l-0Lh" id="aJe-Uz-n5l"/>
                         <outlet property="eventTimeLabel" destination="NhU-cS-MgM" id="qO1-8x-k0s"/>

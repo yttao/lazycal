@@ -10,7 +10,6 @@ import UIKit
 import AddressBook
 import AddressBookUI
 
-// TODO: Put in editing mode. Right swipe = delete. Click below table = add. Select person = view details.
 class ContactsTableViewController: UITableViewController, UITableViewDelegate, UITableViewDataSource, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
     
     private var addressBookRef: ABAddressBookRef!
@@ -20,15 +19,14 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     private var filteredContacts: [ABRecordRef]!
     
     private let reuseIdentifier = "ContactCell"
-    
+    // Search controller for address book contacts
     private var searchController: UISearchController?
-    
+    // True if searching address book is allowed.
     private var searchEnabled: Bool = true
     
     
-    /*
-        @brief Set delegates and data sources, load address book, get contacts, and create the search controller.
-        @discussion The segue to this controller is only initiated if
+    /**
+        Set delegates and data sources, load address book, get contacts, and create the search controller.
     */
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,6 +59,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
                 controller.dimsBackgroundDuringPresentation = false
                 controller.searchBar.sizeToFit()
                 controller.searchBar.delegate = self
+                controller.searchBar.placeholder = "Search for New Contacts"
                 controller.delegate = self
                 controller.hidesNavigationBarDuringPresentation = false
                 
@@ -69,12 +68,17 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
                 return controller
             })()
         }
-        // Needed to hide search controller on view segue.
+        // Hides search controller on view segue
         self.definesPresentationContext = true
         
     }
     
     
+    /**
+        Loads contacts ID data.
+    
+        :param: contactIDs The array of contact IDs.
+    */
     func loadData(contactsIDs: [ABRecordID]) {
         selectedContacts = [ABRecordRef]()
         if ABAddressBookGetAuthorizationStatus() == .Authorized {
@@ -89,14 +93,20 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     }
     
     
+    /**
+        Sets search enabled.
+    
+        :param: enabled `true` if search is enabled; `false` otherwise.
+    */
     func setSearchEnabled(enabled: Bool) {
         searchEnabled = enabled
     }
     
     
-    /*
-        @brief Filters the search results by the text entered in the search bar.
-        @param searchText The text to filter the results.
+    /**
+        Filters the search results by the text entered in the search bar.
+
+        :param: searchText The text to filter the results.
     */
     func filterContentForSearchText(searchText: String) {
         let block = {
@@ -151,8 +161,8 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     }
     
     
-    /*
-        @brief Updates search results by filtering by the search bar text.
+    /**
+        Updates search results by updating `filteredContacts`.
     */
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         filterContentForSearchText(searchController.searchBar.text)
@@ -160,17 +170,18 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     }
     
     
-    /*
-        @brief There is one section in the contacts list.
+    /**
+        There is 1 section in the contacts list.
     */
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
     
     
-    /*
-        @brief The number of rows is determined by the number of contacts.
-        @discussion If the search controller is active, show the filtered contacts. If the search controller is inactive, show the selected contacts.
+    /**
+        The number of rows is determined by the number of contacts.
+        
+        If the search controller is active, show the filtered contacts. If the search controller is inactive, show the selected contacts.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if searchController != nil && searchController!.active && filteredContacts.count > 0 {
@@ -180,9 +191,10 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     }
     
     
-    /*
-        @brief If searching, selection will append to selected contacts and deactive the search controller.
-        @discussion The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
+    /**
+        If searching, selection will append to selected contacts and deactive the search controller.
+        
+        The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if searchController != nil && searchController!.active && filteredContacts.count > 0 {
@@ -197,9 +209,10 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     }
     
     
-    /*
-        @brief Configures each cell in table view with contact information.
-        @discussion The prototype cells are subtitle types so they have a main text label and detail text label. The main text label displays the contact's first and last name. The detail text label (for now) displays the contact's main phone number.
+    /**
+        Configures each cell in table view with contact information.
+        
+        The prototype cells are subtitle types so they have a main text label and detail text label. The main text label displays the contact's first and last name. The detail text label (for now) displays the contact's main phone number.
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
@@ -219,17 +232,17 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     }
     
     
-    /*
-    @brief Allow table cells to be deleted.
-    @discussion Note: If tableView.editing = true, the left circular edit option will appear.
+    /**
+        Allow table cells to be deleted.
+        Note: If tableView.editing = true, the left circular edit option will appear.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         return true
     }
     
     
-    /*
-    @brief If delete is pressed on swipe left, delete the contact.
+    /**
+        If delete is pressed on swipe left, delete the contact.
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == UITableViewCellEditingStyle.Delete {
@@ -241,24 +254,24 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     }
     
     
-    /*
-    @brief Gives option to delete event.
+    /**
+        Gives option to delete event.
     */
     override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
         return UITableViewCellEditingStyle.Delete
     }
     
     
-    /*
-    @brief Prevents indenting for showing circular edit button on the left when editing.
+    /**
+        Prevents indenting for showing circular edit button on the left when editing.
     */
     override func tableView(tableView: UITableView, shouldIndentWhileEditingRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         return false
     }
     
     
-    /*
-        @brief On view exit, updates the change event view controller contacts.
+    /**
+        On view exit, updates the change event view controller contacts.
     */
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)

@@ -196,9 +196,10 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
 }
 
 
-/*
-    @brief Handles cell sizing and spacing.
-    @discussion The collection view should take up the
+/**
+    Handles cell sizing and spacing.
+    
+    The `MonthItemCollectionView` should take up the top half of the screen.
 */
 extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout {
     
@@ -230,7 +231,14 @@ extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout 
 }
 
 
-// Delegate protocol
+/**
+    Delegate protocol for `MonthItemCollectionViewController`.
+*/
 protocol MonthItemCollectionViewControllerDelegate {
+    /**
+        Informs the delegate that the selected date was changed.
+    
+        :param: date The new selected date.
+    */
     func monthItemCollectionViewControllerDidChangeSelectedDate(date: NSDate)
 }

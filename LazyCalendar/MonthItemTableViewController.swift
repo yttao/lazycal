@@ -151,7 +151,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         let event = events[indexPath.row]
         selectedEvent = event
         
-        selectEventTableViewController!.loadEvent(event)
+        selectEventTableViewController!.loadData(event)
     }
     
     
