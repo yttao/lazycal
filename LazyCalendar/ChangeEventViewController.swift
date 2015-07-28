@@ -26,9 +26,14 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     private let dateFormatter = NSDateFormatter()
     
     // Date start and end pickers to decide time interval
-    private let dateStartPicker = UIDatePicker()
-    private let dateEndPicker = UIDatePicker()
-
+    @IBOutlet weak var dateStartPicker: UIDatePicker!
+    @IBOutlet weak var dateEndPicker: UIDatePicker!
+    
+    @IBOutlet weak var dateStartPickerCell: UITableViewCell!
+    @IBOutlet weak var dateEndPickerCell: UITableViewCell!
+    
+    
+    
     // Text field for event name
     @IBOutlet weak var nameTextField: UITextField!
     
@@ -60,7 +65,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     // Keeps track of index paths
     private let indexPaths = ["Name": NSIndexPath(forRow: 0, inSection: 0),
-        "Start": NSIndexPath(forRow: 0, inSection: 1), "End": NSIndexPath(forRow: 0, inSection: 2),
+        "Start": NSIndexPath(forRow: 0, inSection: 1),
+        "StartPicker": NSIndexPath(forRow: 1, inSection: 1),
+        "End": NSIndexPath(forRow: 0, inSection: 2),
+        "EndPicker": NSIndexPath(forRow: 1, inSection: 2),
         "AlarmToggle": NSIndexPath(forRow: 0, inSection: 3),
         "AlarmDateToggle": NSIndexPath(forRow: 1, inSection: 3),
         "AlarmTimeDisplay": NSIndexPath(forRow: 2, inSection: 3),
@@ -70,11 +78,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     // Heights of fields
     private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
     private let PICKER_CELL_HEIGHT = UIPickerView().frame.height
-    
-    private var eventNameCellHeight: CGFloat
-    private var eventDateStartCellHeight: CGFloat
-    private var eventDateEndCellHeight: CGFloat
-    private var alarmToggleCellHeight: CGFloat
+
+    private var dateStartPickerCellHeight: CGFloat
+    private var dateEndPickerCellHeight: CGFloat
+
     private var alarmDateToggleCellHeight: CGFloat
     private var alarmTimeDisplayCellHeight: CGFloat
     private var alarmTimePickerCellHeight: CGFloat
@@ -92,12 +99,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
         }
         
-        eventNameCellHeight = DEFAULT_CELL_HEIGHT
-        
-        eventDateStartCellHeight = DEFAULT_CELL_HEIGHT
-        eventDateEndCellHeight = DEFAULT_CELL_HEIGHT
-        
-        alarmToggleCellHeight = DEFAULT_CELL_HEIGHT
+        dateStartPickerCellHeight = 0
+        dateEndPickerCellHeight = 0
+
         alarmDateToggleCellHeight = 0
         alarmTimeDisplayCellHeight = 0
         alarmTimePickerCellHeight = 0
@@ -320,33 +324,15 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             nameTextField.becomeFirstResponder()
         case sections["Start"]!:
             tableView.beginUpdates()
-            
-            // Hide date start labels
-            dateStartMainLabel.hidden = true
-            dateStartDetailsLabel.hidden = true
-            
             // Recalculate height to show date start picker
-            eventDateStartCellHeight = dateStartPicker.frame.height
-            
-            // Show date start picker
-            cell.contentView.addSubview(dateStartPicker)
-            cell.contentView.didAddSubview(dateStartPicker)
-            
+            dateStartPickerCell.hidden = false
+            dateStartPickerCellHeight = PICKER_CELL_HEIGHT
             tableView.endUpdates()
         case sections["End"]!:
             tableView.beginUpdates()
-            
-            // Hide date end labels
-            dateEndMainLabel.hidden = true
-            dateEndDetailsLabel.hidden = true
-            
             // Recalculate height to show date end picker
-            eventDateEndCellHeight = dateEndPicker.frame.height
-            
-            // Show date end picker
-            cell.contentView.addSubview(dateEndPicker)
-            cell.contentView.didAddSubview(dateEndPicker)
-            
+            dateEndPickerCell.hidden = false
+            dateEndPickerCellHeight = PICKER_CELL_HEIGHT
             tableView.endUpdates()
         case sections["Contacts"]!:
             // Create initial alert notification (first time permission request) for data.
@@ -492,12 +478,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     */
     func showFewerAlarmOptions() {
         tableView.beginUpdates()
-        
-        // Get alarm options cells
-        let alarmDateToggleCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmDateToggle"]!)
-        let alarmTimeDisplayCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimeDisplay"]!)
-        let alarmTimePickerCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimePicker"]!)
-        
+
         // Set cell heights to 0
         alarmDateToggleCellHeight = 0
         alarmTimeDisplayCellHeight = 0
@@ -547,34 +528,21 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     */
     func deselectRowAtIndexPath(indexPath: NSIndexPath) {
         switch indexPath.section {
-            // If deselecting event name field, text field stops being first responder and disables
-            // user interaction with it.
+            // If deselecting event name field, text field stops being first responder and disables user interaction with it.
         case sections["Name"]!:
             nameTextField.userInteractionEnabled = false
             nameTextField.resignFirstResponder()
             // If deselecting date start field, hide date start picker and show labels
         case sections["Start"]!:
             tableView.beginUpdates()
-            
-            let cell = tableView.cellForRowAtIndexPath(indexPath)!
-            dateStartPicker.removeFromSuperview()
-            eventDateStartCellHeight = DEFAULT_CELL_HEIGHT
-            
-            dateStartMainLabel.hidden = false
-            dateStartDetailsLabel.hidden = false
-            
+            dateStartPickerCellHeight = 0
+            dateStartPickerCell.hidden = true
             tableView.endUpdates()
             // If deselecting date end field, hide date end picker and show labels
         case sections["End"]!:
             tableView.beginUpdates()
-            
-            let cell = tableView.cellForRowAtIndexPath(indexPath)!
-            dateEndPicker.removeFromSuperview()
-            eventDateEndCellHeight = DEFAULT_CELL_HEIGHT
-            
-            dateEndMainLabel.hidden = false
-            dateEndDetailsLabel.hidden = false
-            
+            dateEndPickerCellHeight = 0
+            dateEndPickerCell.hidden = true
             tableView.endUpdates()
         default:
             break
@@ -583,23 +551,39 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    // Calculates height for rows
+    /*
+        @brief Calculates height for rows
+    */
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         switch indexPath.section {
         // Event name field has default height
         case sections["Name"]!:
-            return eventNameCellHeight
+            return DEFAULT_CELL_HEIGHT
         // Event date start field changes height based on if it is selected or not
         case sections["Start"]!:
-            return eventDateStartCellHeight
+            switch indexPath.row {
+            case indexPaths["Start"]!.row:
+                return DEFAULT_CELL_HEIGHT
+            case indexPaths["StartPicker"]!.row:
+                return dateStartPickerCellHeight
+            default:
+                return DEFAULT_CELL_HEIGHT
+            }
         // Event date end field changes height based on if it is selected or not
         case sections["End"]!:
-            return eventDateEndCellHeight
+            switch indexPath.row {
+            case indexPaths["End"]!.row:
+                return DEFAULT_CELL_HEIGHT
+            case indexPaths["EndPicker"]!.row:
+                return dateEndPickerCellHeight
+            default:
+                return DEFAULT_CELL_HEIGHT
+            }
         case sections["Alarm"]!:
             switch indexPath.row {
             // Alarm toggle height
             case indexPaths["AlarmToggle"]!.row:
-                return alarmToggleCellHeight
+                return DEFAULT_CELL_HEIGHT
             // Use date toggle height
             case indexPaths["AlarmDateToggle"]!.row:
                 return alarmDateToggleCellHeight

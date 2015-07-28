@@ -248,6 +248,29 @@
                                             <bool key="isElement" value="YES"/>
                                         </accessibility>
                                     </tableViewCell>
+                                    <tableViewCell hidden="YES" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="ty5-c7-JWi" userLabel="DateStartPicker">
+                                        <rect key="frame" x="0.0" y="201" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ty5-c7-JWi" id="miS-np-nRV">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="zfx-ZB-R9Q">
+                                                    <rect key="frame" x="140" y="-59" width="320" height="162"/>
+                                                    <date key="date" timeIntervalSinceReferenceDate="459734896.46758801">
+                                                        <!--2015-07-28 00:08:16 +0000-->
+                                                    </date>
+                                                </datePicker>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="centerX" secondItem="zfx-ZB-R9Q" secondAttribute="centerX" id="3hz-7z-iYq"/>
+                                                <constraint firstAttribute="centerY" secondItem="zfx-ZB-R9Q" secondAttribute="centerY" id="KDo-nw-fVV"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <bool key="isElement" value="YES"/>
+                                        </accessibility>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="End" id="alo-7e-9Yq">
@@ -272,6 +295,29 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
+                                        </tableViewCellContentView>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <bool key="isElement" value="YES"/>
+                                        </accessibility>
+                                    </tableViewCell>
+                                    <tableViewCell hidden="YES" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="1nH-02-GEJ" userLabel="DateEndPicker">
+                                        <rect key="frame" x="0.0" y="288" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="1nH-02-GEJ" id="luX-hI-yUM">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="ZBj-rj-h7a">
+                                                    <rect key="frame" x="140" y="-59" width="320" height="162"/>
+                                                    <date key="date" timeIntervalSinceReferenceDate="459734949.25761002">
+                                                        <!--2015-07-28 00:09:09 +0000-->
+                                                    </date>
+                                                </datePicker>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="centerX" secondItem="ZBj-rj-h7a" secondAttribute="centerX" id="7Iy-09-aAL"/>
+                                                <constraint firstAttribute="centerY" secondItem="ZBj-rj-h7a" secondAttribute="centerY" id="JXF-Oe-sdA"/>
+                                            </constraints>
                                         </tableViewCellContentView>
                                         <accessibility key="accessibilityConfiguration">
                                             <bool key="isElement" value="YES"/>
@@ -444,8 +490,12 @@
                         <outlet property="alarmTimePickerCell" destination="cVw-iZ-pNP" id="4yh-ry-gDm"/>
                         <outlet property="dateEndDetailsLabel" destination="RI1-Hc-M5s" id="bx1-Ba-Qd7"/>
                         <outlet property="dateEndMainLabel" destination="RBF-96-ZwI" id="jQn-Oc-Txy"/>
+                        <outlet property="dateEndPicker" destination="ZBj-rj-h7a" id="dKV-vZ-7Yr"/>
+                        <outlet property="dateEndPickerCell" destination="1nH-02-GEJ" id="Spk-EZ-jzK"/>
                         <outlet property="dateStartDetailsLabel" destination="Vpb-DU-M9h" id="Hfa-7q-sfu"/>
                         <outlet property="dateStartMainLabel" destination="Wql-f1-NyL" id="xu3-tu-ErZ"/>
+                        <outlet property="dateStartPicker" destination="zfx-ZB-R9Q" id="RUR-LU-tYe"/>
+                        <outlet property="dateStartPickerCell" destination="ty5-c7-JWi" id="sem-ll-zAO"/>
                         <outlet property="nameTextField" destination="hmy-da-q8Z" id="yQL-kb-xtI"/>
                     </connections>
                 </tableViewController>
@@ -748,6 +798,29 @@
                                             <bool key="isElement" value="YES"/>
                                         </accessibility>
                                     </tableViewCell>
+                                    <tableViewCell hidden="YES" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="gcA-XH-aBW" userLabel="DateStartPicker">
+                                        <rect key="frame" x="0.0" y="201" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="gcA-XH-aBW" id="gtb-D1-Th0">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="2sB-aU-n8X">
+                                                    <rect key="frame" x="140" y="-60" width="320" height="162"/>
+                                                    <date key="date" timeIntervalSinceReferenceDate="459737874.68402898">
+                                                        <!--2015-07-28 00:57:54 +0000-->
+                                                    </date>
+                                                </datePicker>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="centerX" secondItem="2sB-aU-n8X" secondAttribute="centerX" id="0Ay-ye-cc4"/>
+                                                <constraint firstAttribute="centerY" secondItem="2sB-aU-n8X" secondAttribute="centerY" id="Shy-TE-4HI"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <bool key="isElement" value="YES"/>
+                                        </accessibility>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="End" id="fxf-sh-VR8">
@@ -772,6 +845,29 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
+                                        </tableViewCellContentView>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <bool key="isElement" value="YES"/>
+                                        </accessibility>
+                                    </tableViewCell>
+                                    <tableViewCell hidden="YES" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="kkP-Uu-8Gp" userLabel="DateEndPicker">
+                                        <rect key="frame" x="0.0" y="288" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kkP-Uu-8Gp" id="tap-14-Cgg">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="iBf-hF-ryz">
+                                                    <rect key="frame" x="140" y="-60" width="320" height="162"/>
+                                                    <date key="date" timeIntervalSinceReferenceDate="459737914.76700503">
+                                                        <!--2015-07-28 00:58:34 +0000-->
+                                                    </date>
+                                                </datePicker>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="centerY" secondItem="iBf-hF-ryz" secondAttribute="centerY" id="ei3-X8-NVq"/>
+                                                <constraint firstAttribute="centerX" secondItem="iBf-hF-ryz" secondAttribute="centerX" id="zre-cR-unZ"/>
+                                            </constraints>
                                         </tableViewCellContentView>
                                         <accessibility key="accessibilityConfiguration">
                                             <bool key="isElement" value="YES"/>
@@ -944,8 +1040,12 @@
                         <outlet property="alarmTimePickerCell" destination="49M-Cs-C2U" id="Vs6-Wc-CLo"/>
                         <outlet property="dateEndDetailsLabel" destination="T3v-zK-MqL" id="GLV-AG-ibr"/>
                         <outlet property="dateEndMainLabel" destination="Dpl-jU-l7d" id="3FF-iC-VI9"/>
+                        <outlet property="dateEndPicker" destination="iBf-hF-ryz" id="ETq-zR-WvF"/>
+                        <outlet property="dateEndPickerCell" destination="kkP-Uu-8Gp" id="9rZ-mB-nMm"/>
                         <outlet property="dateStartDetailsLabel" destination="Hzn-E8-NVL" id="7s2-Oh-8qS"/>
                         <outlet property="dateStartMainLabel" destination="9Np-jS-dhf" id="Cut-J9-ybA"/>
+                        <outlet property="dateStartPicker" destination="2sB-aU-n8X" id="ugq-c0-FGh"/>
+                        <outlet property="dateStartPickerCell" destination="gcA-XH-aBW" id="aeH-gA-qBu"/>
                         <outlet property="nameTextField" destination="YXX-Eo-oqm" id="2Wc-4j-POs"/>
                     </connections>
                 </tableViewController>

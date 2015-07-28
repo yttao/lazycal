@@ -69,6 +69,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
                 return controller
             })()
         }
+        // Needed to hide search controller on view segue.
         self.definesPresentationContext = true
         
     }

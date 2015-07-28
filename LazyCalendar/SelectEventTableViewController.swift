@@ -101,7 +101,12 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     @brief Number of sections in table view.
     */
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return sections.count
+        if event!.contacts.count == 0 {
+            return sections.count - 1
+        }
+        else {
+            return sections.count
+        }
     }
     
     
