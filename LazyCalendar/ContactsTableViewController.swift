@@ -43,10 +43,6 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         if ABAddressBookGetAuthorizationStatus() == .Authorized {
             addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
         }
-        else {
-            var error: NSError?
-            NSException.raise("AddressBookAccessNotAuthorizedException", format: "Error: %a", arguments: getVaList([error!]))
-        }
         
         // Get all contacts
         allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
@@ -94,7 +90,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     
     
     /**
-        Sets search enabled.
+        Sets search enabled. If search is enabled, new contacts can be added. If disabled, only current contacts can be viewed.
     
         :param: enabled `true` if search is enabled; `false` otherwise.
     */
@@ -221,6 +217,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         if searchController != nil && searchController!.active && filteredContacts.count > 0 {
             let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
             cell.textLabel?.text = fullName
+            boldSearchTextInLabel(cell.textLabel!)
         }
         // Show selected records
         else {
@@ -233,10 +230,49 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     
     
     /**
+        Bolds the search bar text in the result cells.
+    
+        :param: cell The cell to have bolded text.
+        :param: text The text to show in the cell with bolded search text.
+    */
+    func boldSearchTextInLabel(label: UILabel) {
+        let text = label.text!
+        let searchText = searchController!.searchBar.text
+        
+        // Make range
+        let boldRange = text.rangeOfString(searchText, options: .CaseInsensitiveSearch)
+        
+        // Check if search text is in label (can be in main or details label depending on where search text was found).
+        if boldRange != nil {
+            let start = distance(text.startIndex, boldRange!.startIndex)
+            let length = count(searchText)
+            let range = NSMakeRange(start, length)
+            
+            // Make bold font
+            let font = UIFont.boldSystemFontOfSize(label.font.pointSize)
+            
+            // Create attributed text
+            var attributedText = NSMutableAttributedString(string: text)
+            attributedText.beginEditing()
+            attributedText.addAttribute(NSFontAttributeName, value: font, range: range)
+            attributedText.endEditing()
+            
+            // Set text
+            label.attributedText = attributedText
+        }
+        else {
+            label.text = text
+        }
+    }
+    
+    
+    /**
         Allow table cells to be deleted.
+    
         Note: If tableView.editing = true, the left circular edit option will appear.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        // TODO: Don't allow editing and deleting if searching.
         return true
     }
     
@@ -276,7 +312,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         
-        // Keep only IDs of selected contacts
+        // Get IDs of selected contacts
         var selectedContactIDs = [ABRecordID]()
         for contact in selectedContacts {
             selectedContactIDs.append(ABRecordGetRecordID(contact))
