@@ -34,6 +34,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         if selectedContacts == nil {
             selectedContacts = [ABRecordRef]()
         }
+        filteredContacts = [ABRecordRef]()
         
         // Set table view delegate and data source
         tableView.delegate = self
@@ -216,13 +217,16 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         // Show filtered records
         if searchController != nil && searchController!.active && filteredContacts.count > 0 {
             let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
-            cell.textLabel?.text = fullName
-            boldSearchTextInLabel(cell.textLabel!)
+            if fullName != nil {
+                cell.textLabel!.text = fullName
+                boldSearchTextInLabel(cell.textLabel!)
+            }
         }
         // Show selected records
         else {
             let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row])?.takeRetainedValue() as? String
-            cell.textLabel?.text = fullName
+            cell.textLabel!.attributedText = nil
+            cell.textLabel!.text = fullName
         }
 
         return cell
@@ -233,7 +237,6 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
         Bolds the search bar text in the result cells.
     
         :param: cell The cell to have bolded text.
-        :param: text The text to show in the cell with bolded search text.
     */
     func boldSearchTextInLabel(label: UILabel) {
         let text = label.text!
@@ -261,6 +264,7 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
             label.attributedText = attributedText
         }
         else {
+            label.attributedText = nil
             label.text = text
         }
     }
@@ -269,10 +273,12 @@ class ContactsTableViewController: UITableViewController, UITableViewDelegate, U
     /**
         Allow table cells to be deleted.
     
-        Note: If tableView.editing = true, the left circular edit option will appear.
+        Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // TODO: Don't allow editing and deleting if searching.
+        if filteredContacts.count > 0 {
+            return false
+        }
         return true
     }
     

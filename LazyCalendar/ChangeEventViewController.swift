@@ -594,50 +594,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             return PICKER_CELL_HEIGHT
         }
         return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
-        /*switch indexPath.section {
-        // Event name field has default height
-        case sections["Name"]!:
-            return DEFAULT_CELL_HEIGHT
-        // Event date start field changes height based on if it is selected or not
-        case sections["Start"]!:
-            switch indexPath.row {
-            case indexPaths["Start"]!.row:
-                return DEFAULT_CELL_HEIGHT
-            case indexPaths["StartPicker"]!.row:
-                return PICKER_CELL_HEIGHT
-            default:
-                return DEFAULT_CELL_HEIGHT
-            }
-        // Event date end field changes height based on if it is selected or not
-        case sections["End"]!:
-            switch indexPath.row {
-            case indexPaths["End"]!.row:
-                return DEFAULT_CELL_HEIGHT
-            case indexPaths["EndPicker"]!.row:
-                return PICKER_CELL_HEIGHT
-            default:
-                return DEFAULT_CELL_HEIGHT
-            }
-        case sections["Alarm"]!:
-            switch indexPath.row {
-            // Alarm toggle height
-            case indexPaths["AlarmToggle"]!.row:
-                return DEFAULT_CELL_HEIGHT
-            // Use date toggle height
-            case indexPaths["AlarmDateToggle"]!.row:
-                return DEFAULT_CELL_HEIGHT
-            // Alarm time display height
-            case indexPaths["AlarmTimeDisplay"]!.row:
-                return DEFAULT_CELL_HEIGHT
-            // Alarm time picker height
-            case indexPaths["AlarmTimePicker"]!.row:
-                return PICKER_CELL_HEIGHT
-            default:
-                return DEFAULT_CELL_HEIGHT
-            }
-        default:
-            return DEFAULT_CELL_HEIGHT
-        }*/
     }
     
     
@@ -687,8 +643,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [Contact]
                 
                 let contactEntity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
-                    // Check if contact has already been created before creating this new contact.
+                
+                // If no results, contact is new. Add Contact entity for first time.
                 if results.count == 0 {
+                    NSLog("New contact made")
                     let contact = Contact(entity: contactEntity, insertIntoManagedObjectContext: managedContext)
                     
                     contact.id = contactID
@@ -702,20 +660,20 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                         contactEvents.addObject(event!)
                     }
                 }
+                // If results returned, contact already exists. Add existing contact to event contacts.
                 else {
                     let contact = results.first!
                     
                     eventContacts.addObject(contact)
                     
                     var contactEvents = contact.mutableSetValueForKey("events")
-                    if !contactEvents.containsObject(event!) {
-                        contactEvents.addObject(event!)
-                    }
+                    contactEvents.addObject(event!)
                 }
             }
         }
         
-        // Check for removed contacts for an edited event and remove them.
+        // Check for removed contacts for an edited event and remove them. Also removed the edited event from removed contacts.
+        
         // Find contacts to remove.
         var removedContacts = [Contact]()
         for contact in eventContacts {
@@ -725,15 +683,17 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 removedContacts.append(c)
             }
         }
-        // Remove deleted contacts.
+        // Remove deleted contacts, remove contact connection to event.
         for (var i = 0; i < removedContacts.count; i++) {
             eventContacts.removeObject(removedContacts[i])
+            let contactEvents = removedContacts[i].mutableSetValueForKey("events")
+            contactEvents.removeObject(event!)
         }
         
         // Save event
         var error: NSError?
         if !managedContext.save(&error) {
-            NSLog("Could not save %@, %@", error!, error!.userInfo!)
+            NSLog("%@, %@", error!, error!.userInfo!)
         }
         
         return event!
