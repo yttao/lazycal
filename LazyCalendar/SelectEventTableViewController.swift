@@ -121,7 +121,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
         if section == sections["Contacts"]! && contactCell.hidden {
             return 0
         }
-        else if section == sections["Alarm"] && alarmTimeDisplayCell.hidden {
+        else if section == sections["Alarm"]! && alarmTimeDisplayCell.hidden {
             return 1
         }
         return super.tableView(tableView, numberOfRowsInSection: section)
