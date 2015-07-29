@@ -50,6 +50,9 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     }
     
     
+    /**
+        On view appearance, call `reloadData()` to ensure that the data is updated.
+    */
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         reloadData()
@@ -81,18 +84,11 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
             contactCell.hidden = false
             contactCell.detailTextLabel?.text = "\(event!.contacts.count)"
             contactCell.detailTextLabel?.sizeToFit()
-            if contactCell.superview == nil && tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!) == nil {
-                var cell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
-                cell = contactCell
-            }
         }
         else {
             contactCell.hidden = true
             contactCell.detailTextLabel?.text = nil
             contactCell.detailTextLabel?.sizeToFit()
-            if contactCell.superview != nil {
-                contactCell.removeFromSuperview()
-            }
         }
         
         tableView.reloadData()
@@ -109,31 +105,31 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
         If there are no contacts, the contacts header is nil.
     */
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if event!.contacts.count == 0 && section == sections["Contacts"]! {
+        if section == sections["Contacts"]! && contactCell.hidden  {
             return nil
         }
-        else {
-            return super.tableView(tableView, titleForHeaderInSection: section)
-        }
+        return super.tableView(tableView, titleForHeaderInSection: section)
     }
     
     
     /**
         Returns number of rows for sections.
     
-        If there are no contacts, the contacts section has no rows.
+        If there are no contacts, the contacts section has no rows. If the alarm is off, only show one row indicating alarm is off.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if event!.contacts.count == 0 && section == sections["Contacts"]! {
+        if section == sections["Contacts"]! && contactCell.hidden {
             return 0
         }
-        else {
-            return super.tableView(tableView, numberOfRowsInSection: section)
+        else if section == sections["Alarm"] && alarmTimeDisplayCell.hidden {
+            return 1
         }
+        return super.tableView(tableView, numberOfRowsInSection: section)
     }
     
     
     /**
+        Height is default unless it is the alarm time display cell, which can be hidden.
     */
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath == indexPaths["AlarmTimeDisplay"] && alarmTimeDisplayCell.hidden {
