@@ -30,7 +30,7 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     private var event: FullEvent?
     
     // Section headers associated with section numbers
-    private let sections = ["Details": 0, "Alarm": 1, "Contacts": 2]
+    private let sections = ["Details": 0, "Alarm": 1, "Contacts": 2, "Test": 3]
     
     // Keeps track of index paths
     private let indexPaths = ["Name": NSIndexPath(forRow: 0, inSection: 0),
@@ -38,8 +38,6 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
         "AlarmToggle": NSIndexPath(forRow: 0, inSection: 1),
         "AlarmTimeDisplay": NSIndexPath(forRow: 1, inSection: 1),
         "Contacts": NSIndexPath(forRow: 0, inSection: 2)]
-    
-    private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
     
     private let editEventSegueIdentifier = "EditEventSegue"
     
@@ -136,6 +134,16 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
     
     
     /**
+    */
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if indexPath == indexPaths["AlarmTimeDisplay"] && alarmTimeDisplayCell.hidden {
+            return 0
+        }
+        return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
+    }
+    
+    
+    /**
         Loads the event data.
     
         :param: event The selected event.
@@ -176,6 +184,28 @@ class SelectEventTableViewController: UITableViewController, UITableViewDelegate
         default:
             break
         }
+    }
+    
+    
+    /**
+        If there are no rows in the section, header height is 0. Otherwise default header height.
+    */
+    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
+            return 0
+        }
+        return super.tableView(tableView, heightForHeaderInSection: section)
+    }
+    
+    
+    /**
+        If there are no rows in the section, footer height is 0. Otherwise default footer height.
+    */
+    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
+            return 0
+        }
+        return super.tableView(tableView, heightForHeaderInSection: section)
     }
     
     
