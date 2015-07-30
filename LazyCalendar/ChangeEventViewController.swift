@@ -470,13 +470,11 @@ class ChangeEventViewController: UITableViewController {
             nameTextField.resignFirstResponder()
             // If deselecting date start field, hide date start picker and show labels
         case sections["Start"]!:
-            println("Deselecting")
             tableView.beginUpdates()
             if !dateStartPickerCell.hidden {
                 //dateStartPicker.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
                 dateStartPickerCell.hidden = true
-                println(self.tableView(tableView, numberOfRowsInSection: 1))
             }
             //dateStartPickerCell.hidden = true
             tableView.endUpdates()
