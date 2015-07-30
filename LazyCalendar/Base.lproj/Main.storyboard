@@ -64,7 +64,7 @@
         <!--MonthItemPageViewController-->
         <scene sceneID="RtT-mY-PMQ">
             <objects>
-                <pageViewController storyboardIdentifier="MonthItemPageViewController" autoresizesArchivedViewToFullSize="NO" title="MonthItemPageViewController" transitionStyle="scroll" navigationOrientation="vertical" spineLocation="none" id="F76-rJ-Pnm" customClass="MonthItemPageViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController"/>
+                <pageViewController storyboardIdentifier="MonthItemPageViewController" autoresizesArchivedViewToFullSize="NO" title="MonthItemPageViewController" transitionStyle="scroll" navigationOrientation="horizontal" spineLocation="none" id="F76-rJ-Pnm" customClass="MonthItemPageViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wax-WN-uF0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="910" y="-476"/>
@@ -77,9 +77,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" red="0.49019607840000001" green="1" blue="0.49019607840000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="qY6-km-slp">
-                            <size key="itemSize" width="75" height="75"/>
-                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="EaN-K2-v9q">
+                            <size key="itemSize" width="50" height="50"/>
+                            <size key="headerReferenceSize" width="50" height="50"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
@@ -88,11 +88,11 @@
                                 <rect key="frame" x="0.0" y="0.0" width="80" height="74"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="75" height="75"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Day" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tBi-WE-vSe">
-                                            <rect key="frame" x="23" y="8" width="30" height="21"/>
+                                            <rect key="frame" x="10" y="8" width="30" height="21"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
@@ -109,6 +109,25 @@
                                 </connections>
                             </collectionViewCell>
                         </cells>
+                        <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MonthItemCollectionHeaderView" id="lPe-fG-aLl" customClass="MonthItemCollectionHeaderView" customModule="LazyCalendar" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="0.0" width="600" height="50"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bjz-o7-krC">
+                                    <rect key="frame" x="0.0" y="14" width="42" height="21"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="42" id="eh0-sD-GJs"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="bjz-o7-krC" firstAttribute="centerY" secondItem="lPe-fG-aLl" secondAttribute="centerY" id="cf0-hy-sNJ"/>
+                                <constraint firstItem="bjz-o7-krC" firstAttribute="leading" secondItem="lPe-fG-aLl" secondAttribute="leading" id="lEB-jg-XRA"/>
+                            </constraints>
+                        </collectionReusableView>
                         <connections>
                             <outlet property="dataSource" destination="pQA-1g-TTb" id="uZc-fE-1Qp"/>
                             <outlet property="delegate" destination="pQA-1g-TTb" id="ik9-R5-ZG7"/>

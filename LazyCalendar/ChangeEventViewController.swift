@@ -10,11 +10,10 @@ import UIKit
 import CoreData
 import AddressBook
 
-class ChangeEventViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate {
-    
+class ChangeEventViewController: UITableViewController {
     var delegate: ChangeEventViewControllerDelegate?
     
-    // Date used for initialization info
+    // Event data to store
     private var name: String?
     private var dateStart: NSDate?
     private var dateEnd: NSDate?
@@ -31,7 +30,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     @IBOutlet weak var dateStartPickerCell: UITableViewCell!
     @IBOutlet weak var dateEndPickerCell: UITableViewCell!
-    
     
     
     // Text field for event name
@@ -118,7 +116,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         // Disable text field user interaction, needed to allow proper table view row selection
         nameTextField.userInteractionEnabled = false
         
-        // Add listeners for updates
+        // Add targets for updates
         nameTextField.addTarget(self, action: "updateName", forControlEvents: .EditingChanged)
         dateStartPicker.addTarget(self, action: "updateDateStart", forControlEvents: .ValueChanged)
         dateEndPicker.addTarget(self, action: "updateDateEnd", forControlEvents: .ValueChanged)
@@ -694,40 +692,38 @@ extension ChangeEventViewController: UITableViewDelegate {
         let cell = tableView.cellForRowAtIndexPath(indexPath)!
         
         selectedIndexPath = indexPath
-        // Take action based on what section was chosen
+
         switch indexPath.section {
+        // Enable text field
         case sections["Name"]!:
             nameTextField.userInteractionEnabled = true
             nameTextField.becomeFirstResponder()
+        // Show date start picker
         case sections["Start"]!:
             tableView.beginUpdates()
-            // Recalculate height to show date start picker
             if dateStartPickerCell.hidden {
                 dateStartPickerCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
             }
-            //dateStartPickerCell.hidden = false
             tableView.endUpdates()
+        // Show date end picker
         case sections["End"]!:
             tableView.beginUpdates()
             if dateEndPickerCell.hidden {
                 dateEndPickerCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
             }
-            // Recalculate height to show date end picker
-            //dateEndPickerCell.hidden = false
             tableView.endUpdates()
+        // Ensure permission to access address book, then segue to contacts view.
         case sections["Contacts"]!:
-            // Create initial alert notification (first time permission request) for data.
-            
             // Get authorization status
             let authorizationStatus = ABAddressBookGetAuthorizationStatus()
             
             switch authorizationStatus {
-                // If denied, display message for permission.
+            // If denied, display message for permission.
             case .Denied, .Restricted:
                 displayContactsAccessDeniedMessage()
-                // If granted, continue to next view controller for contacts.
+            // If granted, continue to next view controller for contacts.
             case .Authorized:
                 let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
                 
@@ -739,7 +735,7 @@ extension ChangeEventViewController: UITableViewDelegate {
                 self.navigationController?.showViewController(
                     contactsTableViewController, sender: self)
                 
-                // If undetermined, ask for permission.
+            // If undetermined (first time address book request), ask for permission.
             case .NotDetermined:
                 displayContactsAccessRequest()
             }

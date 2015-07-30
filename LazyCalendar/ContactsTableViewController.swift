@@ -86,7 +86,6 @@ class ContactsTableViewController: UITableViewController {
         }
     }
     
-    
     /**
         Sets search enabled. If search is enabled, new contacts can be added. If disabled, only current contacts can be viewed.
     
@@ -95,7 +94,6 @@ class ContactsTableViewController: UITableViewController {
     func setSearchEnabled(enabled: Bool) {
         searchEnabled = enabled
     }
-    
     
     /**
         Filters the search results by the text entered in the search bar.
@@ -163,7 +161,7 @@ class ContactsTableViewController: UITableViewController {
         let text = label.text!
         let searchText = searchController!.searchBar.text
         
-        // Make range
+        // Find range of search text
         let boldRange = text.rangeOfString(searchText, options: .CaseInsensitiveSearch)
         
         // Check if search text is in label (can be in main or details label depending on where search text was found).
@@ -184,6 +182,7 @@ class ContactsTableViewController: UITableViewController {
             // Set text
             label.attributedText = attributedText
         }
+        // If search text is not in label, show label with plain text.
         else {
             label.attributedText = nil
             label.text = text
@@ -300,14 +299,17 @@ extension ContactsTableViewController: UITableViewDataSource {
             let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
             if fullName != nil {
                 cell.textLabel!.text = fullName
+                // Bold search text in name
                 boldSearchTextInLabel(cell.textLabel!)
             }
         }
-            // Show selected records
+        // Show selected records
         else {
             let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row])?.takeRetainedValue() as? String
-            cell.textLabel!.attributedText = nil
-            cell.textLabel!.text = fullName
+            if fullName != nil {
+                cell.textLabel!.attributedText = nil
+                cell.textLabel!.text = fullName
+            }
         }
         
         return cell

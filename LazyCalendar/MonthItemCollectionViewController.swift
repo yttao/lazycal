@@ -204,6 +204,12 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return MonthItemCollectionViewController.numCellsInMonth
     }
+    
+    override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
+        let header = collectionView.dequeueReusableSupplementaryViewOfKind(UICollectionElementKindSectionHeader, withReuseIdentifier: "MonthItemCollectionHeaderView", forIndexPath: indexPath) as! MonthItemCollectionHeaderView
+        header.createConstraints()
+        return header
+    }
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
