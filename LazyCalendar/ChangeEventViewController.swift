@@ -171,7 +171,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         }
     }
     
-    
+    /**
+        On view appearance, update all information in table view.
+    */
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         updateDateStart()
@@ -181,8 +183,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Initializes data with a start date.
+    /**
+        Initializes data with a start date.
+    
+        :param: The date to load initial data.
     */
     func loadData(#dateStart: NSDate) {
         name = nil
@@ -195,8 +199,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Initializes data with a pre-existing event.
+    /**
+        Initializes data with a pre-existing event.
+    
+        :param: The event to edit.
     */
     func loadData(#event: FullEvent) {
         self.event = event
@@ -218,12 +224,12 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Update date start info.
+    /**
+        Update date start info.
     */
     func updateDateStart() {
         dateStart = dateStartPicker.date
-        updateDateStartLabels(dateStart!)
+        updateDateStartLabels()
         updateDateEndPicker(dateStart!)
         if !alarm! {
             resetAlarmTime()
@@ -231,10 +237,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Update date start labels.
+    /**
+        Update date start labels.
     */
-    func updateDateStartLabels(date: NSDate) {
+    func updateDateStartLabels() {
         dateFormatter.dateFormat = "MMM dd, yyyy"
         dateStartMainLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
         
@@ -243,8 +249,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Update date end info.
+    /**
+        Update date end info.
     */
     func updateDateEnd() {
         dateEnd = dateEndPicker.date
@@ -264,9 +270,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief When date start picker is changed, update the minimum date.
-        @discussion The date end picker should not be able to choose a date before the date start, so it should have a lower limit placed on the date it can choose.
+    /**
+        When date start picker is changed, update the minimum date.
+        The date end picker should not be able to choose a date before the date start, so it should have a lower limit placed on the date it can choose.
     */
     func updateDateEndPicker(date: NSDate) {
         let originalDate = dateEndPicker.date
@@ -281,88 +287,18 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Update the alarm time if the alarm is not already set.
+    /**
+        Update the alarm time if the alarm is not already set.
     */
     func resetAlarmTime() {
         alarmTimePicker.date = dateStartPicker.date
         updateAlarmTime()
     }
     
-    
-    /*
-        @brief Number of sections in table view.
-    */
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return sections.count
-    }
-    
-
     /**
-        @brief Performs actions based on selected index path.
-    */
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let cell = tableView.cellForRowAtIndexPath(indexPath)!
+        Displays an alert to request access to contacts.
         
-        selectedIndexPath = indexPath
-        // Take action based on what section was chosen
-        switch indexPath.section {
-        case sections["Name"]!:
-            nameTextField.userInteractionEnabled = true
-            nameTextField.becomeFirstResponder()
-        case sections["Start"]!:
-            tableView.beginUpdates()
-            // Recalculate height to show date start picker
-            if dateStartPickerCell.hidden {
-                dateStartPickerCell.hidden = false
-                tableView.insertRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
-            }
-            //dateStartPickerCell.hidden = false
-            tableView.endUpdates()
-        case sections["End"]!:
-            tableView.beginUpdates()
-            if dateEndPickerCell.hidden {
-                dateEndPickerCell.hidden = false
-                tableView.insertRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
-            }
-            // Recalculate height to show date end picker
-            //dateEndPickerCell.hidden = false
-            tableView.endUpdates()
-        case sections["Contacts"]!:
-            // Create initial alert notification (first time permission request) for data.
-            
-            // Get authorization status
-            let authorizationStatus = ABAddressBookGetAuthorizationStatus()
-            
-            switch authorizationStatus {
-            // If denied, display message for permission.
-            case .Denied, .Restricted:
-                displayContactsAccessDeniedMessage()
-            // If granted, continue to next view controller for contacts.
-            case .Authorized:
-                let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
-                
-                // Load contacts IDs if they exist already.
-                if contactIDs != nil {
-                    contactsTableViewController.loadData(contactIDs!)
-                }
-                
-                self.navigationController?.showViewController(
-                    contactsTableViewController, sender: self)
-                
-            // If undetermined, ask for permission.
-            case .NotDetermined:
-                displayContactsAccessRequest()
-            }
-        default:
-            break
-        }
-    }
-    
-    
-    /*
-        @brief Displays an alert to request access to contacts.
-        @discussion If permission is granted, it adds the address book reference and shows the contacts view controller. If not, it displays an alert to inform the user that access to contacts is denied.
+        If permission is granted, it adds the address book reference and shows the contacts view controller. If not, it displays an alert to inform the user that access to contacts is denied.
     */
     func displayContactsAccessRequest() {
         ABAddressBookRequestAccessWithCompletion(addressBookRef) {
@@ -390,10 +326,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         }
     }
     
-    
-    /*
-        @brief Alerts the user that access to contacts is denied and offers chance to change permissions in settings.
-        @discussion This occurs when the user is first prompted for access and denies access or in future attempts to use contacts when permission is denied.
+    /**
+        Alerts the user that access to contacts is denied and offers chance to change permissions in settings.
+        This occurs when the user is first prompted for access and denies access or in future attempts to use contacts when permission is denied.
     */
     func displayContactsAccessDeniedMessage() {
         // Create alert for contacts access denial
@@ -413,9 +348,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Opens the settings menu.
-        @discussion This is called when contacts access is explicitly denied and the contacts view controller requires contacts access to continue.
+    /**
+        Opens the settings menu.
+        
+        This is called when contacts access is explicitly denied and the contacts view controller requires contacts access to continue.
     */
     func openSettings() {
         let url = NSURL(string: UIApplicationOpenSettingsURLString)
@@ -446,8 +382,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Shows more alarm options
+    /**
+        Show more alarm options
     */
     func showMoreAlarmOptions() {
         tableView.beginUpdates()
@@ -471,7 +407,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     
     
     /**
-        Shows fewer alarm options.
+        Show fewer alarm options.
     */
     func showFewerAlarmOptions() {
         tableView.beginUpdates()
@@ -494,12 +430,17 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         tableView.endUpdates()
     }
     
-    
+    /**
+        Update event name.
+    */
     func updateName() {
         name = nameTextField.text
     }
     
     
+    /**
+        Update alarm time.
+    */
     func updateAlarmTime() {
         alarmTime = alarmTimePicker.date
         updateAlarmTimeLabels()
@@ -517,15 +458,6 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         dateFormatter.dateFormat = "h:mm a"
         alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
     }
-    
-    
-    /**
-        Called on cell deselection (when a different cell is selected)
-    */
-    override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
-        deselectRowAtIndexPath(indexPath)
-    }
-    
     
     /**
         Performs deselection at index path.
@@ -566,39 +498,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         selectedIndexPath = nil
     }
     
-    
-    /**
-    
-    */
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == sections["Start"]! && dateStartPickerCell.hidden {
-            return 1
-        }
-        else if section == sections["End"]! && dateEndPickerCell.hidden {
-            return 1
-        }
-        else if section == sections["Alarm"] && alarmDateToggleCell.hidden && alarmTimeDisplayCell.hidden && alarmTimeDisplayCell.hidden {
-            return 1
-        }
-        return super.tableView(tableView, numberOfRowsInSection: section)
-    }
-    
-    
-    /**
-        Calculates height for rows.
-    */
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        if indexPath == indexPaths["StartPicker"]! ||
-            indexPath == indexPaths["EndPicker"]! ||
-            indexPath == indexPaths["AlarmTimePicker"]! {
-            return PICKER_CELL_HEIGHT
-        }
-        return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
-    }
-    
-    
     /**
         Saves an event's data.
+    
+        :returns: The saved event.
     */
     func saveEvent() -> FullEvent {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -621,6 +524,25 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         else {
             event!.alarmTime = nil
         }
+        
+        addNewContacts()
+        removeOldContacts()
+        
+        // Save event
+        var error: NSError?
+        if !managedContext.save(&error) {
+            NSLog("%@, %@", error!, error!.userInfo!)
+        }
+        
+        return event!
+    }
+    
+    /**
+        Adds new contacts.
+    */
+    func addNewContacts() {
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let managedContext = appDelegate.managedObjectContext!
         
         var eventContacts = event!.mutableSetValueForKey("contacts")
         if contactIDs != nil {
@@ -656,11 +578,9 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                     eventContacts.addObject(contact)
                     
                     var contactEvents = contact.mutableSetValueForKey("events")
-                    if !contactEvents.containsObject(event!) {
-                        contactEvents.addObject(event!)
-                    }
+                    contactEvents.addObject(event!)
                 }
-                // If results returned, contact already exists. Add existing contact to event contacts.
+                    // If results returned, contact already exists. Add existing contact to event contacts.
                 else {
                     let contact = results.first!
                     
@@ -671,6 +591,13 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 }
             }
         }
+    }
+    
+    /**
+        Removes old contacts.
+    */
+    func removeOldContacts() {
+        var eventContacts = event!.mutableSetValueForKey("contacts")
         
         // Check for removed contacts for an edited event and remove them. Also removed the edited event from removed contacts.
         
@@ -690,16 +617,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
             let contactEvents = removedContacts[i].mutableSetValueForKey("events")
             contactEvents.removeObject(event!)
         }
-        
-        // Save event
-        var error: NSError?
-        if !managedContext.save(&error) {
-            NSLog("%@, %@", error!, error!.userInfo!)
-        }
-        
-        return event!
     }
-    
     
     /**
         Updates the contact IDs.
@@ -755,6 +673,114 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
 }
 
+// MARK: - UITableViewDelegate
+extension ChangeEventViewController: UITableViewDelegate {
+    /**
+        If cell contains a date picker, cell height is height of date picker. Otherwise use default cell height.
+    */
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if indexPath == indexPaths["StartPicker"]! ||
+            indexPath == indexPaths["EndPicker"]! ||
+            indexPath == indexPaths["AlarmTimePicker"]! {
+                return PICKER_CELL_HEIGHT
+        }
+        return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
+    }
+    
+    /**
+        Performs actions based on selected index path.
+    */
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let cell = tableView.cellForRowAtIndexPath(indexPath)!
+        
+        selectedIndexPath = indexPath
+        // Take action based on what section was chosen
+        switch indexPath.section {
+        case sections["Name"]!:
+            nameTextField.userInteractionEnabled = true
+            nameTextField.becomeFirstResponder()
+        case sections["Start"]!:
+            tableView.beginUpdates()
+            // Recalculate height to show date start picker
+            if dateStartPickerCell.hidden {
+                dateStartPickerCell.hidden = false
+                tableView.insertRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
+            }
+            //dateStartPickerCell.hidden = false
+            tableView.endUpdates()
+        case sections["End"]!:
+            tableView.beginUpdates()
+            if dateEndPickerCell.hidden {
+                dateEndPickerCell.hidden = false
+                tableView.insertRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
+            }
+            // Recalculate height to show date end picker
+            //dateEndPickerCell.hidden = false
+            tableView.endUpdates()
+        case sections["Contacts"]!:
+            // Create initial alert notification (first time permission request) for data.
+            
+            // Get authorization status
+            let authorizationStatus = ABAddressBookGetAuthorizationStatus()
+            
+            switch authorizationStatus {
+                // If denied, display message for permission.
+            case .Denied, .Restricted:
+                displayContactsAccessDeniedMessage()
+                // If granted, continue to next view controller for contacts.
+            case .Authorized:
+                let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+                
+                // Load contacts IDs if they exist already.
+                if contactIDs != nil {
+                    contactsTableViewController.loadData(contactIDs!)
+                }
+                
+                self.navigationController?.showViewController(
+                    contactsTableViewController, sender: self)
+                
+                // If undetermined, ask for permission.
+            case .NotDetermined:
+                displayContactsAccessRequest()
+            }
+        default:
+            break
+        }
+    }
+    
+    /**
+        Deselect cell when a different cell is selected.
+    */
+    override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
+        deselectRowAtIndexPath(indexPath)
+    }
+}
+
+// MARK: - UITableViewDataSource
+extension ChangeEventViewController: UITableViewDataSource {
+    /**
+        Number of sections in table view.
+    */
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return sections.count
+    }
+    
+    /**
+        If the date start or end is not selected, show only the time display and not the picker. If the alarm is off, show only the alarm toggle cell.
+    */
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == sections["Start"]! && dateStartPickerCell.hidden {
+            return 1
+        }
+        else if section == sections["End"]! && dateEndPickerCell.hidden {
+            return 1
+        }
+        else if section == sections["Alarm"] && alarmDateToggleCell.hidden && alarmTimeDisplayCell.hidden && alarmTimeDisplayCell.hidden {
+            return 1
+        }
+        return super.tableView(tableView, numberOfRowsInSection: section)
+    }
+}
 
 /**
     Delegate protocol for ChangeEventViewController.
