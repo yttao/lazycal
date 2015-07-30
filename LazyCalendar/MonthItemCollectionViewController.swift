@@ -44,15 +44,20 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     private var monthStartWeekday = 0
     // Keeps track of current date view components
     
+    private var headerHeight: CGFloat?
+    
     /**
         Set delegate and data source.
     */
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         collectionView!.delegate = self
         collectionView!.dataSource = self
+        
+        collectionView!.scrollEnabled = false
+        
     }
-    
     
     // Loads initial data to use
     func loadData(components: NSDateComponents) {
@@ -178,6 +183,15 @@ extension MonthItemCollectionViewController: UICollectionViewDelegate {
     override func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
         deselectSelectedCell()
     }
+    
+    /**
+        When header view is about to be displayed, recalculate cell heights to accomodate header height.
+    */
+    override func collectionView(collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, atIndexPath indexPath: NSIndexPath) {
+        let header = collectionView.dequeueReusableSupplementaryViewOfKind(UICollectionElementKindSectionHeader, withReuseIdentifier: "MonthItemCollectionHeaderView", forIndexPath: indexPath) as! MonthItemCollectionHeaderView
+        headerHeight = header.frame.height
+        collectionView.reloadSections(NSIndexSet(index: indexPath.section))
+    }
 }
 
 // MARK: - UICollectionViewDataSource
@@ -206,9 +220,10 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
     }
     
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
-        let header = collectionView.dequeueReusableSupplementaryViewOfKind(UICollectionElementKindSectionHeader, withReuseIdentifier: "MonthItemCollectionHeaderView", forIndexPath: indexPath) as! MonthItemCollectionHeaderView
-        header.createConstraints()
-        return header
+        let header = collectionView.dequeueReusableSupplementaryViewOfKind(UICollectionElementKindSectionHeader, withReuseIdentifier: "MonthItemCollectionHeaderView", forIndexPath: indexPath) as? MonthItemCollectionHeaderView
+        println(indexPath)
+        header!.createConstraints()
+        return header!
     }
 }
 
@@ -220,10 +235,18 @@ extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout 
         Note: due to the iOS Simulator, the rightmost cell is cut off slightly because it has a scrollbar. The sizing is correct on an actual device.
     */
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.size.width /
-            CGFloat(MonthItemCollectionViewController.numDaysInWeek),
-            height: (collectionView.bounds.size.height) /
-                CGFloat(MonthItemCollectionViewController.numWeeksInMonth))
+        if headerHeight == nil {
+            return CGSize(width: collectionView.bounds.size.width /
+                CGFloat(MonthItemCollectionViewController.numDaysInWeek),
+                height: (collectionView.bounds.size.height) /
+                    CGFloat(MonthItemCollectionViewController.numWeeksInMonth))
+        }
+        else {
+            return CGSize(width: collectionView.bounds.size.width /
+                CGFloat(MonthItemCollectionViewController.numDaysInWeek),
+                height: (collectionView.bounds.size.height - headerHeight!) /
+                    CGFloat(MonthItemCollectionViewController.numWeeksInMonth))
+        }
     }
     
     /**

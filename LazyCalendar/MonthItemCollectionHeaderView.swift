@@ -26,14 +26,15 @@ class MonthItemCollectionHeaderView: UICollectionReusableView {
     }
     
     func createConstraints() {
-        println("CREATE CONSTRAINTS")
+        // Allow custom constraints to be added
+        weekdayLabels[0].setTranslatesAutoresizingMaskIntoConstraints(false)
+        
         let widthConstraint = NSLayoutConstraint(item: weekdayLabels[0], attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: self.frame.width / 7)
-        
         let heightConstraint = NSLayoutConstraint(item: weekdayLabels[0], attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: self.frame.size.height)
-        
         let leadingConstraint = NSLayoutConstraint(item: weekdayLabels[0], attribute: .Leading, relatedBy: .Equal, toItem: self, attribute: .Leading, multiplier: 1.0, constant: 0)
-        
+        let centerXConstraint = NSLayoutConstraint(item: weekdayLabels[0], attribute: .CenterX, relatedBy: .Equal, toItem: self, attribute: .CenterX, multiplier: 1.0, constant: 0)
         let centerYConstraint = NSLayoutConstraint(item: weekdayLabels[0], attribute: .CenterY, relatedBy: .Equal, toItem: self, attribute: .CenterY, multiplier: 1.0, constant: 0)
+        
         weekdayLabels[0].addConstraint(widthConstraint)
         weekdayLabels[0].addConstraint(heightConstraint)
         self.addConstraint(leadingConstraint)
@@ -42,7 +43,6 @@ class MonthItemCollectionHeaderView: UICollectionReusableView {
     
     // Adds labels as subviews
     private func addLabels() {
-        println("ADD LABELS")
         
         //for label in weekdayLabels {
         //    self.addSubview(label)

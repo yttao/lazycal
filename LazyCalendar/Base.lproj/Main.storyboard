@@ -112,21 +112,7 @@
                         <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MonthItemCollectionHeaderView" id="lPe-fG-aLl" customClass="MonthItemCollectionHeaderView" customModule="LazyCalendar" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="0.0" width="600" height="50"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <subviews>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bjz-o7-krC">
-                                    <rect key="frame" x="0.0" y="14" width="42" height="21"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="42" id="eh0-sD-GJs"/>
-                                    </constraints>
-                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                    <nil key="highlightedColor"/>
-                                </label>
-                            </subviews>
-                            <constraints>
-                                <constraint firstItem="bjz-o7-krC" firstAttribute="centerY" secondItem="lPe-fG-aLl" secondAttribute="centerY" id="cf0-hy-sNJ"/>
-                                <constraint firstItem="bjz-o7-krC" firstAttribute="leading" secondItem="lPe-fG-aLl" secondAttribute="leading" id="lEB-jg-XRA"/>
-                            </constraints>
+                            <color key="backgroundColor" white="1" alpha="0.90000000000000002" colorSpace="calibratedWhite"/>
                         </collectionReusableView>
                         <connections>
                             <outlet property="dataSource" destination="pQA-1g-TTb" id="uZc-fE-1Qp"/>
