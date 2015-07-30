@@ -9,14 +9,10 @@
 import UIKit
 
 class MonthItemCollectionViewController: UICollectionViewController, UICollectionViewDataSource, UICollectionViewDelegate {
-    
     var delegate: MonthItemCollectionViewControllerDelegate?
     
     var dateIndex: NSDate?
     var dateComponents: NSDateComponents?
-    
-    // Parent view controller
-    private var monthItemViewController: MonthItemViewController?
     
     // 7 days in a week
     private static let numDaysInWeek = 7
@@ -47,13 +43,10 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     // Start weekday
     private var monthStartWeekday = 0
     // Keeps track of current date view components
-
     
-    required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    // Loads initial data
+    /**
+        Set delegate and data source.
+    */
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView!.delegate = self
@@ -62,8 +55,7 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     
     
     // Loads initial data to use
-    func loadData(components: NSDateComponents, delegate: MonthItemCollectionViewControllerDelegate) {
-        self.delegate = delegate
+    func loadData(components: NSDateComponents) {
         // Copy datecomponents to prevent unexpected changes
         self.dateComponents = components.copy() as? NSDateComponents
         
@@ -81,34 +73,88 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         }
     }
     
-    
-    // Determines number of items in month
-    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return MonthItemCollectionViewController.numCellsInMonth
+    /**
+        Resets collection view selection by calling `deselectSelectedCell()` to deselect the currently selected cell and setting date components to the first day in the month.
+    */
+    func clearSelected() {
+        deselectSelectedCell()
+        dateComponents!.day = 1
+        dateComponents = getNewDateComponents(dateComponents!)
     }
     
     
-    // Makes cell with day number shown
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CalendarCollectionViewCell
-        
-        // Set day number for cell (if it is a valid cell in that month
-        if let day = daysInMonth[indexPath.row] {
-            cell.dayLabel.text = String(day)
-        }
-        else {
-            cell.dayLabel.text = nil
-        }
-        
-        return cell
+    /**
+        Selects the specified cell.
+    
+        :param: cell The cell to select.
+    */
+    func selectCell(cell: CalendarCollectionViewCell) {
+        cell.backgroundColor = selectedColor
+        selectedCell = cell
     }
     
     
-    // Called on selection of day cell in month
+    /**
+        Deselects the currently selected cell.
+    */
+    func deselectSelectedCell() {
+        if let cell = selectedCell {
+            cell.backgroundColor = backgroundColor
+            selectedCell = nil
+        }
+    }
+    
+    
+    /**
+        Gets the first weekday of the month.
+    
+        :param: components The date components of the month.
+    
+        :returns: The month start weekday as an int from 1 (Sunday) to 7 (Saturday).
+    */
+    func getMonthStartWeekday(components: NSDateComponents) -> Int {
+        let componentsCopy = components.copy() as! NSDateComponents
+        componentsCopy.day = 1
+        let startMonthDate = calendar.dateFromComponents(componentsCopy)
+        let startMonthDateComponents = calendar.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
+        return startMonthDateComponents.weekday
+    }
+    
+    
+    /*
+        Returns new date components after components have been modified.
+    
+        :param: components The date components to recalculate.
+    
+        :return The new date components.
+    */
+    func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
+        let newDate = calendar.dateFromComponents(components)
+        return calendar.components(units, fromDate: newDate!)
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+extension MonthItemCollectionViewController: UICollectionViewDelegate {
+    /**
+        Day cells are selectable only if they are a valid day cell.
+    */
+    override func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
+        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
+        
+        if cell.dayLabel.text != nil {
+            return true
+        }
+        return false
+    }
+    
+    /**
+        Called on selection of day cell in month.
+    */
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         // Check if old selected cell has been properly deselected (fix to small bug when viewing selected event details)
         deselectSelectedCell()
-
+        
         // Get cell
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         
@@ -126,86 +172,46 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         delegate?.monthItemCollectionViewControllerDidChangeSelectedDate(selectedDate)
     }
     
-    
-    // Day cells are selectable only if they are a valid day cell
-    override func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-        let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
-        
-        if cell.dayLabel.text != nil {
-            return true
-        }
-        return false
-    }
-    
-    
-    // Called on deselection of day cell in month
+    /**
+        Called on deselection of day cell in month.
+    */
     override func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
         deselectSelectedCell()
     }
-    
-    
-    // Clears current selection
-    func clearSelected() {
-        deselectSelectedCell()
+}
+
+// MARK: - UICollectionViewDataSource
+extension MonthItemCollectionViewController: UICollectionViewDataSource {
+    /**
+        Makes cell with day number shown.
+    */
+    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CalendarCollectionViewCell
         
-        // Reset date components to day 1
-        dateComponents!.day = 1
-        dateComponents = getNewDateComponents(dateComponents!)
-    }
-    
-    
-    func selectCell(cell: CalendarCollectionViewCell) {
-        cell.backgroundColor = selectedColor
-        selectedCell = cell
-    }
-    
-    
-    /*
-        @brief Deselects the currently selected cell.
-    */
-    func deselectSelectedCell() {
-        if let cell = selectedCell {
-            cell.backgroundColor = backgroundColor
-            selectedCell = nil
+        // Set day number for cell (if it is a valid cell in that month
+        if let day = daysInMonth[indexPath.row] {
+            cell.dayLabel.text = String(day)
         }
+        else {
+            cell.dayLabel.text = nil
+        }
+        
+        return cell
     }
-    
-    
-    /*
-        @brief Gets the first weekday of the month
-        @param components The date components of the month.
+    /**
+        Determines number of items in month.
     */
-    func getMonthStartWeekday(components: NSDateComponents) -> Int {
-        let componentsCopy = components.copy() as! NSDateComponents
-        componentsCopy.day = 1
-        let startMonthDate = calendar.dateFromComponents(componentsCopy)
-        let startMonthDateComponents = calendar.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
-        return startMonthDateComponents.weekday
-    }
-    
-    
-    /*
-        @brief Returns new date components after components have been modified.
-        @param components The components to recalculate
-        @return The new date components.
-    */
-    func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
-        let newDate = calendar.dateFromComponents(components)
-        return calendar.components(units, fromDate: newDate!)
+    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return MonthItemCollectionViewController.numCellsInMonth
     }
 }
 
-
-/**
-    Handles cell sizing and spacing.
-    
-    The `MonthItemCollectionView` should take up the top half of the screen.
-*/
+// MARK: - UICollectionViewDelegateFlowLayout
 extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout {
-    
-    /*
-        @brief Determines size of one cell.
-        @discussion Note: due to the iOS Simulator, the rightmost cell is cut off slightly because it has a scrollbar. The sizing is correct on an actual device.
+    /**
+        Determines size of one cell.
+        
+        Note: due to the iOS Simulator, the rightmost cell is cut off slightly because it has a scrollbar. The sizing is correct on an actual device.
     */
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         return CGSize(width: collectionView.bounds.size.width /
@@ -214,22 +220,27 @@ extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout 
                 CGFloat(MonthItemCollectionViewController.numWeeksInMonth))
     }
     
-    // Determines spacing between cells (none)
+    /**
+        Determines spacing between cells (none).
+    */
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
         return 0
     }
     
-    // Determines sizing between sections (none)
+    /** 
+        Determines sizing between sections (none).
+    */
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
         return 0
     }
     
-    // Determines inset for section (none)
+    /**
+        Determines inset for section (none).
+    */
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
         return UIEdgeInsetsZero
     }
 }
-
 
 /**
     Delegate protocol for `MonthItemCollectionViewController`.

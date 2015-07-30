@@ -23,7 +23,6 @@ class FullEvent: NSManagedObject {
     @NSManaged var contacts: NSSet
 }
 
-
 class Contact: NSManagedObject {
     @NSManaged var id: Int32
     
@@ -32,7 +31,6 @@ class Contact: NSManagedObject {
     
     @NSManaged var events: NSSet
 }
-
 
 class TestEvent: NSManagedObject {
     @NSManaged var name: String?

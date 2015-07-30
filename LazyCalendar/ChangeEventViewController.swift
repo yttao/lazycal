@@ -20,7 +20,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     private var dateEnd: NSDate?
     private var alarm: Bool?
     private var alarmTime: NSDate?
-    private var contactsIDs: [ABRecordID]?
+    private var contactIDs: [ABRecordID]?
     
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
@@ -191,7 +191,7 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         dateEnd = dateStart.dateByAddingTimeInterval(hour)
         alarm = false
         alarmTime = dateStart
-        contactsIDs = nil
+        contactIDs = nil
     }
     
     
@@ -209,10 +209,10 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         // Load contacts IDs
         let contactsSet = event.contacts
         if contactsSet.count > 0 && ABAddressBookGetAuthorizationStatus() == .Authorized {
-            contactsIDs = [ABRecordID]()
+            contactIDs = [ABRecordID]()
             for contact in contactsSet {
                 let c = contact as! Contact
-                contactsIDs!.append(c.id)
+                contactIDs!.append(c.id)
             }  
         }
     }
@@ -343,8 +343,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                 let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
                 
                 // Load contacts IDs if they exist already.
-                if contactsIDs != nil {
-                    contactsTableViewController.loadData(contactsIDs!)
+                if contactIDs != nil {
+                    contactsTableViewController.loadData(contactIDs!)
                 }
                 
                 self.navigationController?.showViewController(
@@ -375,8 +375,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
                     let contactsTableViewController = self.storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
                     // Load contacts IDs if they exist already.
                     
-                    if self.contactsIDs != nil {
-                        contactsTableViewController.loadData(self.contactsIDs!)
+                    if self.contactIDs != nil {
+                        contactsTableViewController.loadData(self.contactIDs!)
                     }
                     
                     self.navigationController!.showViewController(
@@ -623,11 +623,11 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         }
         
         var eventContacts = event!.mutableSetValueForKey("contacts")
-        if contactsIDs != nil {
-            for (var i = 0; i < contactsIDs!.count; i++) {
-                let contactID = contactsIDs![i]
+        if contactIDs != nil {
+            for (var i = 0; i < contactIDs!.count; i++) {
+                let contactID = contactIDs![i]
                 
-                let record: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, contactsIDs![i])?.takeUnretainedValue()
+                let record: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, contactIDs![i])?.takeUnretainedValue()
                 
                 let firstName = ABRecordCopyValue(record, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
                 let lastName = ABRecordCopyValue(record, kABPersonLastNameProperty)?.takeRetainedValue() as? String
@@ -679,7 +679,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
         for contact in eventContacts {
             let c = contact as! Contact
             let id = c.id
-            if !contains(contactsIDs!, id) {
+            // Check if the new list of contact IDs contains the old contact ID
+            if !contains(contactIDs!, id) {
                 removedContacts.append(c)
             }
         }
@@ -700,12 +701,12 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     }
     
     
-    /*
-        @brief Updates the contacts IDs
-        @param contacts The contacts IDs that were selected.
+    /**
+        Updates the contact IDs.
+        :param: contacts The contacts IDs that were selected.
     */
-    func updateContacts(contactsIDs: [ABRecordID]) {
-        self.contactsIDs = contactsIDs
+    func updateContacts(contactIDs: [ABRecordID]) {
+        self.contactIDs = contactIDs
         updateContactsDetailsLabel()
     }
     
@@ -717,8 +718,8 @@ class ChangeEventViewController: UITableViewController, UITableViewDataSource, U
     */
     func updateContactsDetailsLabel() {
         let contactCell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
-        if contactsIDs != nil && contactsIDs!.count > 0 {
-            contactCell?.detailTextLabel?.text = "\(contactsIDs!.count)"
+        if contactIDs != nil && contactIDs!.count > 0 {
+            contactCell?.detailTextLabel?.text = "\(contactIDs!.count)"
         }
         else {
             contactCell?.detailTextLabel?.text = nil

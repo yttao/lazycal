@@ -9,33 +9,24 @@
 import UIKit
 import CoreData
 
-class MonthItemTableViewController: UITableViewController, UITableViewDataSource, UITableViewDelegate, SelectEventTableViewControllerDelegate {
-    
+class MonthItemTableViewController: UITableViewController {
     var date: NSDate?
     // The events for selected day
     private var events = [FullEvent]()
-    
-    private var selectedEvent: FullEvent?
+
     // Reuse identifier for cells
     private let reuseIdentifier = "EventCell"
     // Name of entity to retrieve data from.
     private let entityName = "FullEvent"
-    // Cell height
-    private let cellHeight = UITableViewCell().frame.height
     
     private var selectEventTableViewController: SelectEventTableViewController?
     
-    private let selectEventSegueIdentifier = "SelectEventSegue"
+    private let segueIdentifier = "SelectEventSegue"
     
-    
-    required init(coder aDecoder: NSCoder!) {
-        super.init(coder: aDecoder)
-    }
-    
-    
-    /*
-        @brief Initialize table view.
-        @discussion Set data source and delegate to self.
+    /**
+        Initialize table view.
+        
+        Set data source and delegate to self.
     */
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,125 +37,15 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         showEvents(date!)
     }
     
-
-    /*
-        @brief Determines the number of sections in the table.
+    /**
+    
     */
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
+    func reloadEvents() {
+        showEvents(date!)
     }
     
-
-    /*
-        @brief Determines the number of rows in the table (equals the number of events on that day).
-    */
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return events.count
-    }
-    
-    
-    /*
-        @brief Shows the event name and date start to date end.
-        @discussion The event name appears in the event main label and the date in the details label.
-    */
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
-        let event = events[indexPath.row]
-        if let name = event.name {
-            cell.textLabel?.text = name
-        }
-        else {
-            cell.textLabel?.text = nil
-        }
-        
-        return cell
-    }
-    
-    
-    /*
-        @brief Allow table cells to be deleted.
-        @discussion Note: If tableView.editing = true, the left circular edit option will appear.
-    */
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return true
-    }
-    
-    
-    /*
-        @brief If delete is pressed on swipe left, delete the event.
-    */
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == UITableViewCellEditingStyle.Delete {
-            
-            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            let managedContext = appDelegate.managedObjectContext!
-            
-            let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
-            let event = events[indexPath.row]
-
-            // Delete event
-            managedContext.deleteObject(event)
-            
-            // Save changes
-            var error: NSError?
-            if !managedContext.save(&error) {
-                assert(false, "Could not save \(error), \(error?.userInfo)")
-            }
-            
-            // Remove event from list and table view
-            tableView.beginUpdates()
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-            events.removeAtIndex(indexPath.row)
-            tableView.endUpdates()
-        }
-    }
-    
-    
-    /*
-        @brief Gives option to delete event.
-    */
-    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-        return UITableViewCellEditingStyle.Delete
-    }
-    
-    
-    /*
-        @brief Prevents indenting for showing circular edit button on the left when editing.
-    */
-    override func tableView(tableView: UITableView, shouldIndentWhileEditingRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return false
-    }
-    
-    
-    /*
-        @brief Cells cannot be reordered (set to chronological order for now).
-    */
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return false
-    }
-    
-    
-    /*
-        @brief On cell selection, pull up table view to show more information.
-    */
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let event = events[indexPath.row]
-        selectedEvent = event
-        
-        selectEventTableViewController!.loadData(event)
-    }
-    
-    
-    /*
-        @brief Cell heights are standard table view cell heights.
-    */
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return cellHeight
-    }
-    
-    
-    /*
-        @brief Show events in table form for a date.
+    /**
+        Show events in table form for a date.
     */
     func showEvents(date: NSDate) {
         self.date = date
@@ -188,7 +69,7 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
         // Upper limit on date of events is midnight of next day (not inclusive)
         let upperDate: NSDate = lowerDate.dateByAddingTimeInterval(fullDay)
         
-        // Requirements to show an event: the time interval from dateStart to dateEnd must fall between lowerDate and upperDate
+        // To show an event, the time interval from dateStart to dateEnd must fall between lowerDate and upperDate.
         // (dateStart >= lower && dateStart < upper) || (dateEnd >= lower && dateEnd < upper) || (dateStart < lower && dateEnd >= lower) || (dateStart < upper && dateEnd >= upper)
         let requirements = "(dateStart >= %@ && dateStart < %@) || (dateEnd >= %@ && dateEnd < %@) || (dateStart <= %@ && dateEnd >= %@) || (dateStart <= %@ && dateEnd >= %@)"
         let predicate = NSPredicate(format: requirements, lowerDate, upperDate, lowerDate, upperDate, lowerDate, lowerDate, upperDate, upperDate)
@@ -209,33 +90,138 @@ class MonthItemTableViewController: UITableViewController, UITableViewDataSource
     }
     
     
-    /*
-        @brief Initializes information on segue to event details view.
+    /**
+        Initializes information on segue to selected event details view.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let identifier = segue.identifier {
-            switch identifier {
-            case selectEventSegueIdentifier:
-                let selectEventNavigationController = segue.destinationViewController as! UINavigationController
-                selectEventTableViewController = selectEventNavigationController.viewControllers.first as? SelectEventTableViewController
-                selectEventTableViewController!.delegate = self
-            default:
-                break
-            }
+        if segue.identifier != nil && segue.identifier == segueIdentifier {
+            let selectEventNavigationController = segue.destinationViewController as! UINavigationController
+            selectEventTableViewController = selectEventNavigationController.viewControllers.first as? SelectEventTableViewController
+            selectEventTableViewController!.delegate = self
         }
     }
     
-    /*
-        @brief Leaves event details back to main view.
+    /**
+        Leaves event details back to main view.
     */
     @IBAction func leaveEventDetails(segue: UIStoryboardSegue) {
     }
+}
+
+// MARK: - UITableViewDelegate
+extension MonthItemTableViewController: UITableViewDelegate {
+    /**
+        Prevents indenting for showing circular edit button on the left when editing.
+    */
+    override func tableView(tableView: UITableView, shouldIndentWhileEditingRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return false
+    }
+    /**
+        Gives option to delete event.
+    */
+    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
+        return UITableViewCellEditingStyle.Delete
+    }
     
+    /**
+        On cell selection, pull up table view to show more information.
+    */
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let event = events[indexPath.row]
+        
+        selectEventTableViewController!.loadData(event)
+    }
+}
+
+// MARK: - UITableViewDataSource
+extension MonthItemTableViewController: UITableViewDataSource {
+    /**
+        There is 1 section in the table.
+    */
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 1
+    }
     
-    /*
-        @brief On changing event, update events for current table view.
+    /**
+        Determines the number of rows in the table (equals the number of events on that day).
+    */
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return events.count
+    }
+    
+    /**
+        Allow table cells to be deleted.
+    
+        Note: If tableView.editing = true, the left circular edit option will appear.
+    */
+    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+    
+    /**
+        If delete is pressed on swipe left, delete the event.
+    */
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == UITableViewCellEditingStyle.Delete {
+            
+            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            let managedContext = appDelegate.managedObjectContext!
+            
+            let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
+            let event = events[indexPath.row]
+            
+            // Delete event
+            managedContext.deleteObject(event)
+            
+            // Save changes
+            var error: NSError?
+            if !managedContext.save(&error) {
+                assert(false, "Could not save \(error), \(error?.userInfo)")
+            }
+            
+            // Remove event from array and table view
+            tableView.beginUpdates()
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+            events.removeAtIndex(indexPath.row)
+            tableView.endUpdates()
+        }
+    }
+    
+    /**
+        Shows the event name and date start to date end.
+        
+        The event name appears in the event main label and the date in the details label.
+    */
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
+        let event = events[indexPath.row]
+        if let name = event.name {
+            cell.textLabel?.text = name
+        }
+        else {
+            cell.textLabel?.text = nil
+        }
+        
+        return cell
+    }
+}
+
+// MARK: - SelectEventTableViewControllerDelegate
+extension MonthItemTableViewController: SelectEventTableViewControllerDelegate {
+    /**
+        On changing event, update events for current table view.
     */
     func selectEventTableViewControllerDidChangeEvent(event: FullEvent) {
+        showEvents(date!)
+    }
+}
+
+// MARK: - ChangeEventViewControllerDelegate
+extension MonthItemTableViewController: ChangeEventViewControllerDelegate {
+    /**
+        On changing event, update events for current table view.
+    */
+    func changeEventViewControllerDidSaveEvent(event: FullEvent) {
         showEvents(date!)
     }
 }

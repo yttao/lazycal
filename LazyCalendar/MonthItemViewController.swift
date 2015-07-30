@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class MonthItemViewController: UIViewController, MonthItemCollectionViewControllerDelegate, ChangeEventViewControllerDelegate, MonthItemPageViewControllerDelegate {
+class MonthItemViewController: UIViewController {
     @IBOutlet weak var monthItemPageViewContainer: UIView!
     @IBOutlet weak var monthItemTableViewContainer: UIView!
     
@@ -80,15 +80,16 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
                 let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
                 // Set initial date information for event
                 addEventViewController.loadData(dateStart: initialDate!)
-                addEventViewController.delegate = self
+                // Delegate to be informed of new event is table view.
+                addEventViewController.delegate = monthItemTableViewController
             case pageViewSegueIdentifier:
                 monthItemPageViewController = segue.destinationViewController as? MonthItemPageViewController
                 monthItemPageViewController!.monthItemViewController = self
                 monthItemPageViewController!.customDelegate = self
-                loadNavigationTitle(monthItemPageViewController!.dateComponents!)
+                loadNavigationTitle(monthItemPageViewController!.dateComponents)
             case tableViewSegueIdentifier:
                 monthItemTableViewController = segue.destinationViewController as? MonthItemTableViewController
-                monthItemTableViewController!.date = NSCalendar.currentCalendar().dateFromComponents(monthItemPageViewController!.dateComponents!)
+                monthItemTableViewController!.date = NSCalendar.currentCalendar().dateFromComponents(monthItemPageViewController!.dateComponents)
                 break
             default:
                 break
@@ -97,37 +98,42 @@ class MonthItemViewController: UIViewController, MonthItemCollectionViewControll
         
     }
     
-    
-    func monthItemPageViewControllerDidChangeCurrentViewController(monthItemCollectionViewController: MonthItemCollectionViewController) {
-        self.monthItemCollectionViewController = monthItemCollectionViewController
-        loadNavigationTitle(monthItemCollectionViewController.dateComponents!)
-        if monthItemTableViewController != nil {
-            monthItemTableViewController!.showEvents(
-                monthItemCollectionViewController.dateIndex!)
-        }
-    }
-    
-    
-    func monthItemCollectionViewControllerDidChangeSelectedDate(date: NSDate) {
-        // On date selection, show events for that date
-        monthItemTableViewController!.showEvents(date)
-    }
-    
-    
     /*
         @brief After saving an event, show the new event if it is in the current table view.
-    */
+
     func changeEventViewControllerDidSaveEvent(event: FullEvent) {
         let selectedDate = NSCalendar.currentCalendar().dateFromComponents(monthItemCollectionViewController!.dateComponents!)
         monthItemTableViewController!.showEvents(selectedDate!)
-    }
+    }*/
     
 
     @IBAction func saveEvent(segue: UIStoryboardSegue) {
-        monthItemTableViewController!.tableView!.reloadData()
+        monthItemTableViewController!.reloadEvents()
     }
     
     
     @IBAction func cancelEvent(segue: UIStoryboardSegue) {
+    }
+}
+
+extension MonthItemViewController: MonthItemCollectionViewControllerDelegate {
+    /**
+        On date selection, show events for that date.
+        
+        :param: date The currently selected date.
+    */
+    func monthItemCollectionViewControllerDidChangeSelectedDate(date: NSDate) {
+        monthItemTableViewController!.showEvents(date)
+    }
+}
+
+// MARK: - MonthItemPageViewControllerDelegate
+extension MonthItemViewController: MonthItemPageViewControllerDelegate {
+    func monthItemPageViewControllerDidChangeCurrentViewController(monthItemCollectionViewController: MonthItemCollectionViewController) {
+        self.monthItemCollectionViewController = monthItemCollectionViewController
+        loadNavigationTitle(monthItemCollectionViewController.dateComponents!)
+        if monthItemTableViewController != nil {
+            monthItemTableViewController!.showEvents(monthItemCollectionViewController.dateIndex!)
+        }
     }
 }

@@ -8,30 +8,34 @@
 
 import UIKit
 
-class MonthItemPageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+class MonthItemPageViewController: UIPageViewController {
     
     var customDelegate: MonthItemPageViewControllerDelegate?
     
-    private var calendar: NSCalendar?
+    private let calendar = NSCalendar.currentCalendar()
     // Keeps track of current date view
-    var dateComponents: NSDateComponents?
+    var dateComponents: NSDateComponents
     // Calendar units to keep track of
     private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
         NSCalendarUnit.CalendarUnitYear
     
     var monthItemViewController: MonthItemViewController?
-    var currentViewController: MonthItemCollectionViewController? {
+    
+    private var currentViewController: MonthItemCollectionViewController? {
         didSet {
             customDelegate?.monthItemPageViewControllerDidChangeCurrentViewController(currentViewController!)
         }
     }
     
-    // Initialize calendar, start date, and date components for start date
+    /**
+        Initialize date components for start date.
+    */
     required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        dateComponents = calendar.components(units, fromDate: NSDate())
         
-        calendar = NSCalendar.currentCalendar()
-        dateComponents = calendar!.components(units, fromDate: NSDate())
+        super.init(coder: aDecoder)
+        // calendar = NSCalendar.currentCalendar()
+        //dateComponents = calendar.components(units, fromDate: NSDate())
     }
     
     
@@ -45,69 +49,71 @@ class MonthItemPageViewController: UIPageViewController, UIPageViewControllerDat
         initializePageViewController()
     }
     
-    
-    // Moves date components to the next month
-    func goToNextMonth() {
-        dateComponents!.month++
-        dateComponents!.day = 1
-        dateComponents = getNewDateComponents(dateComponents!)
-    }
-    
-    
-    // Moves date components to the previous month
-    func goToPrevMonth() {
-        dateComponents!.month--
-        dateComponents!.day = 1
-        dateComponents = getNewDateComponents(dateComponents!)
-    }
-    
-    
-    // Recalculates components after fields have been changed in components
-    func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
-        let newDate = calendar!.dateFromComponents(components)
-        return calendar!.components(units, fromDate: newDate!)
-    }
-    
-    
-    // Creates first page view controller with month as this month
+    /**
+        Creates first page view controller with month as this month
+    */
     private func initializePageViewController() {
         // Make first view controller
-        let firstController = getMonthItemCollectionViewController(dateComponents!)
+        let firstController = getMonthItemCollectionViewController(dateComponents)
         
         currentViewController = firstController
         
         let startingViewController = [firstController]
-        // Set initial view controller
         self.setViewControllers(startingViewController, direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
+    }
+    
+    /**
+        Update information to progress to the next month.
+    */
+    func goToNextMonth() {
+        dateComponents.month++
+        dateComponents.day = 1
+        dateComponents = getNewDateComponents(dateComponents)
     }
     
     
     /**
-        Previous view controller is for previous month.
+        Update information to return to the previous month.
     */
-    func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        // Create components for previous month
-        let components = dateComponents!.copy() as! NSDateComponents
-        components.month--
-        components.day = 1
-        let newComponents = getNewDateComponents(components)
-        
-        return getMonthItemCollectionViewController(newComponents)
+    func goToPrevMonth() {
+        dateComponents.month--
+        dateComponents.day = 1
+        dateComponents = getNewDateComponents(dateComponents)
     }
     
     
-    // Next view controller is for next month
-    func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
-        // Create components for next month
-        let components = dateComponents!.copy() as! NSDateComponents
-        components.month++
-        components.day = 1
-        let newComponents = getNewDateComponents(components)
-        
-        return getMonthItemCollectionViewController(newComponents)
+    /**
+        Recalculates date components after date component fields have been modified.
+    
+        :param: components The date components to be updated.
+    
+        :returns: The new date components.
+    */
+    func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
+        let newDate = calendar.dateFromComponents(components)
+        return calendar.components(units, fromDate: newDate!)
     }
+    
+    /**
+        Creates a new `MonthItemCollectionViewController` for a month view.
+    
+        :param: components The date components used to construct the month and load month data.
+    
+        :returns: The `MonthItemCollectionViewController` that displays the month view.
+    */
+    private func getMonthItemCollectionViewController(components: NSDateComponents) -> MonthItemCollectionViewController {
+        // Instantiate copy of prefab view controller
+        let monthItemCollectionViewController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemCollectionViewController") as! MonthItemCollectionViewController
+        // Load data
+        monthItemCollectionViewController.loadData(components)
+        monthItemCollectionViewController.delegate = monthItemViewController
+        
+        return monthItemCollectionViewController
+    }
+}
 
-    
+// MARK: - UIPageViewControllerDelegate
+extension MonthItemPageViewController: UIPageViewControllerDelegate {
     /**
         After scrolling, switch months.
     
@@ -131,22 +137,34 @@ class MonthItemPageViewController: UIPageViewController, UIPageViewControllerDat
                 oldMonth.clearSelected()
         }
     }
-    
+}
+
+// MARK: - UIPageViewControllerDataSource
+extension MonthItemPageViewController: UIPageViewControllerDataSource {
+    /**
+        Previous view controller is for previous month.
+    */
+    func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
+        // Create components for previous month
+        let components = dateComponents.copy() as! NSDateComponents
+        components.month--
+        components.day = 1
+        let newComponents = getNewDateComponents(components)
+        
+        return getMonthItemCollectionViewController(newComponents)
+    }
     
     /**
-        Creates a new `MonthItemCollectionViewController`.
-    
-        :param: components The date components used to construct the month and load month data.
-    
-        :returns: The `MonthItemCollectionViewController` that displays the month view.
+        Next view controller is for next month.
     */
-    private func getMonthItemCollectionViewController(components: NSDateComponents) -> MonthItemCollectionViewController {
-        // Instantiate copy of prefab view controller
-        let monthItemCollectionViewController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemCollectionViewController") as! MonthItemCollectionViewController
-        // Load data
-        monthItemCollectionViewController.loadData(components, delegate: monthItemViewController!)
+    func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
+        // Create components for next month
+        let components = dateComponents.copy() as! NSDateComponents
+        components.month++
+        components.day = 1
+        let newComponents = getNewDateComponents(components)
         
-        return monthItemCollectionViewController
+        return getMonthItemCollectionViewController(newComponents)
     }
 }
 
@@ -158,7 +176,7 @@ protocol MonthItemPageViewControllerDelegate {
     /**
         Informs the delegate that the current `MonthItemPageViewController` changed the current controller.
     
-        :param: monthItemCollectionViewController The new `MonthItemCollectionViewController` that is used.
+        :param: monthItemCollectionViewController The new `MonthItemCollectionViewController` that is presented.
     */
     func monthItemPageViewControllerDidChangeCurrentViewController(monthItemCollectionViewController: MonthItemCollectionViewController)
 }
