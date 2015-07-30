@@ -44,8 +44,8 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     private var monthStartWeekday = 0
     // Keeps track of current date view components
     
-    // Note: Make sure this is also set to the same value in the IB.
-    private let headerHeight: CGFloat = 40.0
+    // Size of header
+    private let headerHeight: CGFloat = 30
     
     /**
         Set delegate and data source.
@@ -251,6 +251,10 @@ extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout 
     */
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
         return UIEdgeInsetsZero
+    }
+    
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSizeMake(collectionView.frame.size.width, headerHeight)
     }
 }
 

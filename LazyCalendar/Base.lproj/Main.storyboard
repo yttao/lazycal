@@ -112,7 +112,7 @@
                         <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MonthItemCollectionHeaderView" id="lPe-fG-aLl" customClass="MonthItemCollectionHeaderView" customModule="LazyCalendar" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="0.0" width="600" height="50"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <color key="backgroundColor" white="1" alpha="0.90000000000000002" colorSpace="calibratedWhite"/>
+                            <color key="backgroundColor" red="0.26315789473684209" green="0.67579979355263153" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         </collectionReusableView>
                         <connections>
                             <outlet property="dataSource" destination="pQA-1g-TTb" id="uZc-fE-1Qp"/>
