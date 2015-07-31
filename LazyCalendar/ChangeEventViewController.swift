@@ -558,23 +558,21 @@ class ChangeEventViewController: UITableViewController {
         event!.alarm = alarm!
         if alarm! {
             event!.alarmTime = alarmTime
-            
-            let notificationScheduled = notificationScheduledForEvent(event!)
-            if !notificationScheduled {
+
+            if !notificationsScheduled(event!) {
                 scheduleNotificationsForEvent(event!)
             }
         }
         else {
             event!.alarmTime = nil
-            
-            let notificationScheduled = notificationScheduledForEvent(event!)
-            if notificationScheduledForEvent(event!) {
+
+            if notificationsScheduled(event!) {
                 descheduleNotificationsForEvent(event!)
             }
         }
         
-        addNewContacts()
-        removeOldContacts()
+        addNewContacts(event!)
+        removeOldContacts(event!)
         
         // Save event
         var error: NSError?
@@ -592,7 +590,7 @@ class ChangeEventViewController: UITableViewController {
     
         :returns: `true` if a notification has been scheduled for this event; `false` otherwise.
     */
-    func notificationScheduledForEvent(event: FullEvent) -> Bool {
+    func notificationsScheduled(event: FullEvent) -> Bool {
         let scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
         let results = scheduledNotifications.filter({(
             $0.userInfo!["id"] as! String) == event.id
@@ -645,11 +643,11 @@ class ChangeEventViewController: UITableViewController {
     /**
         Adds new contacts.
     */
-    func addNewContacts() {
+    func addNewContacts(event: FullEvent) {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext!
         
-        var eventContacts = event!.mutableSetValueForKey("contacts")
+        var eventContacts = event.mutableSetValueForKey("contacts")
         if contactIDs != nil {
             for (var i = 0; i < contactIDs!.count; i++) {
                 let contactID = contactIDs![i]
@@ -683,7 +681,7 @@ class ChangeEventViewController: UITableViewController {
                     eventContacts.addObject(contact)
                     
                     var contactEvents = contact.mutableSetValueForKey("events")
-                    contactEvents.addObject(event!)
+                    contactEvents.addObject(event)
                 }
                     // If results returned, contact already exists. Add existing contact to event contacts.
                 else {
@@ -692,7 +690,7 @@ class ChangeEventViewController: UITableViewController {
                     eventContacts.addObject(contact)
                     
                     var contactEvents = contact.mutableSetValueForKey("events")
-                    contactEvents.addObject(event!)
+                    contactEvents.addObject(event)
                 }
             }
         }
@@ -701,8 +699,8 @@ class ChangeEventViewController: UITableViewController {
     /**
         Removes old contacts.
     */
-    func removeOldContacts() {
-        var eventContacts = event!.mutableSetValueForKey("contacts")
+    func removeOldContacts(event: FullEvent) {
+        var eventContacts = event.mutableSetValueForKey("contacts")
         
         // Check for removed contacts for an edited event and remove them. Also removed the edited event from removed contacts.
         
@@ -720,12 +718,13 @@ class ChangeEventViewController: UITableViewController {
         for (var i = 0; i < removedContacts.count; i++) {
             eventContacts.removeObject(removedContacts[i])
             let contactEvents = removedContacts[i].mutableSetValueForKey("events")
-            contactEvents.removeObject(event!)
+            contactEvents.removeObject(event)
         }
     }
     
     /**
         Updates the contact IDs.
+    
         :param: contacts The contacts IDs that were selected.
     */
     func updateContacts(contactIDs: [ABRecordID]) {
