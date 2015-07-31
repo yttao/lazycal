@@ -110,7 +110,7 @@
                             </collectionViewCell>
                         </cells>
                         <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MonthItemCollectionHeaderView" id="lPe-fG-aLl" customClass="MonthItemCollectionHeaderView" customModule="LazyCalendar" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="0.0" width="600" height="50"/>
+                            <rect key="frame" x="0.0" y="0.0" width="600" height="40"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <color key="backgroundColor" red="0.26315789473684209" green="0.67579979355263153" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         </collectionReusableView>
@@ -347,6 +347,7 @@
                                                 </label>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SiC-Zy-YtO">
                                                     <rect key="frame" x="543" y="6" width="51" height="31"/>
+                                                    <gestureRecognizers/>
                                                     <connections>
                                                         <action selector="toggleAlarmOptions:" destination="aIB-mu-9DI" eventType="valueChanged" id="zRK-mt-Geg"/>
                                                     </connections>
@@ -368,15 +369,15 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M7E-Ai-qkC">
+                                                    <rect key="frame" x="543" y="6" width="51" height="31"/>
+                                                </switch>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Pick Specific Date and Time" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6dH-zm-7mO" userLabel="Pick Specific Date and Time">
                                                     <rect key="frame" x="15" y="11" width="227" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M7E-Ai-qkC">
-                                                    <rect key="frame" x="543" y="6" width="51" height="31"/>
-                                                </switch>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="centerY" secondItem="M7E-Ai-qkC" secondAttribute="centerY" id="V33-TX-RXf"/>
@@ -506,6 +507,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jh7-wV-qEo" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="xNc-MM-so5" userLabel="Exit" sceneMemberID="exit"/>
+                <tapGestureRecognizer id="9mC-hs-h48"/>
             </objects>
             <point key="canvasLocation" x="221" y="428"/>
         </scene>

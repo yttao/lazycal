@@ -176,6 +176,8 @@ class ChangeEventViewController: UITableViewController {
         super.viewWillAppear(animated)
         updateDateStart()
         updateDateEnd()
+        // Enable/disable alarm switch depending on settings
+        updateAlarmSwitchEnabled()
         updateAlarmTime()
         updateContactsDetailsLabel()
     }
@@ -294,8 +296,26 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Displays an alert to request access to contacts.
+        Displays an alert indicating that notifications are disabled.
+    */
+    func displayNotificationsDisabledAlert() {
+        let alertController = UIAlertController(title: "Notifications Disabled", message: "Notification settings can be changed in Settings.", preferredStyle: UIAlertControllerStyle.Alert)
         
+        let changeSettingsAlertAction = UIAlertAction(title: "Change Settings", style: UIAlertActionStyle.Default, handler: {
+            (action: UIAlertAction!) in
+            self.openSettings()
+        })
+        let okAlertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
+        
+        alertController.addAction(changeSettingsAlertAction)
+        alertController.addAction(okAlertAction)
+        
+        presentViewController(alertController, animated: true, completion: nil)
+    }
+    
+    /**
+        Displays an alert to request access to contacts.
+    
         If permission is granted, it adds the address book reference and shows the contacts view controller. If not, it displays an alert to inform the user that access to contacts is denied.
     */
     func displayContactsAccessRequest() {
@@ -318,7 +338,7 @@ class ChangeEventViewController: UITableViewController {
                 }
                 // If denied permission, display access denied message.
                 else {
-                    self.displayContactsAccessDeniedMessage()
+                    self.displayContactsAccessDeniedAlert()
                 }
             }
         }
@@ -328,7 +348,7 @@ class ChangeEventViewController: UITableViewController {
         Alerts the user that access to contacts is denied and offers chance to change permissions in settings.
         This occurs when the user is first prompted for access and denies access or in future attempts to use contacts when permission is denied.
     */
-    func displayContactsAccessDeniedMessage() {
+    func displayContactsAccessDeniedAlert() {
         // Create alert for contacts access denial
         let contactsAccessDeniedAlert = UIAlertController(title: "Cannot Access Contacts",
             message: "You must give the app permission to access contacts.",
@@ -356,6 +376,25 @@ class ChangeEventViewController: UITableViewController {
         UIApplication.sharedApplication().openURL(url!)
     }
     
+    /**
+        Updates whether or not the alarm switch is enabled.
+    
+        The alarm switch can be toggled if user notifications are allowed. Otherwise, the alarm switch cannot be toggled.
+    
+        TODO: also possibly do a check on if notification settings have changed from true -> false and all notifications should be removed.
+    */
+    func updateAlarmSwitchEnabled() {
+        let settings = UIApplication.sharedApplication().currentUserNotificationSettings()
+        if settings.types == UIUserNotificationType.None {
+            alarmSwitch.on = false
+            alarm = false
+            alarmSwitch.userInteractionEnabled = false
+            showFewerAlarmOptions()
+        }
+        else {
+            alarmSwitch.userInteractionEnabled = true
+        }
+    }
     
     /**
         On alarm switch toggle, show more or less options.
@@ -508,7 +547,10 @@ class ChangeEventViewController: UITableViewController {
         // Create event if it is a new event being created, otherwise just overwrite old data.
         if event == nil {
             event = FullEvent(entity: entity, insertIntoManagedObjectContext: managedContext)
+            // Assign unique ID if just created.
+            event!.id = NSUUID().UUIDString
         }
+        
         // Set event values
         event!.name = name
         event!.dateStart = dateStart!
@@ -516,9 +558,19 @@ class ChangeEventViewController: UITableViewController {
         event!.alarm = alarm!
         if alarm! {
             event!.alarmTime = alarmTime
+            
+            let notificationScheduled = notificationScheduledForEvent(event!)
+            if !notificationScheduled {
+                scheduleNotificationsForEvent(event!)
+            }
         }
         else {
             event!.alarmTime = nil
+            
+            let notificationScheduled = notificationScheduledForEvent(event!)
+            if notificationScheduledForEvent(event!) {
+                descheduleNotificationsForEvent(event!)
+            }
         }
         
         addNewContacts()
@@ -531,6 +583,63 @@ class ChangeEventViewController: UITableViewController {
         }
         
         return event!
+    }
+    
+    /**
+        Return a `Bool` indicating whether or not a notification has been scheduled for an event.
+    
+        :param: event The event to be checked for existing notifications.
+    
+        :returns: `true` if a notification has been scheduled for this event; `false` otherwise.
+    */
+    func notificationScheduledForEvent(event: FullEvent) -> Bool {
+        let scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
+        let results = scheduledNotifications.filter({(
+            $0.userInfo!["id"] as! String) == event.id
+            })
+        return !results.isEmpty
+    }
+    
+    /**
+        Schedules the notification for an event.
+    
+        :param: event The event to have a scheduled notification.
+    */
+    func scheduleNotificationsForEvent(event: FullEvent) {
+        NSLog("Event scheduled for time: %@", event.alarmTime!.description)
+        let notification = UILocalNotification()
+        if event.name != nil {
+            notification.alertBody = "\(event.name!)"
+        }
+        else {
+            notification.alertBody = "Untitled event"
+        }
+        notification.alertAction = "view"
+        notification.fireDate = event.alarmTime
+        notification.soundName = UILocalNotificationDefaultSoundName
+        notification.userInfo = ["id": event.id]
+        notification.category = "LAZYCALENDAR_CATEGORY"
+        UIApplication.sharedApplication().scheduleLocalNotification(notification)
+    }
+    
+    /**
+        Deschedules the notification for an event.
+    
+        :param: event The event that has notifications to deschedule.
+    */
+    func descheduleNotificationsForEvent(event: FullEvent) {
+        NSLog("Event descheduled for time: %@", event.alarmTime!.description)
+        // Get all notifications
+        var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
+        // Get notifications to remove
+        let notifications = scheduledNotifications.filter({(
+            $0.userInfo!["id"] as! String) == event.id
+        })
+        // Remove scheduled notifications
+        for (index, notification) in enumerate(notifications) {
+            let index = find(scheduledNotifications, notification)
+            scheduledNotifications.removeAtIndex(index!)
+        }
     }
     
     /**
@@ -689,6 +798,8 @@ extension ChangeEventViewController: UITableViewDelegate {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let cell = tableView.cellForRowAtIndexPath(indexPath)!
         
+        NSLog("Selected cell: %@", indexPath.description)
+        
         selectedIndexPath = indexPath
 
         switch indexPath.section {
@@ -712,6 +823,12 @@ extension ChangeEventViewController: UITableViewDelegate {
                 tableView.insertRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
             }
             tableView.endUpdates()
+        case sections["Alarm"]!:
+            if indexPath == indexPaths["AlarmToggle"]! {
+                if !alarmSwitch.userInteractionEnabled {
+                    displayNotificationsDisabledAlert()
+                }
+            }
         // Ensure permission to access address book, then segue to contacts view.
         case sections["Contacts"]!:
             // Get authorization status
@@ -720,7 +837,7 @@ extension ChangeEventViewController: UITableViewDelegate {
             switch authorizationStatus {
             // If denied, display message for permission.
             case .Denied, .Restricted:
-                displayContactsAccessDeniedMessage()
+                displayContactsAccessDeniedAlert()
             // If granted, continue to next view controller for contacts.
             case .Authorized:
                 let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController

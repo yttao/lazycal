@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7701" systemVersion="14C109" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7701" systemVersion="14E46" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Contact" representedClassName="LazyCalendar.Contact" syncable="YES">
         <attribute name="firstName" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="id" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="lastName" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FullEvent" inverseName="contacts" inverseEntity="FullEvent" syncable="YES"/>
     </entity>
@@ -11,8 +11,15 @@
         <attribute name="alarmTime" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="dateEnd" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="dateStart" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="id" attributeType="String" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="contacts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Contact" inverseName="events" inverseEntity="Contact" syncable="YES"/>
+        <relationship name="locations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Location" inverseName="events" inverseEntity="Location" syncable="YES"/>
+    </entity>
+    <entity name="Location" representedClassName="LazyCalendar.Location" syncable="YES">
+        <attribute name="latitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="longitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FullEvent" inverseName="locations" inverseEntity="FullEvent" syncable="YES"/>
     </entity>
     <entity name="TestEvent" representedClassName="LazyCalendar.TestEvent" syncable="YES">
         <attribute name="alarm" optional="YES" attributeType="Boolean" syncable="YES"/>
@@ -22,8 +29,9 @@
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Contact" positionX="-36" positionY="-72" width="128" height="105"/>
-        <element name="FullEvent" positionX="-54" positionY="-306" width="128" height="133"/>
+        <element name="Contact" positionX="-36" positionY="-72" width="128" height="103"/>
+        <element name="FullEvent" positionX="-54" positionY="-306" width="128" height="165"/>
+        <element name="Location" positionX="-254" positionY="-288" width="128" height="88"/>
         <element name="TestEvent" positionX="-243" positionY="-117" width="128" height="118"/>
     </elements>
 </model>

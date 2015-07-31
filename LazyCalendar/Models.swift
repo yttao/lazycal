@@ -8,10 +8,10 @@
 
 import Foundation
 import CoreData
-import AddressBook
-
 
 class FullEvent: NSManagedObject {
+    @NSManaged var id: String
+    
     @NSManaged var name: String?
     
     @NSManaged var dateStart: NSDate
@@ -40,4 +40,11 @@ class TestEvent: NSManagedObject {
     
     @NSManaged var alarm: Bool
     @NSManaged var alarmTime: NSDate?
+}
+
+class Location: NSManagedObject {
+    @NSManaged var latitude: Double
+    @NSManaged var longitude: Double
+    
+    @NSManaged var events: NSSet
 }

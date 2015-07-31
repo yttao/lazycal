@@ -64,7 +64,7 @@ class SelectEventTableViewController: UITableViewController, ChangeEventViewCont
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
         eventTimeLabel.text = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
         
-        if event!.alarm {
+        if event!.alarm && notificationsEnabled() {
             alarmLabel.text = "On"
             alarmTimeDisplayCell.hidden = false
             alarmTimeMainLabel.text = dateFormatter.stringFromDate(event!.alarmTime!)
@@ -92,6 +92,17 @@ class SelectEventTableViewController: UITableViewController, ChangeEventViewCont
         if tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!) != nil {
             tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
         }
+    }
+    
+    /**
+        Returns a `Bool` indicating whether or not notifications are enabled.
+    */
+    func notificationsEnabled() -> Bool {
+        let settings = UIApplication.sharedApplication().currentUserNotificationSettings()
+        if settings.types == UIUserNotificationType.None {
+            return false
+        }
+        return true
     }
     
     /**

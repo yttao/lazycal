@@ -49,7 +49,7 @@ class MonthItemTableViewController: UITableViewController {
     */
     func showEvents(date: NSDate) {
         self.date = date
-        println("Showing events for \(date)")
+        //println("Showing events for \(date)")
         // Find events for that date
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext!
@@ -170,6 +170,8 @@ extension MonthItemTableViewController: UITableViewDataSource {
             let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
             let event = events[indexPath.row]
             
+            descheduleNotificationsForDeletedEvent(event)
+            
             // Delete event
             managedContext.deleteObject(event)
             
@@ -184,6 +186,27 @@ extension MonthItemTableViewController: UITableViewDataSource {
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
             events.removeAtIndex(indexPath.row)
             tableView.endUpdates()
+        }
+    }
+    
+    /**
+        Deschedules notifications for a deleted event.
+    
+        If no notifications are found, it does nothing.
+    
+        :param: event The event that has notifications to deschedule.
+    */
+    func descheduleNotificationsForDeletedEvent(event: FullEvent) {
+        // Get all notifications
+        var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
+        // Get notifications to remove
+        let notifications = scheduledNotifications.filter({(
+            $0.userInfo!["id"] as! String) == event.id
+        })
+        // Remove scheduled notifications
+        for (index, notification) in enumerate(notifications) {
+            let index = find(scheduledNotifications, notification)
+            scheduledNotifications.removeAtIndex(index!)
         }
     }
     
