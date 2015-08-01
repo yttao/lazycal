@@ -558,16 +558,19 @@ class ChangeEventViewController: UITableViewController {
         event!.alarm = alarm!
         if alarm! {
             event!.alarmTime = alarmTime
-
+            
+            if notificationTimesChanged(event!) {
+                descheduleNotifications(event!)
+            }
             if !notificationsScheduled(event!) {
-                scheduleNotificationsForEvent(event!)
+                scheduleNotifications(event!)
             }
         }
         else {
             event!.alarmTime = nil
 
             if notificationsScheduled(event!) {
-                descheduleNotificationsForEvent(event!)
+                descheduleNotifications(event!)
             }
         }
         
@@ -599,11 +602,27 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
+        Returns a `Bool` indicating whether or not notification times have changed for an event.
+    
+        :param: event The event to be checked for changed notification times.
+    
+        :returns: `true` if a notification has been scheduled and its notification time has been changed; `false` otherwise.
+    */
+    func notificationTimesChanged(event: FullEvent) -> Bool {
+        let scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
+        let results = scheduledNotifications.filter({
+            ($0.userInfo!["id"] as! String) == event.id && event.alarmTime != nil &&
+                $0.fireDate!.compare(event.alarmTime!) != .OrderedSame
+        })
+        return !results.isEmpty
+    }
+    
+    /**
         Schedules the notification for an event.
     
         :param: event The event to have a scheduled notification.
     */
-    func scheduleNotificationsForEvent(event: FullEvent) {
+    func scheduleNotifications(event: FullEvent) {
         NSLog("Event scheduled for time: %@", event.alarmTime!.description)
         let notification = UILocalNotification()
         if event.name != nil {
@@ -625,18 +644,17 @@ class ChangeEventViewController: UITableViewController {
     
         :param: event The event that has notifications to deschedule.
     */
-    func descheduleNotificationsForEvent(event: FullEvent) {
-        NSLog("Event descheduled for time: %@", event.alarmTime!.description)
+    func descheduleNotifications(event: FullEvent) {
+        NSLog("Event descheduled for event: %@", event.id)
         // Get all notifications
         var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
         // Get notifications to remove
         let notifications = scheduledNotifications.filter({(
             $0.userInfo!["id"] as! String) == event.id
         })
-        // Remove scheduled notifications
-        for (index, notification) in enumerate(notifications) {
-            let index = find(scheduledNotifications, notification)
-            scheduledNotifications.removeAtIndex(index!)
+        // Cancel notifications
+        for notification in notifications {
+            UIApplication.sharedApplication().cancelLocalNotification(notification)
         }
     }
     
@@ -671,7 +689,6 @@ class ChangeEventViewController: UITableViewController {
                 
                 // If no results, contact is new. Add Contact entity for first time.
                 if results.count == 0 {
-                    NSLog("New contact made")
                     let contact = Contact(entity: contactEntity, insertIntoManagedObjectContext: managedContext)
                     
                     contact.id = contactID
@@ -757,7 +774,6 @@ class ChangeEventViewController: UITableViewController {
         On saving events, saves event and informs the delegate that an event was saved.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        super.prepareForSegue(segue, sender: sender)
         if let identifier = segue.identifier {
             switch identifier {
             case "SaveEventSegue":
@@ -796,8 +812,6 @@ extension ChangeEventViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let cell = tableView.cellForRowAtIndexPath(indexPath)!
-        
-        NSLog("Selected cell: %@", indexPath.description)
         
         selectedIndexPath = indexPath
 

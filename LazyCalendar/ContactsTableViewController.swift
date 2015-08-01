@@ -44,7 +44,12 @@ class ContactsTableViewController: UITableViewController {
         }
         
         // Get all contacts
-        allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
+        if ABAddressBookGetAuthorizationStatus() == .Authorized {
+            allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
+        }
+        else {
+            allContacts = NSArray()
+        }
         
         // Create and configure search controller
         if searchEnabled {
@@ -53,9 +58,7 @@ class ContactsTableViewController: UITableViewController {
                 controller.searchResultsUpdater = self
                 controller.dimsBackgroundDuringPresentation = false
                 controller.searchBar.sizeToFit()
-                //controller.searchBar.delegate = self
                 controller.searchBar.placeholder = "Search for New Contacts"
-                //controller.delegate = self
                 controller.hidesNavigationBarDuringPresentation = false
                 
                 self.tableView.tableHeaderView = controller.searchBar
@@ -63,7 +66,8 @@ class ContactsTableViewController: UITableViewController {
                 return controller
             })()
         }
-        // Hides search controller on view segue
+        
+        // Hides search controller on segue.
         self.definesPresentationContext = true
         
     }
@@ -139,6 +143,7 @@ class ContactsTableViewController: UITableViewController {
             }
             return false
         }
+        
         // Create predicate and filter by predicate
         let predicate = NSPredicate(block: block)
         filteredContacts = allContacts.filteredArrayUsingPredicate(predicate) as [ABRecordRef]

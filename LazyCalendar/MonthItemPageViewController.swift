@@ -21,11 +21,11 @@ class MonthItemPageViewController: UIPageViewController {
     
     var monthItemViewController: MonthItemViewController?
     
-    private var currentViewController: MonthItemCollectionViewController? {
+    /*private var currentViewController: MonthItemCollectionViewController? {
         didSet {
             customDelegate?.monthItemPageViewControllerDidChangeCurrentViewController(currentViewController!)
         }
-    }
+    }*/
     
     /**
         Initialize date components for start date.
@@ -54,12 +54,12 @@ class MonthItemPageViewController: UIPageViewController {
     */
     private func initializePageViewController() {
         // Make first view controller
-        let firstController = getMonthItemCollectionViewController(dateComponents)
+        let firstViewController = getMonthItemCollectionViewController(dateComponents)
         
-        currentViewController = firstController
-        
-        let startingViewController = [firstController]
-        self.setViewControllers(startingViewController, direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
+        //currentViewController = firstController
+        customDelegate?.monthItemPageViewControllerDidChangeCurrentViewController(firstViewController)
+
+        self.setViewControllers([firstViewController], direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
     }
     
     /**
@@ -123,7 +123,8 @@ extension MonthItemPageViewController: UIPageViewControllerDelegate {
         let newMonth = pageViewController.viewControllers.first! as! MonthItemCollectionViewController
         let oldMonth = previousViewControllers.first! as! MonthItemCollectionViewController
         
-        currentViewController = newMonth
+        //currentViewController = newMonth
+        customDelegate?.monthItemPageViewControllerDidChangeCurrentViewController(newMonth)
         
         // Change current month based on whether you went to previous or next month
         if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) ==

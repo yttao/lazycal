@@ -97,15 +97,6 @@ class MonthItemViewController: UIViewController {
         }
         
     }
-    
-    /*
-        @brief After saving an event, show the new event if it is in the current table view.
-
-    func changeEventViewControllerDidSaveEvent(event: FullEvent) {
-        let selectedDate = NSCalendar.currentCalendar().dateFromComponents(monthItemCollectionViewController!.dateComponents!)
-        monthItemTableViewController!.showEvents(selectedDate!)
-    }*/
-    
 
     @IBAction func saveEvent(segue: UIStoryboardSegue) {
         monthItemTableViewController!.reloadEvents()

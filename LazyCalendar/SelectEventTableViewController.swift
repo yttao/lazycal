@@ -118,7 +118,7 @@ class SelectEventTableViewController: UITableViewController, ChangeEventViewCont
         Prepares for segue to event editing by loading event in as initial data.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier != nil && segue.identifier! == editEventSegueIdentifier {
+        if segue.identifier == editEventSegueIdentifier {
             let navigationController = segue.destinationViewController as! UINavigationController
             let editEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
             editEventViewController.loadData(event: event!)

@@ -94,9 +94,9 @@ class MonthItemTableViewController: UITableViewController {
         Initializes information on segue to selected event details view.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier != nil && segue.identifier == segueIdentifier {
-            let selectEventNavigationController = segue.destinationViewController as! UINavigationController
-            selectEventTableViewController = selectEventNavigationController.viewControllers.first as? SelectEventTableViewController
+        if segue.identifier == segueIdentifier {
+            let navigationController = segue.destinationViewController as! UINavigationController
+            selectEventTableViewController = navigationController.viewControllers.first as? SelectEventTableViewController
             selectEventTableViewController!.delegate = self
         }
     }

@@ -57,7 +57,6 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         collectionView!.dataSource = self
         
         collectionView!.scrollEnabled = false
-        
     }
     
     // Loads initial data to use
@@ -171,9 +170,7 @@ extension MonthItemCollectionViewController: UICollectionViewDelegate {
         dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
         dateComponents = getNewDateComponents(dateComponents!)
         
-        // Show events for date
         let selectedDate = calendar.dateFromComponents(dateComponents!)!
-        // Select date function
         // Alert delegate that collection view did change selected day
         delegate?.monthItemCollectionViewControllerDidChangeSelectedDate(selectedDate)
     }
@@ -184,6 +181,11 @@ extension MonthItemCollectionViewController: UICollectionViewDelegate {
     override func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
         deselectSelectedCell()
     }
+    
+    /**
+        override func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+        }
+    */
 }
 
 // MARK: - UICollectionViewDataSource
@@ -204,6 +206,7 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
         
         return cell
     }
+    
     /**
         Determines number of items in month.
     */
@@ -211,8 +214,12 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
         return MonthItemCollectionViewController.numCellsInMonth
     }
     
+    /**
+        Create header with weekday labels.
+    */
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryViewOfKind(UICollectionElementKindSectionHeader, withReuseIdentifier: "MonthItemCollectionHeaderView", forIndexPath: indexPath) as! MonthItemCollectionHeaderView
+        // Create constraints to space labels properly
         header.createConstraints()
         return header
     }
