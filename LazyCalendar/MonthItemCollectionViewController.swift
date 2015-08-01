@@ -57,17 +57,6 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         collectionView!.dataSource = self
         
         collectionView!.scrollEnabled = false
-        
-        // Observer for when notification pops up
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "refreshList:", name: "TodoListShouldRefresh", object: nil)
-    }
-    
-    /**
-        TEST OBSERVER FUNCTIONALITY
-    */
-    func refreshList(notification: NSNotification) {
-        println("Event received")
-        println(notification.userInfo!["id"]!)
     }
     
     // Loads initial data to use

@@ -40,6 +40,9 @@ class MonthItemViewController: UIViewController {
         // Add height constraint determined by device size
         let heightConstraint = NSLayoutConstraint(item: monthItemPageViewContainer, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
         monthItemPageViewContainer.addConstraint(heightConstraint)
+        
+        // Observer for when notification pops up
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationShouldFire", object: nil)
     }
 
     
@@ -53,7 +56,35 @@ class MonthItemViewController: UIViewController {
         // Sets title as month year
         self.navigationItem.title = "\(monthSymbol) \(components.year)"
     }
-
+    
+    /**
+    Show an alert for the event notification.
+    
+    This is only called if this view controller is currently visible.
+    
+    :param: notification The notification from the subject to the observer.
+    */
+    func showEventNotification(notification: NSNotification) {
+        if self.isViewLoaded() && self.view?.window != nil {
+            let localNotification = notification.userInfo!["LocalNotification"] as! UILocalNotification
+            
+            let alertController = UIAlertController(title: "\(localNotification.alertTitle)", message: "\(localNotification.alertBody!)", preferredStyle: .Alert)
+            
+            let viewEventAlertAction = UIAlertAction(title: "View Event", style: .Default, handler: {
+                (action: UIAlertAction!) in
+                let selectEventNavigationController = self.storyboard?.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
+                let selectEventTableViewController = selectEventNavigationController.viewControllers.first as! SelectEventTableViewController
+                self.showViewController(selectEventTableViewController, sender: self)
+            })
+            
+            let okAlertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
+            
+            alertController.addAction(viewEventAlertAction)
+            alertController.addAction(okAlertAction)
+            
+            self.presentViewController(alertController, animated: true, completion: nil)
+        }
+    }
     
     // Sets up necessary data when changing to different view
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

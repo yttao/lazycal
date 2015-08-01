@@ -31,31 +31,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     /**
-        On receiving local notification while in application, show an alert message with information about the event. Then notify relevant observers that the notification was fired.
+        On receiving local notification while in application, notify relevant observers that the notification was fired.
     */
     func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
-        
-        // Display alert
-        dispatch_async(dispatch_get_main_queue(), {
-            let alertController = UIAlertController(title: "\(notification.alertTitle)", message: "\(notification.alertBody!)", preferredStyle: UIAlertControllerStyle.Alert)
-            
-            let viewEventAlertAction = UIAlertAction(title: "View Event", style: UIAlertActionStyle.Default, handler: {
-                (action: UIAlertAction!) in
-                let selectEventNavigationController = self.window?.rootViewController?.storyboard?.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
-                let selectEventTableViewController = selectEventNavigationController.viewControllers.first as! SelectEventTableViewController
-                selectEventTableViewController.setBackButton("Back")
-                self.window?.rootViewController?.presentViewController(selectEventNavigationController, animated: true, completion: nil)
-            })
-            let okAlertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
-            
-            alertController.addAction(viewEventAlertAction)
-            alertController.addAction(okAlertAction)
-            
-            self.window?.rootViewController?.presentViewController(alertController, animated: true, completion: nil)
-        })
-        
         // Notify observers
-        NSNotificationCenter.defaultCenter().postNotificationName("TodoListShouldRefresh", object: self, userInfo: notification.userInfo)
+        NSNotificationCenter.defaultCenter().postNotificationName("EventNotificationShouldFire", object: self, userInfo: ["LocalNotification": notification])
     }
     
     func applicationWillEnterForeground(application: UIApplication) {
