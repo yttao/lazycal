@@ -625,6 +625,7 @@ class ChangeEventViewController: UITableViewController {
     func scheduleNotifications(event: FullEvent) {
         NSLog("Event scheduled for time: %@", event.alarmTime!.description)
         let notification = UILocalNotification()
+        notification.alertTitle = "Event Notification"
         if event.name != nil {
             notification.alertBody = "\(event.name!)"
         }

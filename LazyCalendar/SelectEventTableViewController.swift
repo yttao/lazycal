@@ -52,7 +52,10 @@ class SelectEventTableViewController: UITableViewController, ChangeEventViewCont
     */
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        reloadData()
+        
+        if event != nil {
+            reloadData()
+        }
     }
     
     /**
@@ -112,6 +115,12 @@ class SelectEventTableViewController: UITableViewController, ChangeEventViewCont
     */
     func loadData(event: FullEvent) {
         self.event = event
+    }
+    
+    func setBackButton(text: String) {
+        let backButton = UIBarButtonItem(title: text, style: .Plain, target: nil, action: nil)
+        navigationController?.navigationItem.leftBarButtonItem = backButton
+        navigationItem.leftBarButtonItem = backButton
     }
     
     /**
