@@ -46,7 +46,11 @@ class MonthItemViewController: UIViewController {
     }
 
     
-    // Loads initial data to use
+    /**
+        Loads the navigation title.
+    
+        :param: components The date components to determine the navigation title.
+    */
     func loadNavigationTitle(components: NSDateComponents) {
         // Gets month in string format
         let dateFormatter = NSDateFormatter()
@@ -58,11 +62,11 @@ class MonthItemViewController: UIViewController {
     }
     
     /**
-    Show an alert for the event notification.
+        Show an alert for the event notification. The alert provides two options: "OK" and "View Event". Tap "OK" to dismiss the alert. Tap "View Event" to show event details.
     
-    This is only called if this view controller is currently visible.
+        This is only called if this view controller is loaded and currently visible.
     
-    :param: notification The notification from the subject to the observer.
+        :param: notification The notification from the subject to the observer.
     */
     func showEventNotification(notification: NSNotification) {
         if isViewLoaded() && view?.window != nil {
@@ -74,6 +78,25 @@ class MonthItemViewController: UIViewController {
                 (action: UIAlertAction!) in
                 let selectEventNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
                 let selectEventTableViewController = selectEventNavigationController.viewControllers.first as! SelectEventTableViewController
+                
+                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+                let managedContext = appDelegate.managedObjectContext!
+                
+                let id = localNotification.userInfo!["id"] as! String
+                let requirements = "(id == %@)"
+                let predicate = NSPredicate(format: requirements, id)
+                
+                let fetchRequest = NSFetchRequest(entityName: "FullEvent")
+                fetchRequest.predicate = predicate
+                
+                var error: NSError? = nil
+                let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as? [FullEvent]
+                
+                if results != nil && results!.count > 0 {
+                    let event = results!.first!
+                    selectEventTableViewController.loadData(event)
+                }
+                
                 self.showViewController(selectEventTableViewController, sender: self)
             })
             

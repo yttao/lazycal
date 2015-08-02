@@ -64,6 +64,9 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     */
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
+        deselectSelectedCell()
+        
         collectionView!.reloadData()
     }
     
