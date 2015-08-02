@@ -167,6 +167,9 @@ class ChangeEventViewController: UITableViewController {
             
             alarmTimePicker.date = alarmTime!
         }
+        
+        // Observer for when notification pops up
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationShouldFire", object: nil)
     }
     
     /**
@@ -182,7 +185,6 @@ class ChangeEventViewController: UITableViewController {
         updateContactsDetailsLabel()
     }
     
-    
     /**
         Initializes data with a start date.
     
@@ -197,7 +199,6 @@ class ChangeEventViewController: UITableViewController {
         alarmTime = dateStart
         contactIDs = nil
     }
-    
     
     /**
         Initializes data with a pre-existing event.
@@ -223,6 +224,34 @@ class ChangeEventViewController: UITableViewController {
         }
     }
     
+    /**
+        Show an alert for the event notification.
+    
+        This is only called if this view controller is currently visible.
+    
+        :param: notification The notification from the subject to the observer.
+    */
+    func showEventNotification(notification: NSNotification) {
+        if isViewLoaded() && view?.window != nil {
+            let localNotification = notification.userInfo!["LocalNotification"] as! UILocalNotification
+            
+            let alertController = UIAlertController(title: "\(localNotification.alertTitle)", message: "\(localNotification.alertBody!)", preferredStyle: .Alert)
+            
+            let viewEventAlertAction = UIAlertAction(title: "View Event", style: .Default, handler: {
+                (action: UIAlertAction!) in
+                let selectEventNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
+                let selectEventTableViewController = selectEventNavigationController.viewControllers.first as! SelectEventTableViewController
+                self.showViewController(selectEventTableViewController, sender: self)
+            })
+            
+            let okAlertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
+            
+            alertController.addAction(viewEventAlertAction)
+            alertController.addAction(okAlertAction)
+            
+            presentViewController(alertController, animated: true, completion: nil)
+        }
+    }
     
     /**
         Update date start info.
@@ -236,7 +265,6 @@ class ChangeEventViewController: UITableViewController {
         }
     }
     
-    
     /**
         Update date start labels.
     */
@@ -248,7 +276,6 @@ class ChangeEventViewController: UITableViewController {
         dateStartDetailsLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
     }
     
-    
     /**
         Update date end info.
     */
@@ -257,9 +284,8 @@ class ChangeEventViewController: UITableViewController {
         updateDateEndLabels(dateEnd!)
     }
     
-    
-    /*
-        @brief Update date end labels.
+    /**
+        Update date end labels.
     */
     func updateDateEndLabels(date: NSDate) {
         dateFormatter.dateFormat = "MMM dd, yyyy"
@@ -271,7 +297,8 @@ class ChangeEventViewController: UITableViewController {
     
     
     /**
-        When date start picker is changed, update the minimum date.
+        When date start picker is changed, update the minimum date to ensure the date end is not before the date start.
+    
         The date end picker should not be able to choose a date before the date start, so it should have a lower limit placed on the date it can choose.
     */
     func updateDateEndPicker(date: NSDate) {
