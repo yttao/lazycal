@@ -59,10 +59,18 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         collectionView!.scrollEnabled = false
     }
     
+    /**
+        On view appearance, reload data to ensure proper cell reselection when after switching months.
+    */
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        collectionView!.reloadData()
+    }
+    
     // Loads initial data to use
     func loadData(components: NSDateComponents) {
         // Copy datecomponents to prevent unexpected changes
-        self.dateComponents = components.copy() as? NSDateComponents
+        dateComponents = components.copy() as? NSDateComponents
         
         monthStartWeekday = getMonthStartWeekday(components)
         
@@ -71,7 +79,7 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         dateIndexComponents!.day = 1
         dateIndex = calendar.dateFromComponents(dateIndexComponents!)
         
-        let numDays = self.calendar.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: self.calendar.dateFromComponents(components)!).length
+        let numDays = calendar.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: calendar.dateFromComponents(components)!).length
         
         for (var i = monthStartWeekday - 1; i < numDays + (monthStartWeekday - 1); i++) {
             daysInMonth[i] = i - (monthStartWeekday - 2)
@@ -87,7 +95,6 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         dateComponents = getNewDateComponents(dateComponents!)
     }
     
-    
     /**
         Selects the specified cell.
     
@@ -98,7 +105,6 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         selectedCell = cell
     }
     
-    
     /**
         Deselects the currently selected cell.
     */
@@ -108,7 +114,6 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
             selectedCell = nil
         }
     }
-    
     
     /**
         Gets the first weekday of the month.
@@ -181,11 +186,6 @@ extension MonthItemCollectionViewController: UICollectionViewDelegate {
     override func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
         deselectSelectedCell()
     }
-    
-    /**
-        override func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
-        }
-    */
 }
 
 // MARK: - UICollectionViewDataSource
@@ -199,6 +199,15 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
         // Set day number for cell (if it is a valid cell in that month
         if let day = daysInMonth[indexPath.row] {
             cell.dayLabel.text = String(day)
+            
+            // If no cell has been selected and the cell's day matches the date components day, select the cell.
+            if selectedCell == nil {
+                let dayToSelect = dateComponents!.day
+                
+                if day == dayToSelect {
+                    selectCell(cell)
+                }
+            }
         }
         else {
             cell.dayLabel.text = nil

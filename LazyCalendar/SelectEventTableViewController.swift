@@ -185,7 +185,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == indexPaths["Contacts"]!.section {
-            let contactsTableViewController = self.storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+            let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
             
             // Get all contact IDs from the event contacts.
             let contactsSet = event!.contacts as Set
@@ -198,7 +198,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
             contactsTableViewController.loadData(contactIDs)
             // Disable searching for new contacts (only allowed when editing event).
             contactsTableViewController.setSearchEnabled(false)
-            self.navigationController?.showViewController(contactsTableViewController, sender: self)
+            navigationController?.showViewController(contactsTableViewController, sender: self)
         }
     }
 }

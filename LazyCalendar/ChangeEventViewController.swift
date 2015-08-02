@@ -854,14 +854,14 @@ extension ChangeEventViewController: UITableViewDelegate {
                 displayContactsAccessDeniedAlert()
             // If granted, continue to next view controller for contacts.
             case .Authorized:
-                let contactsTableViewController = self.storyboard?.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+                let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
                 
                 // Load contacts IDs if they exist already.
                 if contactIDs != nil {
                     contactsTableViewController.loadData(contactIDs!)
                 }
                 
-                self.navigationController?.showViewController(
+                navigationController?.showViewController(
                     contactsTableViewController, sender: self)
                 
             // If undetermined (first time address book request), ask for permission.

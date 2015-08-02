@@ -65,14 +65,14 @@ class MonthItemViewController: UIViewController {
     :param: notification The notification from the subject to the observer.
     */
     func showEventNotification(notification: NSNotification) {
-        if self.isViewLoaded() && self.view?.window != nil {
+        if isViewLoaded() && view?.window != nil {
             let localNotification = notification.userInfo!["LocalNotification"] as! UILocalNotification
             
             let alertController = UIAlertController(title: "\(localNotification.alertTitle)", message: "\(localNotification.alertBody!)", preferredStyle: .Alert)
             
             let viewEventAlertAction = UIAlertAction(title: "View Event", style: .Default, handler: {
                 (action: UIAlertAction!) in
-                let selectEventNavigationController = self.storyboard?.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
+                let selectEventNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
                 let selectEventTableViewController = selectEventNavigationController.viewControllers.first as! SelectEventTableViewController
                 self.showViewController(selectEventTableViewController, sender: self)
             })
@@ -82,7 +82,7 @@ class MonthItemViewController: UIViewController {
             alertController.addAction(viewEventAlertAction)
             alertController.addAction(okAlertAction)
             
-            self.presentViewController(alertController, animated: true, completion: nil)
+            presentViewController(alertController, animated: true, completion: nil)
         }
     }
     

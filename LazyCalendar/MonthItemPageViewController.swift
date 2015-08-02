@@ -21,12 +21,6 @@ class MonthItemPageViewController: UIPageViewController {
     
     var monthItemViewController: MonthItemViewController?
     
-    /*private var currentViewController: MonthItemCollectionViewController? {
-        didSet {
-            customDelegate?.monthItemPageViewControllerDidChangeCurrentViewController(currentViewController!)
-        }
-    }*/
-    
     /**
         Initialize date components for start date.
     */
@@ -43,8 +37,8 @@ class MonthItemPageViewController: UIPageViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.delegate = self
-        self.dataSource = self
+        delegate = self
+        dataSource = self
         
         initializePageViewController()
     }
@@ -59,7 +53,7 @@ class MonthItemPageViewController: UIPageViewController {
         //currentViewController = firstController
         customDelegate?.monthItemPageViewControllerDidChangeCurrentViewController(firstViewController)
 
-        self.setViewControllers([firstViewController], direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
+        setViewControllers([firstViewController], direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
     }
     
     /**
@@ -103,7 +97,7 @@ class MonthItemPageViewController: UIPageViewController {
     */
     private func getMonthItemCollectionViewController(components: NSDateComponents) -> MonthItemCollectionViewController {
         // Instantiate copy of prefab view controller
-        let monthItemCollectionViewController = self.storyboard!.instantiateViewControllerWithIdentifier("MonthItemCollectionViewController") as! MonthItemCollectionViewController
+        let monthItemCollectionViewController = storyboard!.instantiateViewControllerWithIdentifier("MonthItemCollectionViewController") as! MonthItemCollectionViewController
         // Load data
         monthItemCollectionViewController.loadData(components)
         monthItemCollectionViewController.delegate = monthItemViewController

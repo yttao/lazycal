@@ -34,21 +34,21 @@ class MonthItemCollectionHeaderView: UICollectionReusableView {
             // Allow custom constraints to be added
             weekdayLabels[i].setTranslatesAutoresizingMaskIntoConstraints(false)
             
-            let widthConstraint = NSLayoutConstraint(item: weekdayLabels[i], attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: self.frame.width / 7)
-            let heightConstraint = NSLayoutConstraint(item: weekdayLabels[i], attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: self.frame.size.height)
+            let widthConstraint = NSLayoutConstraint(item: weekdayLabels[i], attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: frame.width / 7)
+            let heightConstraint = NSLayoutConstraint(item: weekdayLabels[i], attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: frame.size.height)
             let centerYConstraint = NSLayoutConstraint(item: weekdayLabels[i], attribute: .CenterY, relatedBy: .Equal, toItem: self, attribute: .CenterY, multiplier: 1.0, constant: 0)
             
             weekdayLabels[i].addConstraints([widthConstraint, heightConstraint])
-            self.addConstraint(centerYConstraint)
+            addConstraint(centerYConstraint)
         }
         
         // Set first constraint to match first label leading edge and superview leading edge.
         let firstLeadingConstraint = NSLayoutConstraint(item: weekdayLabels[0], attribute: .Leading, relatedBy: .Equal, toItem: self, attribute: .Leading, multiplier: 1.0, constant: 0)
-        self.addConstraint(firstLeadingConstraint)
+        addConstraint(firstLeadingConstraint)
         // Set the other constraints to line up with the trailing edge of label to the left.
         for i in 1..<weekdayLabels.count {
             let leadingConstraint = NSLayoutConstraint(item: weekdayLabels[i], attribute: .Leading, relatedBy: .Equal, toItem: weekdayLabels[i - 1], attribute: .Trailing, multiplier: 1.0, constant: 0)
-            self.addConstraint(leadingConstraint)
+            addConstraint(leadingConstraint)
         }
     }
     
@@ -57,8 +57,8 @@ class MonthItemCollectionHeaderView: UICollectionReusableView {
     */
     private func addLabels() {
         for label in weekdayLabels {
-            self.addSubview(label)
-            self.didAddSubview(label)
+            addSubview(label)
+            didAddSubview(label)
             label.didMoveToSuperview()
         }
     }
