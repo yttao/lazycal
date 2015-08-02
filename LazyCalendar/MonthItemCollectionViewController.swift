@@ -9,17 +9,15 @@
 import UIKit
 
 class MonthItemCollectionViewController: UICollectionViewController, UICollectionViewDataSource, UICollectionViewDelegate {
-    var delegate: MonthItemCollectionViewControllerDelegate?
-    
     var dateIndex: NSDate?
     var dateComponents: NSDateComponents?
     
     // 7 days in a week
-    private static let numDaysInWeek = 7
-    // Max number of weeks that can be displayed
-    private static let numWeeksInMonth = 6
+    private let daysInWeek = 7
+    // Max number of rows that can be displayed, 1 row per week
+    private let rowsInMonth = 6
     // Max number of cells (7 days * 6 rows)
-    private static let numCellsInMonth = 42
+    private let cellsInMonth = 42
     
     // Colors used
     private let backgroundColor = UIColor(red: 125, green: 255, blue: 125, alpha: 0)
@@ -33,7 +31,7 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         NSCalendarUnit.CalendarUnitDay
     
     // Array indexing table view cells
-    private var daysInMonth = [Int?](count: MonthItemCollectionViewController.numCellsInMonth, repeatedValue: nil)
+    private var daysInMonth: [Int?]
     
     // Calendar used
     private let calendar = NSCalendar.currentCalendar()
@@ -47,8 +45,14 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     // Size of header
     private let headerHeight: CGFloat = 30
     
+    required init(coder aDecoder: NSCoder) {
+        daysInMonth = [Int?](count: cellsInMonth, repeatedValue: nil)
+        
+        super.init(coder: aDecoder)
+    }
+    
     /**
-        Set delegate and data source.
+        Set delegate and data source, disable scrolling (page scrolling still allowed though).
     */
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,12 +69,17 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
+        // Deselect currently selected cell (cell will be reused on reloadData)
         deselectSelectedCell()
         
         collectionView!.reloadData()
     }
     
-    // Loads initial data to use
+    /**
+        Loads initial data that the view controller uses to generate the calendar view.
+    
+        :param: components The date components corresponding to the month.
+    */
     func loadData(components: NSDateComponents) {
         // Copy datecomponents to prevent unexpected changes
         dateComponents = components.copy() as? NSDateComponents
@@ -180,7 +189,8 @@ extension MonthItemCollectionViewController: UICollectionViewDelegate {
         
         let selectedDate = calendar.dateFromComponents(dateComponents!)!
         // Alert delegate that collection view did change selected day
-        delegate?.monthItemCollectionViewControllerDidChangeSelectedDate(selectedDate)
+        NSNotificationCenter.defaultCenter().postNotificationName("SelectedDateChanged", object: self, userInfo: ["Date": selectedDate])
+        //delegate?.monthItemCollectionViewControllerDidChangeSelectedDate(selectedDate)
     }
     
     /**
@@ -223,7 +233,7 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
         Determines number of items in month.
     */
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return MonthItemCollectionViewController.numCellsInMonth
+        return cellsInMonth
     }
     
     /**
@@ -246,9 +256,9 @@ extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout 
     */
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         return CGSize(width: collectionView.bounds.size.width /
-            CGFloat(MonthItemCollectionViewController.numDaysInWeek),
+            CGFloat(daysInWeek),
                 height: (collectionView.bounds.size.height - headerHeight) /
-                    CGFloat(MonthItemCollectionViewController.numWeeksInMonth))
+                    CGFloat(rowsInMonth))
     }
     
     /**
@@ -275,16 +285,4 @@ extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout 
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSizeMake(collectionView.frame.size.width, headerHeight)
     }
-}
-
-/**
-    Delegate protocol for `MonthItemCollectionViewController`.
-*/
-protocol MonthItemCollectionViewControllerDelegate {
-    /**
-        Informs the delegate that the selected date was changed.
-    
-        :param: date The new selected date.
-    */
-    func monthItemCollectionViewControllerDidChangeSelectedDate(date: NSDate)
 }

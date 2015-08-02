@@ -19,8 +19,6 @@ class MonthItemTableViewController: UITableViewController {
     // Name of entity to retrieve data from.
     private let entityName = "FullEvent"
     
-    private var selectEventTableViewController: SelectEventTableViewController?
-    
     private let segueIdentifier = "SelectEventSegue"
     
     /**
@@ -34,11 +32,30 @@ class MonthItemTableViewController: UITableViewController {
         tableView.dataSource = self
         tableView.delegate = self
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadEvents", name: "EventSaved", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "changeMonths:", name: "MonthChanged", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "changeSelectedDate:", name: "SelectedDateChanged", object: nil)
+        
         showEvents(date!)
     }
     
     /**
+        On month change, reload navigation title to match month and show events for the first day of the month.
     
+       :param: notification The notification that the month has changed.
+    */
+    func changeMonths(notification: NSNotification) {
+        let monthItemCollectionViewController = notification.userInfo!["ViewController"] as? MonthItemCollectionViewController
+            showEvents(monthItemCollectionViewController!.dateIndex!)
+    }
+    
+    func changeSelectedDate(notification: NSNotification) {
+        let date = notification.userInfo!["Date"] as! NSDate
+        showEvents(date)
+    }
+    
+    /**
+        Reloads the events
     */
     func reloadEvents() {
         showEvents(date!)
@@ -89,18 +106,6 @@ class MonthItemTableViewController: UITableViewController {
         tableView.reloadData()
     }
     
-    
-    /**
-        Initializes information on segue to selected event details view.
-    */
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == segueIdentifier {
-            let navigationController = segue.destinationViewController as! UINavigationController
-            selectEventTableViewController = navigationController.viewControllers.first as? SelectEventTableViewController
-            selectEventTableViewController!.delegate = self
-        }
-    }
-    
     /**
         Leaves event details back to main view.
     */
@@ -129,7 +134,7 @@ extension MonthItemTableViewController: UITableViewDelegate {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let event = events[indexPath.row]
         
-        selectEventTableViewController!.loadData(event)
+        NSNotificationCenter.defaultCenter().postNotificationName("EventSelected", object: self, userInfo: ["Event": event])
     }
 }
 
@@ -226,25 +231,5 @@ extension MonthItemTableViewController: UITableViewDataSource {
         }
         
         return cell
-    }
-}
-
-// MARK: - SelectEventTableViewControllerDelegate
-extension MonthItemTableViewController: SelectEventTableViewControllerDelegate {
-    /**
-        On changing event, update events for current table view.
-    */
-    func selectEventTableViewControllerDidChangeEvent(event: FullEvent) {
-        showEvents(date!)
-    }
-}
-
-// MARK: - ChangeEventViewControllerDelegate
-extension MonthItemTableViewController: ChangeEventViewControllerDelegate {
-    /**
-        On changing event, update events for current table view.
-    */
-    func changeEventViewControllerDidSaveEvent(event: FullEvent) {
-        showEvents(date!)
     }
 }

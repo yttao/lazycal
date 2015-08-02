@@ -11,8 +11,6 @@ import CoreData
 import AddressBook
 
 class ChangeEventViewController: UITableViewController {
-    var delegate: ChangeEventViewControllerDelegate?
-    
     // Event data to store
     private var name: String?
     private var dateStart: NSDate?
@@ -169,7 +167,7 @@ class ChangeEventViewController: UITableViewController {
         }
         
         // Observer for when notification pops up
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationShouldFire", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
     }
     
     /**
@@ -257,7 +255,7 @@ class ChangeEventViewController: UITableViewController {
                 
                 if results != nil && results!.count > 0 {
                     let event = results!.first!
-                    selectEventTableViewController.loadData(event)
+                    NSNotificationCenter.defaultCenter().postNotificationName("EventSelected", object: self, userInfo: ["Event": event])
                 }
                 
                 self.showViewController(selectEventTableViewController, sender: self)
@@ -818,19 +816,21 @@ class ChangeEventViewController: UITableViewController {
     
     
     /**
-        On saving events, saves event and informs the delegate that an event was saved.
+        On saving events, saves event and informs observers that an event was saved.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let identifier = segue.identifier {
             switch identifier {
             case "SaveEventSegue":
                 let event = saveEvent()
-                delegate?.changeEventViewControllerDidSaveEvent(event)
+                //delegate?.changeEventViewControllerDidSaveEvent(event)
+                NSNotificationCenter.defaultCenter().postNotificationName("EventSaved", object: self, userInfo: ["Event": event])
             case "CancelEventSegue":
                 break
             case "SaveEventEditSegue":
                 let event = saveEvent()
-                delegate?.changeEventViewControllerDidSaveEvent(event)
+                //delegate?.changeEventViewControllerDidSaveEvent(event)
+                NSNotificationCenter.defaultCenter().postNotificationName("EventSaved", object: self, userInfo: ["Event": event])
             case "CancelEventEditSegue":
                 break
             default:
@@ -951,16 +951,4 @@ extension ChangeEventViewController: UITableViewDataSource {
         }
         return super.tableView(tableView, numberOfRowsInSection: section)
     }
-}
-
-/**
-    Delegate protocol for ChangeEventViewController.
-*/
-protocol ChangeEventViewControllerDelegate {
-    /**
-        Informs the delegate that the `ChangeEventViewController` just saved an event.
-    
-        :param: event The saved event.
-    */
-    func changeEventViewControllerDidSaveEvent(event: FullEvent)
 }

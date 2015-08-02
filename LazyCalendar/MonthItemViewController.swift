@@ -42,9 +42,9 @@ class MonthItemViewController: UIViewController {
         monthItemPageViewContainer.addConstraint(heightConstraint)
         
         // Observer for when notification pops up
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationShouldFire", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "changeMonths:", name: "MonthChanged", object: nil)
     }
-
     
     /**
         Loads the navigation title.
@@ -62,11 +62,22 @@ class MonthItemViewController: UIViewController {
     }
     
     /**
+        On month change, reload navigation title to match month and show events for the first day of the month.
+    
+        :param: notification The notification that the month has changed.
+    */
+    func changeMonths(notification: NSNotification) {
+        monthItemCollectionViewController = notification.userInfo!["ViewController"] as? MonthItemCollectionViewController
+        loadNavigationTitle(monthItemCollectionViewController!.dateComponents!)
+    }
+    
+    
+    /**
         Show an alert for the event notification. The alert provides two options: "OK" and "View Event". Tap "OK" to dismiss the alert. Tap "View Event" to show event details.
     
         This is only called if this view controller is loaded and currently visible.
     
-        :param: notification The notification from the subject to the observer.
+        :param: notification The notification that a local notification was received.
     */
     func showEventNotification(notification: NSNotification) {
         if isViewLoaded() && view?.window != nil {
@@ -94,7 +105,7 @@ class MonthItemViewController: UIViewController {
                 
                 if results != nil && results!.count > 0 {
                     let event = results!.first!
-                    selectEventTableViewController.loadData(event)
+                    NSNotificationCenter.defaultCenter().postNotificationName("EventSelected", object: self, userInfo: ["Event": event])
                 }
                 
                 self.showViewController(selectEventTableViewController, sender: self)
@@ -134,12 +145,8 @@ class MonthItemViewController: UIViewController {
                 let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
                 // Set initial date information for event
                 addEventViewController.loadData(dateStart: initialDate!)
-                // Delegate to be informed of new event is table view.
-                addEventViewController.delegate = monthItemTableViewController
             case pageViewSegueIdentifier:
                 monthItemPageViewController = segue.destinationViewController as? MonthItemPageViewController
-                monthItemPageViewController!.monthItemViewController = self
-                monthItemPageViewController!.customDelegate = self
                 loadNavigationTitle(monthItemPageViewController!.dateComponents)
             case tableViewSegueIdentifier:
                 monthItemTableViewController = segue.destinationViewController as? MonthItemTableViewController
@@ -158,27 +165,5 @@ class MonthItemViewController: UIViewController {
     
     
     @IBAction func cancelEvent(segue: UIStoryboardSegue) {
-    }
-}
-
-extension MonthItemViewController: MonthItemCollectionViewControllerDelegate {
-    /**
-        On date selection, show events for that date.
-        
-        :param: date The currently selected date.
-    */
-    func monthItemCollectionViewControllerDidChangeSelectedDate(date: NSDate) {
-        monthItemTableViewController!.showEvents(date)
-    }
-}
-
-// MARK: - MonthItemPageViewControllerDelegate
-extension MonthItemViewController: MonthItemPageViewControllerDelegate {
-    func monthItemPageViewControllerDidChangeCurrentViewController(monthItemCollectionViewController: MonthItemCollectionViewController) {
-        self.monthItemCollectionViewController = monthItemCollectionViewController
-        loadNavigationTitle(monthItemCollectionViewController.dateComponents!)
-        if monthItemTableViewController != nil {
-            monthItemTableViewController!.showEvents(monthItemCollectionViewController.dateIndex!)
-        }
     }
 }

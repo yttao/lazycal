@@ -9,17 +9,12 @@
 import UIKit
 
 class MonthItemPageViewController: UIPageViewController {
-    
-    var customDelegate: MonthItemPageViewControllerDelegate?
-    
     private let calendar = NSCalendar.currentCalendar()
     // Keeps track of current date view
     var dateComponents: NSDateComponents
     // Calendar units to keep track of
     private let units = NSCalendarUnit.CalendarUnitDay | NSCalendarUnit.CalendarUnitMonth |
         NSCalendarUnit.CalendarUnitYear
-    
-    var monthItemViewController: MonthItemViewController?
     
     /**
         Initialize date components for start date.
@@ -50,8 +45,7 @@ class MonthItemPageViewController: UIPageViewController {
         // Make first view controller
         let firstViewController = getMonthItemCollectionViewController(dateComponents)
         
-        //currentViewController = firstController
-        customDelegate?.monthItemPageViewControllerDidChangeCurrentViewController(firstViewController)
+        NSNotificationCenter.defaultCenter().postNotificationName("MonthChanged", object: self, userInfo: ["ViewController": firstViewController])
 
         setViewControllers([firstViewController], direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
     }
@@ -100,7 +94,6 @@ class MonthItemPageViewController: UIPageViewController {
         let monthItemCollectionViewController = storyboard!.instantiateViewControllerWithIdentifier("MonthItemCollectionViewController") as! MonthItemCollectionViewController
         // Load data
         monthItemCollectionViewController.loadData(components)
-        monthItemCollectionViewController.delegate = monthItemViewController
         
         return monthItemCollectionViewController
     }
@@ -117,8 +110,7 @@ extension MonthItemPageViewController: UIPageViewControllerDelegate {
         let newMonth = pageViewController.viewControllers.first! as! MonthItemCollectionViewController
         let oldMonth = previousViewControllers.first! as! MonthItemCollectionViewController
         
-        //currentViewController = newMonth
-        customDelegate?.monthItemPageViewControllerDidChangeCurrentViewController(newMonth)
+        NSNotificationCenter.defaultCenter().postNotificationName("MonthChanged", object: self, userInfo: ["ViewController": newMonth])
         
         // Change current month based on whether you went to previous or next month
         if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) ==
@@ -161,17 +153,4 @@ extension MonthItemPageViewController: UIPageViewControllerDataSource {
         
         return getMonthItemCollectionViewController(newComponents)
     }
-}
-
-
-/**
-    Delegate protocol for `MonthItemPageViewController`.
-*/
-protocol MonthItemPageViewControllerDelegate {
-    /**
-        Informs the delegate that the current `MonthItemPageViewController` changed the current controller.
-    
-        :param: monthItemCollectionViewController The new `MonthItemCollectionViewController` that is presented.
-    */
-    func monthItemPageViewControllerDidChangeCurrentViewController(monthItemCollectionViewController: MonthItemCollectionViewController)
 }

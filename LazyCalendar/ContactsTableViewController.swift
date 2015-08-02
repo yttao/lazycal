@@ -72,7 +72,7 @@ class ContactsTableViewController: UITableViewController {
         definesPresentationContext = true
         
         // Observer for when notification pops up
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationShouldFire", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
     }
     
     /**
@@ -98,7 +98,7 @@ class ContactsTableViewController: UITableViewController {
     
         This is only called if this view controller is loaded and currently visible.
     
-        :param: notification The notification from the subject to the observer.
+        :param: notification The notification that a local notification was received.
     */
     func showEventNotification(notification: NSNotification) {
         if isViewLoaded() && view?.window != nil {
@@ -126,7 +126,7 @@ class ContactsTableViewController: UITableViewController {
                 
                 if results != nil && results!.count > 0 {
                     let event = results!.first!
-                    selectEventTableViewController.loadData(event)
+                    NSNotificationCenter.defaultCenter().postNotificationName("EventSelected", object: self, userInfo: ["Event": event])
                 }
                 
                 self.showViewController(selectEventTableViewController, sender: self)
@@ -247,6 +247,7 @@ class ContactsTableViewController: UITableViewController {
 
     /**
         On view exit, updates the change event view controller contacts.
+        TODO: change this to observer-subject.
     */
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)

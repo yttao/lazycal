@@ -35,7 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     */
     func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
         // Notify observers
-        NSNotificationCenter.defaultCenter().postNotificationName("EventNotificationShouldFire", object: self, userInfo: ["LocalNotification": notification])
+        NSNotificationCenter.defaultCenter().postNotificationName("EventNotificationReceived", object: self, userInfo: ["LocalNotification": notification])
     }
     
     func applicationWillEnterForeground(application: UIApplication) {

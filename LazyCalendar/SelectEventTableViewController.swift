@@ -10,9 +10,7 @@ import UIKit
 import CoreData
 import AddressBook
 
-class SelectEventTableViewController: UITableViewController, ChangeEventViewControllerDelegate {
-    var delegate: SelectEventTableViewControllerDelegate?
-    
+class SelectEventTableViewController: UITableViewController {
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
     
@@ -40,11 +38,20 @@ class SelectEventTableViewController: UITableViewController, ChangeEventViewCont
     
     private let editEventSegueIdentifier = "EditEventSegue"
     
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData:", name: "EventSelected", object: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.delegate = self
         tableView.dataSource = self
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadEvent:", name: "EventSaved", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
     }
     
     /**
@@ -54,6 +61,19 @@ class SelectEventTableViewController: UITableViewController, ChangeEventViewCont
         super.viewWillAppear(animated)
         
         if event != nil {
+            reloadData()
+        }
+    }
+    
+    /**
+        Reloads data on event save and informs table view that event was changed.
+    
+        :param: event The notification informing the view controller that the event was changed.
+    */
+    func reloadEvent(notification: NSNotification) {
+        // Update info that was just edited
+        let notifiedEvent = notification.userInfo!["Event"] as! FullEvent
+        if self.event!.id == notifiedEvent.id {
             reloadData()
         }
     }
@@ -109,18 +129,60 @@ class SelectEventTableViewController: UITableViewController, ChangeEventViewCont
     }
     
     /**
-        Loads the event data.
+        Show an alert for the event notification. The alert provides two options: "OK" and "View Event". Tap "OK" to dismiss the alert. Tap "View Event" to show event details.
     
-        :param: event The selected event.
+        This is only called if this view controller is loaded and currently visible.
+    
+        :param: notification The notification from the subject to the observer.
     */
-    func loadData(event: FullEvent) {
-        self.event = event
+    func showEventNotification(notification: NSNotification) {
+        if isViewLoaded() && view?.window != nil {
+            let localNotification = notification.userInfo!["LocalNotification"] as! UILocalNotification
+            
+            let alertController = UIAlertController(title: "\(localNotification.alertTitle)", message: "\(localNotification.alertBody!)", preferredStyle: .Alert)
+            
+            let viewEventAlertAction = UIAlertAction(title: "View Event", style: .Default, handler: {
+                (action: UIAlertAction!) in
+                let selectEventNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
+                let selectEventTableViewController = selectEventNavigationController.viewControllers.first as! SelectEventTableViewController
+                
+                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+                let managedContext = appDelegate.managedObjectContext!
+                
+                let id = localNotification.userInfo!["id"] as! String
+                let requirements = "(id == %@)"
+                let predicate = NSPredicate(format: requirements, id)
+                
+                let fetchRequest = NSFetchRequest(entityName: "FullEvent")
+                fetchRequest.predicate = predicate
+                
+                var error: NSError? = nil
+                let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as? [FullEvent]
+                
+                if results != nil && results!.count > 0 {
+                    let event = results!.first!
+                    NSNotificationCenter.defaultCenter().postNotificationName("EventSelected", object: self, userInfo: ["Event": event])
+                }
+                
+                self.showViewController(selectEventTableViewController, sender: self)
+            })
+            
+            let okAlertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
+            
+            alertController.addAction(viewEventAlertAction)
+            alertController.addAction(okAlertAction)
+            
+            presentViewController(alertController, animated: true, completion: nil)
+        }
     }
     
-    func setBackButton(text: String) {
-        let backButton = UIBarButtonItem(title: text, style: .Plain, target: nil, action: nil)
-        navigationController?.navigationItem.leftBarButtonItem = backButton
-        navigationItem.leftBarButtonItem = backButton
+    /**
+        Loads the event data.
+    
+        :param: notification The notification that an event was selected.
+    */
+    func loadData(notification: NSNotification) {
+        self.event = notification.userInfo!["Event"] as? FullEvent
     }
     
     /**
@@ -131,7 +193,6 @@ class SelectEventTableViewController: UITableViewController, ChangeEventViewCont
             let navigationController = segue.destinationViewController as! UINavigationController
             let editEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
             editEventViewController.loadData(event: event!)
-            editEventViewController.delegate = self
         }
     }
     
@@ -238,30 +299,4 @@ extension SelectEventTableViewController: UITableViewDataSource {
         }
         return super.tableView(tableView, titleForHeaderInSection: section)
     }
-}
-
-// MARK: - ChangeEventViewControllerDelegate
-extension SelectEventTableViewController: ChangeEventViewControllerDelegate {
-    /**
-        Reloads data on event save and informs table view that event was changed.
-    
-        :param: event The saved event.
-    */
-    func changeEventViewControllerDidSaveEvent(event: FullEvent) {
-        // Update info that was just edited
-        reloadData()
-        delegate?.selectEventTableViewControllerDidChangeEvent(event)
-    }
-}
-
-/**
-    Delegate protocol for `SelectEventTableViewController`.
-*/
-protocol SelectEventTableViewControllerDelegate {
-    /**
-        Informs the delegate that the selected event was modified.
-    
-        :param: event The modified event.
-    */
-    func selectEventTableViewControllerDidChangeEvent(event: FullEvent)
 }
