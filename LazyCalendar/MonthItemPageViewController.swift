@@ -23,12 +23,11 @@ class MonthItemPageViewController: UIPageViewController {
         dateComponents = calendar.components(units, fromDate: NSDate())
         
         super.init(coder: aDecoder)
-        // calendar = NSCalendar.currentCalendar()
-        //dateComponents = calendar.components(units, fromDate: NSDate())
     }
     
-    
-    // On load, create page view controller with initial view
+    /**
+        On load, create page view controller with initial view
+    */
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -44,10 +43,10 @@ class MonthItemPageViewController: UIPageViewController {
     private func initializePageViewController() {
         // Make first view controller
         let firstViewController = getMonthItemCollectionViewController(dateComponents)
-        
-        NSNotificationCenter.defaultCenter().postNotificationName("MonthChanged", object: self, userInfo: ["ViewController": firstViewController])
 
         setViewControllers([firstViewController], direction: UIPageViewControllerNavigationDirection.Forward , animated: false, completion: nil)
+        
+        NSNotificationCenter.defaultCenter().postNotificationName("MonthChanged", object: self, userInfo: ["ViewController": firstViewController])
     }
     
     /**

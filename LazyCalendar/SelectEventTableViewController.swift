@@ -42,6 +42,8 @@ class SelectEventTableViewController: UITableViewController {
         super.init(coder: aDecoder)
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData:", name: "EventSelected", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadEvent:", name: "EventSaved", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
     }
     
     override func viewDidLoad() {
@@ -49,9 +51,6 @@ class SelectEventTableViewController: UITableViewController {
         
         tableView.delegate = self
         tableView.dataSource = self
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadEvent:", name: "EventSaved", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
     }
     
     /**

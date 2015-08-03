@@ -91,6 +91,9 @@ class ChangeEventViewController: UITableViewController {
         }
         
         super.init(coder: aDecoder)
+        
+        // Observer for when notification pops up
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
     }
     
     
@@ -165,9 +168,6 @@ class ChangeEventViewController: UITableViewController {
             
             alarmTimePicker.date = alarmTime!
         }
-        
-        // Observer for when notification pops up
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
     }
     
     /**

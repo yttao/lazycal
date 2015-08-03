@@ -115,6 +115,14 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     func selectCell(cell: CalendarCollectionViewCell) {
         cell.backgroundColor = selectedColor
         selectedCell = cell
+        
+        // Update selected date components
+        dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
+        dateComponents = getNewDateComponents(dateComponents!)
+        
+        let selectedDate = calendar.dateFromComponents(dateComponents!)!
+        
+        NSNotificationCenter.defaultCenter().postNotificationName("SelectedDateChanged", object: self, userInfo: ["Date": selectedDate])
     }
     
     /**
@@ -182,15 +190,6 @@ extension MonthItemCollectionViewController: UICollectionViewDelegate {
         
         // Select cell
         selectCell(cell)
-        
-        // Update selected date components
-        dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
-        dateComponents = getNewDateComponents(dateComponents!)
-        
-        let selectedDate = calendar.dateFromComponents(dateComponents!)!
-        // Alert delegate that collection view did change selected day
-        NSNotificationCenter.defaultCenter().postNotificationName("SelectedDateChanged", object: self, userInfo: ["Date": selectedDate])
-        //delegate?.monthItemCollectionViewControllerDidChangeSelectedDate(selectedDate)
     }
     
     /**

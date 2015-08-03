@@ -12,24 +12,23 @@ import CoreData
 class MonthItemViewController: UIViewController {
     @IBOutlet weak var monthItemPageViewContainer: UIView!
     @IBOutlet weak var monthItemTableViewContainer: UIView!
-    
-    var monthItemPageViewController: MonthItemPageViewController?
-    var monthItemCollectionViewController: MonthItemCollectionViewController?
-    var monthItemTableViewController: MonthItemTableViewController?
 
     // Segue identifier to add an event
     private let changeEventSegueIdentifier = "ChangeEventSegue"
-    private let pageViewSegueIdentifier = "PageViewSegue"
-    private let tableViewSegueIdentifier = "TableViewSegue"
     
     // NSCalendarUnits to keep track of
-    private let units = NSCalendarUnit.CalendarUnitYear | NSCalendarUnit.CalendarUnitMonth |
-        NSCalendarUnit.CalendarUnitDay
+    private let units: NSCalendarUnit = .CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay
     
+    private var date: NSDate?
     
     // Initializer
     required init(coder: NSCoder) {
         super.init(coder: coder)
+        
+        // Observer for when notification pops up
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "changeMonths:", name: "MonthChanged", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDate:", name: "SelectedDateChanged", object: nil)
     }
     
     
@@ -37,13 +36,18 @@ class MonthItemViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Add height constraint determined by device size
+        // Add height constraint determined by device size, table view container takes up the remaining space.
         let heightConstraint = NSLayoutConstraint(item: monthItemPageViewContainer, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
         monthItemPageViewContainer.addConstraint(heightConstraint)
-        
-        // Observer for when notification pops up
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "changeMonths:", name: "MonthChanged", object: nil)
+    }
+    
+    /**
+        Update the date.
+    
+        :param: notification The notification indicating that the selected date was changed.
+    */
+    func updateDate(notification: NSNotification) {
+        date = notification.userInfo!["Date"] as? NSDate
     }
     
     /**
@@ -67,10 +71,36 @@ class MonthItemViewController: UIViewController {
         :param: notification The notification that the month has changed.
     */
     func changeMonths(notification: NSNotification) {
-        monthItemCollectionViewController = notification.userInfo!["ViewController"] as? MonthItemCollectionViewController
+        let monthItemCollectionViewController = notification.userInfo!["ViewController"] as? MonthItemCollectionViewController
         loadNavigationTitle(monthItemCollectionViewController!.dateComponents!)
     }
     
+    /**
+        Sets up necessary data when changing to different view.
+    */
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        super.prepareForSegue(segue, sender: sender)
+        
+        if segue.identifier != nil && segue.identifier! == changeEventSegueIdentifier {
+            let calendar = NSCalendar.currentCalendar()
+            
+            // Get current hour and minute
+            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
+                NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
+            
+            // Set initial date choice on date picker as selected date, at current hour and minute
+            let dateComponents = calendar.components(units, fromDate: date!)
+            dateComponents.hour = currentTime.hour
+            dateComponents.minute = currentTime.minute
+            let initialDate = calendar.dateFromComponents(dateComponents)
+            
+            // Find view controller for adding events
+            let navigationController = segue.destinationViewController as! UINavigationController
+            let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
+            // Set initial date information for event
+            addEventViewController.loadData(dateStart: initialDate!)
+        }
+    }
     
     /**
         Show an alert for the event notification. The alert provides two options: "OK" and "View Event". Tap "OK" to dismiss the alert. Tap "View Event" to show event details.
@@ -120,50 +150,15 @@ class MonthItemViewController: UIViewController {
         }
     }
     
-    // Sets up necessary data when changing to different view
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        super.prepareForSegue(segue, sender: sender)
-        
-        if let identifier = segue.identifier {
-            switch identifier {
-            case changeEventSegueIdentifier:
-                let calendar = NSCalendar.currentCalendar()
-                
-                // Get current hour and minute
-                let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
-                    NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
-                
-                let initialDateComponents = monthItemCollectionViewController!.dateComponents!.copy() as! NSDateComponents
-                initialDateComponents.hour = currentTime.hour
-                initialDateComponents.minute = currentTime.minute
-                
-                // Set initial date choice on date picker as selected date, at current hour and minute
-                let initialDate = calendar.dateFromComponents(initialDateComponents)
-                
-                // Find view controller for adding events
-                let navigationController = segue.destinationViewController as! UINavigationController
-                let addEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
-                // Set initial date information for event
-                addEventViewController.loadData(dateStart: initialDate!)
-            case pageViewSegueIdentifier:
-                monthItemPageViewController = segue.destinationViewController as? MonthItemPageViewController
-                loadNavigationTitle(monthItemPageViewController!.dateComponents)
-            case tableViewSegueIdentifier:
-                monthItemTableViewController = segue.destinationViewController as? MonthItemTableViewController
-                monthItemTableViewController!.date = NSCalendar.currentCalendar().dateFromComponents(monthItemPageViewController!.dateComponents)
-                break
-            default:
-                break
-            }
-        }
-        
-    }
-
+    /**
+        Unwind segue on saving event.
+    */
     @IBAction func saveEvent(segue: UIStoryboardSegue) {
-        monthItemTableViewController!.reloadEvents()
     }
     
-    
+    /**
+        Unwind segue on cancelling event.
+    */
     @IBAction func cancelEvent(segue: UIStoryboardSegue) {
     }
 }

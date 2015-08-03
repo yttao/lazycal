@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 
 class MonthItemTableViewController: UITableViewController {
-    var date: NSDate?
+    private var date: NSDate!
     // The events for selected day
     private var events = [FullEvent]()
 
@@ -20,6 +20,14 @@ class MonthItemTableViewController: UITableViewController {
     private let entityName = "FullEvent"
     
     private let segueIdentifier = "SelectEventSegue"
+    
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadEvents", name: "EventSaved", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "changeMonth:", name: "MonthChanged", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "changeSelectedDate:", name: "SelectedDateChanged", object: nil)
+    }
     
     /**
         Initialize table view.
@@ -31,26 +39,28 @@ class MonthItemTableViewController: UITableViewController {
         
         tableView.dataSource = self
         tableView.delegate = self
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadEvents", name: "EventSaved", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "changeMonths:", name: "MonthChanged", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "changeSelectedDate:", name: "SelectedDateChanged", object: nil)
-        
-        showEvents(date!)
     }
     
     /**
         On month change, reload navigation title to match month and show events for the first day of the month.
     
+        Note: this method is not called when the page view controller is first initialized because it is created after the page view controller.
+    
        :param: notification The notification that the month has changed.
     */
-    func changeMonths(notification: NSNotification) {
+    func changeMonth(notification: NSNotification) {
         let monthItemCollectionViewController = notification.userInfo!["ViewController"] as? MonthItemCollectionViewController
-            showEvents(monthItemCollectionViewController!.dateIndex!)
+        date = NSCalendar.currentCalendar().dateFromComponents(monthItemCollectionViewController!.dateComponents!)
+        showEvents(date)
     }
     
+    /**
+        On selected date change, update the date and events shown.
+    
+        :param: notification The notification indicating that the selected date was changed.
+    */
     func changeSelectedDate(notification: NSNotification) {
-        let date = notification.userInfo!["Date"] as! NSDate
+        date = notification.userInfo!["Date"] as? NSDate
         showEvents(date)
     }
     
@@ -58,15 +68,17 @@ class MonthItemTableViewController: UITableViewController {
         Reloads the events
     */
     func reloadEvents() {
-        showEvents(date!)
+        showEvents(date)
     }
     
     /**
-        Show events in table form for a date.
+        Show events for a date.
+    
+        :param: date The date to show.
     */
     func showEvents(date: NSDate) {
-        self.date = date
-        //println("Showing events for \(date)")
+        //self.date = date
+        println("Showing events for \(date)")
         // Find events for that date
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext!
