@@ -16,13 +16,21 @@ class ContactsTableViewController: UITableViewController {
     
     private var allContacts: NSArray!
     private var selectedContacts: [ABRecordRef]!
-    private var filteredContacts: [ABRecordRef]!
+    private var filteredContacts: [ABRecordRef]
     
     private var searchController: UISearchController?
     // True if searching for new contacts is allowed.
     private var searchEnabled = true
     
     private let reuseIdentifier = "ContactCell"
+    
+    required init(coder aDecoder: NSCoder!) {
+        filteredContacts = [ABRecordRef]()
+        super.init(coder: aDecoder)
+        
+        // Observer for when notification pops up
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
+    }
     
     /**
         Set delegates and data sources, load address book, get contacts, and create the search controller.
@@ -33,7 +41,6 @@ class ContactsTableViewController: UITableViewController {
         if selectedContacts == nil {
             selectedContacts = [ABRecordRef]()
         }
-        filteredContacts = [ABRecordRef]()
         
         // Set table view delegate and data source
         tableView.delegate = self
@@ -42,10 +49,6 @@ class ContactsTableViewController: UITableViewController {
         // Address book must be authorized, otherwise throw exception.
         if ABAddressBookGetAuthorizationStatus() == .Authorized {
             addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-        }
-        
-        // Get all contacts
-        if ABAddressBookGetAuthorizationStatus() == .Authorized {
             allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
         }
         else {
@@ -54,40 +57,45 @@ class ContactsTableViewController: UITableViewController {
         
         // Create and configure search controller
         if searchEnabled {
-            searchController = ({
-                let controller = UISearchController(searchResultsController: nil)
-                controller.searchResultsUpdater = self
-                controller.dimsBackgroundDuringPresentation = false
-                controller.searchBar.sizeToFit()
-                controller.searchBar.placeholder = "Search for New Contacts"
-                controller.hidesNavigationBarDuringPresentation = false
-                
-                self.tableView.tableHeaderView = controller.searchBar
-                
-                return controller
-            })()
+            initializeSearchController()
         }
         
         // Hides search controller on segue.
         definesPresentationContext = true
-        
-        // Observer for when notification pops up
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
     }
     
     /**
-        Loads contacts ID data.
+        Initializes the search controller.
+    */
+    func initializeSearchController() {
+        searchController = ({
+            let controller = UISearchController(searchResultsController: nil)
+            controller.searchResultsUpdater = self
+            controller.dimsBackgroundDuringPresentation = false
+            controller.searchBar.sizeToFit()
+            controller.searchBar.placeholder = "Search for New Contacts"
+            controller.hidesNavigationBarDuringPresentation = false
+            
+            self.tableView.tableHeaderView = controller.searchBar
+            
+            return controller
+        })()
+    }
+    
+    /**
+        Loads initial contact IDs data.
     
         :param: contactIDs The array of contact IDs.
     */
     func loadData(contactIDs: [ABRecordID]) {
-        selectedContacts = [ABRecordRef]()
         if ABAddressBookGetAuthorizationStatus() == .Authorized {
             addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
         }
+        
+        selectedContacts = [ABRecordRef]()
+        
         for ID in contactIDs {
-            let person: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, ID)?.takeUnretainedValue()
-            if person != nil {
+            if let person: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, ID)?.takeUnretainedValue() {
                 selectedContacts.append(person!)
             }
         }
@@ -199,11 +207,18 @@ class ContactsTableViewController: UITableViewController {
         let predicate = NSPredicate(block: block)
         filteredContacts = allContacts.filteredArrayUsingPredicate(predicate) as [ABRecordRef]
         
+        sortRecords(&filteredContacts)
+    }
+    
+    /**
+        Sorts an array of ABRecordRefs alphabetically.
+    */
+    func sortRecords(inout records: [ABRecordRef]) {
         // Sort filtered contact IDs by alphabetical name
-        filteredContacts.sort({
+        records.sort({
             let firstFullName = ABRecordCopyCompositeName($0).takeRetainedValue() as! String
             let secondFullName = ABRecordCopyCompositeName($1).takeRetainedValue() as! String
-
+            
             return firstFullName.compare(secondFullName) == .OrderedAscending
         })
     }
