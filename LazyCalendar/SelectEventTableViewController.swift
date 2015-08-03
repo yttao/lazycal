@@ -221,6 +221,26 @@ extension SelectEventTableViewController: UITableViewDelegate {
     }
     
     /**
+        If there are no rows in the section, header view is nil.
+    */
+    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
+            return nil
+        }
+        return super.tableView(tableView, viewForHeaderInSection: section)
+    }
+    
+    /**
+        If there are no rows in the section, footer view is nil.
+    */
+    override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
+            return nil
+        }
+        return super.tableView(tableView, viewForFooterInSection: section)
+    }
+    
+    /**
         Height is default unless it is the alarm time display cell, which can be hidden.
     */
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {

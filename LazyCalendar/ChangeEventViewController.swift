@@ -463,7 +463,6 @@ class ChangeEventViewController: UITableViewController {
         }
     }
     
-    
     /**
         Show more alarm options
     */
@@ -486,7 +485,6 @@ class ChangeEventViewController: UITableViewController {
         
         tableView.endUpdates()
     }
-    
     
     /**
         Show fewer alarm options.
@@ -519,7 +517,6 @@ class ChangeEventViewController: UITableViewController {
         name = nameTextField.text
     }
     
-    
     /**
         Update alarm time.
     */
@@ -527,7 +524,6 @@ class ChangeEventViewController: UITableViewController {
         alarmTime = alarmTimePicker.date
         updateAlarmTimeLabels()
     }
-    
     
     /**
         Update alarm time display.
@@ -706,6 +702,8 @@ class ChangeEventViewController: UITableViewController {
     
     /**
         Adds new contacts.
+    
+        :param: event The event to add contacts to.
     */
     func addNewContacts(event: FullEvent) {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -761,6 +759,10 @@ class ChangeEventViewController: UITableViewController {
     
     /**
         Removes old contacts.
+    
+        All contacts that are not currently contained in `contactIDs` will be removed.
+    
+        :param: event The event to remove contacts from.	
     */
     func removeOldContacts(event: FullEvent) {
         var eventContacts = event.mutableSetValueForKey("contacts")
@@ -915,6 +917,10 @@ extension ChangeEventViewController: UITableViewDelegate {
             case .NotDetermined:
                 displayContactsAccessRequest()
             }
+        case sections["Locations"]!:
+            let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! UIViewController
+            
+            navigationController?.showViewController(locationsViewController, sender: self)
         default:
             break
         }

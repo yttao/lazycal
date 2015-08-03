@@ -23,13 +23,13 @@
                                     <constraint firstAttribute="height" constant="300" placeholder="YES" id="4Ig-Yw-PQc"/>
                                 </constraints>
                                 <connections>
-                                    <segue destination="F76-rJ-Pnm" kind="embed" identifier="PageViewSegue" id="d6i-mu-jwW"/>
+                                    <segue destination="F76-rJ-Pnm" kind="embed" identifier="MonthPageViewSegue" id="d6i-mu-jwW"/>
                                 </connections>
                             </containerView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mfm-EE-QX8">
                                 <rect key="frame" x="0.0" y="300" width="600" height="236"/>
                                 <connections>
-                                    <segue destination="FJJ-Nz-Px7" kind="embed" identifier="TableViewSegue" id="B8s-AW-7TP"/>
+                                    <segue destination="FJJ-Nz-Px7" kind="embed" identifier="MonthTableViewSegue" id="B8s-AW-7TP"/>
                                 </connections>
                             </containerView>
                         </subviews>
@@ -482,7 +482,7 @@
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Number of Locations" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="rk0-2z-DwL" userLabel="Number of Locations">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="rk0-2z-DwL" userLabel="Number of Locations">
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="calibratedRGB"/>
@@ -587,10 +587,10 @@
             </objects>
             <point key="canvasLocation" x="221" y="1139"/>
         </scene>
-        <!--Locations-->
+        <!--LocationsViewController-->
         <scene sceneID="1am-4J-x9m">
             <objects>
-                <viewController id="o8H-hp-xnq" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LocationsViewController" title="LocationsViewController" id="o8H-hp-xnq" customClass="LocationsViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="THB-HF-9Ws"/>
                         <viewControllerLayoutGuide type="bottom" id="dob-qp-OOO"/>
@@ -601,32 +601,36 @@
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ycY-d1-N9G">
                                 <rect key="frame" x="0.0" y="64" width="600" height="300"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="300" placeholder="YES" id="hOW-rN-sVx"/>
-                                </constraints>
                                 <connections>
-                                    <segue destination="pkJ-xm-n9t" kind="embed" id="hRG-fX-Lb8"/>
+                                    <segue destination="m0E-rb-RhV" kind="embed" identifier="LocationsTableViewSegue" id="ZuO-NZ-qwh"/>
                                 </connections>
                             </containerView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="e0W-pQ-BKE">
                                 <rect key="frame" x="0.0" y="364" width="600" height="236"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="236" id="Qyo-kB-hPU"/>
+                                </constraints>
                                 <connections>
-                                    <segue destination="m0E-rb-RhV" kind="embed" id="gU5-fY-kaG"/>
+                                    <segue destination="pkJ-xm-n9t" kind="embed" identifier="LocationsMapViewSegue" id="dy0-Y3-McG"/>
                                 </connections>
                             </containerView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="ycY-d1-N9G" firstAttribute="top" secondItem="THB-HF-9Ws" secondAttribute="bottom" id="4fb-D4-vR3"/>
+                            <constraint firstItem="THB-HF-9Ws" firstAttribute="bottom" secondItem="ycY-d1-N9G" secondAttribute="top" id="4fb-D4-vR3"/>
                             <constraint firstItem="e0W-pQ-BKE" firstAttribute="leading" secondItem="kSX-Qy-LuF" secondAttribute="leading" id="8A9-t7-a7i"/>
                             <constraint firstItem="e0W-pQ-BKE" firstAttribute="bottom" secondItem="dob-qp-OOO" secondAttribute="top" id="9Y4-uH-rKv"/>
-                            <constraint firstAttribute="trailing" secondItem="ycY-d1-N9G" secondAttribute="trailing" id="KqC-Qz-qLQ"/>
+                            <constraint firstItem="ycY-d1-N9G" firstAttribute="trailing" secondItem="kSX-Qy-LuF" secondAttribute="trailing" id="KqC-Qz-qLQ"/>
                             <constraint firstItem="ycY-d1-N9G" firstAttribute="leading" secondItem="kSX-Qy-LuF" secondAttribute="leading" id="NrU-3S-kfi"/>
                             <constraint firstItem="e0W-pQ-BKE" firstAttribute="top" secondItem="ycY-d1-N9G" secondAttribute="bottom" id="S2f-lB-3p3"/>
                             <constraint firstItem="e0W-pQ-BKE" firstAttribute="trailing" secondItem="kSX-Qy-LuF" secondAttribute="trailing" id="Snq-s1-DyN"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Locations" id="an9-ox-IHB"/>
+                    <connections>
+                        <outlet property="locationsMapViewContainer" destination="e0W-pQ-BKE" id="UM8-cv-roS"/>
+                        <outlet property="locationsTableViewContainer" destination="ycY-d1-N9G" id="bK4-PR-EG8"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="b3e-B0-5a2" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -1095,6 +1099,35 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Contacts" id="vWD-ZD-nOY" userLabel="Locations">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="Y9b-Ga-7eU" detailTextLabel="QoJ-OJ-5YO" style="IBUITableViewCellStyleValue1" id="8IK-rC-OP3" userLabel="Locations">
+                                        <rect key="frame" x="0.0" y="375" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="8IK-rC-OP3" id="DcD-pd-Hbd">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Locations" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Y9b-Ga-7eU" userLabel="Locations">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="QoJ-OJ-5YO" userLabel="Number of Locations">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <bool key="isElement" value="YES"/>
+                                        </accessibility>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="5kC-gB-dnz" id="34e-6L-GNK"/>
@@ -1174,10 +1207,10 @@
             </objects>
             <point key="canvasLocation" x="-463" y="1139"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--LocationsNavigationController-->
         <scene sceneID="lXY-Si-Cat">
             <objects>
-                <navigationController id="F0n-UR-PHZ" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="LocationsNavigationController" title="LocationsNavigationController" id="F0n-UR-PHZ" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="N4T-Dn-VLs">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1190,20 +1223,20 @@
             </objects>
             <point key="canvasLocation" x="-463" y="1837"/>
         </scene>
-        <!--View Controller-->
+        <!--LocationsMapViewController-->
         <scene sceneID="ju9-MV-ZNF">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="pkJ-xm-n9t" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LocationsMapViewController" title="LocationsMapViewController" automaticallyAdjustsScrollViewInsets="NO" id="pkJ-xm-n9t" customClass="LocationsMapViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="1I2-eA-Unm"/>
                         <viewControllerLayoutGuide type="bottom" id="kur-TQ-NMj"/>
                     </layoutGuides>
                     <view key="view" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="FqO-4f-W2v">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="236"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="DR5-Nt-yqP">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="236"/>
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -1215,21 +1248,24 @@
                         </constraints>
                     </view>
                     <toolbarItems/>
+                    <connections>
+                        <outlet property="mapView" destination="DR5-Nt-yqP" id="Adt-Is-Hf4"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Foq-jr-Mcf" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="934" y="1687"/>
+            <point key="canvasLocation" x="934" y="1994"/>
         </scene>
-        <!--Table View Controller-->
+        <!--LocationsTableViewController-->
         <scene sceneID="JeT-BH-8tx">
             <objects>
-                <tableViewController id="m0E-rb-RhV" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="LocationsTableViewController" title="LocationsTableViewController" id="m0E-rb-RhV" customClass="LocationsTableViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="jOB-aQ-7EJ">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="236"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="RX6-pA-png" detailTextLabel="Q9I-xM-lqK" style="IBUITableViewCellStyleValue1" id="xf4-Bb-hRg">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="LocationCell" textLabel="RX6-pA-png" detailTextLabel="Q9I-xM-lqK" style="IBUITableViewCellStyleSubtitle" id="xf4-Bb-hRg">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="xf4-Bb-hRg" id="qHL-KF-y6Y">
                                     <autoresizingMask key="autoresizingMask"/>
@@ -1240,16 +1276,17 @@
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Location Details" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Q9I-xM-lqK">
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Address" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Q9I-xM-lqK">
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="calibratedRGB"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
                             </tableViewCell>
                         </prototypes>
+                        <sections/>
                         <connections>
                             <outlet property="dataSource" destination="m0E-rb-RhV" id="jdr-bH-jnc"/>
                             <outlet property="delegate" destination="m0E-rb-RhV" id="UIw-yw-cMk"/>
@@ -1258,7 +1295,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Owq-a8-gnj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="934" y="2019"/>
+            <point key="canvasLocation" x="934" y="1662"/>
         </scene>
     </scenes>
 </document>

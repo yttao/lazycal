@@ -32,11 +32,22 @@ class MonthItemViewController: UIViewController {
     }
     
     
-    // Loads initial data
+    /**
+        Initialize height constraints.
+    */
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Add height constraint determined by device size, table view container takes up the remaining space.
+        initializeHeightConstraints()
+    }
+    
+    /**
+        Initialize height constraints for calendar. The height constraint is determined by device size, while the table view container takes up the remaining space.
+    
+        The height constraint is by default half the screen height but can shrink if there happens to be fewer than 6 rows that need to be displayed (the maximum number of rows that must be displayable).
+    */
+    func initializeHeightConstraints() {
+        monthItemPageViewContainer.setTranslatesAutoresizingMaskIntoConstraints(false)
         let heightConstraint = NSLayoutConstraint(item: monthItemPageViewContainer, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1.0, constant: CGFloat(view.frame.size.height / 2))
         monthItemPageViewContainer.addConstraint(heightConstraint)
     }
@@ -76,7 +87,7 @@ class MonthItemViewController: UIViewController {
     }
     
     /**
-        Sets up necessary data when changing to different view.
+        Sets up necessary data when changing to different view. When about to add an event, calculate
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         super.prepareForSegue(segue, sender: sender)
@@ -84,11 +95,8 @@ class MonthItemViewController: UIViewController {
         if segue.identifier != nil && segue.identifier! == changeEventSegueIdentifier {
             let calendar = NSCalendar.currentCalendar()
             
-            // Get current hour and minute
-            let currentTime = calendar.components(NSCalendarUnit.CalendarUnitHour |
-                NSCalendarUnit.CalendarUnitMinute, fromDate: NSDate())
-            
-            // Set initial date choice on date picker as selected date, at current hour and minute
+            // Set initial date as the currently selected date and hours/minutes as current hours/minutes.
+            let currentTime = calendar.components(.CalendarUnitHour | .CalendarUnitMinute, fromDate: NSDate())
             let dateComponents = calendar.components(units, fromDate: date!)
             dateComponents.hour = currentTime.hour
             dateComponents.minute = currentTime.minute

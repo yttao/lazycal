@@ -119,6 +119,27 @@ class MonthItemTableViewController: UITableViewController {
     }
     
     /**
+        Deschedules notifications for a deleted event.
+    
+        If no notifications are found, it does nothing.
+    
+        :param: event The event that has notifications to deschedule.
+    */
+    func descheduleNotificationsForDeletedEvent(event: FullEvent) {
+        // Get all notifications
+        var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
+        // Get notifications to remove
+        let notifications = scheduledNotifications.filter({(
+            $0.userInfo!["id"] as! String) == event.id
+        })
+        // Remove scheduled notifications
+        for (index, notification) in enumerate(notifications) {
+            let index = find(scheduledNotifications, notification)
+            scheduledNotifications.removeAtIndex(index!)
+        }
+    }
+    
+    /**
         Leaves event details back to main view.
     */
     @IBAction func leaveEventDetails(segue: UIStoryboardSegue) {
@@ -203,27 +224,6 @@ extension MonthItemTableViewController: UITableViewDataSource {
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
             events.removeAtIndex(indexPath.row)
             tableView.endUpdates()
-        }
-    }
-    
-    /**
-        Deschedules notifications for a deleted event.
-    
-        If no notifications are found, it does nothing.
-    
-        :param: event The event that has notifications to deschedule.
-    */
-    func descheduleNotificationsForDeletedEvent(event: FullEvent) {
-        // Get all notifications
-        var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
-        // Get notifications to remove
-        let notifications = scheduledNotifications.filter({(
-            $0.userInfo!["id"] as! String) == event.id
-        })
-        // Remove scheduled notifications
-        for (index, notification) in enumerate(notifications) {
-            let index = find(scheduledNotifications, notification)
-            scheduledNotifications.removeAtIndex(index!)
         }
     }
     
