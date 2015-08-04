@@ -600,18 +600,18 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ycY-d1-N9G">
-                                <rect key="frame" x="0.0" y="64" width="600" height="300"/>
+                                <rect key="frame" x="0.0" y="64" width="600" height="236"/>
                                 <connections>
-                                    <segue destination="m0E-rb-RhV" kind="embed" identifier="LocationsTableViewSegue" id="ZuO-NZ-qwh"/>
+                                    <segue destination="pkJ-xm-n9t" kind="embed" id="Ya4-5s-nSd"/>
                                 </connections>
                             </containerView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="e0W-pQ-BKE">
-                                <rect key="frame" x="0.0" y="364" width="600" height="236"/>
+                                <rect key="frame" x="0.0" y="300" width="600" height="300"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="236" id="Qyo-kB-hPU"/>
+                                    <constraint firstAttribute="height" constant="300" placeholder="YES" id="Qyo-kB-hPU"/>
                                 </constraints>
                                 <connections>
-                                    <segue destination="pkJ-xm-n9t" kind="embed" identifier="LocationsMapViewSegue" id="dy0-Y3-McG"/>
+                                    <segue destination="m0E-rb-RhV" kind="embed" id="Ims-wJ-Cok"/>
                                 </connections>
                             </containerView>
                         </subviews>
@@ -628,8 +628,8 @@
                     </view>
                     <navigationItem key="navigationItem" title="Locations" id="an9-ox-IHB"/>
                     <connections>
-                        <outlet property="locationsMapViewContainer" destination="e0W-pQ-BKE" id="UM8-cv-roS"/>
-                        <outlet property="locationsTableViewContainer" destination="ycY-d1-N9G" id="bK4-PR-EG8"/>
+                        <outlet property="locationsMapViewContainer" destination="ycY-d1-N9G" id="1z5-6t-hcb"/>
+                        <outlet property="locationsTableViewContainer" destination="e0W-pQ-BKE" id="ZJi-VK-G8n"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="b3e-B0-5a2" userLabel="First Responder" sceneMemberID="firstResponder"/>

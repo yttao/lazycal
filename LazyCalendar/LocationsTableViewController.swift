@@ -7,9 +7,9 @@
 //
 
 import UIKit
+import MapKit
 
 class LocationsTableViewController: UITableViewController {
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -17,7 +17,6 @@ class LocationsTableViewController: UITableViewController {
         tableView.dataSource = self
         
         tableView.contentInset = UIEdgeInsetsZero
-        println(tableView.headerViewForSection(0)?.frame.height)
     }
 }
 
@@ -31,7 +30,6 @@ extension LocationsTableViewController: UITableViewDataSource {
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
-    
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 10
     }
