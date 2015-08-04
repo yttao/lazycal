@@ -8,6 +8,8 @@
 
 import UIKit
 import MapKit
+import AddressBook
+import CoreLocation
 
 class LocationsTableViewController: UITableViewController {
     override func viewDidLoad() {

@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import MapKit
 import CoreData
 import AddressBook
+import CoreLocation
 
 class ChangeEventViewController: UITableViewController {
     // Event data to store
@@ -367,19 +369,11 @@ class ChangeEventViewController: UITableViewController {
         ABAddressBookRequestAccessWithCompletion(addressBookRef) {
             (granted: Bool, error: CFError!) in
             dispatch_async(dispatch_get_main_queue()) {
-                // If given permission, get address book reference
+                // If given permission, get address book reference and go to next view controller.
                 if granted {
                     self.addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-                    // Show next view controller
-                    let contactsTableViewController = self.storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
-                    // Load contacts IDs if they exist already.
                     
-                    if self.contactIDs != nil {
-                        contactsTableViewController.loadData(self.contactIDs!)
-                    }
-                    
-                    self.navigationController!.showViewController(
-                        contactsTableViewController, sender: self)
+                    self.showContactsViewController()
                 }
                 // If denied permission, display access denied message.
                 else {
@@ -390,31 +384,65 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Alerts the user that access to contacts is denied and offers chance to change permissions in settings.
-        This occurs when the user is first prompted for access and denies access or in future attempts to use contacts when permission is denied.
+        Alerts the user that access to contacts is denied or restricted and requests a permissions change by going to settings.
+    
+        This occurs when the user is first prompted for access and denies access or in future attempts to use contacts when permission is denied or restricted.
     */
     func displayContactsAccessDeniedAlert() {
         // Create alert for contacts access denial
         let contactsAccessDeniedAlert = UIAlertController(title: "Cannot Access Contacts",
-            message: "You must give the app permission to access contacts.",
+            message: "You must give the app permission to access contacts to use this feature.",
             preferredStyle: .Alert)
+        
+        let changeSettingsAlertAction = UIAlertAction(title: "Change Settings", style: .Default, handler: { action in
+            self.openSettings()
+        })
+        let okAlertAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
+        
         // Add option to open settings and allow contacts access
-        contactsAccessDeniedAlert.addAction(UIAlertAction(title: "Change Settings",
-            style: .Default,
-            handler: { action in
-                self.openSettings()
-        }))
-        // Add option to just continue without contacts access
-        contactsAccessDeniedAlert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-        // Show alert
+        contactsAccessDeniedAlert.addAction(changeSettingsAlertAction)
+        contactsAccessDeniedAlert.addAction(okAlertAction)
         presentViewController(contactsAccessDeniedAlert, animated: true, completion: nil)
     }
     
+    /**
+        Displays an alert to request access to user location.
+    
+        If permission is granted, it goes to the location view controller. If not, it displays an alert to inform the user that access to user location is denied.
+    */
+    func displayLocationAccessRequest() {
+        let locationManager = CLLocationManager()
+        locationManager.requestWhenInUseAuthorization()
+        
+        if CLLocationManager.authorizationStatus() == .AuthorizedWhenInUse {
+            showLocationsViewController()
+        }
+        else if CLLocationManager.authorizationStatus() == .Denied {
+            displayLocationAccessDeniedAlert()
+        }
+    }
+    
+    /**
+        Alerts the user that access to user location is denied or restricted and requests a permissions change by going to settings.
+    
+        This occurs when the user is first prompt for access and denies access or in future attempts to use locations when permission is denied or restricted.
+    */
+    func displayLocationAccessDeniedAlert() {
+        let locationAccessDeniedAlert = UIAlertController(title: "Cannot Access User Location", message: "You must give the app permission to access locations to use this feature.", preferredStyle: .Alert)
+        
+        let changeSettingsAlertAction = UIAlertAction(title: "Change Settings", style: .Default, handler: { action in
+            self.openSettings()
+        })
+        let okAlertAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
+        locationAccessDeniedAlert.addAction(changeSettingsAlertAction)
+        locationAccessDeniedAlert.addAction(okAlertAction)
+        presentViewController(locationAccessDeniedAlert, animated: true, completion: nil)
+    }
     
     /**
         Opens the settings menu.
         
-        This is called when contacts access is explicitly denied and the contacts view controller requires contacts access to continue.
+        This is called when requested access for user information is denied and permissions should be changed.
     */
     func openSettings() {
         let url = NSURL(string: UIApplicationOpenSettingsURLString)
@@ -422,11 +450,33 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
+        Shows the contacts view controller.
+    */
+    func showContactsViewController() {
+        let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+        
+        // Load contacts IDs if they exist already.
+        if contactIDs != nil {
+            contactsTableViewController.loadData(self.contactIDs!)
+        }
+        
+        navigationController!.showViewController(contactsTableViewController, sender: self)
+    }
+    
+    /**
+        Shows the location view controller.
+    */
+    func showLocationsViewController() {
+        let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! UIViewController
+        navigationController?.showViewController(locationsViewController, sender: self)
+    }
+    
+    /**
         Updates whether or not the alarm switch is enabled.
     
         The alarm switch can be toggled if user notifications are allowed. Otherwise, the alarm switch cannot be toggled.
     
-        TODO: also possibly do a check on if notification settings have changed from true -> false and all notifications should be removed.
+        TODO: also possibly do a check on if notification settings have changed from true -> false and all notifications are silenced properly.
     */
     func updateAlarmSwitchEnabled() {
         let settings = UIApplication.sharedApplication().currentUserNotificationSettings()
@@ -464,7 +514,7 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Show more alarm options
+        Show more alarm options.
     */
     func showMoreAlarmOptions() {
         tableView.beginUpdates()
@@ -667,6 +717,8 @@ class ChangeEventViewController: UITableViewController {
         NSLog("Event scheduled for time: %@", event.alarmTime!.description)
         let notification = UILocalNotification()
         notification.alertTitle = "Event Notification"
+        
+        // Fill in notification info
         if event.name != nil {
             notification.alertBody = "\(event.name!)"
         }
@@ -678,6 +730,8 @@ class ChangeEventViewController: UITableViewController {
         notification.soundName = UILocalNotificationDefaultSoundName
         notification.userInfo = ["id": event.id]
         notification.category = "LAZYCALENDAR_CATEGORY"
+        
+        // Schedule notification
         UIApplication.sharedApplication().scheduleLocalNotification(notification)
     }
     
@@ -690,10 +744,12 @@ class ChangeEventViewController: UITableViewController {
         NSLog("Event descheduled for event: %@", event.id)
         // Get all notifications
         var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
+        
         // Get notifications to remove
         let notifications = scheduledNotifications.filter({(
             $0.userInfo!["id"] as! String) == event.id
         })
+        
         // Cancel notifications
         for notification in notifications {
             UIApplication.sharedApplication().cancelLocalNotification(notification)
@@ -731,7 +787,7 @@ class ChangeEventViewController: UITableViewController {
                 
                 let contactEntity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
                 
-                // If no results, contact is new. Add Contact entity for first time.
+                // If no results, contact is new. Add Contact for first time.
                 if results.count == 0 {
                     let contact = Contact(entity: contactEntity, insertIntoManagedObjectContext: managedContext)
                     
@@ -744,7 +800,7 @@ class ChangeEventViewController: UITableViewController {
                     var contactEvents = contact.mutableSetValueForKey("events")
                     contactEvents.addObject(event)
                 }
-                    // If results returned, contact already exists. Add existing contact to event contacts.
+                    // If results returned, contact already exists. Add existing contact to events related to the contact.
                 else {
                     let contact = results.first!
                     
@@ -826,13 +882,11 @@ class ChangeEventViewController: UITableViewController {
             switch identifier {
             case "SaveEventSegue":
                 let event = saveEvent()
-                //delegate?.changeEventViewControllerDidSaveEvent(event)
                 NSNotificationCenter.defaultCenter().postNotificationName("EventSaved", object: self, userInfo: ["Event": event])
             case "CancelEventSegue":
                 break
             case "SaveEventEditSegue":
                 let event = saveEvent()
-                //delegate?.changeEventViewControllerDidSaveEvent(event)
                 NSNotificationCenter.defaultCenter().postNotificationName("EventSaved", object: self, userInfo: ["Event": event])
             case "CancelEventEditSegue":
                 break
@@ -886,6 +940,7 @@ extension ChangeEventViewController: UITableViewDelegate {
                 tableView.insertRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
             }
             tableView.endUpdates()
+        // Show notifications disabled alert if notifications are turned off.
         case sections["Alarm"]!:
             if indexPath == indexPaths["AlarmToggle"]! {
                 if !alarmSwitch.userInteractionEnabled {
@@ -894,33 +949,30 @@ extension ChangeEventViewController: UITableViewDelegate {
             }
         // Ensure permission to access address book, then segue to contacts view.
         case sections["Contacts"]!:
-            // Get authorization status
             let authorizationStatus = ABAddressBookGetAuthorizationStatus()
             
+            // If contacts access is authorized, show contacts view. Else, display request for access.
             switch authorizationStatus {
-            // If denied, display message for permission.
+            case .Authorized:
+                showContactsViewController()
             case .Denied, .Restricted:
                 displayContactsAccessDeniedAlert()
-            // If granted, continue to next view controller for contacts.
-            case .Authorized:
-                let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
-                
-                // Load contacts IDs if they exist already.
-                if contactIDs != nil {
-                    contactsTableViewController.loadData(contactIDs!)
-                }
-                
-                navigationController?.showViewController(
-                    contactsTableViewController, sender: self)
-                
-            // If undetermined (first time address book request), ask for permission.
             case .NotDetermined:
                 displayContactsAccessRequest()
             }
+        // Ensure permission to access user location, then segue to locations view.
         case sections["Locations"]!:
-            let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! UIViewController
+            let authorizationStatus = CLLocationManager.authorizationStatus()
             
-            navigationController?.showViewController(locationsViewController, sender: self)
+            // If user location access is authorized, show location view. Else, display request for access.
+            switch authorizationStatus {
+            case .AuthorizedWhenInUse, .AuthorizedAlways:
+                showLocationsViewController()
+            case CLAuthorizationStatus.Restricted, .Denied:
+                displayLocationAccessDeniedAlert()
+            case .NotDetermined:
+                displayLocationAccessRequest()
+            }
         default:
             break
         }
