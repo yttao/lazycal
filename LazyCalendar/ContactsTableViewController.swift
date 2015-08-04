@@ -16,7 +16,7 @@ class ContactsTableViewController: UITableViewController {
     
     private var allContacts: NSArray!
     private var selectedContacts: [ABRecordRef]!
-    private var filteredContacts: [ABRecordRef]
+    private var filteredContacts = [ABRecordRef]()
     
     private var searchController: UISearchController?
     // True if searching for new contacts is allowed.
@@ -25,7 +25,6 @@ class ContactsTableViewController: UITableViewController {
     private let reuseIdentifier = "ContactCell"
     
     required init(coder aDecoder: NSCoder!) {
-        filteredContacts = [ABRecordRef]()
         super.init(coder: aDecoder)
         
         // Observer for when notification pops up
@@ -59,7 +58,6 @@ class ContactsTableViewController: UITableViewController {
         if searchEnabled {
             initializeSearchController()
         }
-        
         // Hides search controller on segue.
         definesPresentationContext = true
     }
@@ -163,7 +161,7 @@ class ContactsTableViewController: UITableViewController {
 
         :param: searchText The text to filter the results.
     */
-    func filterContentForSearchText(searchText: String) {
+    func filterContacts(searchText: String) {
         let block = {
             (record: AnyObject!, bindings: [NSObject: AnyObject]!) -> Bool in
             let recordRef: ABRecordRef = record as ABRecordRef
@@ -394,7 +392,7 @@ extension ContactsTableViewController: UISearchResultsUpdating {
         Updates search results by updating `filteredContacts`.
     */
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        filterContentForSearchText(searchController.searchBar.text)
+        filterContacts(searchController.searchBar.text)
         tableView.reloadData()
     }
 }

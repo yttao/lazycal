@@ -34,6 +34,8 @@ class LocationsMapViewController: UIViewController {
         if CLLocationManager.authorizationStatus() == CLAuthorizationStatus.AuthorizedWhenInUse {
             centerOnUserLocation()
         }
+        
+        NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
     }
     
     /**

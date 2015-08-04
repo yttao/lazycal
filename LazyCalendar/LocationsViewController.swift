@@ -15,16 +15,27 @@ class LocationsViewController: UIViewController {
     
     private let locationManager = CLLocationManager()
     
+    private var mapView: MKMapView?
+    
+    private let locationsTableViewSegue = "LocationsTableViewSegue"
+    private let locationsMapViewSegue = "LocationsMapViewSegue"
+    
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setMapView:", name: "MapViewLoaded", object: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         initializeHeightConstraints()
+        
+        checkLocationAuthorizationStatus()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        checkLocationAuthorizationStatus()
     }
     
     /**
@@ -38,10 +49,25 @@ class LocationsViewController: UIViewController {
     }
     
     func checkLocationAuthorizationStatus() {
-        if CLLocationManager.authorizationStatus() == .AuthorizedWhenInUse {
+        let authorizationStatus = CLLocationManager.authorizationStatus()
+        
+        if authorizationStatus == .AuthorizedWhenInUse {
             NSNotificationCenter.defaultCenter().postNotificationName("LocationUseAuthorized", object: self, userInfo: nil)
-        } else {
-            locationManager.requestWhenInUseAuthorization()
+        }
+    }
+    
+    func setMapView(notification: NSNotification) {
+        mapView = notification.userInfo!["MapView"] as? MKMapView
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        super.prepareForSegue(segue, sender: sender)
+        
+        if let identifier = segue.identifier {
+            if identifier == locationsTableViewSegue {
+                let locationsTableViewController = segue.destinationViewController as! LocationsTableViewController
+                locationsTableViewController.setMapView(mapView)
+            }
         }
     }
 }

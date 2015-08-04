@@ -671,7 +671,7 @@ class ChangeEventViewController: UITableViewController {
         // Save event
         var error: NSError?
         if !managedContext.save(&error) {
-            NSLog("%@, %@", error!, error!.userInfo!)
+            NSLog("Error occurred while saving: %@", error!.localizedDescription)
         }
         
         return event!
