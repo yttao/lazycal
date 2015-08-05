@@ -24,16 +24,17 @@ class LocationsMapViewController: UIViewController {
     */
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "centerOnUserLocation", name: "LocationUseAuthorized", object: nil)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if CLLocationManager.authorizationStatus() == CLAuthorizationStatus.AuthorizedWhenInUse {
+        locationManager.delegate = self
+        locationManager.startUpdatingLocation()
+        if CLLocationManager.authorizationStatus() == .AuthorizedWhenInUse {
             centerOnUserLocation()
         }
+        locationManager.stopUpdatingLocation()
         
         NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
         
@@ -50,8 +51,23 @@ class LocationsMapViewController: UIViewController {
     */
     func centerOnUserLocation() {
         mapView.showsUserLocation = true
-        let coordinateRegion = MKCoordinateRegionMakeWithDistance(mapView.userLocation.coordinate, regionRadius * 2.0, regionRadius * 2.0)
+        let coordinateRegion = MKCoordinateRegionMakeWithDistance(locationManager.location.coordinate, regionRadius * 2.0, regionRadius * 2.0)
         println("Center: \(mapView.region.center.latitude), \(mapView.region.center.longitude)")
+        println("\(locationManager.location.coordinate.latitude), \(locationManager.location.coordinate.longitude)")
         mapView.setRegion(coordinateRegion, animated: true)
     }
+}
+
+// MARK: - MKMapViewDelegate
+extension LocationsMapViewController: MKMapViewDelegate {
+    /**
+        If the user location changes, update the center coordinate.
+    */
+    func mapView(mapView: MKMapView!, didUpdateUserLocation userLocation: MKUserLocation!) {
+        mapView.centerCoordinate = mapView.userLocation.location.coordinate
+    }
+}
+
+// MARK: - CLLocationManagerDelegate
+extension LocationsMapViewController: CLLocationManagerDelegate {
 }

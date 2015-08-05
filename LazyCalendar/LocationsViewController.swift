@@ -32,8 +32,6 @@ class LocationsViewController: UIViewController {
         super.viewDidLoad()
         
         initializeHeightConstraints()
-        
-        checkLocationAuthorizationStatus()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -48,14 +46,6 @@ class LocationsViewController: UIViewController {
     func initializeHeightConstraints() {
         let heightConstraint = NSLayoutConstraint(item: locationsMapViewContainer, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: view.frame.height / 3)
         locationsMapViewContainer.addConstraint(heightConstraint)
-    }
-    
-    func checkLocationAuthorizationStatus() {
-        let authorizationStatus = CLLocationManager.authorizationStatus()
-        
-        if authorizationStatus == .AuthorizedWhenInUse {
-            NSNotificationCenter.defaultCenter().postNotificationName("LocationUseAuthorized", object: self, userInfo: nil)
-        }
     }
     
     func setMapView(notification: NSNotification) {

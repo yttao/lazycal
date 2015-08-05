@@ -83,8 +83,6 @@ class ChangeEventViewController: UITableViewController {
     private var event: FullEvent?
     
     private var addressBookRef: ABAddressBookRef?
-    private let locationManager = CLLocationManager()
-    
     
     /**
         On initialization, get address book.
@@ -356,13 +354,6 @@ class ChangeEventViewController: UITableViewController {
         contactsAccessDeniedAlert.addAction(changeSettingsAlertAction)
         contactsAccessDeniedAlert.addAction(okAlertAction)
         presentViewController(contactsAccessDeniedAlert, animated: true, completion: nil)
-    }
-    
-    /**
-        Displays an alert to request access to user location.
-    */
-    func displayLocationAccessRequest() {
-        locationManager.requestWhenInUseAuthorization()
     }
     
     /**
@@ -962,7 +953,7 @@ extension ChangeEventViewController: UITableViewDelegate {
             case CLAuthorizationStatus.Restricted, .Denied:
                 displayLocationAccessDeniedAlert()
             case .NotDetermined:
-                displayLocationAccessRequest()
+                NSLog("Error: location manager authorization status should already be determined.")
             }
         default:
             break
@@ -1000,22 +991,5 @@ extension ChangeEventViewController: UITableViewDataSource {
             return 1
         }
         return super.tableView(tableView, numberOfRowsInSection: section)
-    }
-}
-
-// MARK: - CLLocationManagerDelegate
-extension ChangeEventViewController: CLLocationManagerDelegate {
-    /**
-        If access is authorized, show the locations view controller upon granting permission. Otherwise, display a location access denied alert.
-    */
-    func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-        if CLLocationManager.authorizationStatus() == .AuthorizedWhenInUse {
-            NSLog("Authorized")
-            showLocationsViewController()
-        }
-        else {
-            NSLog("Denied")
-            displayLocationAccessDeniedAlert()
-        }
     }
 }

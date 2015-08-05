@@ -8,15 +8,18 @@
 
 import UIKit
 import CoreData
+import CoreLocation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    let locationManager = CLLocationManager()
+    
     var window: UIWindow?
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Ask for user notification permission
         application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: .Alert | .Badge | .Sound, categories: nil))
+        locationManager.requestWhenInUseAuthorization()
         return true
     }
 
@@ -35,7 +38,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     */
     func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
         // Notify observers
-        println("FIRE NOTIFICATION")
         NSNotificationCenter.defaultCenter().postNotificationName("EventNotificationReceived", object: self, userInfo: ["LocalNotification": notification])
     }
     
