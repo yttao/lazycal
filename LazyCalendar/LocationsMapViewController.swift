@@ -13,9 +13,6 @@ import CoreLocation
 
 class LocationsMapViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
-
-    // Radius in meters
-    private let regionRadius: CLLocationDistance = 1000
     
     private let locationManager = CLLocationManager()
     
@@ -31,10 +28,6 @@ class LocationsMapViewController: UIViewController {
         
         locationManager.delegate = self
         locationManager.startUpdatingLocation()
-        if CLLocationManager.authorizationStatus() == .AuthorizedWhenInUse {
-            centerOnUserLocation()
-        }
-        locationManager.stopUpdatingLocation()
         
         NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
         
@@ -47,27 +40,42 @@ class LocationsMapViewController: UIViewController {
     }
     
     /**
-        Centers the map on the user's location.
+        Centers the map on the specified location with the given region radius.
+    
+        :param: location The location to center the map on.
+        :param: regionRadius The radius of the region to display around `location`. Default is 1000m.
     */
-    func centerOnUserLocation() {
+    func centerMap(location: CLLocation, regionRadius: CLLocationDistance = 1000) {
         mapView.showsUserLocation = true
-        let coordinateRegion = MKCoordinateRegionMakeWithDistance(locationManager.location.coordinate, regionRadius * 2.0, regionRadius * 2.0)
-        println("Center: \(mapView.region.center.latitude), \(mapView.region.center.longitude)")
-        println("\(locationManager.location.coordinate.latitude), \(locationManager.location.coordinate.longitude)")
+        let coordinateRegion = MKCoordinateRegionMakeWithDistance(location.coordinate, regionRadius * 2.0, regionRadius * 2.0)
         mapView.setRegion(coordinateRegion, animated: true)
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        locationManager.stopUpdatingLocation()
     }
 }
 
 // MARK: - MKMapViewDelegate
 extension LocationsMapViewController: MKMapViewDelegate {
-    /**
-        If the user location changes, update the center coordinate.
-    */
     func mapView(mapView: MKMapView!, didUpdateUserLocation userLocation: MKUserLocation!) {
-        mapView.centerCoordinate = mapView.userLocation.location.coordinate
+        centerMap(userLocation.location)
     }
 }
 
 // MARK: - CLLocationManagerDelegate
 extension LocationsMapViewController: CLLocationManagerDelegate {
+    /**
+        When locations are updated, center the map.
+    */
+    func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
+        centerMap(manager.location)
+    }
+    
+    /**
+        On error, show description of error.
+    */
+    func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
+        NSLog("%@", error.localizedDescription)
+    }
 }

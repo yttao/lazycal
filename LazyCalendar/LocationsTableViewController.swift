@@ -21,6 +21,8 @@ class LocationsTableViewController: UITableViewController {
     
     private let reuseIdentifier = "LocationCell"
     
+    private var timer: NSTimer?
+    
     /**
         Sets table view delegate and data source and creates search controller.
     */
@@ -77,26 +79,40 @@ class LocationsTableViewController: UITableViewController {
     /**
         Filters the search results by the text entered in the search bar.
     
-        :param: searchText The text to filter the results.
+        :param: timer The timer controlling when the search request fires.
     */
-    func filterLocationsForSearchText(searchText: String) {
-        // Create search request
-        let request = MKLocalSearchRequest()
-        request.naturalLanguageQuery = searchText
-        // Set location to begin searching from
-        request.region = mapView!.region
+    func filterLocations(timer: NSTimer) {
+        let searchText = timer.userInfo as? String
         
-        // Search for string
-        let search = MKLocalSearch(request: request)
-        search.startWithCompletionHandler({(response: MKLocalSearchResponse!,
-            error: NSError!) in
-            if error != nil {
-                NSLog("Error occurred when searching locations: %@", error.localizedDescription)
-            }
-            else {
-                self.filteredLocations = response.mapItems as! [MKMapItem]
-            }
-        })
+        // Create search request if search isn't empty
+        if searchText != "" {
+            let request = MKLocalSearchRequest()
+            request.naturalLanguageQuery = searchText
+            // Set location to begin searching from
+            request.region = mapView!.region
+            
+            // Search for string
+            let search = MKLocalSearch(request: request)
+            search.startWithCompletionHandler({(response: MKLocalSearchResponse!,
+                error: NSError!) in
+                if error != nil {
+                    NSLog("Error occurred when searching: %@", error.localizedDescription)
+                }
+                else {
+                    for item in response.mapItems as! [MKMapItem] {
+                        println(item.name)
+                    }
+                    self.filteredLocations = response.mapItems as! [MKMapItem]
+                }
+                println(self.filteredLocations.count)
+                self.tableView.reloadData()
+            })
+        }
+        else {
+            filteredLocations.removeAll(keepCapacity: false)
+            println(filteredLocations.count)
+            tableView.reloadData()
+        }
     }
 }
 
@@ -204,7 +220,7 @@ extension LocationsTableViewController: UITableViewDataSource {
 // MARK: - UISearchResultsUpdating
 extension LocationsTableViewController: UISearchResultsUpdating {
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        filterLocationsForSearchText(searchController.searchBar.text)
-        tableView.reloadData()
+        timer?.invalidate()
+        timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "filterLocations:", userInfo: searchController.searchBar.text, repeats: false)
     }
 }

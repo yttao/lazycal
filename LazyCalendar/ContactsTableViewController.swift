@@ -157,6 +157,7 @@ class ContactsTableViewController: UITableViewController {
         let predicate = NSPredicate(block: block)
         filteredContacts = allContacts.filteredArrayUsingPredicate(predicate) as [ABRecordRef]
         
+        // Sort results and reload
         sortRecords(&filteredContacts)
     }
     
