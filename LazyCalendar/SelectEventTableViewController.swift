@@ -98,7 +98,7 @@ class SelectEventTableViewController: UITableViewController {
         }
         alarmTimeMainLabel.sizeToFit()
 
-        if event!.contacts.count != 0 {
+        if event!.contacts.count > 0 {
             contactCell.hidden = false
             contactCell.detailTextLabel?.text = "\(event!.contacts.count)"
             contactCell.detailTextLabel?.sizeToFit()

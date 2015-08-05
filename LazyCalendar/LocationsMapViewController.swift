@@ -36,6 +36,13 @@ class LocationsMapViewController: UIViewController {
         }
         
         NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
+        
+        /*
+        var annotation = MKPointAnnotation()
+        annotation.coordinate = item.placemark.coordinate
+        annotation.title = item.name
+        self.mapView.addAnnotation(annotation)
+        */
     }
     
     /**
