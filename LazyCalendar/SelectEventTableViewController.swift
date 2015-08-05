@@ -36,7 +36,7 @@ class SelectEventTableViewController: UITableViewController {
         "AlarmTime": NSIndexPath(forRow: 1, inSection: 1),
         "Contacts": NSIndexPath(forRow: 0, inSection: 2)]
     
-    private let editEventSegueIdentifier = "EditEventSegue"
+    private let segueIdentifier = "EditEventSegue"
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -188,7 +188,7 @@ class SelectEventTableViewController: UITableViewController {
         Prepares for segue to event editing by loading event in as initial data.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == editEventSegueIdentifier {
+        if segue.identifier == segueIdentifier {
             let navigationController = segue.destinationViewController as! UINavigationController
             let editEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
             editEventViewController.loadData(event: event!)

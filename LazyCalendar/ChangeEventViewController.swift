@@ -83,6 +83,7 @@ class ChangeEventViewController: UITableViewController {
     private var event: FullEvent?
     
     private var addressBookRef: ABAddressBookRef?
+    private let locationManager = CLLocationManager()
     
     
     /**
@@ -226,54 +227,6 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Show an alert for the event notification. The alert provides two options: "OK" and "View Event". Tap "OK" to dismiss the alert. Tap "View Event" to show event details.
-    
-        This is only called if this view controller is loaded and currently visible.
-    
-        :param: notification The notification from the subject to the observer.
-    */
-    func showEventNotification(notification: NSNotification) {
-        if isViewLoaded() && view?.window != nil {
-            let localNotification = notification.userInfo!["LocalNotification"] as! UILocalNotification
-            
-            let alertController = UIAlertController(title: "\(localNotification.alertTitle)", message: "\(localNotification.alertBody!)", preferredStyle: .Alert)
-            
-            let viewEventAlertAction = UIAlertAction(title: "View Event", style: .Default, handler: {
-                (action: UIAlertAction!) in
-                let selectEventNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
-                let selectEventTableViewController = selectEventNavigationController.viewControllers.first as! SelectEventTableViewController
-                
-                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-                let managedContext = appDelegate.managedObjectContext!
-                
-                let id = localNotification.userInfo!["id"] as! String
-                let requirements = "(id == %@)"
-                let predicate = NSPredicate(format: requirements, id)
-                
-                let fetchRequest = NSFetchRequest(entityName: "FullEvent")
-                fetchRequest.predicate = predicate
-                
-                var error: NSError? = nil
-                let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as? [FullEvent]
-                
-                if results != nil && results!.count > 0 {
-                    let event = results!.first!
-                    NSNotificationCenter.defaultCenter().postNotificationName("EventSelected", object: self, userInfo: ["Event": event])
-                }
-                
-                self.showViewController(selectEventTableViewController, sender: self)
-            })
-            
-            let okAlertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
-            
-            alertController.addAction(viewEventAlertAction)
-            alertController.addAction(okAlertAction)
-            
-            presentViewController(alertController, animated: true, completion: nil)
-        }
-    }
-    
-    /**
         Update date start info.
     */
     func updateDateStart() {
@@ -407,19 +360,9 @@ class ChangeEventViewController: UITableViewController {
     
     /**
         Displays an alert to request access to user location.
-    
-        If permission is granted, it goes to the location view controller. If not, it displays an alert to inform the user that access to user location is denied.
     */
     func displayLocationAccessRequest() {
-        let locationManager = CLLocationManager()
         locationManager.requestWhenInUseAuthorization()
-        
-        if CLLocationManager.authorizationStatus() == .AuthorizedWhenInUse {
-            showLocationsViewController()
-        }
-        else if CLLocationManager.authorizationStatus() == .Denied {
-            displayLocationAccessDeniedAlert()
-        }
     }
     
     /**
@@ -895,6 +838,54 @@ class ChangeEventViewController: UITableViewController {
             }
         }
     }
+    
+    /**
+        Show an alert for the event notification. The alert provides two options: "OK" and "View Event". Tap "OK" to dismiss the alert. Tap "View Event" to show event details.
+    
+        This is only called if this view controller is loaded and currently visible.
+    
+        :param: notification The notification from the subject to the observer.
+    */
+    func showEventNotification(notification: NSNotification) {
+        if isViewLoaded() && view?.window != nil {
+            let localNotification = notification.userInfo!["LocalNotification"] as! UILocalNotification
+            
+            let alertController = UIAlertController(title: "\(localNotification.alertTitle)", message: "\(localNotification.alertBody!)", preferredStyle: .Alert)
+            
+            let viewEventAlertAction = UIAlertAction(title: "View Event", style: .Default, handler: {
+                (action: UIAlertAction!) in
+                let selectEventNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
+                let selectEventTableViewController = selectEventNavigationController.viewControllers.first as! SelectEventTableViewController
+                
+                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+                let managedContext = appDelegate.managedObjectContext!
+                
+                let id = localNotification.userInfo!["id"] as! String
+                let requirements = "(id == %@)"
+                let predicate = NSPredicate(format: requirements, id)
+                
+                let fetchRequest = NSFetchRequest(entityName: "FullEvent")
+                fetchRequest.predicate = predicate
+                
+                var error: NSError? = nil
+                let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as? [FullEvent]
+                
+                if results != nil && results!.count > 0 {
+                    let event = results!.first!
+                    NSNotificationCenter.defaultCenter().postNotificationName("EventSelected", object: self, userInfo: ["Event": event])
+                }
+                
+                self.showViewController(selectEventTableViewController, sender: self)
+            })
+            
+            let okAlertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
+            
+            alertController.addAction(viewEventAlertAction)
+            alertController.addAction(okAlertAction)
+            
+            presentViewController(alertController, animated: true, completion: nil)
+        }
+    }
 }
 
 // MARK: - UITableViewDelegate
@@ -1009,5 +1000,22 @@ extension ChangeEventViewController: UITableViewDataSource {
             return 1
         }
         return super.tableView(tableView, numberOfRowsInSection: section)
+    }
+}
+
+// MARK: - CLLocationManagerDelegate
+extension ChangeEventViewController: CLLocationManagerDelegate {
+    /**
+        If access is authorized, show the locations view controller upon granting permission. Otherwise, display a location access denied alert.
+    */
+    func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        if CLLocationManager.authorizationStatus() == .AuthorizedWhenInUse {
+            NSLog("Authorized")
+            showLocationsViewController()
+        }
+        else {
+            NSLog("Denied")
+            displayLocationAccessDeniedAlert()
+        }
     }
 }

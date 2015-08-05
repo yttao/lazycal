@@ -35,6 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     */
     func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
         // Notify observers
+        println("FIRE NOTIFICATION")
         NSNotificationCenter.defaultCenter().postNotificationName("EventNotificationReceived", object: self, userInfo: ["LocalNotification": notification])
     }
     

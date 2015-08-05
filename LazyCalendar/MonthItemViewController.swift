@@ -14,7 +14,7 @@ class MonthItemViewController: UIViewController {
     @IBOutlet weak var monthItemTableViewContainer: UIView!
 
     // Segue identifier to add an event
-    private let changeEventSegueIdentifier = "ChangeEventSegue"
+    private let segueIdentifier = "ChangeEventSegue"
     
     // NSCalendarUnits to keep track of
     private let units: NSCalendarUnit = .CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay
@@ -92,7 +92,7 @@ class MonthItemViewController: UIViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         super.prepareForSegue(segue, sender: sender)
         
-        if segue.identifier != nil && segue.identifier! == changeEventSegueIdentifier {
+        if segue.identifier != nil && segue.identifier! == segueIdentifier {
             let calendar = NSCalendar.currentCalendar()
             
             // Set initial date as the currently selected date and hours/minutes as current hours/minutes.
