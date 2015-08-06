@@ -129,7 +129,6 @@ class LocationsTableViewController: UITableViewController {
         annotation.coordinate = mapItem.placemark.coordinate
         annotation.title = mapItem.name
         
-        //let address = ABCreateStringWithAddressDictionary(mapItem.placemark.addressDictionary, false)
         let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
         annotation.subtitle = address
         
@@ -270,7 +269,8 @@ extension LocationsTableViewController: UITableViewDataSource {
 // MARK: - UISearchResultsUpdating
 extension LocationsTableViewController: UISearchResultsUpdating {
     func updateSearchResultsForSearchController(searchController: UISearchController) {
+        // Destroy last request and make a new one
         timer?.invalidate()
-        timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "filterLocations:", userInfo: searchController.searchBar.text, repeats: false)
+        timer = NSTimer.scheduledTimerWithTimeInterval(0.3, target: self, selector: "filterLocations:", userInfo: searchController.searchBar.text, repeats: false)
     }
 }

@@ -47,4 +47,12 @@ class Location: NSManagedObject {
     @NSManaged var longitude: Double
     
     @NSManaged var events: NSSet
+    @NSManaged var annotations: NSSet
+}
+
+class Annotation: NSManagedObject {
+    @NSManaged var title: String?
+    @NSManaged var subtitle: String?
+    
+    @NSManaged var locations: NSSet
 }
