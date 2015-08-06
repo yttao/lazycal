@@ -15,6 +15,7 @@ import CoreLocation
 class LocationsTableViewController: UITableViewController {
     private var searchController: UISearchController?
     
+    private var annotations: [MKPointAnnotation]!
     private var selectedLocations: [MKMapItem]!
     private var filteredLocations = [MKMapItem]()
     
@@ -35,6 +36,9 @@ class LocationsTableViewController: UITableViewController {
         
         if selectedLocations == nil {
             selectedLocations = [MKMapItem]()
+        }
+        if annotations == nil {
+            annotations = [MKPointAnnotation]()
         }
         
         initializeSearchController()
@@ -114,41 +118,6 @@ class LocationsTableViewController: UITableViewController {
             tableView.reloadData()
         }
     }
-}
-
-// MARK: - UITableViewDelegate
-extension LocationsTableViewController: UITableViewDelegate {
-    /**
-        Prevents indenting for showing circular edit button on the left when editing.
-    */
-    override func tableView(tableView: UITableView, shouldIndentWhileEditingRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return false
-    }
-    
-    /**
-        Gives option to delete contact.
-    */
-    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-        return UITableViewCellEditingStyle.Delete
-    }
-    
-    /**
-        If searching, selection will append to selected locations and clear the search bar. If not searching, selection will center the map on the selected location.
-    
-        TODO: The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
-    */
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
-            let mapItem = filteredLocations[indexPath.row]
-            selectedLocations.append(mapItem)
-            addMapItemToMapView(mapItem)
-            searchController?.searchBar.text = nil
-        }
-        else {
-            let mapItem = selectedLocations[indexPath.row]
-            NSNotificationCenter.defaultCenter().postNotificationName("LocationChanged", object: self, userInfo: ["Location": mapItem.placemark.location])
-        }
-    }
     
     /**
         Shows an annotation at the map item's location with displayed information about the map item.
@@ -163,9 +132,25 @@ extension LocationsTableViewController: UITableViewDelegate {
         //let address = ABCreateStringWithAddressDictionary(mapItem.placemark.addressDictionary, false)
         let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
         annotation.subtitle = address
-        println(address)
         
         mapView?.addAnnotation(annotation)
+        annotations.append(annotation)
+    }
+    
+    /**
+        Removes the annotation at the map item's location.
+    
+        :param: mapItem The map item to remove from the map view.
+    */
+    func removeMapItemFromMapView(mapItem: MKMapItem) {
+        let annotation = annotations.filter({
+            let nameMatch = $0.title == mapItem.name
+            let addressMatch = $0.subtitle == self.stringFromAddressDictionary(mapItem.placemark.addressDictionary)
+            let coordinateMatch = $0.coordinate.latitude == mapItem.placemark.coordinate.latitude && $0.coordinate.longitude == mapItem.placemark.coordinate.longitude
+            return nameMatch && addressMatch && coordinateMatch
+        })
+        
+        mapView?.removeAnnotations(annotation)
     }
     
     /**
@@ -194,13 +179,48 @@ extension LocationsTableViewController: UITableViewDelegate {
                 }
                 return address
             }
-            // Format address if it doesn't have a specific street address
+                // Format address if it doesn't have a specific street address
             else {
                 return join(" ", lines)
             }
         }
         else {
             return ABCreateStringWithAddressDictionary(addressDictionary, false)
+        }
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension LocationsTableViewController: UITableViewDelegate {
+    /**
+        Prevents indenting for showing circular edit button on the left when editing.
+    */
+    override func tableView(tableView: UITableView, shouldIndentWhileEditingRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return false
+    }
+    
+    /**
+        Gives option to delete contact.
+    */
+    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
+        return UITableViewCellEditingStyle.Delete
+    }
+    
+    /**
+        If searching, selection will append to selected locations and clear the search bar. If not searching, selection will center the map on the selected location.
+    
+        The filter ensures that search results will not show locations that are already selected, so this method cannot add duplicate locations.
+    */
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
+            let mapItem = filteredLocations[indexPath.row]
+            selectedLocations.append(mapItem)
+            addMapItemToMapView(mapItem)
+            searchController?.searchBar.text = nil
+        }
+        else {
+            let mapItem = selectedLocations[indexPath.row]
+            NSNotificationCenter.defaultCenter().postNotificationName("LocationChanged", object: self, userInfo: ["Location": mapItem.placemark.location])
         }
     }
 }
@@ -243,6 +263,7 @@ extension LocationsTableViewController: UITableViewDataSource {
         if editingStyle == .Delete {
             tableView.beginUpdates()
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+            removeMapItemFromMapView(selectedLocations[indexPath.row])
             selectedLocations.removeAtIndex(indexPath.row)
             tableView.endUpdates()
         }
