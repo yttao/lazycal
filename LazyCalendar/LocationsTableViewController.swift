@@ -159,34 +159,7 @@ class LocationsTableViewController: UITableViewController {
         :param: addressDictionary A dictionary of address information.
     */
     func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String {
-        if var lines = addressDictionary["FormattedAddressLines"] as? [String] {
-            // Don't include country in address
-            if let countryIndex = find(lines, addressDictionary[kABPersonAddressCountryKey] as! String) {
-                lines.removeAtIndex(countryIndex)
-            }
-            
-            // Format address if it has a specific street address
-            if addressDictionary[kABPersonAddressStreetKey] as? String != nil && contains(lines, addressDictionary[kABPersonAddressStreetKey] as! String) {
-                var address = ""
-                for i in 0..<lines.count {
-                    address += lines[i]
-                    if i == 0 {
-                        address += ", "
-                    }
-                    else if i != lines.count - 1 {
-                        address += " "
-                    }
-                }
-                return address
-            }
-                // Format address if it doesn't have a specific street address
-            else {
-                return join(" ", lines)
-            }
-        }
-        else {
-            return ABCreateStringWithAddressDictionary(addressDictionary, false)
-        }
+        return ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: " ")
     }
 }
 
