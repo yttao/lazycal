@@ -200,7 +200,7 @@ extension MonthItemTableViewController: UITableViewDataSource {
         If delete is pressed on swipe left, delete the event.
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == UITableViewCellEditingStyle.Delete {
+        if editingStyle == .Delete {
             
             let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
             let managedContext = appDelegate.managedObjectContext!

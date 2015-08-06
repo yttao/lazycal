@@ -21,6 +21,8 @@ class LocationsMapViewController: UIViewController {
     */
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "centerMap:", name: "LocationChanged", object: nil)
     }
     
     override func viewDidLoad() {
@@ -29,14 +31,19 @@ class LocationsMapViewController: UIViewController {
         locationManager.delegate = self
         locationManager.startUpdatingLocation()
         
-        NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
+        mapView.delegate = self
         
-        /*
-        var annotation = MKPointAnnotation()
-        annotation.coordinate = item.placemark.coordinate
-        annotation.title = item.name
-        self.mapView.addAnnotation(annotation)
-        */
+        NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
+    }
+    
+    /**
+        Centers the map on the point of interest upon notification.
+    
+        :param: notification The notification that the location to center the map on has changed.
+    */
+    func centerMap(notification: NSNotification) {
+        let location = notification.userInfo!["Location"] as! CLLocation
+        centerMap(location)
     }
     
     /**
@@ -50,17 +57,10 @@ class LocationsMapViewController: UIViewController {
         let coordinateRegion = MKCoordinateRegionMakeWithDistance(location.coordinate, regionRadius * 2.0, regionRadius * 2.0)
         mapView.setRegion(coordinateRegion, animated: true)
     }
-    
-    override func viewWillDisappear(animated: Bool) {
-        locationManager.stopUpdatingLocation()
-    }
 }
 
 // MARK: - MKMapViewDelegate
 extension LocationsMapViewController: MKMapViewDelegate {
-    func mapView(mapView: MKMapView!, didUpdateUserLocation userLocation: MKUserLocation!) {
-        centerMap(userLocation.location)
-    }
 }
 
 // MARK: - CLLocationManagerDelegate
@@ -70,6 +70,7 @@ extension LocationsMapViewController: CLLocationManagerDelegate {
     */
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         centerMap(manager.location)
+        locationManager.stopUpdatingLocation()
     }
     
     /**

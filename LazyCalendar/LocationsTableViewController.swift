@@ -17,7 +17,7 @@ class LocationsTableViewController: UITableViewController {
     private var selectedLocations: [MKMapItem]!
     private var filteredLocations = [MKMapItem]()
     
-    private var mapView: MKMapView?
+    private weak var mapView: MKMapView?
     
     private let reuseIdentifier = "LocationCell"
     
@@ -133,14 +133,57 @@ extension LocationsTableViewController: UITableViewDelegate {
     }
     
     /**
-        If searching, selection will append to selected locations and clear the search bar.
+        If searching, selection will append to selected locations and clear the search bar. If not searching, selection will center the map on the selected location.
     
         TODO: The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if searchController != nil && searchController!.active && filteredLocations.count > 0 {
-            selectedLocations.append(filteredLocations[indexPath.row])
+            let mapItem = filteredLocations[indexPath.row]
+            selectedLocations.append(mapItem)
+            addMapItemToMapView(mapItem)
             searchController?.searchBar.text = nil
+        }
+        else {
+            let mapItem = selectedLocations[indexPath.row]
+            NSNotificationCenter.defaultCenter().postNotificationName("LocationChanged", object: self, userInfo: ["Location": mapItem.placemark.location])
+        }
+    }
+    
+    /**
+        Shows an annotation at the map item's location with displayed information about the map item.
+    
+        :param: mapItem The map item to show on the map view.
+    */
+    func addMapItemToMapView(mapItem: MKMapItem) {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = mapItem.placemark.coordinate
+        annotation.title = mapItem.name
+        
+        let placemark = mapItem.placemark
+        let address = makeAddressString(placemark)
+        annotation.subtitle = address
+        
+        mapView?.addAnnotation(annotation)
+    }
+    
+    /**
+        Creates an address in readable, string format from an `MKPlacemark`.
+    
+        :param: placemark The placemark containing information about the address.
+    */
+    func makeAddressString(placemark: MKPlacemark) -> String? {
+        let addressDictionary = placemark.addressDictionary
+        let street = addressDictionary[kABPersonAddressStreetKey] as? String
+        let city = addressDictionary[kABPersonAddressCityKey] as? String
+        let state = addressDictionary[kABPersonAddressStateKey] as? String
+        let zipcode = addressDictionary[kABPersonAddressZIPKey] as? String
+        
+        if street != nil {
+            return "\(street!), \(city!), \(state!) \(zipcode!)"
+        }
+        else {
+            return "\(city!), \(state!) \(zipcode!)"
         }
     }
 }
@@ -177,36 +220,48 @@ extension LocationsTableViewController: UITableViewDataSource {
     }
     
     /**
+        Selected locations can be removed by swiping left and pressing delete.
+    */
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == .Delete {
+            tableView.beginUpdates()
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+            selectedLocations.removeAtIndex(indexPath.row)
+            tableView.endUpdates()
+        }
+    }
+    
+    /**
         Display cell with name as text label and phone number as detail text label. If searching, show a LocationCell for the filtered location. If not searching, show a LocationCell for the selected location.
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         
         if searchController != nil && searchController!.active && filteredLocations.count > 0 {
-            let location = filteredLocations[indexPath.row]
-            if let name = location.name {
+            let mapItem = filteredLocations[indexPath.row]
+            if let name = mapItem.name {
                 cell.textLabel?.text = name
             }
             else {
                 cell.textLabel?.text = nil
             }
-            if let phoneNumber = location.phoneNumber {
-                cell.detailTextLabel?.text = filteredLocations[indexPath.row].phoneNumber
+            if let address = makeAddressString(mapItem.placemark) {
+                cell.detailTextLabel?.text = address
             }
             else {
                 cell.detailTextLabel?.text = nil
             }
         }
         else {
-            let location = selectedLocations[indexPath.row]
-            if let name = location.name {
+            let mapItem = selectedLocations[indexPath.row]
+            if let name = mapItem.name {
                 cell.textLabel?.text = selectedLocations[indexPath.row].name
             }
             else {
                 cell.textLabel?.text = nil
             }
-            if let phoneNumber = location.phoneNumber {
-                cell.detailTextLabel?.text = selectedLocations[indexPath.row].phoneNumber
+            if let address = makeAddressString(mapItem.placemark) {
+                cell.detailTextLabel?.text = address
             }
             else {
                 cell.detailTextLabel?.text = nil

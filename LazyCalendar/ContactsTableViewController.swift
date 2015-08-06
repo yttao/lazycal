@@ -349,7 +349,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         If delete is pressed on swipe left, delete the contact.
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == UITableViewCellEditingStyle.Delete {
+        if editingStyle == .Delete {
             tableView.beginUpdates()
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
             selectedContacts.removeAtIndex(indexPath.row)

@@ -16,7 +16,7 @@ class LocationsViewController: UIViewController {
     
     private let locationManager = CLLocationManager()
     
-    private var mapView: MKMapView?
+    private weak var mapView: MKMapView?
     
     private let locationsTableViewSegue = "LocationsTableViewSegue"
     private let locationsMapViewSegue = "LocationsMapViewSegue"
@@ -33,11 +33,7 @@ class LocationsViewController: UIViewController {
         
         initializeHeightConstraints()
     }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
+
     /**
         Initialize height constraints on the map view. The height constraints are determined by device size while the table view container takes up the remaining space.
     
