@@ -25,6 +25,8 @@ class LocationsTableViewController: UITableViewController {
     
     private var timer: NSTimer?
     
+    // MARK: - Methods for setting up view controller and data.
+    
     /**
         Sets table view delegate and data source and creates search controller.
     */
@@ -48,7 +50,7 @@ class LocationsTableViewController: UITableViewController {
     /**
         Initializes the search controller.
     */
-    func initializeSearchController() {
+    private func initializeSearchController() {
         searchController = ({
             let controller = UISearchController(searchResultsController: nil)
             controller.searchResultsUpdater = self
@@ -81,6 +83,17 @@ class LocationsTableViewController: UITableViewController {
         self.mapView = mapView
     }
     
+    // MARK: - Methods related to searching.
+    
+    /**
+        Returns `true` if the user is currently searching for a location; `false` otherwise.
+    
+        :returns: `true` if the user is currently searching; `false` otherwise.
+    */
+    private func searching() -> Bool {
+        return searchController != nil && searchController!.active && searchController!.searchBar.text != ""
+    }
+    
     /**
         Filters the search results by the text entered in the search bar.
     
@@ -90,7 +103,7 @@ class LocationsTableViewController: UITableViewController {
         let searchText = timer.userInfo as? String
         
         // Create search request if search isn't empty
-        if searchText != "" {
+        if searching() {
             let request = MKLocalSearchRequest()
             request.naturalLanguageQuery = searchText
             // Set location to begin searching from
@@ -98,8 +111,8 @@ class LocationsTableViewController: UITableViewController {
             
             // Search for string
             let search = MKLocalSearch(request: request)
-            search.startWithCompletionHandler({(response: MKLocalSearchResponse!,
-                error: NSError!) in
+            search.startWithCompletionHandler() {
+                (response: MKLocalSearchResponse!, error: NSError!) in
                 if error != nil {
                     NSLog("Error occurred when searching: %@", error.localizedDescription)
                 }
@@ -111,7 +124,7 @@ class LocationsTableViewController: UITableViewController {
                     })
                 }
                 self.tableView.reloadData()
-            })
+            }
         }
         else {
             filteredLocations.removeAll(keepCapacity: false)
@@ -119,12 +132,25 @@ class LocationsTableViewController: UITableViewController {
         }
     }
     
+    // MARK: - Methods for adding map items.
+    
+    /**
+        Adds a new map item.
+    
+        The new map item annotation is added to the map view and the map item is appended to the table view.
+    */
+    private func addNewMapItem(mapItem: MKMapItem) {
+        addMapItemToMapView(mapItem)
+        selectedLocations.append(mapItem)
+        searchController?.searchBar.text = nil
+    }
+    
     /**
         Shows an annotation at the map item's location with displayed information about the map item.
     
         :param: mapItem The map item to show on the map view.
     */
-    func addMapItemToMapView(mapItem: MKMapItem) {
+    private func addMapItemToMapView(mapItem: MKMapItem) {
         let annotation = MKPointAnnotation()
         annotation.coordinate = mapItem.placemark.coordinate
         annotation.title = mapItem.name
@@ -136,12 +162,27 @@ class LocationsTableViewController: UITableViewController {
         annotations.append(annotation)
     }
     
+    // MARK: - Methods for removing map items.
+    
+    /**
+        Deletes a selected map item.
+    
+        The map item annotation is removed from the map view and the map item is removed from the table view.
+    
+        :param: mapItem The map item to delete.
+        :param: indexPath The index path of the deleted map item.
+    */
+    private func deleteSelectedMapItem(mapItem: MKMapItem, atIndexPath indexPath: NSIndexPath) {
+        removeMapItemFromMapView(mapItem)
+        removeMapItemFromTableView(indexPath)
+    }
+    
     /**
         Removes the annotation at the map item's location.
     
         :param: mapItem The map item to remove from the map view.
     */
-    func removeMapItemFromMapView(mapItem: MKMapItem) {
+    private func removeMapItemFromMapView(mapItem: MKMapItem) {
         let annotation = annotations.filter({
             let nameMatch = $0.title == mapItem.name
             let addressMatch = $0.subtitle == self.stringFromAddressDictionary(mapItem.placemark.addressDictionary)
@@ -153,11 +194,23 @@ class LocationsTableViewController: UITableViewController {
     }
     
     /**
+        Removes a map item from the table view and deletes from the selected locations.
+    
+        :param: indexPath The index path of the map item to remove from the table view and selected locations list.
+    */
+    private func removeMapItemFromTableView(indexPath: NSIndexPath) {
+        tableView.beginUpdates()
+        tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+        selectedLocations.removeAtIndex(indexPath.row)
+        tableView.endUpdates()
+    }
+    
+    /**
         Makes an address string out of the available information in the address dictionary.
     
         :param: addressDictionary A dictionary of address information.
     */
-    func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String {
+    private func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String {
         return ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: " ")
     }
 }
@@ -175,7 +228,7 @@ extension LocationsTableViewController: UITableViewDelegate {
         Gives option to delete contact.
     */
     override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-        return UITableViewCellEditingStyle.Delete
+        return .Delete
     }
     
     /**
@@ -184,11 +237,9 @@ extension LocationsTableViewController: UITableViewDelegate {
         The filter ensures that search results will not show locations that are already selected, so this method cannot add duplicate locations.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
+        if searching() {
             let mapItem = filteredLocations[indexPath.row]
-            selectedLocations.append(mapItem)
-            addMapItemToMapView(mapItem)
-            searchController?.searchBar.text = nil
+            addNewMapItem(mapItem)
         }
         else {
             let mapItem = selectedLocations[indexPath.row]
@@ -210,7 +261,7 @@ extension LocationsTableViewController: UITableViewDataSource {
         If searching, the number of rows is the number of search results. If not searching, the number of rows is the number of selected locations.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
+        if searching() {
             return filteredLocations.count
         }
         return selectedLocations.count
@@ -222,7 +273,7 @@ extension LocationsTableViewController: UITableViewDataSource {
         Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
+        if searching() {
             return false
         }
         return true
@@ -233,11 +284,7 @@ extension LocationsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            tableView.beginUpdates()
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-            removeMapItemFromMapView(selectedLocations[indexPath.row])
-            selectedLocations.removeAtIndex(indexPath.row)
-            tableView.endUpdates()
+            deleteSelectedMapItem(selectedLocations[indexPath.row], atIndexPath: indexPath)
         }
     }
     
@@ -247,7 +294,7 @@ extension LocationsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         
-        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
+        if searching() {
             let mapItem = filteredLocations[indexPath.row]
             let name = mapItem.name
             let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
@@ -268,6 +315,9 @@ extension LocationsTableViewController: UITableViewDataSource {
 
 // MARK: - UISearchResultsUpdating
 extension LocationsTableViewController: UISearchResultsUpdating {
+    /**
+        When the search bar is activated or the text in the search bar changes, start updating search results. Search results cannot be duplicates of already-selected locations.
+    */
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         // Destroy last request and make a new one
         timer?.invalidate()

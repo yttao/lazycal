@@ -216,7 +216,16 @@ class ContactsTableViewController: UITableViewController {
             label.text = text
         }
     }
-
+    
+    /**
+        Returns `true` if the user is currently searching for a location; `false` otherwise.
+    
+        :returns: `true` if the user is currently searching; `false` otherwise.
+    */
+    private func searching() -> Bool {
+        return searchController != nil && searchController!.active && searchController!.searchBar.text != ""
+    }
+    
     /**
         On view exit, updates the change event view controller contacts.
         TODO: change this to observer-subject.
@@ -231,7 +240,7 @@ class ContactsTableViewController: UITableViewController {
         }
         
         // Return selected contacts to change event view controller
-        let changeEventViewController = self.navigationController?.viewControllers.first as? ChangeEventViewController
+        let changeEventViewController = self.navigationController!.viewControllers.first as? ChangeEventViewController
         changeEventViewController?.updateContacts(selectedContactIDs)
     }
     
@@ -297,7 +306,7 @@ extension ContactsTableViewController: UITableViewDelegate {
         Gives option to delete contact.
     */
     override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-        return UITableViewCellEditingStyle.Delete
+        return .Delete
     }
     
     /**
@@ -306,14 +315,14 @@ extension ContactsTableViewController: UITableViewDelegate {
         The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
+        if searching() {
             selectedContacts.append(filteredContacts[indexPath.row])
             searchController?.searchBar.text = nil
         }
         else {
             let personViewController = ABPersonViewController()
             personViewController.displayedPerson = selectedContacts[indexPath.row]
-            navigationController?.showViewController(personViewController, sender: self)
+            navigationController!.showViewController(personViewController, sender: self)
         }
     }
 }
@@ -333,7 +342,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         If the search controller is active, show the filtered contacts. If the search controller is inactive, show the selected contacts.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
+        if searching() {
             return filteredContacts.count
         }
         return selectedContacts.count
@@ -345,7 +354,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        if searchController != nil && searchController!.searchBar.text != "" {
+        if searching() {
             return false
         }
         return true
@@ -372,7 +381,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
         
         // Show filtered records
-        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
+        if searching() {
             let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
             if fullName != nil {
                 cell.textLabel!.text = fullName

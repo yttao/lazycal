@@ -88,10 +88,6 @@ class ChangeEventViewController: UITableViewController {
         On initialization, get address book.
     */
     required init(coder aDecoder: NSCoder) {
-        if ABAddressBookGetAuthorizationStatus() == .Authorized {
-            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-        }
-        
         super.init(coder: aDecoder)
         
         // Observer for when notification pops up
@@ -100,10 +96,11 @@ class ChangeEventViewController: UITableViewController {
     
     
     /**
-        Initialize information on view load.
         Provides setup information for the initial data, before the user changes anything.
-        * Set the table view delegate and data source if they are not already set.
-        * Disable the event name text field. This is done to allow proper cell selection (which is not possible if the text field can be clicked on within its section).
+    
+        On view load:
+        * Set the table view delegate and data source.
+        * Disable the event name text field. This is done to allow proper cell selection (which does not work properly if the text field is selectable.
         * Set date start picker date to the selected date (or the first day of the month if none are selected) and the picker time to the current time (in hours and minutes). Set date end picker time to show one hour after the date start picker date and time.
         * Add event listeners that are informed when event date start picker or end picker are changed. Update the event start and end labels. Additionally, if the event start time is changed, the minimum time for the event end time is modified if the end time will come before the start time.
         * Format the event start and end labels. The main labels show the format: month day, year. The details labels show the format: hour:minutes period.
@@ -111,6 +108,11 @@ class ChangeEventViewController: UITableViewController {
     */
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Get address book
+        if ABAddressBookGetAuthorizationStatus() == .Authorized {
+            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
+        }
         
         // Set tableview delegate and data source
         tableView.delegate = self
@@ -402,7 +404,7 @@ class ChangeEventViewController: UITableViewController {
     */
     func showLocationsViewController() {
         let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! UIViewController
-        navigationController?.showViewController(locationsViewController, sender: self)
+        navigationController!.showViewController(locationsViewController, sender: self)
     }
     
     /**
@@ -446,6 +448,17 @@ class ChangeEventViewController: UITableViewController {
             }
         }
     }
+    
+    /**
+        On tapping the name text field, deselect the currently selected field.
+    */
+    @IBAction func selectNameTextField(sender: AnyObject) {
+        if selectedIndexPath != nil && selectedIndexPath != indexPaths["Name"] {
+            deselectRowAtIndexPath(selectedIndexPath!)
+        }
+        selectedIndexPath = indexPaths["Name"]
+    }
+    
     
     /**
         Show more alarm options.
@@ -809,23 +822,13 @@ class ChangeEventViewController: UITableViewController {
     
     
     /**
-        On saving events, saves event and informs observers that an event was saved.
+        On saving events, save event and inform observers that an event was saved.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let identifier = segue.identifier {
-            switch identifier {
-            case "SaveEventSegue":
+            if identifier == "SaveEventSegue" || identifier == "EditEventSegue" {
                 let event = saveEvent()
                 NSNotificationCenter.defaultCenter().postNotificationName("EventSaved", object: self, userInfo: ["Event": event])
-            case "CancelEventSegue":
-                break
-            case "SaveEventEditSegue":
-                let event = saveEvent()
-                NSNotificationCenter.defaultCenter().postNotificationName("EventSaved", object: self, userInfo: ["Event": event])
-            case "CancelEventEditSegue":
-                break
-            default:
-                break
             }
         }
     }
@@ -898,7 +901,7 @@ extension ChangeEventViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let cell = tableView.cellForRowAtIndexPath(indexPath)!
-        
+
         selectedIndexPath = indexPath
 
         switch indexPath.section {
@@ -953,7 +956,7 @@ extension ChangeEventViewController: UITableViewDelegate {
             case CLAuthorizationStatus.Restricted, .Denied:
                 displayLocationAccessDeniedAlert()
             case .NotDetermined:
-                NSLog("Error: location manager authorization status should already be determined.")
+                NSLog("Error: user location authorization status should already be determined.")
             }
         default:
             break

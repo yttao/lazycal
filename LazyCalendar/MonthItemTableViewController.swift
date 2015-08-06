@@ -119,6 +119,55 @@ class MonthItemTableViewController: UITableViewController {
     }
     
     /**
+        Deletes an event from persistent storage, deletes all notifications associated with the event, and removes the event from the listed events in the table view.
+    
+        :param: event The event to delete.
+        :param: indexPath The index path of the event to be deleted from the table view.
+    */
+    private func deleteEvent(event: FullEvent, atIndexPath indexPath: NSIndexPath) {
+        // Deschedule all notifications
+        descheduleNotificationsForDeletedEvent(event)
+        
+        // Remove from persistent storage
+        removeEventFromPersistentStorage(event)
+        
+        // Remove from event
+        removeEventFromTableView(event, atIndexPath: indexPath)
+    }
+    
+    /**
+        Removes an event from persistent storage.
+    
+        :param: event The event to remove from persistent storage.
+    */
+    private func removeEventFromPersistentStorage(event: FullEvent) {
+        // Delete event
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let managedContext = appDelegate.managedObjectContext!
+        let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
+        managedContext.deleteObject(event)
+        
+        // Save changes
+        var error: NSError?
+        if !managedContext.save(&error) {
+            assert(false, "Could not save \(error), \(error?.userInfo)")
+        }
+    }
+    
+    /**
+        Removes the event from the array of events and the table view.
+    
+        :param: event The event to remove from the table view.
+        :param: indexPath The index path to locate the event in the table view.
+    */
+    private func removeEventFromTableView(event: FullEvent, atIndexPath indexPath: NSIndexPath) {
+        tableView.beginUpdates()
+        tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+        events.removeAtIndex(indexPath.row)
+        tableView.endUpdates()
+    }
+    
+    /**
         Deschedules notifications for a deleted event.
     
         If no notifications are found, it does nothing.
@@ -158,7 +207,7 @@ extension MonthItemTableViewController: UITableViewDelegate {
         Gives option to delete event.
     */
     override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-        return UITableViewCellEditingStyle.Delete
+        return .Delete
     }
     
     /**
@@ -201,29 +250,8 @@ extension MonthItemTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            
-            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            let managedContext = appDelegate.managedObjectContext!
-            
-            let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
             let event = events[indexPath.row]
-            
-            descheduleNotificationsForDeletedEvent(event)
-            
-            // Delete event
-            managedContext.deleteObject(event)
-            
-            // Save changes
-            var error: NSError?
-            if !managedContext.save(&error) {
-                assert(false, "Could not save \(error), \(error?.userInfo)")
-            }
-            
-            // Remove event from array and table view
-            tableView.beginUpdates()
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-            events.removeAtIndex(indexPath.row)
-            tableView.endUpdates()
+            deleteEvent(event, atIndexPath: indexPath)
         }
     }
     

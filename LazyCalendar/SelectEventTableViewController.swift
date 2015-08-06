@@ -278,7 +278,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
             contactsTableViewController.loadData(contactIDs)
             // Disable searching for new contacts (only allowed when editing event).
             contactsTableViewController.setSearchEnabled(false)
-            navigationController?.showViewController(contactsTableViewController, sender: self)
+            navigationController!.showViewController(contactsTableViewController, sender: self)
         }
     }
 }
