@@ -9,6 +9,7 @@
 import UIKit
 import MapKit
 import AddressBook
+import AddressBookUI
 import CoreLocation
 
 class LocationsTableViewController: UITableViewController {
@@ -99,18 +100,17 @@ class LocationsTableViewController: UITableViewController {
                     NSLog("Error occurred when searching: %@", error.localizedDescription)
                 }
                 else {
-                    for item in response.mapItems as! [MKMapItem] {
-                        println(item.name)
-                    }
-                    self.filteredLocations = response.mapItems as! [MKMapItem]
+                    let mapItems = response.mapItems as! [MKMapItem]
+                    // Remove all search results that already exist in selectedLocations
+                    self.filteredLocations = mapItems.filter({
+                        !contains(self.selectedLocations, $0)
+                    })
                 }
-                println(self.filteredLocations.count)
                 self.tableView.reloadData()
             })
         }
         else {
             filteredLocations.removeAll(keepCapacity: false)
-            println(filteredLocations.count)
             tableView.reloadData()
         }
     }
@@ -138,7 +138,7 @@ extension LocationsTableViewController: UITableViewDelegate {
         TODO: The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if searchController != nil && searchController!.active && filteredLocations.count > 0 {
+        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
             let mapItem = filteredLocations[indexPath.row]
             selectedLocations.append(mapItem)
             addMapItemToMapView(mapItem)
@@ -160,30 +160,47 @@ extension LocationsTableViewController: UITableViewDelegate {
         annotation.coordinate = mapItem.placemark.coordinate
         annotation.title = mapItem.name
         
-        let placemark = mapItem.placemark
-        let address = makeAddressString(placemark)
+        //let address = ABCreateStringWithAddressDictionary(mapItem.placemark.addressDictionary, false)
+        let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
         annotation.subtitle = address
+        println(address)
         
         mapView?.addAnnotation(annotation)
     }
     
     /**
-        Creates an address in readable, string format from an `MKPlacemark`.
+        Makes an address string out of the available information in the address dictionary.
     
-        :param: placemark The placemark containing information about the address.
+        :param: addressDictionary A dictionary of address information.
     */
-    func makeAddressString(placemark: MKPlacemark) -> String? {
-        let addressDictionary = placemark.addressDictionary
-        let street = addressDictionary[kABPersonAddressStreetKey] as? String
-        let city = addressDictionary[kABPersonAddressCityKey] as? String
-        let state = addressDictionary[kABPersonAddressStateKey] as? String
-        let zipcode = addressDictionary[kABPersonAddressZIPKey] as? String
-        
-        if street != nil {
-            return "\(street!), \(city!), \(state!) \(zipcode!)"
+    func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String {
+        if var lines = addressDictionary["FormattedAddressLines"] as? [String] {
+            // Don't include country in address
+            if let countryIndex = find(lines, addressDictionary[kABPersonAddressCountryKey] as! String) {
+                lines.removeAtIndex(countryIndex)
+            }
+            
+            // Format address if it has a specific street address
+            if addressDictionary[kABPersonAddressStreetKey] as? String != nil && contains(lines, addressDictionary[kABPersonAddressStreetKey] as! String) {
+                var address = ""
+                for i in 0..<lines.count {
+                    address += lines[i]
+                    if i == 0 {
+                        address += ", "
+                    }
+                    else if i != lines.count - 1 {
+                        address += " "
+                    }
+                }
+                return address
+            }
+            // Format address if it doesn't have a specific street address
+            else {
+                return join(" ", lines)
+            }
         }
         else {
-            return "\(city!), \(state!) \(zipcode!)"
+            return ABCreateStringWithAddressDictionary(addressDictionary, false)
         }
     }
 }
@@ -201,7 +218,7 @@ extension LocationsTableViewController: UITableViewDataSource {
         If searching, the number of rows is the number of search results. If not searching, the number of rows is the number of selected locations.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchController != nil && searchController!.active && filteredLocations.count > 0 {
+        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
             return filteredLocations.count
         }
         return selectedLocations.count
@@ -213,7 +230,7 @@ extension LocationsTableViewController: UITableViewDataSource {
         Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        if searchController != nil && searchController!.active && filteredLocations.count > 0 {
+        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
             return false
         }
         return true
@@ -237,35 +254,19 @@ extension LocationsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         
-        if searchController != nil && searchController!.active && filteredLocations.count > 0 {
+        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
             let mapItem = filteredLocations[indexPath.row]
-            if let name = mapItem.name {
-                cell.textLabel?.text = name
-            }
-            else {
-                cell.textLabel?.text = nil
-            }
-            if let address = makeAddressString(mapItem.placemark) {
-                cell.detailTextLabel?.text = address
-            }
-            else {
-                cell.detailTextLabel?.text = nil
-            }
+            let name = mapItem.name
+            let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
+            cell.textLabel?.text = mapItem.name
+            cell.detailTextLabel?.text = address
         }
         else {
             let mapItem = selectedLocations[indexPath.row]
-            if let name = mapItem.name {
-                cell.textLabel?.text = selectedLocations[indexPath.row].name
-            }
-            else {
-                cell.textLabel?.text = nil
-            }
-            if let address = makeAddressString(mapItem.placemark) {
-                cell.detailTextLabel?.text = address
-            }
-            else {
-                cell.detailTextLabel?.text = nil
-            }
+            let name = mapItem.name
+            let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
+            cell.textLabel?.text = name
+            cell.detailTextLabel?.text = address
         }
         
         return cell

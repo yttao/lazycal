@@ -77,6 +77,6 @@ extension LocationsMapViewController: CLLocationManagerDelegate {
         On error, show description of error.
     */
     func locationManager(manager: CLLocationManager!, didFailWithError error: NSError!) {
-        NSLog("%@", error.localizedDescription)
+        NSLog("Location manager failed: %@", error.localizedDescription)
     }
 }

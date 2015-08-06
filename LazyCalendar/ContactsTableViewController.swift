@@ -119,11 +119,17 @@ class ContactsTableViewController: UITableViewController {
             let recordRef: ABRecordRef = record as ABRecordRef
             
             // Check if record is already recorded in selected contacts, don't show if already a selected contact.
-            for (var i = 0; i < self.selectedContacts.count; i++) {
+            let identicalRecords = self.selectedContacts.filter({
+                ABRecordGetRecordID($0) == ABRecordGetRecordID(recordRef)
+            })
+            if !identicalRecords.isEmpty {
+                return false
+            }
+            /*for (var i = 0; i < self.selectedContacts.count; i++) {
                 if ABRecordGetRecordID(recordRef) == ABRecordGetRecordID(self.selectedContacts[i]) {
                     return false
                 }
-            }
+            }*/
             
             // Get name, phone numbers, and emails
             let name = ABRecordCopyCompositeName(recordRef)?.takeRetainedValue() as? String
@@ -300,7 +306,7 @@ extension ContactsTableViewController: UITableViewDelegate {
         The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if searchController != nil && searchController!.active && filteredContacts.count > 0 {
+        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
             selectedContacts.append(filteredContacts[indexPath.row])
             searchController?.searchBar.text = nil
         }
@@ -327,7 +333,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         If the search controller is active, show the filtered contacts. If the search controller is inactive, show the selected contacts.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchController != nil && searchController!.active && filteredContacts.count > 0 {
+        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
             return filteredContacts.count
         }
         return selectedContacts.count
@@ -339,7 +345,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        if filteredContacts.count > 0 {
+        if searchController != nil && searchController!.searchBar.text != "" {
             return false
         }
         return true
@@ -366,7 +372,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
         
         // Show filtered records
-        if searchController != nil && searchController!.active && filteredContacts.count > 0 {
+        if searchController != nil && searchController!.active && searchController!.searchBar.text != "" {
             let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
             if fullName != nil {
                 cell.textLabel!.text = fullName
