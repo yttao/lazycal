@@ -223,7 +223,7 @@ class ContactsTableViewController: UITableViewController {
         :returns: `true` if the user is currently searching; `false` otherwise.
     */
     private func searching() -> Bool {
-        return searchController != nil && searchController!.active && searchController!.searchBar.text != ""
+        return searchController != nil && searchController!.active && searchController!.searchBar.text != "" && filteredContacts.count > 0
     }
     
     /**

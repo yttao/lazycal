@@ -21,6 +21,8 @@ class LocationsViewController: UIViewController {
     private let locationsTableViewSegue = "LocationsTableViewSegue"
     private let locationsMapViewSegue = "LocationsMapViewSegue"
     
+    // MARK: - Methods for initializing view controller and data.
+    
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
@@ -39,14 +41,21 @@ class LocationsViewController: UIViewController {
     
         The map's height is 1/3 of the screen.
     */
-    func initializeHeightConstraints() {
+    private func initializeHeightConstraints() {
         let heightConstraint = NSLayoutConstraint(item: locationsMapViewContainer, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: view.frame.height / 3)
         locationsMapViewContainer.addConstraint(heightConstraint)
     }
     
+    /**
+        Sets the map view.
+    
+        :param: notification The notification that the map view has loaded.
+    */
     func setMapView(notification: NSNotification) {
         mapView = notification.userInfo!["MapView"] as? MKMapView
     }
+    
+    // MARK: - Methods for exiting view controller.
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         super.prepareForSegue(segue, sender: sender)
@@ -58,6 +67,8 @@ class LocationsViewController: UIViewController {
             }
         }
     }
+    
+    // MARK: - Methods for showing notifications.
     
     /**
         Show an alert for the event notification. The alert provides two options: "OK" and "View Event". Tap "OK" to dismiss the alert. Tap "View Event" to show event details.

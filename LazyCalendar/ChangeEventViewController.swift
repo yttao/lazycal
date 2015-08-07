@@ -20,6 +20,7 @@ class ChangeEventViewController: UITableViewController {
     private var alarm: Bool?
     private var alarmTime: NSDate?
     private var contactIDs: [ABRecordID]?
+    private var locations: [MKMapItem]?
     
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
@@ -30,7 +31,6 @@ class ChangeEventViewController: UITableViewController {
     
     @IBOutlet weak var dateStartPickerCell: UITableViewCell!
     @IBOutlet weak var dateEndPickerCell: UITableViewCell!
-    
     
     // Text field for event name
     @IBOutlet weak var nameTextField: UITextField!
@@ -84,6 +84,8 @@ class ChangeEventViewController: UITableViewController {
     
     private var addressBookRef: ABAddressBookRef?
     
+    // MARK: - Methods for initializing view controller and data.
+    
     /**
         On initialization, get address book.
     */
@@ -93,7 +95,6 @@ class ChangeEventViewController: UITableViewController {
         // Observer for when notification pops up
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
     }
-    
     
     /**
         Provides setup information for the initial data, before the user changes anything.
@@ -175,6 +176,10 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
+    
+    */
+    
+    /**
         On view appearance, update all information in table view.
     */
     override func viewWillAppear(animated: Bool) {
@@ -185,6 +190,7 @@ class ChangeEventViewController: UITableViewController {
         updateAlarmSwitchEnabled()
         updateAlarmTime()
         updateContactsDetailsLabel()
+        updateLocationsDetailsLabel()
     }
     
     /**
@@ -293,6 +299,43 @@ class ChangeEventViewController: UITableViewController {
     func resetAlarmTime() {
         alarmTimePicker.date = dateStartPicker.date
         updateAlarmTime()
+    }
+    
+    /**
+        Updates the contacts detail label.
+    
+        The contacts detail label does not display a number if no contacts have been selected yet or if the number of contacts selected is zero. Otherwise, if at least one contact is selected, it displays the number of contacts.
+    */
+    func updateContactsDetailsLabel() {
+        let contactsCell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
+        if contactIDs != nil && contactIDs!.count > 0 {
+            contactsCell?.detailTextLabel?.text = "\(contactIDs!.count)"
+        }
+        else {
+            contactsCell?.detailTextLabel?.text = nil
+        }
+        // Resizes contacts cell to fit label.
+        contactsCell?.detailTextLabel?.sizeToFit()
+        tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
+    }
+    
+    /**
+        Updates the locations detail label.
+        
+        The locations detail label does not display a number if no locations have been selected yet or if the number of locations selected is zero. Otherwise, if at least one location is selected, it displays the number of locations.
+    */
+    func updateLocationsDetailsLabel() {
+        let locationsCell = tableView.cellForRowAtIndexPath(indexPaths["Locations"]!)
+        if locations != nil && locations!.count > 0 {
+            locationsCell?.detailTextLabel?.text = "\(locations!.count)"
+        }
+        else {
+            locationsCell?.detailTextLabel?.text = nil
+        }
+        // Resize locations cell to fit label.
+        locationsCell?.detailTextLabel?.sizeToFit()
+        println(locationsCell?.detailTextLabel?.frame.width)
+        tableView.reloadRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
     }
     
     /**
@@ -532,6 +575,21 @@ class ChangeEventViewController: UITableViewController {
         
         dateFormatter.dateFormat = "h:mm a"
         alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
+    }
+    
+    /**
+        Updates the contact IDs.
+    
+        :param: contacts The contacts IDs that were selected.
+    */
+    func updateContacts(contactIDs: [ABRecordID]) {
+        self.contactIDs = contactIDs
+        updateContactsDetailsLabel()
+    }
+    
+    func updateLocations(locations: [MKMapItem]) {
+        self.locations = locations
+        updateLocationsDetailsLabel()
     }
     
     /**
@@ -789,37 +847,6 @@ class ChangeEventViewController: UITableViewController {
             contactEvents.removeObject(event)
         }
     }
-    
-    /**
-        Updates the contact IDs.
-    
-        :param: contacts The contacts IDs that were selected.
-    */
-    func updateContacts(contactIDs: [ABRecordID]) {
-        self.contactIDs = contactIDs
-        updateContactsDetailsLabel()
-    }
-    
-    
-    /**
-        Updates the contacts detail label.
-        
-        The contacts detail label does not display a number if no contacts have been selected yet or if the number of contacts selected is zero. Otherwise, if at least one contact is selected, it displays the number of contacts.
-    */
-    func updateContactsDetailsLabel() {
-        let contactCell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
-        if contactIDs != nil && contactIDs!.count > 0 {
-            contactCell?.detailTextLabel?.text = "\(contactIDs!.count)"
-        }
-        else {
-            contactCell?.detailTextLabel?.text = nil
-        }
-        // Resizes contact cell to fit data.
-        contactCell?.detailTextLabel?.sizeToFit()
-        tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
-    }
-    
-    
     
     /**
         On saving events, save event and inform observers that an event was saved.

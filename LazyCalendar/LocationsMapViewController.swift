@@ -16,6 +16,8 @@ class LocationsMapViewController: UIViewController {
     
     private let locationManager = CLLocationManager()
     
+    // MARK: - Methods for initializing view controller and data.
+    
     /**
         Attach observer for when location use is authorized.
     */
@@ -36,6 +38,8 @@ class LocationsMapViewController: UIViewController {
         NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
     }
     
+    // MARK: - Methods for controlling map view.
+    
     /**
         Centers the map on the point of interest upon notification.
     
@@ -52,7 +56,7 @@ class LocationsMapViewController: UIViewController {
         :param: location The location to center the map on.
         :param: regionRadius The radius of the region to display around `location`. Default is 1000m.
     */
-    func centerMap(location: CLLocation, regionRadius: CLLocationDistance = 1000) {
+    private func centerMap(location: CLLocation, regionRadius: CLLocationDistance = 1000) {
         mapView.showsUserLocation = true
         let coordinateRegion = MKCoordinateRegionMakeWithDistance(location.coordinate, regionRadius * 2.0, regionRadius * 2.0)
         mapView.setRegion(coordinateRegion, animated: true)

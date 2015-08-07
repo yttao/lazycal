@@ -14,7 +14,8 @@ import CoreLocation
 
 class LocationsTableViewController: UITableViewController {
     private var searchController: UISearchController?
-    
+    private var searchEnabled = true
+
     private var annotations: [MKPointAnnotation]!
     private var selectedLocations: [MKMapItem]!
     private var filteredLocations = [MKMapItem]()
@@ -213,6 +214,14 @@ class LocationsTableViewController: UITableViewController {
     private func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String {
         return ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: " ")
     }
+    
+    // MARK: - Methods related to exiting view controller.
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        let changeEventViewController = navigationController!.viewControllers.first as? ChangeEventViewController
+        changeEventViewController?.updateLocations(selectedLocations)
+    }
 }
 
 // MARK: - UITableViewDelegate
@@ -317,10 +326,13 @@ extension LocationsTableViewController: UITableViewDataSource {
 extension LocationsTableViewController: UISearchResultsUpdating {
     /**
         When the search bar is activated or the text in the search bar changes, start updating search results. Search results cannot be duplicates of already-selected locations.
+    
+        TODO: disable selecting from selected locations when waiting to load results and still showing selected locations.
     */
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         // Destroy last request and make a new one
         timer?.invalidate()
         timer = NSTimer.scheduledTimerWithTimeInterval(0.3, target: self, selector: "filterLocations:", userInfo: searchController.searchBar.text, repeats: false)
+        tableView.reloadData()
     }
 }
