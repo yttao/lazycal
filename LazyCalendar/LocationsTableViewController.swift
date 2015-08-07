@@ -73,6 +73,20 @@ class LocationsTableViewController: UITableViewController {
     */
     func loadData(locations: [MKMapItem]) {
         self.selectedLocations = locations
+        
+        // Convert map items to annotations
+        annotations = selectedLocations.map({
+            mapItem in
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = mapItem.placemark.coordinate
+            annotation.title = mapItem.name
+            let address = self.stringFromAddressDictionary(mapItem.placemark.addressDictionary)
+            annotation.subtitle = address
+            return annotation
+        })
+        
+        // Add all annotations to map view.
+        mapView?.addAnnotations(annotations)
     }
     
     /**

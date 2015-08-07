@@ -84,6 +84,9 @@ class ChangeEventViewController: UITableViewController {
     
     private var addressBookRef: ABAddressBookRef?
     
+    // Amount of error allowed for floating points
+    private let EPSILON = pow(10.0, -5.0)
+    
     // MARK: - Methods for initializing view controller and data.
     
     /**
@@ -435,7 +438,7 @@ class ChangeEventViewController: UITableViewController {
         
         // Load contacts IDs if they exist already.
         if contactIDs != nil {
-            contactsTableViewController.loadData(self.contactIDs!)
+            contactsTableViewController.loadData(contactIDs!)
         }
         
         navigationController!.showViewController(contactsTableViewController, sender: self)
@@ -445,7 +448,12 @@ class ChangeEventViewController: UITableViewController {
         Shows the location view controller.
     */
     func showLocationsViewController() {
-        let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! UIViewController
+        let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
+        
+        if locations != nil {
+            locationsViewController.loadData(locations!)
+        }
+        
         navigationController!.showViewController(locationsViewController, sender: self)
     }
     
@@ -670,7 +678,7 @@ class ChangeEventViewController: UITableViewController {
         removeOldContacts()
         
         addNewLocations()
-        removeOldLocations()
+        //removeOldLocations()
         println(event!.locations.count)
         
         // Save event
@@ -865,11 +873,24 @@ class ChangeEventViewController: UITableViewController {
                 let latitude = locations![i].placemark.coordinate.latitude
                 let longitude = locations![i].placemark.coordinate.longitude
                 
+                let block = {(evaluatedObject: AnyObject!, expressions: [AnyObject]!, context: NSMutableDictionary!) -> AnyObject! in
+                    let lat = evaluatedObject as! CLLocationDegrees
+                    return fabs(lat - latitude) < self.EPSILON
+                }
                 let fetchRequest = NSFetchRequest(entityName: "Location")
                 fetchRequest.fetchLimit = 1
-                let requirements = "(latitude == %d) && (longitude == %d)"
-                let predicate = NSPredicate(format: requirements, latitude, longitude)
-                fetchRequest.predicate = predicate
+                let expression = NSExpressionDescription()
+                let latitudeKeyPath = NSExpression(forKeyPath: "latitude")
+                let latitudeExpression = NSExpression(forBlock: block, arguments: [latitudeKeyPath])
+                //let latitudeExpression = NSExpression(forFunction: "fabs:", arguments: [latitude, latitudeKeyPath])
+                let latitudeDescription = NSExpressionDescription()
+                latitudeDescription.name = "latitudeExpression"
+                latitudeDescription.expression = latitudeExpression
+                latitudeDescription.expressionResultType = NSAttributeType.DoubleAttributeType
+                fetchRequest.propertiesToFetch = [latitudeDescription]
+                //let requirements = "((fabs(latitude - %d)) < %d) && ((fabs(longitude - %d)) < %d)"
+                //let predicate = NSPredicate(format: requirements, latitude, EPSILON, longitude, EPSILON)
+
                 var error: NSError? = nil
                 let location = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Location
                 
@@ -919,10 +940,11 @@ class ChangeEventViewController: UITableViewController {
             var removedSet = Set<Location>()
             // Find locations to remove
             for location in eventLocations {
-                let l = CLLocation(latitude: location.latitude, longitude: location.longitude)
+                let loc = location as! Location
+                let l = CLLocation(latitude: loc.latitude, longitude: loc.longitude)
                 
                 if !contains(newLocations, l) {
-                    removedSet.insert(location as! Location)
+                    removedSet.insert(loc)
                 }
                 
                 /*if results.isEmpty {

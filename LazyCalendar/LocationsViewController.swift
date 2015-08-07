@@ -21,6 +21,8 @@ class LocationsViewController: UIViewController {
     private let locationsTableViewSegue = "LocationsTableViewSegue"
     private let locationsMapViewSegue = "LocationsMapViewSegue"
     
+    private var locations: [MKMapItem]?
+    
     // MARK: - Methods for initializing view controller and data.
     
     required init(coder aDecoder: NSCoder) {
@@ -34,6 +36,12 @@ class LocationsViewController: UIViewController {
         super.viewDidLoad()
         
         initializeHeightConstraints()
+    }
+    
+    /**
+    */
+    func loadData(locations: [MKMapItem]) {
+        self.locations = locations
     }
 
     /**
@@ -64,6 +72,9 @@ class LocationsViewController: UIViewController {
             if identifier == locationsTableViewSegue {
                 let locationsTableViewController = segue.destinationViewController as! LocationsTableViewController
                 locationsTableViewController.setMapView(mapView)
+                if locations != nil {
+                    locationsTableViewController.loadData(locations!)
+                }
             }
         }
     }
