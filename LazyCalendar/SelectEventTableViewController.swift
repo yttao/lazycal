@@ -86,7 +86,12 @@ class SelectEventTableViewController: UITableViewController {
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
         eventTimeLabel.text = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
         
-        if event!.alarm && notificationsEnabled() {
+        if !notificationsEnabled() {
+            alarmLabel.text = "Disabled"
+            alarmTimeDisplayCell.hidden = true
+            alarmTimeMainLabel.text = nil
+        }
+        else if event!.alarm {
             alarmLabel.text = "On"
             alarmTimeDisplayCell.hidden = false
             alarmTimeMainLabel.text = dateFormatter.stringFromDate(event!.alarmTime!)

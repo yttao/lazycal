@@ -93,7 +93,7 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         
         let numDays = calendar.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: calendar.dateFromComponents(components)!).length
         
-        for (var i = monthStartWeekday - 1; i < numDays + (monthStartWeekday - 1); i++) {
+        for i in (monthStartWeekday - 1)..<(numDays + (monthStartWeekday - 1)) {
             daysInMonth[i] = i - (monthStartWeekday - 2)
         }
     }

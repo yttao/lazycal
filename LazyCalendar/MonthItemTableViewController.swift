@@ -182,9 +182,9 @@ class MonthItemTableViewController: UITableViewController {
             $0.userInfo!["id"] as! String) == event.id
         })
         // Remove scheduled notifications
-        for (index, notification) in enumerate(notifications) {
-            let index = find(scheduledNotifications, notification)
-            scheduledNotifications.removeAtIndex(index!)
+        for notification in notifications {
+            let deletedIndex = find(scheduledNotifications, notification)
+            scheduledNotifications.removeAtIndex(deletedIndex!)
         }
     }
     

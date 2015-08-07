@@ -21,6 +21,7 @@ class FullEvent: NSManagedObject {
     @NSManaged var alarmTime: NSDate?
     
     @NSManaged var contacts: NSSet
+    @NSManaged var locations: NSSet
 }
 
 class Contact: NSManagedObject {

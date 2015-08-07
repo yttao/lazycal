@@ -334,7 +334,6 @@ class ChangeEventViewController: UITableViewController {
         }
         // Resize locations cell to fit label.
         locationsCell?.detailTextLabel?.sizeToFit()
-        println(locationsCell?.detailTextLabel?.frame.width)
         tableView.reloadRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
     }
     
@@ -611,17 +610,14 @@ class ChangeEventViewController: UITableViewController {
                 tableView.deleteRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
                 dateStartPickerCell.hidden = true
             }
-            //dateStartPickerCell.hidden = true
             tableView.endUpdates()
             // If deselecting date end field, hide date end picker and show labels
         case sections["End"]!:
             tableView.beginUpdates()
             if !dateEndPickerCell.hidden {
-                //dateEndPickerCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
                 dateEndPickerCell.hidden = true
             }
-            //dateEndPickerCell.hidden = true
             tableView.endUpdates()
         default:
             break
@@ -670,8 +666,12 @@ class ChangeEventViewController: UITableViewController {
             }
         }
         
-        addNewContacts(event!)
-        removeOldContacts(event!)
+        addNewContacts()
+        removeOldContacts()
+        
+        addNewLocations()
+        removeOldLocations()
+        println(event!.locations.count)
         
         // Save event
         var error: NSError?
@@ -761,18 +761,21 @@ class ChangeEventViewController: UITableViewController {
         }
     }
     
+    // MARK: - Methods for handling contacts when saving.
+    
     /**
-        Adds new contacts.
+        Adds new contacts to the event.
     
         :param: event The event to add contacts to.
     */
-    func addNewContacts(event: FullEvent) {
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let managedContext = appDelegate.managedObjectContext!
-        
-        var eventContacts = event.mutableSetValueForKey("contacts")
+    func addNewContacts() {
         if contactIDs != nil {
-            for (var i = 0; i < contactIDs!.count; i++) {
+            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            let managedContext = appDelegate.managedObjectContext!
+            
+            var eventContacts = event!.mutableSetValueForKey("contacts")
+            
+            for i in 0..<contactIDs!.count {
                 let contactID = contactIDs![i]
                 
                 let record: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, contactIDs![i])?.takeUnretainedValue()
@@ -782,19 +785,19 @@ class ChangeEventViewController: UITableViewController {
                 
                 // Create fetch request for contacts
                 let fetchRequest = NSFetchRequest(entityName: "Contact")
+                fetchRequest.fetchLimit = 1
                 // Create predicate for fetch request
                 let requirements = "(id == %d)"
                 let predicate = NSPredicate(format: requirements, contactID)
                 fetchRequest.predicate = predicate
                 // Execute fetch request for contacts
                 var error: NSError? = nil
-                let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [Contact]
-                
-                let contactEntity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
+                let contact = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Contact
                 
                 // If no results, contact is new. Add Contact for first time.
-                if results.count == 0 {
-                    let contact = Contact(entity: contactEntity, insertIntoManagedObjectContext: managedContext)
+                if contact == nil {
+                    let entity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
+                    let contact = Contact(entity: entity, insertIntoManagedObjectContext: managedContext)
                     
                     contact.id = contactID
                     contact.firstName = firstName
@@ -803,35 +806,33 @@ class ChangeEventViewController: UITableViewController {
                     eventContacts.addObject(contact)
                     
                     var contactEvents = contact.mutableSetValueForKey("events")
-                    contactEvents.addObject(event)
+                    contactEvents.addObject(event!)
                 }
-                    // If results returned, contact already exists. Add existing contact to events related to the contact.
+                // If results returned, contact already exists. Add existing contact to events related to the contact.
                 else {
-                    let contact = results.first!
-                    
+                    let contact = contact!
                     eventContacts.addObject(contact)
                     
                     var contactEvents = contact.mutableSetValueForKey("events")
-                    contactEvents.addObject(event)
+                    contactEvents.addObject(event!)
                 }
             }
         }
     }
     
     /**
-        Removes old contacts.
+        Removes old contacts from the event.
     
         All contacts that are not currently contained in `contactIDs` will be removed.
     
         :param: event The event to remove contacts from.	
     */
-    func removeOldContacts(event: FullEvent) {
-        var eventContacts = event.mutableSetValueForKey("contacts")
-        
-        // Check for removed contacts for an edited event and remove them. Also removed the edited event from removed contacts.
-        
+    func removeOldContacts() {
+        var eventContacts = event!.mutableSetValueForKey("contacts")
+
         // Find contacts to remove.
         var removedContacts = [Contact]()
+        
         for contact in eventContacts {
             let c = contact as! Contact
             let id = c.id
@@ -840,11 +841,116 @@ class ChangeEventViewController: UITableViewController {
                 removedContacts.append(c)
             }
         }
-        // Remove deleted contacts, remove contact connection to event.
-        for (var i = 0; i < removedContacts.count; i++) {
-            eventContacts.removeObject(removedContacts[i])
-            let contactEvents = removedContacts[i].mutableSetValueForKey("events")
-            contactEvents.removeObject(event)
+        // Remove deleted contacts, remove contact relation to event.
+        for contact in removedContacts {
+            eventContacts.removeObject(Contact)
+            let contactEvents = contact.mutableSetValueForKey("events")
+            contactEvents.removeObject(event!)
+        }
+    }
+    
+    // MARK: - Method for handling locations when saving event.
+    
+    /**
+        Adds new locations to the event.
+    */
+    func addNewLocations() {
+        if locations != nil {
+            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            let managedContext = appDelegate.managedObjectContext!
+            
+            var eventLocations = event!.mutableSetValueForKey("locations")
+            
+            for i in 0..<locations!.count {
+                let latitude = locations![i].placemark.coordinate.latitude
+                let longitude = locations![i].placemark.coordinate.longitude
+                
+                let fetchRequest = NSFetchRequest(entityName: "Location")
+                fetchRequest.fetchLimit = 1
+                let requirements = "(latitude == %d) && (longitude == %d)"
+                let predicate = NSPredicate(format: requirements, latitude, longitude)
+                fetchRequest.predicate = predicate
+                var error: NSError? = nil
+                let location = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Location
+                
+                if location == nil {
+                    let entity = NSEntityDescription.entityForName("Location", inManagedObjectContext: managedContext)!
+                    let location = Location(entity: entity, insertIntoManagedObjectContext: managedContext)
+                    
+                    location.latitude = latitude
+                    location.longitude = longitude
+                    
+                    // Add relation
+                    eventLocations.addObject(location)
+                    
+                    // Add inverse relation
+                    var locationEvents = location.mutableSetValueForKey("events")
+                    locationEvents.addObject(event!)
+                }
+                else {
+                    let location = location!
+                    
+                    eventLocations.addObject(location)
+                    
+                    var locationEvents = location.mutableSetValueForKey("events")
+                    locationEvents.addObject(event!)
+                }
+            }
+        }
+    }
+    
+    /**
+        Removes old locations from the event.
+    */
+    func removeOldLocations() {
+        var eventLocations = event!.mutableSetValueForKey("locations")
+        
+        if locations != nil {
+            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            let managedContext = appDelegate.managedObjectContext!
+            
+            let newLocations = locations!.map({
+                CLLocation(latitude: $0.placemark.coordinate.latitude, longitude: $0.placemark.coordinate.longitude)
+            }) as [CLLocation]
+            
+            // Check for removed locations for an edited event and remove them. Also remove the edited event from removed locations.
+            
+            var removedLocations = [MKMapItem]()
+            var removedSet = Set<Location>()
+            // Find locations to remove
+            for location in eventLocations {
+                let l = CLLocation(latitude: location.latitude, longitude: location.longitude)
+                
+                if !contains(newLocations, l) {
+                    removedSet.insert(location as! Location)
+                }
+                
+                /*if results.isEmpty {
+                removedLocations.append(location)
+                }*/
+            }
+            eventLocations.intersectSet(removedSet)
+            
+            /*for location in removedLocations {
+            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            let managedContext = appDelegate.managedObjectContext!
+            
+            let coordinate = location.placemark.coordinate
+            let fetchRequest = NSFetchRequest(entityName: "Location")
+            fetchRequest.fetchLimit = 1
+            let requirements = "(latitude == %d) && (longitude == %d)"
+            let predicate = NSPredicate(format: requirements, coordinate.latitude, coordinate.longitude)
+            fetchRequest.predicate = predicate
+            var error: NSError? = nil
+            let result = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Location
+            
+            if result != nil {
+            eventLocations.removeObject(result!)
+            }
+            }*/
+        }
+        else {
+            eventLocations.removeAllObjects()
         }
     }
     
@@ -853,7 +959,7 @@ class ChangeEventViewController: UITableViewController {
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let identifier = segue.identifier {
-            if identifier == "SaveEventSegue" || identifier == "EditEventSegue" {
+            if identifier == "SaveEventSegue" || identifier == "SaveEventEditSegue" {
                 let event = saveEvent()
                 NSNotificationCenter.defaultCenter().postNotificationName("EventSaved", object: self, userInfo: ["Event": event])
             }

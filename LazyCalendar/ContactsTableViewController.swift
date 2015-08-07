@@ -125,11 +125,6 @@ class ContactsTableViewController: UITableViewController {
             if !identicalRecords.isEmpty {
                 return false
             }
-            /*for (var i = 0; i < self.selectedContacts.count; i++) {
-                if ABRecordGetRecordID(recordRef) == ABRecordGetRecordID(self.selectedContacts[i]) {
-                    return false
-                }
-            }*/
             
             // Get name, phone numbers, and emails
             let name = ABRecordCopyCompositeName(recordRef)?.takeRetainedValue() as? String
@@ -142,7 +137,7 @@ class ContactsTableViewController: UITableViewController {
             }
             
             // Search phone numbers for search text
-            for (var i = 0; i < ABMultiValueGetCount(phoneNumbersMultivalue!); i++) {
+            for i in 0..<ABMultiValueGetCount(phoneNumbersMultivalue!) {
                 let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue!, i).takeRetainedValue() as! String
                 if phoneNumber.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
                     return true
@@ -150,7 +145,7 @@ class ContactsTableViewController: UITableViewController {
             }
             
             // Search emails for search text
-            for (var i = 0; i < ABMultiValueGetCount(emailsMultivalue); i++) {
+            for i in 0..<ABMultiValueGetCount(emailsMultivalue) {
                 let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, i).takeRetainedValue() as! String
                 if email.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
                     return true
