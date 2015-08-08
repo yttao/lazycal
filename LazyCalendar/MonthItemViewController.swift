@@ -31,7 +31,6 @@ class MonthItemViewController: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDate:", name: "SelectedDateChanged", object: nil)
     }
     
-    
     /**
         Initialize height constraints.
     */

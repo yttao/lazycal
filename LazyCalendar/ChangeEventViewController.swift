@@ -679,7 +679,6 @@ class ChangeEventViewController: UITableViewController {
         
         addNewLocations()
         //removeOldLocations()
-        println(event!.locations.count)
         
         // Save event
         var error: NSError?
@@ -873,13 +872,13 @@ class ChangeEventViewController: UITableViewController {
                 let latitude = locations![i].placemark.coordinate.latitude
                 let longitude = locations![i].placemark.coordinate.longitude
                 
-                let block = {(evaluatedObject: AnyObject!, expressions: [AnyObject]!, context: NSMutableDictionary!) -> AnyObject! in
+                /*let block = {(evaluatedObject: AnyObject!, expressions: [AnyObject]!, context: NSMutableDictionary!) -> AnyObject! in
                     let lat = evaluatedObject as! CLLocationDegrees
                     return fabs(lat - latitude) < self.EPSILON
-                }
+                }*/
                 let fetchRequest = NSFetchRequest(entityName: "Location")
                 fetchRequest.fetchLimit = 1
-                let expression = NSExpressionDescription()
+                /*let expression = NSExpressionDescription()
                 let latitudeKeyPath = NSExpression(forKeyPath: "latitude")
                 let latitudeExpression = NSExpression(forBlock: block, arguments: [latitudeKeyPath])
                 //let latitudeExpression = NSExpression(forFunction: "fabs:", arguments: [latitude, latitudeKeyPath])
@@ -887,9 +886,9 @@ class ChangeEventViewController: UITableViewController {
                 latitudeDescription.name = "latitudeExpression"
                 latitudeDescription.expression = latitudeExpression
                 latitudeDescription.expressionResultType = NSAttributeType.DoubleAttributeType
-                fetchRequest.propertiesToFetch = [latitudeDescription]
-                //let requirements = "((fabs(latitude - %d)) < %d) && ((fabs(longitude - %d)) < %d)"
-                //let predicate = NSPredicate(format: requirements, latitude, EPSILON, longitude, EPSILON)
+                fetchRequest.propertiesToFetch = [latitudeDescription]*/
+                let requirements = "((latitude - %d) BETWEEN {0, %d} AND (latitude - %d) BETWEEN {%d, 0}) AND ((longitude - %d) BETWEEN {0, %d} AND (longitude - %d) BETWEEN {%d, 0})"
+                let predicate = NSPredicate(format: requirements, argumentArray: [latitude, EPSILON, longitude, -EPSILON, longitude, EPSILON, longitude, -EPSILON])
 
                 var error: NSError? = nil
                 let location = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Location

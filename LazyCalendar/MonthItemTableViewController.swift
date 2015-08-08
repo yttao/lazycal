@@ -100,7 +100,7 @@ class MonthItemTableViewController: UITableViewController {
         
         // To show an event, the time interval from dateStart to dateEnd must fall between lowerDate and upperDate.
         // (dateStart >= lower && dateStart < upper) || (dateEnd >= lower && dateEnd < upper) || (dateStart < lower && dateEnd >= lower) || (dateStart < upper && dateEnd >= upper)
-        let requirements = "(dateStart >= %@ && dateStart < %@) || (dateEnd >= %@ && dateEnd < %@) || (dateStart <= %@ && dateEnd >= %@) || (dateStart <= %@ && dateEnd >= %@)"
+        let requirements = "(dateStart >= %@ AND dateStart < %@) OR (dateEnd >= %@ AND dateEnd < %@) OR (dateStart <= %@ AND dateEnd >= %@) OR (dateStart <= %@ AND dateEnd >= %@)"
         let predicate = NSPredicate(format: requirements, lowerDate, upperDate, lowerDate, upperDate, lowerDate, lowerDate, upperDate, upperDate)
         fetchRequest.predicate = predicate
         

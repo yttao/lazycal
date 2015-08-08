@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MonthItemCollectionViewController: UICollectionViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class MonthItemCollectionViewController: UICollectionViewController {
     var dateIndex: NSDate?
     var dateComponents: NSDateComponents?
     
@@ -104,7 +104,7 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     func clearSelected() {
         deselectSelectedCell()
         dateComponents!.day = 1
-        dateComponents = getNewDateComponents(dateComponents!)
+        getNewDateComponents(&dateComponents!)
     }
     
     /**
@@ -118,7 +118,7 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
         
         // Update selected date components
         dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
-        dateComponents = getNewDateComponents(dateComponents!)
+        getNewDateComponents(&dateComponents!)
         
         let selectedDate = calendar.dateFromComponents(dateComponents!)!
         
@@ -158,9 +158,9 @@ class MonthItemCollectionViewController: UICollectionViewController, UICollectio
     
         :return The new date components.
     */
-    func getNewDateComponents(components: NSDateComponents) -> NSDateComponents {
+    func getNewDateComponents(inout components: NSDateComponents) {
         let newDate = calendar.dateFromComponents(components)
-        return calendar.components(units, fromDate: newDate!)
+        components = calendar.components(units, fromDate: newDate!)
     }
 }
 
