@@ -1005,6 +1005,7 @@ class ChangeEventViewController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let identifier = segue.identifier {
             if identifier == "SaveEventSegue" || identifier == "SaveEventEditSegue" {
+                NSNotificationCenter.defaultCenter().removeObserver(self, name: "EventNotificationReceived", object: nil)
                 let event = saveEvent()
                 NSNotificationCenter.defaultCenter().postNotificationName("EventSaved", object: self, userInfo: ["Event": event])
             }
