@@ -77,8 +77,7 @@ class MonthItemTableViewController: UITableViewController {
         :param: date The date to show.
     */
     func showEvents(date: NSDate) {
-        //self.date = date
-        println("Showing events for \(date)")
+        //println("Showing events for \(date)")
         // Find events for that date
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext!

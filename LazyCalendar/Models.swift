@@ -21,7 +21,7 @@ class FullEvent: NSManagedObject {
     @NSManaged var alarmTime: NSDate?
     
     @NSManaged var contacts: NSSet
-    @NSManaged var locations: NSSet
+    @NSManaged var pointsOfInterest: NSSet
 }
 
 class Contact: NSManagedObject {
@@ -33,27 +33,12 @@ class Contact: NSManagedObject {
     @NSManaged var events: NSSet
 }
 
-class TestEvent: NSManagedObject {
-    @NSManaged var name: String?
-    
-    @NSManaged var dateStart: NSDate
-    @NSManaged var dateEnd: NSDate
-    
-    @NSManaged var alarm: Bool
-    @NSManaged var alarmTime: NSDate?
-}
-
-class Location: NSManagedObject {
+class PointOfInterest: NSManagedObject {
     @NSManaged var latitude: Double
     @NSManaged var longitude: Double
     
-    @NSManaged var events: NSSet
-    @NSManaged var annotations: NSSet
-}
-
-class Annotation: NSManagedObject {
     @NSManaged var title: String?
     @NSManaged var subtitle: String?
     
-    @NSManaged var locations: NSSet
+    @NSManaged var events: NSSet
 }

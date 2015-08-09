@@ -234,7 +234,7 @@ class LocationsTableViewController: UITableViewController {
         super.viewWillDisappear(animated)
         
         let changeEventViewController = navigationController!.viewControllers.first as? ChangeEventViewController
-        changeEventViewController?.updateLocations(selectedLocations)
+        changeEventViewController?.updateMapItems(selectedLocations)
     }
 }
 

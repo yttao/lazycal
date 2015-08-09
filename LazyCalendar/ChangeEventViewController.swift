@@ -10,6 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 import AddressBook
+import AddressBookUI
 import CoreLocation
 
 class ChangeEventViewController: UITableViewController {
@@ -20,7 +21,7 @@ class ChangeEventViewController: UITableViewController {
     private var alarm: Bool?
     private var alarmTime: NSDate?
     private var contactIDs: [ABRecordID]?
-    private var locations: [MKMapItem]?
+    private var mapItems: [MKMapItem]?
     
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
@@ -85,7 +86,7 @@ class ChangeEventViewController: UITableViewController {
     private var addressBookRef: ABAddressBookRef?
     
     // Amount of error allowed for floating points
-    private let EPSILON = pow(10.0, -5.0)
+    private let EPSILON = pow(10.0, -10.0)
     
     // MARK: - Methods for initializing view controller and data.
     
@@ -177,10 +178,6 @@ class ChangeEventViewController: UITableViewController {
             alarmTimePicker.date = alarmTime!
         }
     }
-    
-    /**
-    
-    */
     
     /**
         On view appearance, update all information in table view.
@@ -288,7 +285,7 @@ class ChangeEventViewController: UITableViewController {
         dateEndPicker.minimumDate = date
 
         // If the old date end comes after the new date start, change the old date end to equal the new date start.
-        if (originalDate.compare(dateStartPicker.date) == .OrderedAscending) {
+        if originalDate.compare(dateStartPicker.date) == .OrderedAscending {
             dateEndPicker.date = dateStartPicker.date
             updateDateEnd()
         }
@@ -325,12 +322,12 @@ class ChangeEventViewController: UITableViewController {
     /**
         Updates the locations detail label.
         
-        The locations detail label does not display a number if no locations have been selected yet or if the number of locations selected is zero. Otherwise, if at least one location is selected, it displays the number of locations.
+        The locations detail label does not display a number if no map items have been selected yet or if the number of map items selected is zero. Otherwise, if at least one map item is selected, it displays the number of map items.
     */
     func updateLocationsDetailsLabel() {
         let locationsCell = tableView.cellForRowAtIndexPath(indexPaths["Locations"]!)
-        if locations != nil && locations!.count > 0 {
-            locationsCell?.detailTextLabel?.text = "\(locations!.count)"
+        if mapItems != nil && mapItems!.count > 0 {
+            locationsCell?.detailTextLabel?.text = "\(mapItems!.count)"
         }
         else {
             locationsCell?.detailTextLabel?.text = nil
@@ -450,8 +447,8 @@ class ChangeEventViewController: UITableViewController {
     func showLocationsViewController() {
         let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
         
-        if locations != nil {
-            locationsViewController.loadData(locations!)
+        if mapItems != nil {
+            locationsViewController.loadData(mapItems!)
         }
         
         navigationController!.showViewController(locationsViewController, sender: self)
@@ -594,8 +591,8 @@ class ChangeEventViewController: UITableViewController {
         updateContactsDetailsLabel()
     }
     
-    func updateLocations(locations: [MKMapItem]) {
-        self.locations = locations
+    func updateMapItems(mapItems: [MKMapItem]) {
+        self.mapItems = mapItems
         updateLocationsDetailsLabel()
     }
     
@@ -614,7 +611,6 @@ class ChangeEventViewController: UITableViewController {
         case sections["Start"]!:
             tableView.beginUpdates()
             if !dateStartPickerCell.hidden {
-                //dateStartPicker.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
                 dateStartPickerCell.hidden = true
             }
@@ -677,8 +673,20 @@ class ChangeEventViewController: UITableViewController {
         addNewContacts()
         removeOldContacts()
         
-        addNewLocations()
-        //removeOldLocations()
+        //addNewPointsOfInterest()
+        //removeOldPointsOfInterest()
+        /*let count = event!.mutableSetValueForKey("pointsOfInterest").count
+        println("Event locations: \(count)")
+        
+        let fetchRequest = NSFetchRequest(entityName: "PointOfInterest")
+        let allLocations = managedContext.executeFetchRequest(fetchRequest, error: nil) as! [PointOfInterest]
+        println("Total locations: \(allLocations.count)")
+        
+        for l in allLocations {
+            println("\(l.title) \(l.latitude) \(l.longitude)")
+            let e = l.mutableSetValueForKey("events")
+            println("Associated events: \(e.count)")
+        }*/
         
         // Save event
         var error: NSError?
@@ -836,23 +844,31 @@ class ChangeEventViewController: UITableViewController {
     */
     func removeOldContacts() {
         var eventContacts = event!.mutableSetValueForKey("contacts")
-
-        // Find contacts to remove.
-        var removedContacts = [Contact]()
+        var removedContacts = NSMutableSet()
         
+        // Find old contacts to remove
         for contact in eventContacts {
-            let c = contact as! Contact
-            let id = c.id
-            // Check if the new list of contact IDs contains the old contact ID
+            let contact = contact as! Contact
+            let id = contact.id
+            // Check if the new list of contact IDs contains the old contact ID. If not, add to list of removed objects.
             if !contains(contactIDs!, id) {
-                removedContacts.append(c)
+                removedContacts.addObject(contact)
             }
         }
-        // Remove deleted contacts, remove contact relation to event.
+        eventContacts.minusSet(removedContacts as Set<NSObject>)
+        
+        // Remove deleted contacts, remove contact relation to event. If contact has no related events, delete contact.
         for contact in removedContacts {
-            eventContacts.removeObject(Contact)
+            let contact = contact as! Contact
+            eventContacts.removeObject(contact)
             let contactEvents = contact.mutableSetValueForKey("events")
             contactEvents.removeObject(event!)
+            
+            if contactEvents.count == 0 {
+                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+                let managedContext = appDelegate.managedObjectContext!
+                managedContext.deleteObject(contact)
+            }
         }
     }
     
@@ -861,59 +877,51 @@ class ChangeEventViewController: UITableViewController {
     /**
         Adds new locations to the event.
     */
-    func addNewLocations() {
-        if locations != nil {
+    func addNewPointsOfInterest() {
+        if mapItems != nil {
             let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
             let managedContext = appDelegate.managedObjectContext!
             
-            var eventLocations = event!.mutableSetValueForKey("locations")
+            var eventPointsOfInterest = event!.mutableSetValueForKey("pointsOfInterest")
             
-            for i in 0..<locations!.count {
-                let latitude = locations![i].placemark.coordinate.latitude
-                let longitude = locations![i].placemark.coordinate.longitude
+            for mapItem in mapItems! {
+                let latitude = mapItem.placemark.coordinate.latitude
+                let longitude = mapItem.placemark.coordinate.longitude
+                let title = mapItem.name
+                let subtitle = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
                 
-                /*let block = {(evaluatedObject: AnyObject!, expressions: [AnyObject]!, context: NSMutableDictionary!) -> AnyObject! in
-                    let lat = evaluatedObject as! CLLocationDegrees
-                    return fabs(lat - latitude) < self.EPSILON
-                }*/
-                let fetchRequest = NSFetchRequest(entityName: "Location")
+                let fetchRequest = NSFetchRequest(entityName: "PointOfInterest")
                 fetchRequest.fetchLimit = 1
-                /*let expression = NSExpressionDescription()
-                let latitudeKeyPath = NSExpression(forKeyPath: "latitude")
-                let latitudeExpression = NSExpression(forBlock: block, arguments: [latitudeKeyPath])
-                //let latitudeExpression = NSExpression(forFunction: "fabs:", arguments: [latitude, latitudeKeyPath])
-                let latitudeDescription = NSExpressionDescription()
-                latitudeDescription.name = "latitudeExpression"
-                latitudeDescription.expression = latitudeExpression
-                latitudeDescription.expressionResultType = NSAttributeType.DoubleAttributeType
-                fetchRequest.propertiesToFetch = [latitudeDescription]*/
-                let requirements = "((latitude - %d) BETWEEN {0, %d} AND (latitude - %d) BETWEEN {%d, 0}) AND ((longitude - %d) BETWEEN {0, %d} AND (longitude - %d) BETWEEN {%d, 0})"
+                let requirements = "((latitude - %d) < %d AND (latitude - %d) > %d) AND ((longitude - %d) < %d AND (longitude - %d) > %d)"
                 let predicate = NSPredicate(format: requirements, argumentArray: [latitude, EPSILON, longitude, -EPSILON, longitude, EPSILON, longitude, -EPSILON])
-
-                var error: NSError? = nil
-                let location = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Location
+                fetchRequest.predicate = predicate
                 
-                if location == nil {
-                    let entity = NSEntityDescription.entityForName("Location", inManagedObjectContext: managedContext)!
-                    let location = Location(entity: entity, insertIntoManagedObjectContext: managedContext)
+                var error: NSError? = nil
+                let storedPointOfInterest = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? PointOfInterest
+                
+                if storedPointOfInterest == nil {
+                    let entity = NSEntityDescription.entityForName("PointOfInterest", inManagedObjectContext: managedContext)!
+                    let newPointOfInterest = PointOfInterest(entity: entity, insertIntoManagedObjectContext: managedContext)
                     
-                    location.latitude = latitude
-                    location.longitude = longitude
+                    newPointOfInterest.latitude = latitude
+                    newPointOfInterest.longitude = longitude
+                    newPointOfInterest.title = title
+                    newPointOfInterest.subtitle = subtitle
                     
                     // Add relation
-                    eventLocations.addObject(location)
+                    eventPointsOfInterest.addObject(newPointOfInterest)
                     
                     // Add inverse relation
-                    var locationEvents = location.mutableSetValueForKey("events")
-                    locationEvents.addObject(event!)
+                    var inverse = newPointOfInterest.mutableSetValueForKey("events")
+                    inverse.addObject(event!)
                 }
                 else {
-                    let location = location!
+                    let storedPointOfInterest = storedPointOfInterest!
                     
-                    eventLocations.addObject(location)
+                    eventPointsOfInterest.addObject(storedPointOfInterest)
                     
-                    var locationEvents = location.mutableSetValueForKey("events")
-                    locationEvents.addObject(event!)
+                    var inverse = storedPointOfInterest.mutableSetValueForKey("events")
+                    inverse.addObject(event!)
                 }
             }
         }
@@ -922,57 +930,73 @@ class ChangeEventViewController: UITableViewController {
     /**
         Removes old locations from the event.
     */
-    func removeOldLocations() {
-        var eventLocations = event!.mutableSetValueForKey("locations")
+    func removeOldPointsOfInterest() {
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let managedContext = appDelegate.managedObjectContext!
         
-        if locations != nil {
-            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            let managedContext = appDelegate.managedObjectContext!
-            
-            let newLocations = locations!.map({
+        var eventPointsOfInterest = event!.mutableSetValueForKey("pointsOfInterest")
+        
+        if mapItems != nil && mapItems!.count > 0 {
+            let newLocations = mapItems!.map({
                 CLLocation(latitude: $0.placemark.coordinate.latitude, longitude: $0.placemark.coordinate.longitude)
             }) as [CLLocation]
             
             // Check for removed locations for an edited event and remove them. Also remove the edited event from removed locations.
-            
-            var removedLocations = [MKMapItem]()
-            var removedSet = Set<Location>()
-            // Find locations to remove
-            for location in eventLocations {
-                let loc = location as! Location
-                let l = CLLocation(latitude: loc.latitude, longitude: loc.longitude)
+
+            var removedPointsOfInterest = NSMutableSet()
+            // Find points of interest to remove
+            for pointOfInterest in eventPointsOfInterest {
+                let storedPointOfInterest = pointOfInterest as! PointOfInterest
+                let storedLocation = CLLocation(latitude: storedPointOfInterest.latitude, longitude: storedPointOfInterest.longitude)
                 
-                if !contains(newLocations, l) {
-                    removedSet.insert(loc)
+                // Points of interest still exist if there is a coordinate match in the currently selected map items.
+                let foundMatch = mapItems!.filter({
+                    let latitudeMatch = fabs($0.placemark.coordinate.latitude - storedLocation.coordinate.latitude) < self.EPSILON
+                    let longitudeMatch = fabs($0.placemark.coordinate.longitude - storedLocation.coordinate.longitude) < self.EPSILON
+                    return latitudeMatch && longitudeMatch
+                    }).first
+                
+                // If there is no coordinate match, the point of interest has been removed.
+                if foundMatch == nil {
+                    removedPointsOfInterest.addObject(pointOfInterest)
                 }
+            }
+            // Remove old points of interest
+            eventPointsOfInterest.minusSet(removedPointsOfInterest as Set<NSObject>)
+            
+            // Remove inverse; if the point of interest has no related events, delete the point of interest.
+            for pointOfInterest in removedPointsOfInterest {
+                let pointOfInterest = pointOfInterest as! PointOfInterest
+                let inverse = pointOfInterest.mutableSetValueForKey("events")
+                inverse.removeObject(event!)
                 
-                /*if results.isEmpty {
-                removedLocations.append(location)
-                }*/
+                if inverse.count == 0 {
+                    managedContext.deleteObject(pointOfInterest)
+                }
             }
-            eventLocations.intersectSet(removedSet)
-            
-            /*for location in removedLocations {
-            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            let managedContext = appDelegate.managedObjectContext!
-            
-            let coordinate = location.placemark.coordinate
-            let fetchRequest = NSFetchRequest(entityName: "Location")
-            fetchRequest.fetchLimit = 1
-            let requirements = "(latitude == %d) && (longitude == %d)"
-            let predicate = NSPredicate(format: requirements, coordinate.latitude, coordinate.longitude)
-            fetchRequest.predicate = predicate
-            var error: NSError? = nil
-            let result = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Location
-            
-            if result != nil {
-            eventLocations.removeObject(result!)
-            }
-            }*/
         }
         else {
-            eventLocations.removeAllObjects()
+            // For all relevant points of interest, remove inverse relationship and delete point of interest if no associated events exist.
+            for pointOfInterest in eventPointsOfInterest {
+                let pointOfInterest = pointOfInterest as! PointOfInterest
+                let inverse = pointOfInterest.mutableSetValueForKey("events")
+                inverse.removeObject(event!)
+                
+                if inverse.count == 0 {
+                    managedContext.deleteObject(pointOfInterest)
+                }
+            }
+            eventPointsOfInterest.removeAllObjects()
         }
+    }
+    
+    /**
+        Makes an address string out of the available information in the address dictionary.
+    
+        :param: addressDictionary A dictionary of address information.
+    */
+    private func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String {
+        return ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: " ")
     }
     
     /**
