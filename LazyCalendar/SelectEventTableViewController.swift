@@ -108,37 +108,29 @@ class SelectEventTableViewController: UITableViewController {
         if event!.contacts.count > 0 {
             contactsCell.hidden = false
             contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
-            contactsCell.detailTextLabel?.sizeToFit()
-            contactsCell.sizeToFit()
         }
         else {
             contactsCell.hidden = true
             contactsCell.detailTextLabel?.text = nil
-            contactsCell.detailTextLabel?.sizeToFit()
-            contactsCell.sizeToFit()
         }
+        contactsCell.detailTextLabel?.sizeToFit()
+        contactsCell.sizeToFit()
         
         if event!.pointsOfInterest.count > 0 {
             locationsCell.hidden = false
             locationsCell.detailTextLabel?.text = "\(event!.pointsOfInterest.count)"
-            locationsCell.detailTextLabel?.sizeToFit()
-            locationsCell.sizeToFit()
         }
         else {
             locationsCell.hidden = true
             locationsCell.detailTextLabel?.text = nil
-            locationsCell?.detailTextLabel?.sizeToFit()
-            locationsCell.sizeToFit()
         }
+        locationsCell.detailTextLabel?.sizeToFit()
+        locationsCell.sizeToFit()
         
         tableView.reloadData()
         // Must be called after in case the number of rows changes for contacts.
-        if tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!) != nil {
-            tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
-        }
-        if tableView.cellForRowAtIndexPath(indexPaths["Locations"]!) != nil {
-            tableView.reloadRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
-        }
+        tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
+        tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
     }
     
     /**
@@ -240,7 +232,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
-            return 0
+            return CGFloat(0)
         }
         return super.tableView(tableView, heightForHeaderInSection: section)
     }
@@ -270,7 +262,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath == indexPaths["AlarmTime"] && alarmTimeDisplayCell.hidden {
-            return 0
+            return CGFloat(0)
         }
         return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
     }
@@ -280,7 +272,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
-            return 0
+            return CGFloat(0)
         }
         return super.tableView(tableView, heightForHeaderInSection: section)
     }
@@ -318,13 +310,6 @@ extension SelectEventTableViewController: UITableViewDelegate {
 
 // MARK: - UITableViewDataSource
 extension SelectEventTableViewController: UITableViewDataSource {
-    /**
-        Number of sections in the table view.
-    */
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return sections.count
-    }
-    
     /**
         Returns number of rows for sections.
     
