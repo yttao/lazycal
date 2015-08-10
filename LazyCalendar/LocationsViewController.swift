@@ -21,7 +21,7 @@ class LocationsViewController: UIViewController {
     private let locationsTableViewSegue = "LocationsTableViewSegue"
     private let locationsMapViewSegue = "LocationsMapViewSegue"
     
-    private var locations: [MKMapItem]?
+    private var mapItems: [MapItem]?
     
     // MARK: - Methods for initializing view controller and data.
     
@@ -39,9 +39,12 @@ class LocationsViewController: UIViewController {
     }
     
     /**
+        Loads initial data about map items in the view.
+    
+        :param: mapItems The initial map items in the view.
     */
-    func loadData(locations: [MKMapItem]) {
-        self.locations = locations
+    func loadData(mapItems: [MapItem]) {
+        self.mapItems = mapItems
     }
 
     /**
@@ -63,8 +66,11 @@ class LocationsViewController: UIViewController {
         mapView = notification.userInfo!["MapView"] as? MKMapView
     }
     
-    // MARK: - Methods for exiting view controller.
+    // MARK: - Methods for segueing.
     
+    /**
+        When locations table view is about to be created, set map view and load initial map items.
+    */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         super.prepareForSegue(segue, sender: sender)
         
@@ -72,8 +78,8 @@ class LocationsViewController: UIViewController {
             if identifier == locationsTableViewSegue {
                 let locationsTableViewController = segue.destinationViewController as! LocationsTableViewController
                 locationsTableViewController.setMapView(mapView)
-                if locations != nil {
-                    locationsTableViewController.loadData(locations!)
+                if let mapItems = mapItems {
+                    locationsTableViewController.loadData(mapItems)
                 }
             }
         }

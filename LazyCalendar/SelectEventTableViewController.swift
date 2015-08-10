@@ -8,6 +8,8 @@
 
 import UIKit
 import CoreData
+import CoreLocation
+import MapKit
 import AddressBook
 
 class SelectEventTableViewController: UITableViewController {
@@ -301,8 +303,21 @@ extension SelectEventTableViewController: UITableViewDelegate {
         // If locations row selected
         else if indexPath.section == indexPaths["Locations"]!.section {
             let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
-            // TODO: get all MKMapItems from event points of interest.
+
+            // Make array of map items from event points of interest
+            var mapItems = [MapItem]()
+            for pointOfInterest in event!.pointsOfInterest {
+                let pointOfInterest = pointOfInterest as! PointOfInterest
+                let coordinate = CLLocationCoordinate2D(latitude: pointOfInterest.latitude, longitude: pointOfInterest.longitude)
+                let name = pointOfInterest.title
+                let address = pointOfInterest.subtitle
+                let mapItem = MapItem(coordinate: coordinate, name: name, address: address)
+                mapItems.append(mapItem)
+            }
+            // Load map items into locations view controller
+            locationsViewController.loadData(mapItems)
             
+            // Show locations view controller
             navigationController!.showViewController(locationsViewController, sender: self)
         }
     }

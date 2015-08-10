@@ -16,9 +16,8 @@ class LocationsTableViewController: UITableViewController {
     private var searchController: UISearchController?
     private var searchEnabled = true
 
-    private var annotations: [MKAnnotation]!
-    private var selectedLocations: [MKMapItem]!
-    private var filteredLocations = [MKMapItem]()
+    private var selectedMapItems: [MapItem]!
+    private var filteredMapItems = [MapItem]()
     
     private weak var mapView: MKMapView?
     
@@ -37,12 +36,13 @@ class LocationsTableViewController: UITableViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        if selectedLocations == nil {
-            selectedLocations = [MKMapItem]()
+        if selectedMapItems == nil {
+            selectedMapItems = [MapItem]()
         }
-        if annotations == nil {
-            annotations = [MKAnnotation]()
+        /*if annotations == nil {
+            annotations = [MKPointAnnotation]()
         }
+        */
         
         initializeSearchController()
         definesPresentationContext = true
@@ -71,22 +71,23 @@ class LocationsTableViewController: UITableViewController {
     
         :param: locations The initial selected locations.
     */
-    func loadData(locations: [MKMapItem]) {
-        self.selectedLocations = locations
+    func loadData(mapItems: [MapItem]) {
+        self.selectedMapItems = mapItems
         
         // Convert map items to annotations
-        annotations = selectedLocations.map({
+        /*annotations = selectedLocations.map({
             mapItem in
             let annotation = MKPointAnnotation()
-            annotation.coordinate = mapItem.placemark.coordinate
             annotation.title = mapItem.name
             let address = self.stringFromAddressDictionary(mapItem.placemark.addressDictionary)
             annotation.subtitle = address
+            annotation.coordinate = mapItem.placemark.coordinate
             return annotation
-        })
+        })*/
         
         // Add all annotations to map view.
-        mapView?.addAnnotations(annotations)
+        mapView?.addAnnotations(selectedMapItems)
+        /*mapView?.addAnnotations(annotations)*/
     }
     
     /**
@@ -132,17 +133,24 @@ class LocationsTableViewController: UITableViewController {
                     NSLog("Error occurred when searching: %@", error.localizedDescription)
                 }
                 else {
-                    let mapItems = response.mapItems as! [MKMapItem]
-                    // Remove all search results that already exist in selectedLocations
-                    self.filteredLocations = mapItems.filter({
-                        !contains(self.selectedLocations, $0)
+                    let mkMapItems = response.mapItems as! [MKMapItem]
+                    let mapItems = mkMapItems.map({
+                        return MapItem(coordinate: $0.placemark.coordinate, name: $0.name, address: self.stringFromAddressDictionary($0.placemark.addressDictionary))
                     })
+                    self.filteredMapItems = mapItems.filter({
+                        !contains(self.selectedMapItems, $0)
+                    })
+                    // Remove all search results that already exist in selectedLocations
+                    /*self.filteredLocations = mapItems.filter({
+                        !contains(self.selectedMapItems, $0)
+                    })*/
+                    
                 }
                 self.tableView.reloadData()
             }
         }
         else {
-            filteredLocations.removeAll(keepCapacity: false)
+            filteredMapItems.removeAll(keepCapacity: false)
             tableView.reloadData()
         }
     }
@@ -154,9 +162,9 @@ class LocationsTableViewController: UITableViewController {
     
         The new map item annotation is added to the map view and the map item is appended to the table view.
     */
-    private func addNewMapItem(mapItem: MKMapItem) {
+    private func addNewMapItem(mapItem: MapItem) {
         addMapItemToMapView(mapItem)
-        selectedLocations.append(mapItem)
+        selectedMapItems.append(mapItem)
         searchController?.searchBar.text = nil
     }
     
@@ -165,16 +173,15 @@ class LocationsTableViewController: UITableViewController {
     
         :param: mapItem The map item to show on the map view.
     */
-    private func addMapItemToMapView(mapItem: MKMapItem) {
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = mapItem.placemark.coordinate
+    private func addMapItemToMapView(mapItem: MapItem) {
+        /*let annotation = MKPointAnnotation()
         annotation.title = mapItem.name
-        
         let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
         annotation.subtitle = address
+        annotation.coordinate = mapItem.placemark.coordinate*/
         
-        mapView?.addAnnotation(annotation)
-        annotations.append(annotation)
+        mapView?.addAnnotation(mapItem)
+        /*annotations.append(annotation)*/
     }
     
     // MARK: - Methods for removing map items.
@@ -187,7 +194,7 @@ class LocationsTableViewController: UITableViewController {
         :param: mapItem The map item to delete.
         :param: indexPath The index path of the deleted map item.
     */
-    private func deleteSelectedMapItem(mapItem: MKMapItem, atIndexPath indexPath: NSIndexPath) {
+    private func deleteSelectedMapItem(mapItem: MapItem, atIndexPath indexPath: NSIndexPath) {
         removeMapItemFromMapView(mapItem)
         removeMapItemFromTableView(indexPath)
     }
@@ -197,13 +204,16 @@ class LocationsTableViewController: UITableViewController {
     
         :param: mapItem The map item to remove from the map view.
     */
-    private func removeMapItemFromMapView(mapItem: MKMapItem) {
-        let annotation = annotations.filter({
+    private func removeMapItemFromMapView(mapItem: MapItem) {
+        /*let annotation = annotations.filter({
             let nameMatch = $0.title == mapItem.name
             let addressMatch = $0.subtitle == self.stringFromAddressDictionary(mapItem.placemark.addressDictionary)
             let coordinateMatch = $0.coordinate.latitude == mapItem.placemark.coordinate.latitude && $0.coordinate.longitude == mapItem.placemark.coordinate.longitude
             return nameMatch && addressMatch && coordinateMatch
-        }).first as? MKPointAnnotation
+        }).first as? MKPointAnnotation*/
+        let annotation = selectedMapItems.filter({
+            $0 == mapItem
+        }).first
         
         mapView?.removeAnnotation(annotation)
     }
@@ -216,7 +226,7 @@ class LocationsTableViewController: UITableViewController {
     private func removeMapItemFromTableView(indexPath: NSIndexPath) {
         tableView.beginUpdates()
         tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-        selectedLocations.removeAtIndex(indexPath.row)
+        selectedMapItems.removeAtIndex(indexPath.row)
         tableView.endUpdates()
     }
     
@@ -250,7 +260,7 @@ class LocationsTableViewController: UITableViewController {
         super.viewWillDisappear(animated)
         
         let changeEventViewController = navigationController!.viewControllers.first as? ChangeEventViewController
-        changeEventViewController?.updateMapItems(selectedLocations)
+        changeEventViewController?.updateMapItems(selectedMapItems)
     }
 }
 
@@ -277,12 +287,12 @@ extension LocationsTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if searching() {
-            let mapItem = filteredLocations[indexPath.row]
+            let mapItem = filteredMapItems[indexPath.row]
             addNewMapItem(mapItem)
         }
         else {
-            let mapItem = selectedLocations[indexPath.row]
-            NSNotificationCenter.defaultCenter().postNotificationName("LocationChanged", object: self, userInfo: ["Location": mapItem.placemark.location])
+            let mapItem = selectedMapItems[indexPath.row]
+            NSNotificationCenter.defaultCenter().postNotificationName("LocationChanged", object: self, userInfo: ["Location": mapItem.location])
         }
     }
 }
@@ -301,9 +311,9 @@ extension LocationsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if searching() {
-            return filteredLocations.count
+            return filteredMapItems.count
         }
-        return selectedLocations.count
+        return selectedMapItems.count
     }
     
     /**
@@ -323,7 +333,7 @@ extension LocationsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            deleteSelectedMapItem(selectedLocations[indexPath.row], atIndexPath: indexPath)
+            deleteSelectedMapItem(selectedMapItems[indexPath.row], atIndexPath: indexPath)
         }
     }
     
@@ -333,16 +343,16 @@ extension LocationsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         
-        let mapItem: MKMapItem
+        let mapItem: MapItem
         if searching() {
-            mapItem = filteredLocations[indexPath.row]
+            mapItem = filteredMapItems[indexPath.row]
             
         }
         else {
-            mapItem = selectedLocations[indexPath.row]
+            mapItem = selectedMapItems[indexPath.row]
         }
         let name = mapItem.name
-        let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
+        let address = mapItem.address
         cell.textLabel?.text = name
         cell.detailTextLabel?.text = address
         
@@ -354,8 +364,6 @@ extension LocationsTableViewController: UITableViewDataSource {
 extension LocationsTableViewController: UISearchResultsUpdating {
     /**
         When the search bar is activated or the text in the search bar changes, start updating search results. Search results cannot be duplicates of already-selected locations.
-    
-        TODO: disable selecting from selected locations when waiting to load results and still showing selected locations.
     */
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         // Destroy last request and make a new one

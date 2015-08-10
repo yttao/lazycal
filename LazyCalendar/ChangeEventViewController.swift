@@ -21,7 +21,7 @@ class ChangeEventViewController: UITableViewController {
     private var alarm: Bool?
     private var alarmTime: NSDate?
     private var contactIDs: [ABRecordID]?
-    private var mapItems: [MKMapItem]?
+    private var mapItems: [MapItem]?
     
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
@@ -231,52 +231,14 @@ class ChangeEventViewController: UITableViewController {
         
         let geocoder = CLGeocoder()
         let pointsOfInterestSet = event.pointsOfInterest
-        mapItems = [MKMapItem]()
+        mapItems = [MapItem]()
         for pointOfInterest in pointsOfInterestSet {
             let pointOfInterest = pointOfInterest as! PointOfInterest
-            let latitude = pointOfInterest.latitude
-            let longitude = pointOfInterest.longitude
-            let location = CLLocation(latitude: latitude, longitude: longitude)
+            let coordinate = CLLocationCoordinate2D(latitude: pointOfInterest.latitude, longitude: pointOfInterest.longitude)
+            let name = pointOfInterest.title
             let address = pointOfInterest.subtitle
-
-            // Convert coordinate to placemark
-            geocoder.geocodeAddressString(address, completionHandler: {
-                (placemark, error) in
-                if let error = error {
-                    NSLog("Error while geocoding address string: %@", error.localizedDescription)
-                }
-                else {
-                    if let placemark = placemark.first as? CLPlacemark {
-                        let addressDictionary = placemark.addressDictionary
-                        let placemark = MKPlacemark(coordinate: CLLocationCoordinate2DMake(latitude, longitude), addressDictionary: addressDictionary)
-                        let mapItem = MKMapItem(placemark: placemark)
-                        self.mapItems!.append(mapItem)
-                        self.updateLocationsDetailsLabel()
-                    }
-                }
-                
-            })
-            /*geocoder.reverseGeocodeLocation(location, completionHandler: {
-                (placemark: [AnyObject]!, error: NSError?) in
-                if error != nil {
-                    NSLog("Error occurred while reverse geolocating: %@", error!.localizedDescription)
-                }
-                else {
-                    let placemark = placemark?.first as? CLPlacemark
-                    self.mapItems = [MKMapItem]()
-                    if placemark != nil {
-                        // Convert CLPlacemark to MKPlacemark
-                        let placemark = MKPlacemark(placemark: placemark)
-                        // Make map item
-                        let mapItem = MKMapItem(placemark: placemark)
-                        // Add map item to list
-                        self.mapItems!.append(mapItem)
-                    }
-                    else {
-                        NSLog("Error: no placemark found for coordinate: (%d, %d)", latitude, longitude)
-                    }
-                }
-            })*/
+            let mapItem = MapItem(coordinate: coordinate, name: name, address: address)
+            mapItems!.append(mapItem)
         }
     }
     
@@ -639,7 +601,12 @@ class ChangeEventViewController: UITableViewController {
         updateContactsDetailsLabel()
     }
     
-    func updateMapItems(mapItems: [MKMapItem]) {
+    /**
+        Updates the map items.
+    
+        :param: mapItems The map items that were selected.
+    */
+    func updateMapItems(mapItems: [MapItem]) {
         self.mapItems = mapItems
         updateLocationsDetailsLabel()
     }
@@ -773,7 +740,7 @@ class ChangeEventViewController: UITableViewController {
     /**
         Schedules the notification for an event.
     
-        TODO: make sure this doesn't reschedule a notification after the event has already fired a notification.
+        TODO: make sure this doesn't reschedule a notification after the event has already fired a notification (unless the new alarm time is after current time).
     
         :param: event The event to have a scheduled notification.
     */
@@ -929,10 +896,10 @@ class ChangeEventViewController: UITableViewController {
             var eventPointsOfInterest = event!.mutableSetValueForKey("pointsOfInterest")
             
             for mapItem in mapItems! {
-                let latitude = mapItem.placemark.coordinate.latitude
-                let longitude = mapItem.placemark.coordinate.longitude
+                let latitude = mapItem.coordinate.latitude
+                let longitude = mapItem.coordinate.longitude
                 let title = mapItem.name
-                let subtitle = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
+                let subtitle = mapItem.address
                 
                 let fetchRequest = NSFetchRequest(entityName: "PointOfInterest")
                 fetchRequest.fetchLimit = 1
@@ -982,7 +949,7 @@ class ChangeEventViewController: UITableViewController {
         
         if mapItems != nil && mapItems!.count > 0 {
             let newLocations = mapItems!.map({
-                CLLocation(latitude: $0.placemark.coordinate.latitude, longitude: $0.placemark.coordinate.longitude)
+                CLLocation(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude)
             }) as [CLLocation]
             
             // Check for removed locations for an edited event and remove them. Also remove the edited event from removed locations.
@@ -995,8 +962,8 @@ class ChangeEventViewController: UITableViewController {
                 
                 // Points of interest still exist if there is a coordinate match in the currently selected map items.
                 let foundMatch = mapItems!.filter({
-                    let latitudeMatch = fabs($0.placemark.coordinate.latitude - storedLocation.coordinate.latitude) < self.EPSILON
-                    let longitudeMatch = fabs($0.placemark.coordinate.longitude - storedLocation.coordinate.longitude) < self.EPSILON
+                    let latitudeMatch = fabs($0.coordinate.latitude - storedLocation.coordinate.latitude) < self.EPSILON
+                    let longitudeMatch = fabs($0.coordinate.longitude - storedLocation.coordinate.longitude) < self.EPSILON
                     return latitudeMatch && longitudeMatch
                     }).first
                 
