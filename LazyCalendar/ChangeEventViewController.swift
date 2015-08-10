@@ -237,9 +237,26 @@ class ChangeEventViewController: UITableViewController {
             let latitude = pointOfInterest.latitude
             let longitude = pointOfInterest.longitude
             let location = CLLocation(latitude: latitude, longitude: longitude)
-            
+            let address = pointOfInterest.subtitle
+
             // Convert coordinate to placemark
-            geocoder.reverseGeocodeLocation(location, completionHandler: {
+            geocoder.geocodeAddressString(address, completionHandler: {
+                (placemark, error) in
+                if let error = error {
+                    NSLog("Error while geocoding address string: %@", error.localizedDescription)
+                }
+                else {
+                    if let placemark = placemark.first as? CLPlacemark {
+                        let addressDictionary = placemark.addressDictionary
+                        let placemark = MKPlacemark(coordinate: CLLocationCoordinate2DMake(latitude, longitude), addressDictionary: addressDictionary)
+                        let mapItem = MKMapItem(placemark: placemark)
+                        self.mapItems!.append(mapItem)
+                        self.updateLocationsDetailsLabel()
+                    }
+                }
+                
+            })
+            /*geocoder.reverseGeocodeLocation(location, completionHandler: {
                 (placemark: [AnyObject]!, error: NSError?) in
                 if error != nil {
                     NSLog("Error occurred while reverse geolocating: %@", error!.localizedDescription)
@@ -259,13 +276,7 @@ class ChangeEventViewController: UITableViewController {
                         NSLog("Error: no placemark found for coordinate: (%d, %d)", latitude, longitude)
                     }
                 }
-            })
-        }
-        
-        if mapItems != nil {
-            for mapItem in mapItems! {
-                println(mapItem.placemark.description)
-            }
+            })*/
         }
     }
     
