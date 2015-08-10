@@ -16,7 +16,7 @@ class LocationsTableViewController: UITableViewController {
     private var searchController: UISearchController?
     private var searchEnabled = true
 
-    private var annotations: [MKPointAnnotation]!
+    private var annotations: [MKAnnotation]!
     private var selectedLocations: [MKMapItem]!
     private var filteredLocations = [MKMapItem]()
     
@@ -41,7 +41,7 @@ class LocationsTableViewController: UITableViewController {
             selectedLocations = [MKMapItem]()
         }
         if annotations == nil {
-            annotations = [MKPointAnnotation]()
+            annotations = [MKAnnotation]()
         }
         
         initializeSearchController()
@@ -203,9 +203,9 @@ class LocationsTableViewController: UITableViewController {
             let addressMatch = $0.subtitle == self.stringFromAddressDictionary(mapItem.placemark.addressDictionary)
             let coordinateMatch = $0.coordinate.latitude == mapItem.placemark.coordinate.latitude && $0.coordinate.longitude == mapItem.placemark.coordinate.longitude
             return nameMatch && addressMatch && coordinateMatch
-        })
+        }).first as? MKPointAnnotation
         
-        mapView?.removeAnnotations(annotation)
+        mapView?.removeAnnotation(annotation)
     }
     
     /**
@@ -222,6 +222,22 @@ class LocationsTableViewController: UITableViewController {
     
     /**
         Makes an address string out of the available information in the address dictionary.
+    
+        The address string is created in two steps:
+    
+        * Create a multiline address with all information.
+    
+        The address string created by `ABCreateStringWithAddressDictionary:` is a multiline address usually created the following format (if any parts of the address are unavailable, they do not appear):
+    
+        Street address
+    
+        City State Zip code
+    
+        Country
+    
+        * Replace newlines with spaces.
+        
+        The newlines are then replaced with spaces using `stringByReplacingOccurrencesOfString:withString:` because the `subtitle` property of `MKAnnotation` can only display single line strings.
     
         :param: addressDictionary A dictionary of address information.
     */
@@ -255,7 +271,7 @@ extension LocationsTableViewController: UITableViewDelegate {
     }
     
     /**
-        If searching, selection will append to selected locations and clear the search bar. If not searching, selection will center the map on the selected location.
+        If searching, selection will append to selected locations and clear the search bar. If not searching, selection will send out a notification that the location to focus on has changed and center the map on the selected location.
     
         The filter ensures that search results will not show locations that are already selected, so this method cannot add duplicate locations.
     */
@@ -317,20 +333,18 @@ extension LocationsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         
+        let mapItem: MKMapItem
         if searching() {
-            let mapItem = filteredLocations[indexPath.row]
-            let name = mapItem.name
-            let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
-            cell.textLabel?.text = mapItem.name
-            cell.detailTextLabel?.text = address
+            mapItem = filteredLocations[indexPath.row]
+            
         }
         else {
-            let mapItem = selectedLocations[indexPath.row]
-            let name = mapItem.name
-            let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
-            cell.textLabel?.text = name
-            cell.detailTextLabel?.text = address
+            mapItem = selectedLocations[indexPath.row]
         }
+        let name = mapItem.name
+        let address = stringFromAddressDictionary(mapItem.placemark.addressDictionary)
+        cell.textLabel?.text = name
+        cell.detailTextLabel?.text = address
         
         return cell
     }

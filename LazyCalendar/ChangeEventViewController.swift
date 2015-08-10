@@ -211,7 +211,7 @@ class ChangeEventViewController: UITableViewController {
     /**
         Initializes data with a pre-existing event.
     
-        :param: The event to edit.
+        :param: event The event to edit.
     */
     func loadData(#event: FullEvent) {
         self.event = event
@@ -223,12 +223,49 @@ class ChangeEventViewController: UITableViewController {
         
         // Load contacts IDs
         let contactsSet = event.contacts
-        if contactsSet.count > 0 && ABAddressBookGetAuthorizationStatus() == .Authorized {
-            contactIDs = [ABRecordID]()
-            for contact in contactsSet {
-                let c = contact as! Contact
-                contactIDs!.append(c.id)
-            }  
+        contactIDs = [ABRecordID]()
+        for contact in contactsSet {
+            let contact = contact as! Contact
+            contactIDs!.append(contact.id)
+        }
+        
+        let geocoder = CLGeocoder()
+        let pointsOfInterestSet = event.pointsOfInterest
+        mapItems = [MKMapItem]()
+        for pointOfInterest in pointsOfInterestSet {
+            let pointOfInterest = pointOfInterest as! PointOfInterest
+            let latitude = pointOfInterest.latitude
+            let longitude = pointOfInterest.longitude
+            let location = CLLocation(latitude: latitude, longitude: longitude)
+            
+            // Convert coordinate to placemark
+            geocoder.reverseGeocodeLocation(location, completionHandler: {
+                (placemark: [AnyObject]!, error: NSError?) in
+                if error != nil {
+                    NSLog("Error occurred while reverse geolocating: %@", error!.localizedDescription)
+                }
+                else {
+                    let placemark = placemark?.first as? CLPlacemark
+                    self.mapItems = [MKMapItem]()
+                    if placemark != nil {
+                        // Convert CLPlacemark to MKPlacemark
+                        let placemark = MKPlacemark(placemark: placemark)
+                        // Make map item
+                        let mapItem = MKMapItem(placemark: placemark)
+                        // Add map item to list
+                        self.mapItems!.append(mapItem)
+                    }
+                    else {
+                        NSLog("Error: no placemark found for coordinate: (%d, %d)", latitude, longitude)
+                    }
+                }
+            })
+        }
+        
+        if mapItems != nil {
+            for mapItem in mapItems! {
+                println(mapItem.placemark.description)
+            }
         }
     }
     
@@ -681,12 +718,6 @@ class ChangeEventViewController: UITableViewController {
         let fetchRequest = NSFetchRequest(entityName: "PointOfInterest")
         let allLocations = managedContext.executeFetchRequest(fetchRequest, error: nil) as! [PointOfInterest]
         println("Total locations: \(allLocations.count)")
-        
-        /*for l in allLocations {
-            println("\(l.title) \(l.latitude) \(l.longitude)")
-            let e = l.mutableSetValueForKey("events")
-            println("Associated events: \(e.count)")
-        }*/
         
         // Save event
         var error: NSError?
