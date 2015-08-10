@@ -108,10 +108,19 @@ class MonthItemTableViewController: UITableViewController {
         events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [FullEvent]
         
         // Display events sorted by dateStart.
-        //TODO: Add an additional alphabetical sort for two dateStarts at the same times.
         events.sort({
             let firstDate = $0.dateStart
             let secondDate = $1.dateStart
+            if firstDate.compare(secondDate) == .OrderedSame {
+                let firstName = $0.name
+                let secondName = $1.name
+                if firstName != nil && secondName != nil {
+                    return firstName!.compare(secondName!) == .OrderedAscending
+                }
+                else {
+                    return true
+                }
+            }
             return firstDate.compare(secondDate) == .OrderedAscending
             })
         tableView.reloadData()
@@ -136,6 +145,8 @@ class MonthItemTableViewController: UITableViewController {
     
     /**
         Removes an event from persistent storage.
+    
+        TODO: Remove connections to other objects (contacts, POIs).
     
         :param: event The event to remove from persistent storage.
     */

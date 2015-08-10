@@ -21,20 +21,22 @@ class SelectEventTableViewController: UITableViewController {
     @IBOutlet weak var alarmTimeDetailsLabel: UILabel!
     
     @IBOutlet weak var alarmTimeDisplayCell: UITableViewCell!
-    @IBOutlet weak var contactCell: UITableViewCell!
+    @IBOutlet weak var contactsCell: UITableViewCell!
+    @IBOutlet weak var locationsCell: UITableViewCell!
     
     // Selected event, must exist for data to be loaded properly.
     private var event: FullEvent?
     
     // Section headers associated with section numbers
-    private let sections = ["Details": 0, "Alarm": 1, "Contacts": 2, "Test": 3]
+    private let sections = ["Details": 0, "Alarm": 1, "Contacts": 2, "Locations": 3]
     
     // Index paths of rows
     private let indexPaths = ["Name": NSIndexPath(forRow: 0, inSection: 0),
         "Time": NSIndexPath(forRow: 1, inSection: 0),
         "AlarmToggle": NSIndexPath(forRow: 0, inSection: 1),
         "AlarmTime": NSIndexPath(forRow: 1, inSection: 1),
-        "Contacts": NSIndexPath(forRow: 0, inSection: 2)]
+        "Contacts": NSIndexPath(forRow: 0, inSection: 2),
+        "Locations": NSIndexPath(forRow: 0, inSection: 3)]
     
     private let segueIdentifier = "EditEventSegue"
     
@@ -104,20 +106,38 @@ class SelectEventTableViewController: UITableViewController {
         alarmTimeMainLabel.sizeToFit()
 
         if event!.contacts.count > 0 {
-            contactCell.hidden = false
-            contactCell.detailTextLabel?.text = "\(event!.contacts.count)"
-            contactCell.detailTextLabel?.sizeToFit()
+            contactsCell.hidden = false
+            contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
+            contactsCell.detailTextLabel?.sizeToFit()
+            contactsCell.sizeToFit()
         }
         else {
-            contactCell.hidden = true
-            contactCell.detailTextLabel?.text = nil
-            contactCell.detailTextLabel?.sizeToFit()
+            contactsCell.hidden = true
+            contactsCell.detailTextLabel?.text = nil
+            contactsCell.detailTextLabel?.sizeToFit()
+            contactsCell.sizeToFit()
+        }
+        
+        if event!.pointsOfInterest.count > 0 {
+            locationsCell.hidden = false
+            locationsCell.detailTextLabel?.text = "\(event!.pointsOfInterest.count)"
+            locationsCell.detailTextLabel?.sizeToFit()
+            locationsCell.sizeToFit()
+        }
+        else {
+            locationsCell.hidden = true
+            locationsCell.detailTextLabel?.text = nil
+            locationsCell?.detailTextLabel?.sizeToFit()
+            locationsCell.sizeToFit()
         }
         
         tableView.reloadData()
         // Must be called after in case the number of rows changes for contacts.
         if tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!) != nil {
             tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
+        }
+        if tableView.cellForRowAtIndexPath(indexPaths["Locations"]!) != nil {
+            tableView.reloadRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
         }
     }
     
@@ -126,10 +146,42 @@ class SelectEventTableViewController: UITableViewController {
     */
     func notificationsEnabled() -> Bool {
         let settings = UIApplication.sharedApplication().currentUserNotificationSettings()
-        if settings.types == UIUserNotificationType.None {
+        if settings.types == .None {
             return false
         }
         return true
+    }
+    
+    /**
+        Loads the event data.
+    
+        :param: notification The notification that an event was selected.
+    */
+    func loadData(notification: NSNotification) {
+        self.event = notification.userInfo!["Event"] as? FullEvent
+    }
+    
+    /**
+        Prepares for segue to event editing by loading event in as initial data.
+    */
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == segueIdentifier {
+            let navigationController = segue.destinationViewController as! UINavigationController
+            let editEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
+            editEventViewController.loadData(event: event!)
+        }
+    }
+    
+    /**
+        The unwind segue for saving event edits.
+    */
+    @IBAction func saveEventEdit(segue: UIStoryboardSegue) {
+    }
+    
+    /**
+        The unwind segue for canceling event edits.
+    */
+    @IBAction func cancelEventEdit(segue: UIStoryboardSegue) {
     }
     
     /**
@@ -178,38 +230,6 @@ class SelectEventTableViewController: UITableViewController {
             
             presentViewController(alertController, animated: true, completion: nil)
         }
-    }
-    
-    /**
-        Loads the event data.
-    
-        :param: notification The notification that an event was selected.
-    */
-    func loadData(notification: NSNotification) {
-        self.event = notification.userInfo!["Event"] as? FullEvent
-    }
-    
-    /**
-        Prepares for segue to event editing by loading event in as initial data.
-    */
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == segueIdentifier {
-            let navigationController = segue.destinationViewController as! UINavigationController
-            let editEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
-            editEventViewController.loadData(event: event!)
-        }
-    }
-    
-    /**
-        The unwind segue for saving event edits.
-    */
-    @IBAction func saveEventEdit(segue: UIStoryboardSegue) {
-    }
-    
-    /**
-        The unwind segue for canceling event edits.
-    */
-    @IBAction func cancelEventEdit(segue: UIStoryboardSegue) {
     }
 }
 
@@ -266,9 +286,10 @@ extension SelectEventTableViewController: UITableViewDelegate {
     }
     
     /**
-        When contacts row is selected, it displays the contacts table view controller that acts as a contact list and contact details view.
+        When contacts row is selected, it displays the contacts table view controller that acts as a contact list and contact details view. When locations row is selected, it displays the locations view controller that acts as the locations list and map view.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        // If contacts row selected
         if indexPath.section == indexPaths["Contacts"]!.section {
             let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
             
@@ -284,6 +305,13 @@ extension SelectEventTableViewController: UITableViewDelegate {
             // Disable searching for new contacts (only allowed when editing event).
             contactsTableViewController.setSearchEnabled(false)
             navigationController!.showViewController(contactsTableViewController, sender: self)
+        }
+        // If locations row selected
+        else if indexPath.section == indexPaths["Locations"]!.section {
+            let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
+            // TODO: get all MKMapItems from event points of interest.
+            
+            navigationController!.showViewController(locationsViewController, sender: self)
         }
     }
 }
@@ -303,11 +331,14 @@ extension SelectEventTableViewController: UITableViewDataSource {
         If there are no contacts, the contacts section has no rows. If the alarm is off, only show one row indicating alarm is off.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == sections["Contacts"]! && contactCell.hidden {
+        if section == sections["Alarm"]! && alarmTimeDisplayCell.hidden {
+            return 1
+        }
+        else if section == sections["Contacts"]! && contactsCell.hidden {
             return 0
         }
-        else if section == sections["Alarm"]! && alarmTimeDisplayCell.hidden {
-            return 1
+        else if section == sections["Locations"]! && locationsCell.hidden {
+            return 0
         }
         return super.tableView(tableView, numberOfRowsInSection: section)
     }
@@ -318,7 +349,10 @@ extension SelectEventTableViewController: UITableViewDataSource {
         If there are no contacts, the contacts header is nil.
     */
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == sections["Contacts"]! && contactCell.hidden  {
+        if section == sections["Contacts"]! && contactsCell.hidden  {
+            return nil
+        }
+        else if section == sections["Locations"]! && locationsCell.hidden {
             return nil
         }
         return super.tableView(tableView, titleForHeaderInSection: section)

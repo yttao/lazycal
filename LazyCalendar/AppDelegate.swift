@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         On receiving local notification while in application, notify relevant observers that the notification was fired.
     */
     func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
-        // Notify observers
+        // Notify observers of event notification
         NSNotificationCenter.defaultCenter().postNotificationName("EventNotificationReceived", object: self, userInfo: ["LocalNotification": notification])
     }
     

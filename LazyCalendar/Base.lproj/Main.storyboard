@@ -730,7 +730,7 @@
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="eh4-il-d2d" id="J5O-S5-v4D">
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Contacts List" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="OGA-ij-ckD">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Contacts" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="OGA-ij-ckD">
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -747,14 +747,14 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Test" id="eYX-3G-AEf">
+                            <tableViewSection headerTitle="Locations" id="eYX-3G-AEf">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="9mR-tI-HFA" style="IBUITableViewCellStyleDefault" id="9MB-RH-HDr" userLabel="Test">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="9mR-tI-HFA" style="IBUITableViewCellStyleDefault" id="9MB-RH-HDr" userLabel="Locations">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="9MB-RH-HDr" id="wc4-uS-sdk">
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Test" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9mR-tI-HFA">
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Locations" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9mR-tI-HFA">
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -780,9 +780,10 @@
                         <outlet property="alarmTimeDetailsLabel" destination="Vzg-iG-oT3" id="JXY-w5-hVa"/>
                         <outlet property="alarmTimeDisplayCell" destination="lNb-xl-Gh6" id="jly-Fu-rzY"/>
                         <outlet property="alarmTimeMainLabel" destination="gx4-vy-IpG" id="sgH-0a-fiE"/>
-                        <outlet property="contactCell" destination="eh4-il-d2d" id="gPp-qo-f2C"/>
+                        <outlet property="contactsCell" destination="eh4-il-d2d" id="BHr-ZT-1ru"/>
                         <outlet property="eventNameLabel" destination="jF5-0l-0Lh" id="aJe-Uz-n5l"/>
                         <outlet property="eventTimeLabel" destination="NhU-cS-MgM" id="qO1-8x-k0s"/>
+                        <outlet property="locationsCell" destination="9MB-RH-HDr" id="CRV-i3-rh9"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kOz-eU-Jup" userLabel="First Responder" sceneMemberID="firstResponder"/>

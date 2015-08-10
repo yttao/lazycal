@@ -673,16 +673,16 @@ class ChangeEventViewController: UITableViewController {
         addNewContacts()
         removeOldContacts()
         
-        //addNewPointsOfInterest()
-        //removeOldPointsOfInterest()
-        /*let count = event!.mutableSetValueForKey("pointsOfInterest").count
+        addNewPointsOfInterest()
+        removeOldPointsOfInterest()
+        let count = event!.mutableSetValueForKey("pointsOfInterest").count
         println("Event locations: \(count)")
         
         let fetchRequest = NSFetchRequest(entityName: "PointOfInterest")
         let allLocations = managedContext.executeFetchRequest(fetchRequest, error: nil) as! [PointOfInterest]
         println("Total locations: \(allLocations.count)")
         
-        for l in allLocations {
+        /*for l in allLocations {
             println("\(l.title) \(l.latitude) \(l.longitude)")
             let e = l.mutableSetValueForKey("events")
             println("Associated events: \(e.count)")
@@ -730,6 +730,8 @@ class ChangeEventViewController: UITableViewController {
     
     /**
         Schedules the notification for an event.
+    
+        TODO: make sure this doesn't reschedule a notification after the event has already fired a notification.
     
         :param: event The event to have a scheduled notification.
     */
@@ -872,10 +874,10 @@ class ChangeEventViewController: UITableViewController {
         }
     }
     
-    // MARK: - Method for handling locations when saving event.
+    // MARK: - Method for handling points of interest when saving event.
     
     /**
-        Adds new locations to the event.
+        Adds new points of interest to the event.
     */
     func addNewPointsOfInterest() {
         if mapItems != nil {
@@ -928,7 +930,7 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Removes old locations from the event.
+        Removes old points of interest from the event.
     */
     func removeOldPointsOfInterest() {
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
