@@ -16,12 +16,6 @@ class SelectEventTableViewController: UITableViewController {
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
     
-    @IBOutlet weak var eventNameLabel: UILabel!
-    @IBOutlet weak var eventTimeLabel: UILabel!
-    @IBOutlet weak var alarmLabel: UILabel!
-    @IBOutlet weak var alarmTimeMainLabel: UILabel!
-    @IBOutlet weak var alarmTimeDetailsLabel: UILabel!
-    
     @IBOutlet weak var alarmTimeDisplayCell: UITableViewCell!
     @IBOutlet weak var contactsCell: UITableViewCell!
     @IBOutlet weak var locationsCell: UITableViewCell!
@@ -85,16 +79,21 @@ class SelectEventTableViewController: UITableViewController {
         Refreshes the event information displayed.
     */
     func reloadData() {
-        eventNameLabel.text = event!.name
+        let eventNameCell = tableView.cellForRowAtIndexPath(indexPaths["Name"]!)
+        eventNameCell?.textLabel?.text = event!.name
         
+        let eventTimeCell = tableView.cellForRowAtIndexPath(indexPaths["Time"]!)
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
-        eventTimeLabel.text = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
+        eventTimeCell?.textLabel?.text = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
         
         tableView.beginUpdates()
+        let alarmCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmToggle"]!)
         if !notificationsEnabled() {
             // If notifications are disabled, the alarm cannot send an alert so it displays "Disabled" and hides the alarm time.
-            alarmLabel.text = "Disabled"
+            alarmCell?.detailTextLabel?.text = "Disabled"
+            
             alarmTimeDisplayCell.textLabel?.text = nil
+            alarmTimeDisplayCell.detailTextLabel?.text = nil
             
             if tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) == super.tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) {
                 alarmTimeDisplayCell.hidden = true
@@ -104,8 +103,13 @@ class SelectEventTableViewController: UITableViewController {
         }
         else if event!.alarm {
             // If the alarm is enabled, the alarm says "On" and displays the time.
-            alarmLabel.text = "On"
+            alarmCell?.detailTextLabel?.text = "On"
+            
+            dateFormatter.dateFormat = "MMM dd, yyyy"
             alarmTimeDisplayCell.textLabel?.text = dateFormatter.stringFromDate(event!.alarmTime!)
+            
+            dateFormatter.dateFormat = "h:mm a"
+            alarmTimeDisplayCell.detailTextLabel?.text = dateFormatter.stringFromDate(event!.alarmTime!)
             
             if tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) == 1 {
                 alarmTimeDisplayCell.hidden = false
@@ -114,8 +118,10 @@ class SelectEventTableViewController: UITableViewController {
         }
         else {
             // If the alarm is disabled, the alarm says "Off" and hides the time display.
-            alarmLabel.text = "Off"
+            alarmCell?.detailTextLabel?.text = "Off"
+            
             alarmTimeDisplayCell.textLabel?.text = nil
+            alarmTimeDisplayCell.detailTextLabel?.text = nil
             
             if tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) == super.tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) {
                 alarmTimeDisplayCell.hidden = true
@@ -124,8 +130,8 @@ class SelectEventTableViewController: UITableViewController {
             
         }
         alarmTimeDisplayCell.textLabel?.sizeToFit()
+        alarmTimeDisplayCell.detailTextLabel?.sizeToFit()
 
-        //tableView.beginUpdates()
         if event!.contacts.count > 0 {
             // Show contacts cell with number of contacts in detail label if the event has at least one contact.
             contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
@@ -200,12 +206,11 @@ class SelectEventTableViewController: UITableViewController {
         let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
         
         // Get all contact IDs from the event contacts.
-        let contactsSet = event!.contacts as Set
-        var contactIDs = [ABRecordID]()
-        for contact in contactsSet {
-            let contact = contact as! Contact
-            contactIDs.append(contact.id)
-        }
+        let storedContacts = event!.contacts.allObjects as! [Contact]
+        let contactIDs = storedContacts.map({
+            return $0.id
+        })
+        
         // Load contact IDs into contacts table view controller.
         contactsTableViewController.loadData(contactIDs)
         // Disable searching for new contacts.
@@ -218,15 +223,10 @@ class SelectEventTableViewController: UITableViewController {
         let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
         
         // Make array of map items from event points of interest.
-        var mapItems = [MapItem]()
-        for location in event!.locations {
-            let location = location as! Location
-            let coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
-            let name = location.name
-            let address = location.address
-            let mapItem = MapItem(coordinate: coordinate, name: name, address: address)
-            mapItems.append(mapItem)
-        }
+        let storedLocations = event!.locations.allObjects as! [Location]
+        let mapItems = storedLocations.map({
+            return MapItem(coordinate: $0.coordinate, name: $0.name, address: $0.address)
+        })
         
         // Load map items into locations view controller.
         locationsViewController.loadData(mapItems)

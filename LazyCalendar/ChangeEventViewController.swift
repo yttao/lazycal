@@ -16,9 +16,9 @@ import CoreLocation
 class ChangeEventViewController: UITableViewController {
     // Event data to store
     private var name: String?
-    private var dateStart: NSDate?
-    private var dateEnd: NSDate?
-    private var alarm: Bool?
+    private var dateStart: NSDate!
+    private var dateEnd: NSDate!
+    private var alarm: Bool = false
     private var alarmTime: NSDate?
     private var contactIDs: [ABRecordID]?
     private var mapItems: [MapItem]?
@@ -32,31 +32,19 @@ class ChangeEventViewController: UITableViewController {
     @IBOutlet weak var dateStartPicker: UIDatePicker!
     @IBOutlet weak var dateEndPicker: UIDatePicker!
     
-    @IBOutlet weak var dateStartPickerCell: UITableViewCell!
-    @IBOutlet weak var dateEndPickerCell: UITableViewCell!
-    
     // Text field for event name
     @IBOutlet weak var nameTextField: UITextField!
-    
-    // Labels to display event start info
-    @IBOutlet weak var dateStartMainLabel: UILabel!
-    @IBOutlet weak var dateStartDetailsLabel: UILabel!
-    
-    // Labels to display event end info
-    @IBOutlet weak var dateEndMainLabel: UILabel!
-    @IBOutlet weak var dateEndDetailsLabel: UILabel!
     
     // Toggles alarm option on/off
     @IBOutlet weak var alarmSwitch: UISwitch!
     @IBOutlet weak var alarmDateSwitch: UISwitch!
     
-    // Displays alarm time
-    @IBOutlet weak var alarmTimeMainLabel: UILabel!
-    @IBOutlet weak var alarmTimeDetailsLabel: UILabel!
-    
     // Picks alarm time
     @IBOutlet weak var alarmTimePicker: UIDatePicker!
     
+    // Table cells
+    @IBOutlet weak var dateStartPickerCell: UITableViewCell!
+    @IBOutlet weak var dateEndPickerCell: UITableViewCell!
     @IBOutlet weak var alarmDateToggleCell: UITableViewCell!
     @IBOutlet weak var alarmTimeDisplayCell: UITableViewCell!
     @IBOutlet weak var alarmTimePickerCell: UITableViewCell!
@@ -77,10 +65,7 @@ class ChangeEventViewController: UITableViewController {
         "Contacts": NSIndexPath(forRow: 0, inSection: 4),
         "Locations": NSIndexPath(forRow: 0, inSection: 5)]
     
-    // Heights of fields
-    private let DEFAULT_CELL_HEIGHT = UITableViewCell().frame.height
-    private let PICKER_CELL_HEIGHT = UIPickerView().frame.height
-    
+    // Currently selected index path
     private var selectedIndexPath: NSIndexPath?
     
     private var addressBookRef: ABAddressBookRef?
@@ -90,7 +75,7 @@ class ChangeEventViewController: UITableViewController {
     // Amount of error allowed for floating points
     private let EPSILON = pow(10.0, -10.0)
     
-    // MARK: - Methods for initializing view controller and data.
+    // MARK: - Methods for initializing view controller.
     
     /**
         On initialization, get address book.
@@ -107,9 +92,9 @@ class ChangeEventViewController: UITableViewController {
     
         On view load:
         * Set the table view delegate and data source.
-        * Disable the event name text field. This is done to allow proper cell selection (which does not work properly if the text field is selectable.
         * Set date start picker date to the selected date (or the first day of the month if none are selected) and the picker time to the current time (in hours and minutes). Set date end picker time to show one hour after the date start picker date and time.
-        * Add event listeners that are informed when event date start picker or end picker are changed. Update the event start and end labels. Additionally, if the event start time is changed, the minimum time for the event end time is modified if the end time will come before the start time.
+        * Disable the event name text field. This is done to allow proper cell selection (which does not work properly if the text field is selectable.
+        * Add action targets that are informed when events occur.
         * Format the event start and end labels. The main labels show the format: month day, year. The details labels show the format: hour:minutes period.
         * Default set the alarm switches off and the alarm time picker to the initial date start.
     */
@@ -125,61 +110,19 @@ class ChangeEventViewController: UITableViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
+        // Add targets for updates
+        addTargets()
+        
         // Disable text field user interaction, needed to allow proper table view row selection
         nameTextField.userInteractionEnabled = false
         
-        // Add targets for updates
-        nameTextField.addTarget(self, action: "updateName", forControlEvents: .EditingChanged)
-        dateStartPicker.addTarget(self, action: "updateDateStart", forControlEvents: .ValueChanged)
-        dateEndPicker.addTarget(self, action: "updateDateEnd", forControlEvents: .ValueChanged)
-        alarmSwitch.addTarget(self, action: "selectAlarm", forControlEvents: .ValueChanged)
-        alarmTimePicker.addTarget(self, action: "updateAlarmTime", forControlEvents: .ValueChanged)
-        
         // If using a pre-existing event, load data from event.
-        if (event != nil) {
-            nameTextField.text = name
-            dateStartPicker.date = dateStart!
-            dateEndPicker.date = dateEnd!
-            dateEndPicker.minimumDate = dateStart!
-            alarmSwitch.on = alarm!
-            alarmDateSwitch.on = false
-            if alarmTime != nil {
-                alarmTimePicker.date = alarmTime!
-                showMoreAlarmOptions()
-            }
-            else {
-                alarmTimePicker.date = dateStart!
-            }
-            
-            // Format and set main date labels
-            dateFormatter.dateFormat = "MMM dd, yyyy"
-            if alarmTime != nil {
-                alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTime!)
-            }
-            else {
-                alarmTimeMainLabel.text = dateFormatter.stringFromDate(dateStart!)
-            }
-            
-            // Format and set details labels
-            dateFormatter.dateFormat = "h:mm a"
-            if alarmTime != nil {
-                alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTime!)
-            }
-            else {
-                alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(dateStart!)
-            }
-        }
-        // If creating a new event, load initial data.
-        else {
-            // Set initial picker value to selected date and end picker value to 1 hour later
-            dateStartPicker.date = dateStart!
-            dateEndPicker.date = dateEnd!
-            
-            alarmSwitch.on = alarm!
-            alarmDateSwitch.on = false
-            
-            alarmTimePicker.date = alarmTime!
-        }
+        nameTextField.text = name
+        dateStartPicker.date = dateStart
+        dateEndPicker.date = dateEnd
+        alarmSwitch.on = alarm
+        alarmDateSwitch.on = false
+        alarmTimePicker.date = alarmTime!
     }
     
     /**
@@ -191,10 +134,24 @@ class ChangeEventViewController: UITableViewController {
         updateDateEnd()
         // Enable/disable alarm switch depending on settings
         updateAlarmSwitchEnabled()
+        updateAlarm()
         updateAlarmTime()
-        updateContactsDetailsLabel()
-        updateLocationsDetailsLabel()
+        updateContactsLabel()
+        updateLocationsLabel()
     }
+    
+    /**
+        Adds the necessary targets for actions.
+    */
+    private func addTargets() {
+        nameTextField.addTarget(self, action: "updateName", forControlEvents: .EditingChanged)
+        dateStartPicker.addTarget(self, action: "updateDateStart", forControlEvents: .ValueChanged)
+        dateEndPicker.addTarget(self, action: "updateDateEnd", forControlEvents: .ValueChanged)
+        alarmSwitch.addTarget(self, action: "selectAlarm", forControlEvents: .ValueChanged)
+        alarmTimePicker.addTarget(self, action: "updateAlarmTime", forControlEvents: .ValueChanged)
+    }
+    
+    // MARK: - Methods for initializing data.
     
     /**
         Initializes data with a start date.
@@ -222,7 +179,12 @@ class ChangeEventViewController: UITableViewController {
         dateStart = event.dateStart
         dateEnd = event.dateEnd
         alarm = event.alarm
-        alarmTime = event.alarmTime
+        if event.alarmTime != nil {
+            alarmTime = event.alarmTime
+        }
+        else {
+            alarmTime = event.dateStart
+        }
         
         // Load Contacts as ABRecordIDs
         let storedContacts = event.contacts.allObjects as! [Contact]
@@ -237,29 +199,32 @@ class ChangeEventViewController: UITableViewController {
         })
     }
     
+    // MARK: - Methods related to updating data.
+    
     /**
         Update date start info.
     */
     func updateDateStart() {
         dateStart = dateStartPicker.date
         updateDateStartLabels()
-        updateDateEndPicker(dateStart!)
         
-        // If alarm is off, update alarm time with date start so if it the alarm is turned on, the alarm time is at date start.
-        if !alarm! {
-            resetAlarmTime()
-        }
+        updateDateEndPicker()
+        
+        updateAlarm()
     }
     
     /**
         Update date start labels.
     */
-    func updateDateStartLabels() {
+    private func updateDateStartLabels() {
+        let dateStartCell = tableView.cellForRowAtIndexPath(indexPaths["Start"]!)
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        dateStartMainLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
+        //dateStartMainLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
+        dateStartCell?.textLabel?.text = dateFormatter.stringFromDate(dateStartPicker.date)
         
         dateFormatter.dateFormat = "h:mm a"
-        dateStartDetailsLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
+        dateStartCell?.detailTextLabel?.text = dateFormatter.stringFromDate(dateStartPicker.date)
+        //dateStartDetailsLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
     }
     
     /**
@@ -267,18 +232,21 @@ class ChangeEventViewController: UITableViewController {
     */
     func updateDateEnd() {
         dateEnd = dateEndPicker.date
-        updateDateEndLabels(dateEnd!)
+        updateDateEndLabels()
     }
     
     /**
         Update date end labels.
     */
-    func updateDateEndLabels(date: NSDate) {
+    private func updateDateEndLabels() {
+        let dateEndCell = tableView.cellForRowAtIndexPath(indexPaths["End"]!)
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        dateEndMainLabel.text = dateFormatter.stringFromDate(date)
+        //dateEndMainLabel.text = dateFormatter.stringFromDate(dateEnd)
+        dateEndCell?.textLabel?.text = dateFormatter.stringFromDate(dateEnd)
         
         dateFormatter.dateFormat = "h:mm a"
-        dateEndDetailsLabel.text = dateFormatter.stringFromDate(date)
+        //dateEndDetailsLabel.text = dateFormatter.stringFromDate(dateEnd)
+        dateEndCell?.detailTextLabel?.text = dateFormatter.stringFromDate(dateEnd)
     }
     
     
@@ -287,25 +255,16 @@ class ChangeEventViewController: UITableViewController {
     
         The date end picker should not be able to choose a date before the date start, so it should have a lower limit placed on the date it can choose.
     */
-    func updateDateEndPicker(date: NSDate) {
+    private func updateDateEndPicker() {
         let originalDate = dateEndPicker.date
-        dateEndPicker.minimumDate = date
+        dateEndPicker.minimumDate = dateStart
 
         // If the old date end comes after the new date start, change the old date end to equal the new date start.
-        if originalDate.compare(dateStartPicker.date) == .OrderedAscending {
-            dateEndPicker.date = dateStartPicker.date
+        if originalDate.compare(dateStart) == .OrderedAscending {
+            dateEndPicker.date = dateStart
             updateDateEnd()
         }
         dateEndPicker.reloadInputViews()
-    }
-    
-    
-    /**
-        Update the alarm time if the alarm is not already set.
-    */
-    func resetAlarmTime() {
-        alarmTimePicker.date = dateStartPicker.date
-        updateAlarmTime()
     }
     
     /**
@@ -313,7 +272,7 @@ class ChangeEventViewController: UITableViewController {
     
         The contacts detail label does not display a number if no contacts have been selected yet or if the number of contacts selected is zero. Otherwise, if at least one contact is selected, it displays the number of contacts.
     */
-    func updateContactsDetailsLabel() {
+    private func updateContactsLabel() {
         let contactsCell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
         if contactIDs != nil && contactIDs!.count > 0 {
             contactsCell?.detailTextLabel?.text = "\(contactIDs!.count)"
@@ -331,7 +290,7 @@ class ChangeEventViewController: UITableViewController {
         
         The locations detail label does not display a number if no map items have been selected yet or if the number of map items selected is zero. Otherwise, if at least one map item is selected, it displays the number of map items.
     */
-    func updateLocationsDetailsLabel() {
+    private func updateLocationsLabel() {
         let locationsCell = tableView.cellForRowAtIndexPath(indexPaths["Locations"]!)
         if mapItems != nil && mapItems!.count > 0 {
             locationsCell?.detailTextLabel?.text = "\(mapItems!.count)"
@@ -342,6 +301,160 @@ class ChangeEventViewController: UITableViewController {
         // Resize locations cell to fit label.
         locationsCell?.detailTextLabel?.sizeToFit()
         tableView.reloadRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
+    }
+    
+    /**
+    Updates whether or not the alarm switch is enabled.
+    
+    The alarm switch can be toggled if user notifications are allowed. Otherwise, the alarm switch cannot be toggled.
+    
+    TODO: also possibly do a check on if notification settings have changed from true -> false and all notifications are silenced properly.
+    */
+    func updateAlarmSwitchEnabled() {
+        let settings = UIApplication.sharedApplication().currentUserNotificationSettings()
+        if notificationsEnabled() {
+            alarmSwitch.userInteractionEnabled = true
+        }
+        else {
+            alarmSwitch.on = false
+            alarm = false
+            alarmSwitch.userInteractionEnabled = false
+            showFewerAlarmOptions()
+        }
+    }
+    
+    /**
+        When the alarm switch is pressed, the alarm cell is selected and the alarm is updated.
+    */
+    func selectAlarm() {
+        if selectedIndexPath != nil && selectedIndexPath != indexPaths["AlarmToggle"]! {
+            deselectRowAtIndexPath(selectedIndexPath!)
+        }
+        selectedIndexPath = indexPaths["AlarmToggle"]
+        
+        updateAlarm()
+    }
+    
+    /**
+        Updates the alarm.
+    
+        Turning the alarm switch on shows more alarm options while turning it off shows fewer alarm options.
+    */
+    func updateAlarm() {
+        alarm = alarmSwitch.on
+        
+        if alarmSwitch.on {
+            showMoreAlarmOptions()
+        }
+        else {
+            showFewerAlarmOptions()
+            resetAlarmTime()
+        }
+    }
+    
+    /**
+        Update the alarm time if the alarm is off.
+    */
+    func resetAlarmTime() {
+        alarmTimePicker.date = dateStartPicker.date
+        updateAlarmTime()
+    }
+    
+    /**
+        Show more alarm options.
+    */
+    func showMoreAlarmOptions() {
+        tableView.beginUpdates()
+        
+        if alarmDateToggleCell.hidden {
+            tableView.insertRowsAtIndexPaths([indexPaths["AlarmDateToggle"]!], withRowAnimation: .Automatic)
+        }
+        if alarmTimeDisplayCell.hidden {
+            tableView.insertRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .Automatic)
+        }
+        if alarmTimePickerCell.hidden {
+            tableView.insertRowsAtIndexPaths([indexPaths["AlarmTimePicker"]!], withRowAnimation: .Automatic)
+        }
+        
+        alarmDateToggleCell.hidden = false
+        alarmTimeDisplayCell.hidden = false
+        alarmTimePickerCell.hidden = false
+        
+        tableView.endUpdates()
+    }
+    
+    /**
+        Show fewer alarm options.
+    */
+    func showFewerAlarmOptions() {
+        tableView.beginUpdates()
+        
+        if !alarmDateToggleCell.hidden {
+            tableView.deleteRowsAtIndexPaths([indexPaths["AlarmDateToggle"]!], withRowAnimation: .Automatic)
+        }
+        if !alarmTimeDisplayCell.hidden {
+            tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .Automatic)
+        }
+        if !alarmTimePickerCell.hidden {
+            tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTimePicker"]!], withRowAnimation: .Automatic)
+        }
+        
+        // Hide options
+        alarmDateToggleCell!.hidden = true
+        alarmTimeDisplayCell!.hidden = true
+        alarmTimePickerCell!.hidden = true
+        
+        tableView.endUpdates()
+    }
+    
+    /**
+        Update event name.
+    */
+    func updateName() {
+        name = nameTextField.text
+    }
+    
+    /**
+        Update alarm time.
+    */
+    func updateAlarmTime() {
+        alarmTime = alarmTimePicker.date
+        updateAlarmTimeLabels()
+    }
+    
+    /**
+        Update alarm time display.
+    */
+    func updateAlarmTimeLabels() {
+        let alarmTimeCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimeDisplay"]!)
+        // Main label shows format: month day, year
+        dateFormatter.dateFormat = "MMM dd, yyyy"
+        //alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
+        alarmTimeCell?.textLabel?.text = dateFormatter.stringFromDate(alarmTime!)
+        
+        dateFormatter.dateFormat = "h:mm a"
+        //alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
+        alarmTimeCell?.detailTextLabel?.text = dateFormatter.stringFromDate(alarmTime!)
+    }
+    
+    /**
+        Updates the contact IDs.
+    
+        :param: contacts The contacts IDs that were selected.
+    */
+    func updateContacts(contactIDs: [ABRecordID]) {
+        self.contactIDs = contactIDs
+        updateContactsLabel()
+    }
+    
+    /**
+        Updates the map items.
+    
+        :param: mapItems The map items that were selected.
+    */
+    func updateMapItems(mapItems: [MapItem]) {
+        self.mapItems = mapItems
+        updateLocationsLabel()
     }
     
     // MARK: - Methods related to user permissions.
@@ -452,144 +565,6 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Updates whether or not the alarm switch is enabled.
-    
-        The alarm switch can be toggled if user notifications are allowed. Otherwise, the alarm switch cannot be toggled.
-    
-        TODO: also possibly do a check on if notification settings have changed from true -> false and all notifications are silenced properly.
-    */
-    func updateAlarmSwitchEnabled() {
-        let settings = UIApplication.sharedApplication().currentUserNotificationSettings()
-        if settings.types == UIUserNotificationType.None {
-            alarmSwitch.on = false
-            alarm = false
-            alarmSwitch.userInteractionEnabled = false
-            showFewerAlarmOptions()
-        }
-        else {
-            alarmSwitch.userInteractionEnabled = true
-        }
-    }
-    
-    /**
-        When the alarm switch is pressed, the alarm cell is selected. Turning the alarm switch on shows more alarm options while turning it off shows fewer alarm options.
-    */
-    func selectAlarm() {
-        if selectedIndexPath != nil && selectedIndexPath != indexPaths["AlarmToggle"]! {
-            deselectRowAtIndexPath(selectedIndexPath!)
-        }
-        selectedIndexPath = indexPaths["AlarmToggle"]
-        
-        updateAlarm()
-    }
-    
-    func updateAlarm() {
-        alarm = alarmSwitch.on
-        
-        if alarmSwitch.on {
-            showMoreAlarmOptions()
-        }
-        else {
-            showFewerAlarmOptions()
-            resetAlarmTime()
-        }
-    }
-    
-    /**
-        Show more alarm options.
-    */
-    func showMoreAlarmOptions() {
-        tableView.beginUpdates()
-        
-        if alarmDateToggleCell.hidden {
-            tableView.insertRowsAtIndexPaths([indexPaths["AlarmDateToggle"]!], withRowAnimation: .Automatic)
-        }
-        if alarmTimeDisplayCell.hidden {
-            tableView.insertRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .Automatic)
-        }
-        if alarmTimePickerCell.hidden {
-            tableView.insertRowsAtIndexPaths([indexPaths["AlarmTimePicker"]!], withRowAnimation: .Automatic)
-        }
-        
-        alarmDateToggleCell.hidden = false
-        alarmTimeDisplayCell.hidden = false
-        alarmTimePickerCell.hidden = false
-        
-        tableView.endUpdates()
-    }
-    
-    /**
-        Show fewer alarm options.
-    */
-    func showFewerAlarmOptions() {
-        tableView.beginUpdates()
-        
-        if !alarmDateToggleCell.hidden {
-            tableView.deleteRowsAtIndexPaths([indexPaths["AlarmDateToggle"]!], withRowAnimation: .Automatic)
-        }
-        if !alarmTimeDisplayCell.hidden {
-            tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .Automatic)
-        }
-        if !alarmTimePickerCell.hidden {
-            tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTimePicker"]!], withRowAnimation: .Automatic)
-        }
-        
-        // Hide options
-        alarmDateToggleCell!.hidden = true
-        alarmTimeDisplayCell!.hidden = true
-        alarmTimePickerCell!.hidden = true
-        
-        tableView.endUpdates()
-    }
-    
-    /**
-        Update event name.
-    */
-    func updateName() {
-        name = nameTextField.text
-    }
-    
-    /**
-        Update alarm time.
-    */
-    func updateAlarmTime() {
-        alarmTime = alarmTimePicker.date
-        updateAlarmTimeLabels()
-    }
-    
-    /**
-        Update alarm time display.
-    */
-    func updateAlarmTimeLabels() {
-        // Main label shows format: month day, year
-        dateFormatter.dateFormat = "MMM dd, yyyy"
-        alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
-        
-        dateFormatter.dateFormat = "h:mm a"
-        alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
-    }
-    
-    /**
-        Updates the contact IDs.
-    
-        :param: contacts The contacts IDs that were selected.
-    */
-    func updateContacts(contactIDs: [ABRecordID]) {
-        self.contactIDs = contactIDs
-        updateContactsDetailsLabel()
-    }
-    
-    /**
-        Updates the map items.
-    
-        :param: mapItems The map items that were selected.
-    */
-    func updateMapItems(mapItems: [MapItem]) {
-        self.mapItems = mapItems
-        updateLocationsDetailsLabel()
-    }
-    
-    /**
         Performs deselection at index path.
         
         :param: indexPath The deselected index path.
@@ -641,8 +616,8 @@ class ChangeEventViewController: UITableViewController {
         event!.name = name
         event!.dateStart = dateStart!
         event!.dateEnd = dateEnd!
-        event!.alarm = alarm!
-        if alarm! {
+        event!.alarm = alarm
+        if alarm {
             event!.alarmTime = alarmTime
             
             if notificationTimesChanged(event!) {
@@ -681,6 +656,21 @@ class ChangeEventViewController: UITableViewController {
         return event!
     }
     
+    // MARK: - Methods related to notifications and scheduling notifications.
+    
+    /**
+        Returns a `Bool` indicating whether or not notifications are enabled.
+    
+        Notifications are enabled if alerts, badges, and sound are enabled.
+    */
+    private func notificationsEnabled() -> Bool {
+        let notificationTypes = UIApplication.sharedApplication().currentUserNotificationSettings().types
+        if notificationTypes.rawValue & UIUserNotificationType.Alert.rawValue != 0 && notificationTypes.rawValue & UIUserNotificationType.Badge.rawValue != 0 && notificationTypes.rawValue & UIUserNotificationType.Sound.rawValue != 0 {
+            return true
+        }
+        return false
+    }
+    
     /**
         Return a `Bool` indicating whether or not a notification has been scheduled for an event.
     
@@ -688,7 +678,7 @@ class ChangeEventViewController: UITableViewController {
     
         :returns: `true` if a notification has been scheduled for this event; `false` otherwise.
     */
-    func notificationsScheduled(event: FullEvent) -> Bool {
+    private func notificationsScheduled(event: FullEvent) -> Bool {
         let scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
         let results = scheduledNotifications.filter({(
             $0.userInfo!["id"] as! String) == event.id
@@ -703,7 +693,7 @@ class ChangeEventViewController: UITableViewController {
     
         :returns: `true` if a notification has been scheduled and its notification time has been changed; `false` otherwise.
     */
-    func notificationTimesChanged(event: FullEvent) -> Bool {
+    private func notificationTimesChanged(event: FullEvent) -> Bool {
         let scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
         let results = scheduledNotifications.filter({
             ($0.userInfo!["id"] as! String) == event.id && event.alarmTime != nil &&
@@ -719,7 +709,7 @@ class ChangeEventViewController: UITableViewController {
     
         :param: event The event to have a scheduled notification.
     */
-    func scheduleNotifications(event: FullEvent) {
+    private func scheduleNotifications(event: FullEvent) {
         NSLog("Event scheduled for time: %@", event.alarmTime!.description)
         let notification = UILocalNotification()
         notification.alertTitle = "Event Notification"
@@ -746,7 +736,7 @@ class ChangeEventViewController: UITableViewController {
     
         :param: event The event that has notifications to deschedule.
     */
-    func descheduleNotifications(event: FullEvent) {
+    private func descheduleNotifications(event: FullEvent) {
         NSLog("Event descheduled for event: %@", event.id)
         // Get all notifications
         var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
@@ -769,16 +759,18 @@ class ChangeEventViewController: UITableViewController {
     
         :param: event The event to add contacts to.
     */
-    func addNewContacts() {
-        if contactIDs != nil {
-            var storedContacts = event!.mutableSetValueForKey("contacts")
+    private func addNewContacts() {
+        // Check that there are any contact IDs to add.
+        if contactIDs != nil && contactIDs!.count > 0 {
+            let storedContacts = event!.mutableSetValueForKey("contacts")
             
             for contactID in contactIDs! {
                 let record: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, contactID)?.takeUnretainedValue()
-                
+
                 let firstName = ABRecordCopyValue(record, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
                 let lastName = ABRecordCopyValue(record, kABPersonLastNameProperty)?.takeRetainedValue() as? String
                 
+                // Check if the contact has already been stored.
                 let storedContact = getStoredContact(contactID)
                 
                 if storedContact != nil {
@@ -786,37 +778,56 @@ class ChangeEventViewController: UITableViewController {
                     let storedContact = storedContact!
                     storedContacts.addObject(storedContact)
                     
-                    let inverse = storedContact.mutableSetValueForKey("events")
-                    inverse.addObject(event!)
+                    addEventRelationship(storedContact)
                 }
                 else {
-                    // If contact doesn't exist in storage, create new contact.
-                    let entity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
-                    let newContact = Contact(entity: entity, insertIntoManagedObjectContext: managedContext)
-                    
-                    // Set values
-                    newContact.id = contactID
-                    newContact.firstName = firstName
-                    newContact.lastName = lastName
-                    
-                    // Add contact to stored contacts
+                    // If contact doesn't exist in storage, add new contact and inverse relationship.
+                    let newContact = Contact(id: contactID, firstName: firstName, lastName: lastName)
                     storedContacts.addObject(newContact)
                     
-                    // Add inverse
-                    let inverse = newContact.mutableSetValueForKey("events")
-                    inverse.addObject(event!)
+                    addEventRelationship(newContact)
                 }
             }
         }
     }
     
     /**
-        Searches the stored contacts for a contact ID.
+        Removes old contacts from the event.
+    
+        All contacts that are not currently in `contactIDs` will be removed.
+    
+        :param: event The event to remove contacts from.	
+    */
+    private func removeOldContacts() {
+        let storedContacts = event!.mutableSetValueForKey("contacts")
+        let removedContacts = NSMutableSet()
+        
+        // Find old contacts to remove.
+        for contact in storedContacts {
+            let contact = contact as! Contact
+            let id = contact.id
+            // Search for stored contact IDs in current contact IDs. If not found, add to set of objects to remove from storage.
+            if !contains(contactIDs!, id) {
+                removedContacts.addObject(contact)
+            }
+        }
+        storedContacts.minusSet(removedContacts as Set<NSObject>)
+        
+        for contact in removedContacts {
+            // Remove old contact from stored contacts and inverse relationship.
+            let contact = contact as! Contact
+            storedContacts.removeObject(contact)
+            removeEventRelationship(contact)
+        }
+    }
+    
+    /**
+        Searches the stored contacts for a contact ID. Returns the `Contact` if it was found, or `nil` if none was found.
     
         :param: contactID The ID of the contact to search for.
         :returns: The contact if it was found in storage or `nil` if none was found.
     */
-    func getStoredContact(contactID: ABRecordID) -> Contact? {
+    private func getStoredContact(contactID: ABRecordID) -> Contact? {
         // Create fetch request for contact
         let fetchRequest = NSFetchRequest(entityName: "Contact")
         fetchRequest.fetchLimit = 1
@@ -832,101 +843,88 @@ class ChangeEventViewController: UITableViewController {
         return storedContact
     }
     
+    // MARK: - Method for handling locations when saving event.
+    
     /**
-        Removes old contacts from the event.
-    
-        All contacts that are not currently contained in `contactIDs` will be removed.
-    
-        :param: event The event to remove contacts from.	
+        Adds new locations to the event.
     */
-    func removeOldContacts() {
-        var storedContacts = event!.mutableSetValueForKey("contacts")
-        var removedContacts = NSMutableSet()
-        
-        // Find old contacts to remove
-        for contact in storedContacts {
-            let contact = contact as! Contact
-            let id = contact.id
-            // Check if the new list of contact IDs contains the old contact ID. If not, add to list of removed objects.
-            if !contains(contactIDs!, id) {
-                removedContacts.addObject(contact)
-            }
-        }
-        storedContacts.minusSet(removedContacts as Set<NSObject>)
-        
-        for contact in removedContacts {
-            // Remove old contact from stored contacts.
-            let contact = contact as! Contact
-            storedContacts.removeObject(contact)
+    private func addNewLocations() {
+        if mapItems != nil && mapItems!.count > 0 {
+            let storedLocations = event!.mutableSetValueForKey("locations")
             
-            // Remove inverse
-            let inverse = contact.mutableSetValueForKey("events")
-            inverse.removeObject(event!)
-            
-            // Delete contact if it has no related events.
-            if inverse.count == 0 {
-                managedContext.deleteObject(contact)
+            for mapItem in mapItems! {
+                // Get values of interest to be stored.
+                
+                // See if the location has been previously stored.
+                let storedLocation = getStoredLocation(mapItem.coordinate)
+                
+                if storedLocation != nil {
+                    // If location is already stored, add stored location and add inverse.
+                    let storedLocation = storedLocation!
+                    storedLocations.addObject(storedLocation)
+                    addEventRelationship(storedLocation)
+                }
+                else {
+                    // If location is new, add new location and add inverse.
+                    let newLocation = Location(coordinate: mapItem.coordinate, name: mapItem.name, address: mapItem.address)
+                    storedLocations.addObject(newLocation)
+                    addEventRelationship(newLocation)
+                }
             }
         }
     }
     
-    // MARK: - Method for handling locations when saving event.
-    
     /**
-        Adds new points of interest to the event.
+        Removes old points of interest from the event.
     */
-    func addNewLocations() {
+    private func removeOldLocations() {
+        let storedLocations = event!.mutableSetValueForKey("locations")
+        
         if mapItems != nil && mapItems!.count > 0 {
-            var storedLocations = event!.mutableSetValueForKey("locations")
+            var removedLocations = NSMutableSet()
             
-            for mapItem in mapItems! {
-                // Get values of interest to be stored.
-                let latitude = mapItem.coordinate.latitude
-                let longitude = mapItem.coordinate.longitude
-                let name = mapItem.name
-                let address = mapItem.address
+            // Find points of interest to remove
+            for location in storedLocations {
+                let location = location as! Location
+                // Convert to map item for comparing with current map items
+                let mapItem = MapItem(coordinate: location.coordinate, name: location.name, address: location.address)
                 
-                // See if the location has been previously stored.
-                let storedLocation = getStoredLocation(latitude, longitude)
-                
-                if storedLocation != nil {
-                    // If location is already stored, add location to this event's locations.
-                    storedLocations.addObject(storedLocation!)
-                    
-                    // Add inverse relation
-                    var inverse = storedLocation!.mutableSetValueForKey("events")
-                    inverse.addObject(event!)
-                }
-                else {
-                    // If location is new, create new location.
-                    let entity = NSEntityDescription.entityForName("Location", inManagedObjectContext: managedContext)!
-                    let newLocation = Location(entity: entity, insertIntoManagedObjectContext: managedContext)
-                    
-                    // Set values
-                    newLocation.latitude = latitude
-                    newLocation.longitude = longitude
-                    newLocation.name = name
-                    newLocation.address = address
-                    
-                    // Add location
-                    storedLocations.addObject(newLocation)
-                    
-                    // Add inverse relation
-                    var inverse = newLocation.mutableSetValueForKey("events")
-                    inverse.addObject(event!)
+                if !contains(mapItems!, mapItem) {
+                    removedLocations.addObject(location)
                 }
             }
+            // Remove old locations
+            storedLocations.minusSet(removedLocations as Set<NSObject>)
+            
+            // Remove event from inverse relation.
+            for location in removedLocations {
+                let location = location as! Location
+                removeEventRelationship(location)
+            }
+        }
+        else {
+            // Remove event from all related locations and remove all locations from event.
+            for location in storedLocations {
+                let location = location as! Location
+                removeEventRelationship(location)
+            }
+        
+            storedLocations.removeAllObjects()
         }
     }
     
     /**
         Searches the stored locations for a given location.
     
-        :param: latitude The latitude of the location to find.
-        :param: longitude The longitude of the location to find.
-        :returns: The location if it was found or `nil` if none was found.
+        Currently, stored locations are found by matching coordinates.
+    
+        :param: coordinate The coordinate of the location to be found.
+        :returns: The `Location` object if it was found or `nil` if none was found.
     */
-    func getStoredLocation(latitude: CLLocationDegrees, _ longitude: CLLocationDegrees) -> Location? {
+    private func getStoredLocation(coordinate: CLLocationCoordinate2D) -> Location? {
+        let latitude = coordinate.latitude
+        let longitude = coordinate.longitude
+        
         // Create fetch request for a location entity
         let fetchRequest = NSFetchRequest(entityName: "Location")
         fetchRequest.fetchLimit = 1
@@ -943,59 +941,29 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Removes old points of interest from the event.
+        Adds the event to its relationship with another object.
+    
+        :param: relatedObject The object that is related to the event.
     */
-    func removeOldLocations() {
-        let storedLocations = event!.mutableSetValueForKey("locations")
+    private func addEventRelationship(relatedObject: NSManagedObject) {
+        // Add inverse relation
+        let inverse = relatedObject.mutableSetValueForKey("events")
+        inverse.addObject(event!)
+    }
+    
+    /**
+        Removes the event from its relationship with another object.
+    
+        First, it removes the event from its inverse. Then, it checks if the relationship still has associated events. If not, the object is no longer needed and the object is removed from persistent storage. For example, if a `Location` has no related events anymore, it will be deleted.
+    
+        :param: relatedObject The object that was related to the event.
+    */
+    private func removeEventRelationship(relatedObject: NSManagedObject) {
+        let inverse = relatedObject.mutableSetValueForKey("events")
+        inverse.removeObject(event!)
         
-        if mapItems != nil && mapItems!.count > 0 {
-            var removedLocations = NSMutableSet()
-            
-            // Find points of interest to remove
-            for location in storedLocations {
-                let location = location as! Location
-                
-                // Search for current location in stored locations.
-                let foundLocation = mapItems!.filter({
-                    let latitudeMatch = fabs($0.coordinate.latitude - location.latitude) < self.EPSILON
-                    let longitudeMatch = fabs($0.coordinate.longitude - location.longitude) < self.EPSILON
-                    return latitudeMatch && longitudeMatch
-                    }).first
-                
-                // If no location is found, remove location from storage.
-                if foundLocation == nil {
-                    removedLocations.addObject(location)
-                }
-            }
-            // Remove old locations
-            storedLocations.minusSet(removedLocations as Set<NSObject>)
-            
-            // Remove event from inverse relation.
-            for location in removedLocations {
-                let location = location as! Location
-                let inverse = location.mutableSetValueForKey("events")
-                inverse.removeObject(event!)
-                
-                // Delete location if it has no related events.
-                if inverse.count == 0 {
-                    managedContext.deleteObject(location)
-                }
-            }
-        }
-        else {
-            // Remove event from all related locations and remove all locations from event.
-            for location in storedLocations {
-                let location = location as! Location
-                let inverse = location.mutableSetValueForKey("events")
-                inverse.removeObject(event!)
-                
-                // Delete location if it has no related events.
-                if inverse.count == 0 {
-                    managedContext.deleteObject(location)
-                }
-            }
-        
-            storedLocations.removeAllObjects()
+        if inverse.count == 0 {
+            managedContext.deleteObject(relatedObject)
         }
     }
     
@@ -1079,7 +1047,7 @@ extension ChangeEventViewController: UITableViewDelegate {
         if indexPath == indexPaths["StartPicker"]! ||
             indexPath == indexPaths["EndPicker"]! ||
             indexPath == indexPaths["AlarmTimePicker"]! {
-                return PICKER_CELL_HEIGHT
+                return UIPickerView().frame.height
         }
         return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
     }
@@ -1161,13 +1129,6 @@ extension ChangeEventViewController: UITableViewDelegate {
 
 // MARK: - UITableViewDataSource
 extension ChangeEventViewController: UITableViewDataSource {
-    /**
-        Number of sections in table view.
-    */
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return sections.count
-    }
-    
     /**
         If the date start or end is not selected, show only the time display and not the picker. If the alarm is off, show only the alarm toggle cell.
     */

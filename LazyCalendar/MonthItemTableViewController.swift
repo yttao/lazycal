@@ -143,8 +143,6 @@ class MonthItemTableViewController: UITableViewController {
     /**
         Removes an event from persistent storage.
     
-        TODO: Remove connections to other objects (contacts, POIs).
-    
         :param: event The event to remove from persistent storage.
     */
     private func removeEventFromPersistentStorage(event: FullEvent) {

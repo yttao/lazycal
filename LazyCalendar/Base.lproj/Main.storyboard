@@ -514,17 +514,11 @@
                         <outlet property="alarmDateSwitch" destination="M7E-Ai-qkC" id="nHX-xn-BzY"/>
                         <outlet property="alarmDateToggleCell" destination="c08-D8-MfJ" id="EB1-RM-AT9"/>
                         <outlet property="alarmSwitch" destination="SiC-Zy-YtO" id="l6O-8T-O5N"/>
-                        <outlet property="alarmTimeDetailsLabel" destination="iEh-Ic-6fb" id="REx-zZ-w3n"/>
                         <outlet property="alarmTimeDisplayCell" destination="bTK-Ej-BTD" id="tBl-lq-CZj"/>
-                        <outlet property="alarmTimeMainLabel" destination="Vfv-Ml-dDh" id="Z3X-SV-ivV"/>
                         <outlet property="alarmTimePicker" destination="yyY-Mi-MnN" id="7mj-yw-E3K"/>
                         <outlet property="alarmTimePickerCell" destination="cVw-iZ-pNP" id="4yh-ry-gDm"/>
-                        <outlet property="dateEndDetailsLabel" destination="RI1-Hc-M5s" id="bx1-Ba-Qd7"/>
-                        <outlet property="dateEndMainLabel" destination="RBF-96-ZwI" id="jQn-Oc-Txy"/>
                         <outlet property="dateEndPicker" destination="ZBj-rj-h7a" id="dKV-vZ-7Yr"/>
                         <outlet property="dateEndPickerCell" destination="1nH-02-GEJ" id="Spk-EZ-jzK"/>
-                        <outlet property="dateStartDetailsLabel" destination="Vpb-DU-M9h" id="Hfa-7q-sfu"/>
-                        <outlet property="dateStartMainLabel" destination="Wql-f1-NyL" id="xu3-tu-ErZ"/>
                         <outlet property="dateStartPicker" destination="zfx-ZB-R9Q" id="RUR-LU-tYe"/>
                         <outlet property="dateStartPickerCell" destination="ty5-c7-JWi" id="sem-ll-zAO"/>
                         <outlet property="nameTextField" destination="hmy-da-q8Z" id="yQL-kb-xtI"/>
@@ -776,13 +770,8 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="alarmLabel" destination="KhG-Ie-Wyq" id="oaE-5c-YIl"/>
-                        <outlet property="alarmTimeDetailsLabel" destination="Vzg-iG-oT3" id="JXY-w5-hVa"/>
                         <outlet property="alarmTimeDisplayCell" destination="lNb-xl-Gh6" id="jly-Fu-rzY"/>
-                        <outlet property="alarmTimeMainLabel" destination="gx4-vy-IpG" id="sgH-0a-fiE"/>
                         <outlet property="contactsCell" destination="eh4-il-d2d" id="BHr-ZT-1ru"/>
-                        <outlet property="eventNameLabel" destination="jF5-0l-0Lh" id="aJe-Uz-n5l"/>
-                        <outlet property="eventTimeLabel" destination="NhU-cS-MgM" id="qO1-8x-k0s"/>
                         <outlet property="locationsCell" destination="9MB-RH-HDr" id="CRV-i3-rh9"/>
                     </connections>
                 </tableViewController>
@@ -1150,17 +1139,11 @@
                         <outlet property="alarmDateSwitch" destination="2mp-hf-WWg" id="ghg-z0-fgu"/>
                         <outlet property="alarmDateToggleCell" destination="bu7-Ol-iRX" id="Hui-hh-go1"/>
                         <outlet property="alarmSwitch" destination="8rq-Av-dwN" id="QRf-Ag-6AW"/>
-                        <outlet property="alarmTimeDetailsLabel" destination="c3A-gU-fLz" id="rqx-lb-bAA"/>
                         <outlet property="alarmTimeDisplayCell" destination="9rW-qa-4iV" id="Uge-XT-gXg"/>
-                        <outlet property="alarmTimeMainLabel" destination="y6A-4J-vUt" id="GOE-uZ-z26"/>
                         <outlet property="alarmTimePicker" destination="DJ3-vK-mdW" id="WTG-hR-Z8N"/>
                         <outlet property="alarmTimePickerCell" destination="49M-Cs-C2U" id="Vs6-Wc-CLo"/>
-                        <outlet property="dateEndDetailsLabel" destination="T3v-zK-MqL" id="GLV-AG-ibr"/>
-                        <outlet property="dateEndMainLabel" destination="Dpl-jU-l7d" id="3FF-iC-VI9"/>
                         <outlet property="dateEndPicker" destination="iBf-hF-ryz" id="ETq-zR-WvF"/>
                         <outlet property="dateEndPickerCell" destination="kkP-Uu-8Gp" id="9rZ-mB-nMm"/>
-                        <outlet property="dateStartDetailsLabel" destination="Hzn-E8-NVL" id="7s2-Oh-8qS"/>
-                        <outlet property="dateStartMainLabel" destination="9Np-jS-dhf" id="Cut-J9-ybA"/>
                         <outlet property="dateStartPicker" destination="2sB-aU-n8X" id="ugq-c0-FGh"/>
                         <outlet property="dateStartPickerCell" destination="gcA-XH-aBW" id="aeH-gA-qBu"/>
                         <outlet property="nameTextField" destination="YXX-Eo-oqm" id="2Wc-4j-POs"/>

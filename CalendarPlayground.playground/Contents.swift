@@ -22,3 +22,4 @@ var t: String? = "test"
 s == t
 s = "test"
 s == t
+
