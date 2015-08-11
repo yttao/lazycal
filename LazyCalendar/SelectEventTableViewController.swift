@@ -107,66 +107,48 @@ class SelectEventTableViewController: UITableViewController {
         }
         alarmTimeMainLabel.sizeToFit()
 
+        tableView.beginUpdates()
         if event!.contacts.count > 0 {
-            tableView.beginUpdates()
-            
             contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
             contactsCell.detailTextLabel?.sizeToFit()
             
             if self.tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 0 {
                 contactsCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
-                //tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
             }
-            
-            tableView.endUpdates()
         }
         else {
-            tableView.beginUpdates()
-            
             contactsCell.detailTextLabel?.text = nil
             contactsCell.detailTextLabel?.sizeToFit()
             
             if self.tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 1 {
                 contactsCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
-                //tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
             }
-            
-            tableView.endUpdates()
         }
         
         if event!.locations.count > 0 {
-            tableView.beginUpdates()
-            
             locationsCell.detailTextLabel?.text = "\(event!.locations.count)"
             locationsCell.detailTextLabel?.sizeToFit()
             
             if self.tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 0 {
                 locationsCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
-                //tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
             }
-            
-            tableView.endUpdates()
         }
         else {
-            tableView.beginUpdates()
-            
             locationsCell.detailTextLabel?.text = nil
             locationsCell.detailTextLabel?.sizeToFit()
             
             if self.tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 1 {
                 locationsCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
-                //tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
             }
-            
-            tableView.endUpdates()
         }
+        tableView.endUpdates()
         
         tableView.reloadData()
-        tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
+        //tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
     }
     
     /**
