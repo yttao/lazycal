@@ -20,7 +20,7 @@ class ContactsTableViewController: UITableViewController {
     
     private var searchController: UISearchController?
     // True if searching for new contacts is allowed.
-    private var searchEnabled = true
+    private var editingEnabled = true
     
     private let reuseIdentifier = "ContactCell"
     
@@ -55,7 +55,7 @@ class ContactsTableViewController: UITableViewController {
         }
         
         // Create and configure search controller
-        if searchEnabled {
+        if editingEnabled {
             initializeSearchController()
         }
         // Hides search controller on segue.
@@ -100,12 +100,12 @@ class ContactsTableViewController: UITableViewController {
     }
     
     /**
-        Sets search enabled. If search is enabled, new contacts can be added. If disabled, only current contacts can be viewed.
+        Sets editing enabled. If enabled, contacts can be added and removed. Otherwise, selected contacts are fixed.
     
         :param: enabled `true` if search is enabled; `false` otherwise.
     */
-    func setSearchEnabled(enabled: Bool) {
-        searchEnabled = enabled
+    func setEditingEnabled(enabled: Bool) {
+        editingEnabled = enabled
     }
     
     /**
@@ -349,7 +349,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        if searching() || !searchEnabled {
+        if searching() || !editingEnabled {
             return false
         }
         return true

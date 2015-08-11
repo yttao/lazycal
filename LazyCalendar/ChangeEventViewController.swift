@@ -23,6 +23,8 @@ class ChangeEventViewController: UITableViewController {
     private var contactIDs: [ABRecordID]?
     private var mapItems: [MapItem]?
     
+    private var event: FullEvent?
+    
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
     
@@ -80,8 +82,6 @@ class ChangeEventViewController: UITableViewController {
     private let PICKER_CELL_HEIGHT = UIPickerView().frame.height
     
     private var selectedIndexPath: NSIndexPath?
-    
-    private var event: FullEvent?
     
     private var addressBookRef: ABAddressBookRef?
     
@@ -838,7 +838,6 @@ class ChangeEventViewController: UITableViewController {
         Searches the stored contacts for a contact ID.
     
         :param: contactID The ID of the contact to search for.
-    
         :returns: The contact if it was found in storage or `nil` if none was found.
     */
     func getStoredContact(contactID: ABRecordID) -> Contact? {
@@ -948,9 +947,7 @@ class ChangeEventViewController: UITableViewController {
         Searches the stored locations for a given location.
     
         :param: latitude The latitude of the location to find.
-    
         :param: longitude The longitude of the location to find.
-    
         :returns: The location if it was found or `nil` if none was found.
     */
     func getStoredLocation(latitude: CLLocationDegrees, _ longitude: CLLocationDegrees) -> Location? {

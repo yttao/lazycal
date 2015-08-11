@@ -90,76 +90,105 @@ class SelectEventTableViewController: UITableViewController {
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
         eventTimeLabel.text = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
         
+        tableView.beginUpdates()
         if !notificationsEnabled() {
+            // If notifications are disabled, the alarm cannot send an alert so it displays "Disabled" and hides the alarm time.
             alarmLabel.text = "Disabled"
-            alarmTimeDisplayCell.hidden = true
-            alarmTimeMainLabel.text = nil
+            alarmTimeDisplayCell.textLabel?.text = nil
+            
+            if tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) == super.tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) {
+                alarmTimeDisplayCell.hidden = true
+                tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTime"]!], withRowAnimation: .None)
+            }
+            
         }
         else if event!.alarm {
+            // If the alarm is enabled, the alarm says "On" and displays the time.
             alarmLabel.text = "On"
-            alarmTimeDisplayCell.hidden = false
-            alarmTimeMainLabel.text = dateFormatter.stringFromDate(event!.alarmTime!)
+            alarmTimeDisplayCell.textLabel?.text = dateFormatter.stringFromDate(event!.alarmTime!)
+            
+            if tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) == 1 {
+                alarmTimeDisplayCell.hidden = false
+                tableView.insertRowsAtIndexPaths([indexPaths["AlarmTime"]!], withRowAnimation: .None)
+            }
         }
         else {
+            // If the alarm is disabled, the alarm says "Off" and hides the time display.
             alarmLabel.text = "Off"
-            alarmTimeDisplayCell.hidden = true
-            alarmTimeMainLabel.text = nil
-        }
-        alarmTimeMainLabel.sizeToFit()
-
-        tableView.beginUpdates()
-        if event!.contacts.count > 0 {
-            contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
-            contactsCell.detailTextLabel?.sizeToFit()
+            alarmTimeDisplayCell.textLabel?.text = nil
             
+            if tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) == super.tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) {
+                alarmTimeDisplayCell.hidden = true
+                tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTime"]!], withRowAnimation: .None)
+            }
+            
+        }
+        alarmTimeDisplayCell.textLabel?.sizeToFit()
+
+        //tableView.beginUpdates()
+        if event!.contacts.count > 0 {
+            // Show contacts cell with number of contacts in detail label if the event has at least one contact.
+            contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
+            //contactsCell.detailTextLabel?.sizeToFit()
+            
+            // If contacts row has been removed, add row back.
             if self.tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 0 {
                 contactsCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
             }
         }
         else {
+            // Hide contacts cell if the event has no contacts.
             contactsCell.detailTextLabel?.text = nil
-            contactsCell.detailTextLabel?.sizeToFit()
+            //contactsCell.detailTextLabel?.sizeToFit()
             
-            if self.tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 1 {
+            // If contacts cell exists, delete row.
+            if tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 1 {
                 contactsCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
             }
         }
+        contactsCell.detailTextLabel?.sizeToFit()
         
         if event!.locations.count > 0 {
+            // Show locations cell with number of locations in detail label if the event has at least one location.
             locationsCell.detailTextLabel?.text = "\(event!.locations.count)"
-            locationsCell.detailTextLabel?.sizeToFit()
+            //locationsCell.detailTextLabel?.sizeToFit()
             
-            if self.tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 0 {
+            // If locations row has been removed, add row back.
+            if tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 0 {
                 locationsCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
             }
         }
         else {
+            // Hide locations cell if the event has no locations.
             locationsCell.detailTextLabel?.text = nil
-            locationsCell.detailTextLabel?.sizeToFit()
+            //locationsCell.detailTextLabel?.sizeToFit()
             
-            if self.tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 1 {
+            // If locations cell exists, delete row.
+            if tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 1 {
                 locationsCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
             }
         }
+        locationsCell.detailTextLabel?.sizeToFit()
         tableView.endUpdates()
         
         tableView.reloadData()
-        //tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
     }
     
     /**
         Returns a `Bool` indicating whether or not notifications are enabled.
+    
+        Notifications are enabled if alerts, badges, and sound are enabled.
     */
-    func notificationsEnabled() -> Bool {
-        let settings = UIApplication.sharedApplication().currentUserNotificationSettings()
-        if settings.types == .None {
-            return false
+    private func notificationsEnabled() -> Bool {
+        let notificationTypes = UIApplication.sharedApplication().currentUserNotificationSettings().types
+        if notificationTypes.rawValue & UIUserNotificationType.Alert.rawValue != 0 && notificationTypes.rawValue & UIUserNotificationType.Badge.rawValue != 0 && notificationTypes.rawValue & UIUserNotificationType.Sound.rawValue != 0 {
+            return true
         }
-        return true
+        return false
     }
     
     /**
@@ -184,7 +213,7 @@ class SelectEventTableViewController: UITableViewController {
         // Load contact IDs into contacts table view controller.
         contactsTableViewController.loadData(contactIDs)
         // Disable searching for new contacts.
-        contactsTableViewController.setSearchEnabled(false)
+        contactsTableViewController.setEditingEnabled(false)
         
         navigationController!.showViewController(contactsTableViewController, sender: self)
     }
@@ -206,7 +235,7 @@ class SelectEventTableViewController: UITableViewController {
         // Load map items into locations view controller.
         locationsViewController.loadData(mapItems)
         // Disable searching for new locations.
-        locationsViewController.setSearchEnabled(false)
+        locationsViewController.setEditingEnabled(false)
         
         // Show locations view controller
         navigationController!.showViewController(locationsViewController, sender: self)

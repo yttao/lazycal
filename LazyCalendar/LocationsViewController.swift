@@ -22,7 +22,7 @@ class LocationsViewController: UIViewController {
     private let locationsMapViewSegue = "LocationsMapViewSegue"
     
     private var mapItems: [MapItem]?
-    private var searchEnabled: Bool?
+    private var editingEnabled: Bool?
     
     // MARK: - Methods for initializing view controller and data.
     
@@ -48,8 +48,13 @@ class LocationsViewController: UIViewController {
         self.mapItems = mapItems
     }
     
-    func setSearchEnabled(enabled: Bool) {
-        searchEnabled = enabled
+    /**
+        Sets whether or not editing is enabled.
+    
+        :param: enabled `true` if editing is enabled; `false` otherwise.
+    */
+    func setEditingEnabled(enabled: Bool) {
+        editingEnabled = enabled
     }
 
     /**
@@ -86,8 +91,8 @@ class LocationsViewController: UIViewController {
                 if let mapItems = mapItems {
                     locationsTableViewController.loadData(mapItems)
                 }
-                if let searchEnabled = searchEnabled {
-                    locationsTableViewController.setSearchEnabled(searchEnabled)
+                if let editingEnabled = editingEnabled {
+                    locationsTableViewController.setEditingEnabled(editingEnabled)
                 }
             }
         }

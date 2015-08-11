@@ -701,7 +701,7 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell hidden="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="gx4-vy-IpG" detailTextLabel="Vzg-iG-oT3" style="IBUITableViewCellStyleValue1" id="lNb-xl-Gh6" userLabel="AlarmTimeDisplay">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="gx4-vy-IpG" detailTextLabel="Vzg-iG-oT3" style="IBUITableViewCellStyleValue1" id="lNb-xl-Gh6" userLabel="AlarmTimeDisplay">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lNb-xl-Gh6" id="Hvd-bz-4ew">
                                             <autoresizingMask key="autoresizingMask"/>
@@ -1108,7 +1108,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Contacts" id="vWD-ZD-nOY" userLabel="Locations">
+                            <tableViewSection headerTitle="Locations" id="vWD-ZD-nOY" userLabel="Locations">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="Y9b-Ga-7eU" detailTextLabel="QoJ-OJ-5YO" style="IBUITableViewCellStyleValue1" id="8IK-rC-OP3" userLabel="Locations">
                                         <rect key="frame" x="0.0" y="375" width="320" height="44"/>
