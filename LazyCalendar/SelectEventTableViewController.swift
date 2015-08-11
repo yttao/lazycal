@@ -129,7 +129,6 @@ class SelectEventTableViewController: UITableViewController {
         if event!.contacts.count > 0 {
             // Show contacts cell with number of contacts in detail label if the event has at least one contact.
             contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
-            //contactsCell.detailTextLabel?.sizeToFit()
             
             // If contacts row has been removed, add row back.
             if self.tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 0 {
@@ -140,7 +139,6 @@ class SelectEventTableViewController: UITableViewController {
         else {
             // Hide contacts cell if the event has no contacts.
             contactsCell.detailTextLabel?.text = nil
-            //contactsCell.detailTextLabel?.sizeToFit()
             
             // If contacts cell exists, delete row.
             if tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 1 {
@@ -153,7 +151,6 @@ class SelectEventTableViewController: UITableViewController {
         if event!.locations.count > 0 {
             // Show locations cell with number of locations in detail label if the event has at least one location.
             locationsCell.detailTextLabel?.text = "\(event!.locations.count)"
-            //locationsCell.detailTextLabel?.sizeToFit()
             
             // If locations row has been removed, add row back.
             if tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 0 {
@@ -164,7 +161,6 @@ class SelectEventTableViewController: UITableViewController {
         else {
             // Hide locations cell if the event has no locations.
             locationsCell.detailTextLabel?.text = nil
-            //locationsCell.detailTextLabel?.sizeToFit()
             
             // If locations cell exists, delete row.
             if tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 1 {

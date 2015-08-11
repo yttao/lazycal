@@ -132,6 +132,7 @@ class ChangeEventViewController: UITableViewController {
         nameTextField.addTarget(self, action: "updateName", forControlEvents: .EditingChanged)
         dateStartPicker.addTarget(self, action: "updateDateStart", forControlEvents: .ValueChanged)
         dateEndPicker.addTarget(self, action: "updateDateEnd", forControlEvents: .ValueChanged)
+        alarmSwitch.addTarget(self, action: "selectAlarm", forControlEvents: .ValueChanged)
         alarmTimePicker.addTarget(self, action: "updateAlarmTime", forControlEvents: .ValueChanged)
         
         // If using a pre-existing event, load data from event.
@@ -223,25 +224,17 @@ class ChangeEventViewController: UITableViewController {
         alarm = event.alarm
         alarmTime = event.alarmTime
         
-        // Load contacts IDs
-        let contactsSet = event.contacts
-        contactIDs = [ABRecordID]()
-        for contact in contactsSet {
-            let contact = contact as! Contact
-            contactIDs!.append(contact.id)
-        }
+        // Load Contacts as ABRecordIDs
+        let storedContacts = event.contacts.allObjects as! [Contact]
+        contactIDs = storedContacts.map({
+            return $0.id
+        })
         
-        // Load locations
-        let locations = event.locations
-        mapItems = [MapItem]()
-        for location in locations {
-            let location = location as! Location
-            let coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
-            let name = location.name
-            let address = location.address
-            let mapItem = MapItem(coordinate: coordinate, name: name, address: address)
-            mapItems!.append(mapItem)
-        }
+        // Load Locations as MapItems
+        let storedLocations = event.locations.allObjects as! [Location]
+        mapItems = storedLocations.map({
+            return MapItem(coordinate: CLLocationCoordinate2DMake($0.latitude, $0.longitude), name: $0.name, address: $0.address)
+        })
     }
     
     /**
@@ -251,6 +244,8 @@ class ChangeEventViewController: UITableViewController {
         dateStart = dateStartPicker.date
         updateDateStartLabels()
         updateDateEndPicker(dateStart!)
+        
+        // If alarm is off, update alarm time with date start so if it the alarm is turned on, the alarm time is at date start.
         if !alarm! {
             resetAlarmTime()
         }
@@ -349,23 +344,7 @@ class ChangeEventViewController: UITableViewController {
         tableView.reloadRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
     }
     
-    /**
-        Displays an alert indicating that notifications are disabled.
-    */
-    func displayNotificationsDisabledAlert() {
-        let alertController = UIAlertController(title: "Notifications Disabled", message: "Notification settings can be changed in Settings.", preferredStyle: UIAlertControllerStyle.Alert)
-        
-        let changeSettingsAlertAction = UIAlertAction(title: "Change Settings", style: UIAlertActionStyle.Default, handler: {
-            (action: UIAlertAction!) in
-            self.openSettings()
-        })
-        let okAlertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
-        
-        alertController.addAction(changeSettingsAlertAction)
-        alertController.addAction(okAlertAction)
-        
-        presentViewController(alertController, animated: true, completion: nil)
-    }
+    // MARK: - Methods related to user permissions.
     
     /**
         Displays an alert to request access to contacts.
@@ -382,7 +361,7 @@ class ChangeEventViewController: UITableViewController {
                     
                     self.showContactsViewController()
                 }
-                // If denied permission, display access denied message.
+                    // If denied permission, display access denied message.
                 else {
                     self.displayContactsAccessDeniedAlert()
                 }
@@ -393,40 +372,46 @@ class ChangeEventViewController: UITableViewController {
     /**
         Alerts the user that access to contacts is denied or restricted and requests a permissions change by going to settings.
     
-        This occurs when the user is first prompted for access and denies access or in future attempts to use contacts when permission is denied or restricted.
+        This occurs when the user is first prompted for access in `displayContactsAccessRequest` and denies access or in future attempts to press the contacts cell when permission is denied or restricted.
     */
     func displayContactsAccessDeniedAlert() {
-        // Create alert for contacts access denial
-        let contactsAccessDeniedAlert = UIAlertController(title: "Cannot Access Contacts",
-            message: "You must give the app permission to access contacts to use this feature.",
-            preferredStyle: .Alert)
-        
-        let changeSettingsAlertAction = UIAlertAction(title: "Change Settings", style: .Default, handler: { action in
-            self.openSettings()
-        })
-        let okAlertAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
-        
-        // Add option to open settings and allow contacts access
-        contactsAccessDeniedAlert.addAction(changeSettingsAlertAction)
-        contactsAccessDeniedAlert.addAction(okAlertAction)
-        presentViewController(contactsAccessDeniedAlert, animated: true, completion: nil)
+        presentPermissionAlertController("Cannot Access Contacts", "You must give permission to access contacts to use this feature.")
+    }
+    
+    /**
+        Displays an alert indicating that notifications are disabled.
+    
+        This occurs when the user attempts to press the alarm switch or select the alarm cell when they have notifications disabled.
+    */
+    func displayNotificationsDisabledAlert() {
+        presentPermissionAlertController("Notifications Disabled", "You must give permission to send notifications to use this feature.")
     }
     
     /**
         Alerts the user that access to user location is denied or restricted and requests a permissions change by going to settings.
     
-        This occurs when the user is first prompt for access and denies access or in future attempts to use locations when permission is denied or restricted.
+        This occurs when the user attempts to press the locations cell when permission is denied or restricted.
     */
     func displayLocationAccessDeniedAlert() {
-        let locationAccessDeniedAlert = UIAlertController(title: "Cannot Access User Location", message: "You must give the app permission to access locations to use this feature.", preferredStyle: .Alert)
-        
-        let changeSettingsAlertAction = UIAlertAction(title: "Change Settings", style: .Default, handler: { action in
+        presentPermissionAlertController("Cannot Access User Location", "You must give permission to access locations to use this feature.")
+    }
+    
+    /**
+        Presents a `UIAlertController` with a given title and message and options to change settings or dismiss the alert.
+    
+        This method is used to present an alert controller stating that permissions to a feature is denied and that settings must be changed in order for said feature to be used. On pressing the "Settings" option, settings will be opened. On pressing the "OK" option, the alert will be dismissed.
+    */
+    func presentPermissionAlertController(title: String?, _ message: String?) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+        let settingsAlertAction = UIAlertAction(title: "Settings", style: .Default, handler: {
+            action in
             self.openSettings()
-        })
+            })
         let okAlertAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
-        locationAccessDeniedAlert.addAction(changeSettingsAlertAction)
-        locationAccessDeniedAlert.addAction(okAlertAction)
-        presentViewController(locationAccessDeniedAlert, animated: true, completion: nil)
+        alertController.addAction(settingsAlertAction)
+        alertController.addAction(okAlertAction)
+        
+        presentViewController(alertController, animated: true, completion: nil)
     }
     
     /**
@@ -487,37 +472,28 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        On alarm switch toggle, show more or less options.
+        When the alarm switch is pressed, the alarm cell is selected. Turning the alarm switch on shows more alarm options while turning it off shows fewer alarm options.
     */
-    @IBAction func toggleAlarmOptions(sender: AnyObject) {
-        if let alarmToggle = sender as? UISwitch {
-            // On alarm switch press, deselect current selection
-            if selectedIndexPath != nil && selectedIndexPath != indexPaths["AlarmToggle"] {
-                deselectRowAtIndexPath(selectedIndexPath!)
-            }
-            selectedIndexPath = indexPaths["AlarmToggle"]
-            
-            alarm = alarmToggle.on
-            if alarmToggle.on {
-                showMoreAlarmOptions()
-            }
-            else {
-                showFewerAlarmOptions()
-                resetAlarmTime()
-            }
-        }
-    }
-    
-    /**
-        On tapping the name text field, deselect the currently selected field.
-    */
-    @IBAction func selectNameTextField(sender: AnyObject) {
-        if selectedIndexPath != nil && selectedIndexPath != indexPaths["Name"] {
+    func selectAlarm() {
+        if selectedIndexPath != nil && selectedIndexPath != indexPaths["AlarmToggle"]! {
             deselectRowAtIndexPath(selectedIndexPath!)
         }
-        selectedIndexPath = indexPaths["Name"]
+        selectedIndexPath = indexPaths["AlarmToggle"]
+        
+        updateAlarm()
     }
     
+    func updateAlarm() {
+        alarm = alarmSwitch.on
+        
+        if alarmSwitch.on {
+            showMoreAlarmOptions()
+        }
+        else {
+            showFewerAlarmOptions()
+            resetAlarmTime()
+        }
+    }
     
     /**
         Show more alarm options.

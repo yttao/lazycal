@@ -54,5 +54,5 @@ func ==(lhs: MapItem, rhs: MapItem) -> Bool {
     let latitudeMatch = fabs(lhs.coordinate.latitude - rhs.coordinate.latitude) < EPSILON
     let longitudeMatch = fabs(lhs.coordinate.longitude - rhs.coordinate.longitude) < EPSILON
     let coordinateMatch = latitudeMatch && longitudeMatch
-    return nameMatch && addressMatch && coordinateMatch
+    return coordinateMatch && nameMatch && addressMatch
 }
