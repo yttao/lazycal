@@ -44,7 +44,9 @@ class LocationsTableViewController: UITableViewController {
         }
         */
         
-        initializeSearchController()
+        if searchEnabled {
+            initializeSearchController()
+        }
         definesPresentationContext = true
     }
     
@@ -64,6 +66,10 @@ class LocationsTableViewController: UITableViewController {
             
             return controller
         })()
+    }
+    
+    func setSearchEnabled(enabled: Bool) {
+        searchEnabled = enabled
     }
     
     /**
@@ -205,12 +211,6 @@ class LocationsTableViewController: UITableViewController {
         :param: mapItem The map item to remove from the map view.
     */
     private func removeMapItemFromMapView(mapItem: MapItem) {
-        /*let annotation = annotations.filter({
-            let nameMatch = $0.title == mapItem.name
-            let addressMatch = $0.subtitle == self.stringFromAddressDictionary(mapItem.placemark.addressDictionary)
-            let coordinateMatch = $0.coordinate.latitude == mapItem.placemark.coordinate.latitude && $0.coordinate.longitude == mapItem.placemark.coordinate.longitude
-            return nameMatch && addressMatch && coordinateMatch
-        }).first as? MKPointAnnotation*/
         let annotation = selectedMapItems.filter({
             $0 == mapItem
         }).first
@@ -322,7 +322,7 @@ extension LocationsTableViewController: UITableViewDataSource {
         Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        if searching() {
+        if searching() || !searchEnabled {
             return false
         }
         return true

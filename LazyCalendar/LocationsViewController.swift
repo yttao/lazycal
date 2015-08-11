@@ -22,6 +22,7 @@ class LocationsViewController: UIViewController {
     private let locationsMapViewSegue = "LocationsMapViewSegue"
     
     private var mapItems: [MapItem]?
+    private var searchEnabled: Bool?
     
     // MARK: - Methods for initializing view controller and data.
     
@@ -45,6 +46,10 @@ class LocationsViewController: UIViewController {
     */
     func loadData(mapItems: [MapItem]) {
         self.mapItems = mapItems
+    }
+    
+    func setSearchEnabled(enabled: Bool) {
+        searchEnabled = enabled
     }
 
     /**
@@ -80,6 +85,9 @@ class LocationsViewController: UIViewController {
                 locationsTableViewController.setMapView(mapView)
                 if let mapItems = mapItems {
                     locationsTableViewController.loadData(mapItems)
+                }
+                if let searchEnabled = searchEnabled {
+                    locationsTableViewController.setSearchEnabled(searchEnabled)
                 }
             }
         }

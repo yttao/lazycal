@@ -349,7 +349,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        if searching() {
+        if searching() || !searchEnabled {
             return false
         }
         return true

@@ -108,31 +108,59 @@ class SelectEventTableViewController: UITableViewController {
         alarmTimeMainLabel.sizeToFit()
 
         if event!.contacts.count > 0 {
-            contactsCell.hidden = false
+            tableView.beginUpdates()
             contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
+            contactsCell.detailTextLabel?.sizeToFit()
+            contactsCell.sizeToFit()
+            if tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!) == nil {
+                tableView.insertRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
+                tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
+            }
+            contactsCell.hidden = false
+            tableView.endUpdates()
         }
         else {
-            contactsCell.hidden = true
+            tableView.beginUpdates()
             contactsCell.detailTextLabel?.text = nil
+            contactsCell.detailTextLabel?.sizeToFit()
+            contactsCell.sizeToFit()
+            if tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!) != nil {
+                tableView.deleteRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
+                tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
+            }
+            contactsCell.hidden = true
+            tableView.endUpdates()
         }
-        contactsCell.detailTextLabel?.sizeToFit()
-        contactsCell.sizeToFit()
         
-        if event!.pointsOfInterest.count > 0 {
+        if event!.locations.count > 0 {
+            tableView.beginUpdates()
+            locationsCell.detailTextLabel?.text = "\(event!.locations.count)"
+            locationsCell.detailTextLabel?.sizeToFit()
+            locationsCell.sizeToFit()
+            if tableView.cellForRowAtIndexPath(indexPaths["Locations"]!) == nil {
+                tableView.insertRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
+                tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
+            }
             locationsCell.hidden = false
-            locationsCell.detailTextLabel?.text = "\(event!.pointsOfInterest.count)"
+            tableView.endUpdates()
         }
         else {
-            locationsCell.hidden = true
+            tableView.beginUpdates()
             locationsCell.detailTextLabel?.text = nil
+            locationsCell.detailTextLabel?.sizeToFit()
+            locationsCell.sizeToFit()
+            if tableView.cellForRowAtIndexPath(indexPaths["Locations"]!) != nil {
+                tableView.deleteRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
+                tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
+            }
+            locationsCell.hidden = true
+            tableView.endUpdates()
         }
-        locationsCell.detailTextLabel?.sizeToFit()
-        locationsCell.sizeToFit()
         
         tableView.reloadData()
         // Must be called after in case the number of rows changes for contacts.
-        tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
-        tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
+        //tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
+        //tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
     }
     
     /**
@@ -153,6 +181,47 @@ class SelectEventTableViewController: UITableViewController {
     */
     func loadData(notification: NSNotification) {
         self.event = notification.userInfo!["Event"] as? FullEvent
+    }
+    
+    private func showContactsViewController() {
+        let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+        
+        // Get all contact IDs from the event contacts.
+        let contactsSet = event!.contacts as Set
+        var contactIDs = [ABRecordID]()
+        for contact in contactsSet {
+            let contact = contact as! Contact
+            contactIDs.append(contact.id)
+        }
+        // Load contact IDs into contacts table view controller.
+        contactsTableViewController.loadData(contactIDs)
+        // Disable searching for new contacts.
+        contactsTableViewController.setSearchEnabled(false)
+        
+        navigationController!.showViewController(contactsTableViewController, sender: self)
+    }
+    
+    private func showLocationsViewController() {
+        let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
+        
+        // Make array of map items from event points of interest.
+        var mapItems = [MapItem]()
+        for location in event!.locations {
+            let location = location as! Location
+            let coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
+            let name = location.name
+            let address = location.address
+            let mapItem = MapItem(coordinate: coordinate, name: name, address: address)
+            mapItems.append(mapItem)
+        }
+        
+        // Load map items into locations view controller.
+        locationsViewController.loadData(mapItems)
+        // Disable searching for new locations.
+        locationsViewController.setSearchEnabled(false)
+        
+        // Show locations view controller
+        navigationController!.showViewController(locationsViewController, sender: self)
     }
     
     /**
@@ -285,40 +354,11 @@ extension SelectEventTableViewController: UITableViewDelegate {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         // If contacts row selected
         if indexPath.section == indexPaths["Contacts"]!.section {
-            let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
-            
-            // Get all contact IDs from the event contacts.
-            let contactsSet = event!.contacts as Set
-            var contactIDs = [ABRecordID]()
-            for contact in contactsSet {
-                let c = contact as! Contact
-                contactIDs.append(c.id)
-            }
-            // Load contact IDs into contacts table view controller.
-            contactsTableViewController.loadData(contactIDs)
-            // Disable searching for new contacts (only allowed when editing event).
-            contactsTableViewController.setSearchEnabled(false)
-            navigationController!.showViewController(contactsTableViewController, sender: self)
+            showContactsViewController()
         }
-        // If locations row selected
+        // If locations row selected, initialize locations view controller
         else if indexPath.section == indexPaths["Locations"]!.section {
-            let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
-
-            // Make array of map items from event points of interest
-            var mapItems = [MapItem]()
-            for pointOfInterest in event!.pointsOfInterest {
-                let pointOfInterest = pointOfInterest as! PointOfInterest
-                let coordinate = CLLocationCoordinate2D(latitude: pointOfInterest.latitude, longitude: pointOfInterest.longitude)
-                let name = pointOfInterest.title
-                let address = pointOfInterest.subtitle
-                let mapItem = MapItem(coordinate: coordinate, name: name, address: address)
-                mapItems.append(mapItem)
-            }
-            // Load map items into locations view controller
-            locationsViewController.loadData(mapItems)
-            
-            // Show locations view controller
-            navigationController!.showViewController(locationsViewController, sender: self)
+            showLocationsViewController()
         }
     }
 }

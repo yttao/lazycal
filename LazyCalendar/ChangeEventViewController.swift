@@ -85,6 +85,8 @@ class ChangeEventViewController: UITableViewController {
     
     private var addressBookRef: ABAddressBookRef?
     
+    private let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+    
     // Amount of error allowed for floating points
     private let EPSILON = pow(10.0, -10.0)
     
@@ -229,14 +231,14 @@ class ChangeEventViewController: UITableViewController {
             contactIDs!.append(contact.id)
         }
         
-        let geocoder = CLGeocoder()
-        let pointsOfInterestSet = event.pointsOfInterest
+        // Load locations
+        let locations = event.locations
         mapItems = [MapItem]()
-        for pointOfInterest in pointsOfInterestSet {
-            let pointOfInterest = pointOfInterest as! PointOfInterest
-            let coordinate = CLLocationCoordinate2D(latitude: pointOfInterest.latitude, longitude: pointOfInterest.longitude)
-            let name = pointOfInterest.title
-            let address = pointOfInterest.subtitle
+        for location in locations {
+            let location = location as! Location
+            let coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
+            let name = location.name
+            let address = location.address
             let mapItem = MapItem(coordinate: coordinate, name: name, address: address)
             mapItems!.append(mapItem)
         }
@@ -650,9 +652,6 @@ class ChangeEventViewController: UITableViewController {
         :returns: The saved event.
     */
     func saveEvent() -> FullEvent {
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let managedContext = appDelegate.managedObjectContext!
-        
         let entity = NSEntityDescription.entityForName("FullEvent", inManagedObjectContext: managedContext)!
         
         // Create event if it is a new event being created, otherwise just overwrite old data.
@@ -688,13 +687,13 @@ class ChangeEventViewController: UITableViewController {
         addNewContacts()
         removeOldContacts()
         
-        addNewPointsOfInterest()
-        removeOldPointsOfInterest()
-        let count = event!.mutableSetValueForKey("pointsOfInterest").count
+        addNewLocations()
+        removeOldLocations()
+        let count = event!.mutableSetValueForKey("locations").count
         println("Event locations: \(count)")
         
-        let fetchRequest = NSFetchRequest(entityName: "PointOfInterest")
-        let allLocations = managedContext.executeFetchRequest(fetchRequest, error: nil) as! [PointOfInterest]
+        let fetchRequest = NSFetchRequest(entityName: "Location")
+        let allLocations = managedContext.executeFetchRequest(fetchRequest, error: nil) as! [Location]
         println("Total locations: \(allLocations.count)")
         
         // Save event
@@ -796,54 +795,66 @@ class ChangeEventViewController: UITableViewController {
     */
     func addNewContacts() {
         if contactIDs != nil {
-            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            let managedContext = appDelegate.managedObjectContext!
+            var storedContacts = event!.mutableSetValueForKey("contacts")
             
-            var eventContacts = event!.mutableSetValueForKey("contacts")
-            
-            for i in 0..<contactIDs!.count {
-                let contactID = contactIDs![i]
-                
-                let record: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, contactIDs![i])?.takeUnretainedValue()
+            for contactID in contactIDs! {
+                let record: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, contactID)?.takeUnretainedValue()
                 
                 let firstName = ABRecordCopyValue(record, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
                 let lastName = ABRecordCopyValue(record, kABPersonLastNameProperty)?.takeRetainedValue() as? String
                 
-                // Create fetch request for contacts
-                let fetchRequest = NSFetchRequest(entityName: "Contact")
-                fetchRequest.fetchLimit = 1
-                // Create predicate for fetch request
-                let requirements = "(id == %d)"
-                let predicate = NSPredicate(format: requirements, contactID)
-                fetchRequest.predicate = predicate
-                // Execute fetch request for contacts
-                var error: NSError? = nil
-                let contact = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Contact
+                let storedContact = getStoredContact(contactID)
                 
-                // If no results, contact is new. Add Contact for first time.
-                if contact == nil {
-                    let entity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
-                    let contact = Contact(entity: entity, insertIntoManagedObjectContext: managedContext)
+                if storedContact != nil {
+                    // If contact exists in storage, add contact to event.
+                    let storedContact = storedContact!
+                    storedContacts.addObject(storedContact)
                     
-                    contact.id = contactID
-                    contact.firstName = firstName
-                    contact.lastName = lastName
-                    
-                    eventContacts.addObject(contact)
-                    
-                    var contactEvents = contact.mutableSetValueForKey("events")
-                    contactEvents.addObject(event!)
+                    let inverse = storedContact.mutableSetValueForKey("events")
+                    inverse.addObject(event!)
                 }
-                // If results returned, contact already exists. Add existing contact to events related to the contact.
                 else {
-                    let contact = contact!
-                    eventContacts.addObject(contact)
+                    // If contact doesn't exist in storage, create new contact.
+                    let entity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
+                    let newContact = Contact(entity: entity, insertIntoManagedObjectContext: managedContext)
                     
-                    var contactEvents = contact.mutableSetValueForKey("events")
-                    contactEvents.addObject(event!)
+                    // Set values
+                    newContact.id = contactID
+                    newContact.firstName = firstName
+                    newContact.lastName = lastName
+                    
+                    // Add contact to stored contacts
+                    storedContacts.addObject(newContact)
+                    
+                    // Add inverse
+                    let inverse = newContact.mutableSetValueForKey("events")
+                    inverse.addObject(event!)
                 }
             }
         }
+    }
+    
+    /**
+        Searches the stored contacts for a contact ID.
+    
+        :param: contactID The ID of the contact to search for.
+    
+        :returns: The contact if it was found in storage or `nil` if none was found.
+    */
+    func getStoredContact(contactID: ABRecordID) -> Contact? {
+        // Create fetch request for contact
+        let fetchRequest = NSFetchRequest(entityName: "Contact")
+        fetchRequest.fetchLimit = 1
+        
+        // Contact can be found if a stored contact ID matches the given contact ID.
+        let requirements = "(id == %d)"
+        let predicate = NSPredicate(format: requirements, contactID)
+        fetchRequest.predicate = predicate
+        
+        // Execute fetch request for contact
+        var error: NSError? = nil
+        let storedContact = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Contact
+        return storedContact
     }
     
     /**
@@ -854,11 +865,11 @@ class ChangeEventViewController: UITableViewController {
         :param: event The event to remove contacts from.	
     */
     func removeOldContacts() {
-        var eventContacts = event!.mutableSetValueForKey("contacts")
+        var storedContacts = event!.mutableSetValueForKey("contacts")
         var removedContacts = NSMutableSet()
         
         // Find old contacts to remove
-        for contact in eventContacts {
+        for contact in storedContacts {
             let contact = contact as! Contact
             let id = contact.id
             // Check if the new list of contact IDs contains the old contact ID. If not, add to list of removed objects.
@@ -866,72 +877,67 @@ class ChangeEventViewController: UITableViewController {
                 removedContacts.addObject(contact)
             }
         }
-        eventContacts.minusSet(removedContacts as Set<NSObject>)
+        storedContacts.minusSet(removedContacts as Set<NSObject>)
         
-        // Remove deleted contacts, remove contact relation to event. If contact has no related events, delete contact.
         for contact in removedContacts {
+            // Remove old contact from stored contacts.
             let contact = contact as! Contact
-            eventContacts.removeObject(contact)
-            let contactEvents = contact.mutableSetValueForKey("events")
-            contactEvents.removeObject(event!)
+            storedContacts.removeObject(contact)
             
-            if contactEvents.count == 0 {
-                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-                let managedContext = appDelegate.managedObjectContext!
+            // Remove inverse
+            let inverse = contact.mutableSetValueForKey("events")
+            inverse.removeObject(event!)
+            
+            // Delete contact if it has no related events.
+            if inverse.count == 0 {
                 managedContext.deleteObject(contact)
             }
         }
     }
     
-    // MARK: - Method for handling points of interest when saving event.
+    // MARK: - Method for handling locations when saving event.
     
     /**
         Adds new points of interest to the event.
     */
-    func addNewPointsOfInterest() {
-        if mapItems != nil {
-            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            let managedContext = appDelegate.managedObjectContext!
-            
-            var eventPointsOfInterest = event!.mutableSetValueForKey("pointsOfInterest")
+    func addNewLocations() {
+        if mapItems != nil && mapItems!.count > 0 {
+            var storedLocations = event!.mutableSetValueForKey("locations")
             
             for mapItem in mapItems! {
+                // Get values of interest to be stored.
                 let latitude = mapItem.coordinate.latitude
                 let longitude = mapItem.coordinate.longitude
-                let title = mapItem.name
-                let subtitle = mapItem.address
+                let name = mapItem.name
+                let address = mapItem.address
                 
-                let fetchRequest = NSFetchRequest(entityName: "PointOfInterest")
-                fetchRequest.fetchLimit = 1
-                let requirements = "((latitude - %d) < %d AND (latitude - %d) > %d) AND ((longitude - %d) < %d AND (longitude - %d) > %d)"
-                let predicate = NSPredicate(format: requirements, argumentArray: [latitude, EPSILON, longitude, -EPSILON, longitude, EPSILON, longitude, -EPSILON])
-                fetchRequest.predicate = predicate
+                // See if the location has been previously stored.
+                let storedLocation = getStoredLocation(latitude, longitude)
                 
-                var error: NSError? = nil
-                let storedPointOfInterest = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? PointOfInterest
-                
-                if storedPointOfInterest == nil {
-                    let entity = NSEntityDescription.entityForName("PointOfInterest", inManagedObjectContext: managedContext)!
-                    let newPointOfInterest = PointOfInterest(entity: entity, insertIntoManagedObjectContext: managedContext)
-                    
-                    newPointOfInterest.latitude = latitude
-                    newPointOfInterest.longitude = longitude
-                    newPointOfInterest.title = title
-                    newPointOfInterest.subtitle = subtitle
-                    
-                    // Add relation
-                    eventPointsOfInterest.addObject(newPointOfInterest)
+                if storedLocation != nil {
+                    // If location is already stored, add location to this event's locations.
+                    storedLocations.addObject(storedLocation!)
                     
                     // Add inverse relation
-                    var inverse = newPointOfInterest.mutableSetValueForKey("events")
+                    var inverse = storedLocation!.mutableSetValueForKey("events")
                     inverse.addObject(event!)
                 }
                 else {
-                    let storedPointOfInterest = storedPointOfInterest!
+                    // If location is new, create new location.
+                    let entity = NSEntityDescription.entityForName("Location", inManagedObjectContext: managedContext)!
+                    let newLocation = Location(entity: entity, insertIntoManagedObjectContext: managedContext)
                     
-                    eventPointsOfInterest.addObject(storedPointOfInterest)
+                    // Set values
+                    newLocation.latitude = latitude
+                    newLocation.longitude = longitude
+                    newLocation.name = name
+                    newLocation.address = address
                     
-                    var inverse = storedPointOfInterest.mutableSetValueForKey("events")
+                    // Add location
+                    storedLocations.addObject(newLocation)
+                    
+                    // Add inverse relation
+                    var inverse = newLocation.mutableSetValueForKey("events")
                     inverse.addObject(event!)
                 }
             }
@@ -939,65 +945,84 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
+        Searches the stored locations for a given location.
+    
+        :param: latitude The latitude of the location to find.
+    
+        :param: longitude The longitude of the location to find.
+    
+        :returns: The location if it was found or `nil` if none was found.
+    */
+    func getStoredLocation(latitude: CLLocationDegrees, _ longitude: CLLocationDegrees) -> Location? {
+        // Create fetch request for a location entity
+        let fetchRequest = NSFetchRequest(entityName: "Location")
+        fetchRequest.fetchLimit = 1
+        
+        // A stored location and the map item's location are considered the same if they have the same coordinates (matching latitude and longitude).
+        let requirements = "((latitude - %d) < %d AND (latitude - %d) > %d) AND ((longitude - %d) < %d AND (longitude - %d) > %d)"
+        let predicate = NSPredicate(format: requirements, argumentArray: [latitude, EPSILON, longitude, -EPSILON, longitude, EPSILON, longitude, -EPSILON])
+        fetchRequest.predicate = predicate
+        
+        // Search for location in storage.
+        var error: NSError? = nil
+        let storedLocation = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Location
+        return storedLocation
+    }
+    
+    /**
         Removes old points of interest from the event.
     */
-    func removeOldPointsOfInterest() {
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let managedContext = appDelegate.managedObjectContext!
-        
-        var eventPointsOfInterest = event!.mutableSetValueForKey("pointsOfInterest")
+    func removeOldLocations() {
+        let storedLocations = event!.mutableSetValueForKey("locations")
         
         if mapItems != nil && mapItems!.count > 0 {
-            let newLocations = mapItems!.map({
-                CLLocation(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude)
-            }) as [CLLocation]
+            var removedLocations = NSMutableSet()
             
-            // Check for removed locations for an edited event and remove them. Also remove the edited event from removed locations.
-
-            var removedPointsOfInterest = NSMutableSet()
             // Find points of interest to remove
-            for pointOfInterest in eventPointsOfInterest {
-                let storedPointOfInterest = pointOfInterest as! PointOfInterest
-                let storedLocation = CLLocation(latitude: storedPointOfInterest.latitude, longitude: storedPointOfInterest.longitude)
+            for location in storedLocations {
+                let location = location as! Location
                 
-                // Points of interest still exist if there is a coordinate match in the currently selected map items.
-                let foundMatch = mapItems!.filter({
-                    let latitudeMatch = fabs($0.coordinate.latitude - storedLocation.coordinate.latitude) < self.EPSILON
-                    let longitudeMatch = fabs($0.coordinate.longitude - storedLocation.coordinate.longitude) < self.EPSILON
+                // Search for current location in stored locations.
+                let foundLocation = mapItems!.filter({
+                    let latitudeMatch = fabs($0.coordinate.latitude - location.latitude) < self.EPSILON
+                    let longitudeMatch = fabs($0.coordinate.longitude - location.longitude) < self.EPSILON
                     return latitudeMatch && longitudeMatch
                     }).first
                 
-                // If there is no coordinate match, the point of interest has been removed.
-                if foundMatch == nil {
-                    removedPointsOfInterest.addObject(pointOfInterest)
+                // If no location is found, remove location from storage.
+                if foundLocation == nil {
+                    removedLocations.addObject(location)
                 }
             }
-            // Remove old points of interest
-            eventPointsOfInterest.minusSet(removedPointsOfInterest as Set<NSObject>)
+            // Remove old locations
+            storedLocations.minusSet(removedLocations as Set<NSObject>)
             
-            // Remove inverse; if the point of interest has no related events, delete the point of interest.
-            for pointOfInterest in removedPointsOfInterest {
-                let pointOfInterest = pointOfInterest as! PointOfInterest
-                let inverse = pointOfInterest.mutableSetValueForKey("events")
+            // Remove event from inverse relation.
+            for location in removedLocations {
+                let location = location as! Location
+                let inverse = location.mutableSetValueForKey("events")
                 inverse.removeObject(event!)
                 
+                // Delete location if it has no related events.
                 if inverse.count == 0 {
-                    managedContext.deleteObject(pointOfInterest)
+                    managedContext.deleteObject(location)
                 }
             }
         }
         else {
-            // For all relevant points of interest, remove inverse relationship and delete point of interest if no associated events exist.
-            for pointOfInterest in eventPointsOfInterest {
-                let pointOfInterest = pointOfInterest as! PointOfInterest
-                let inverse = pointOfInterest.mutableSetValueForKey("events")
+            // Remove event from all related locations and remove all locations from event.
+            for location in storedLocations {
+                let location = location as! Location
+                let inverse = location.mutableSetValueForKey("events")
                 inverse.removeObject(event!)
                 
+                // Delete location if it has no related events.
                 if inverse.count == 0 {
-                    managedContext.deleteObject(pointOfInterest)
+                    managedContext.deleteObject(location)
                 }
             }
-            eventPointsOfInterest.removeAllObjects()
+        
+            storedLocations.removeAllObjects()
         }
     }
     

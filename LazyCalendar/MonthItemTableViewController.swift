@@ -21,6 +21,8 @@ class MonthItemTableViewController: UITableViewController {
     
     private let segueIdentifier = "SelectEventSegue"
     
+    private let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+    
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
@@ -77,11 +79,6 @@ class MonthItemTableViewController: UITableViewController {
         :param: date The date to show.
     */
     func showEvents(date: NSDate) {
-        //println("Showing events for \(date)")
-        // Find events for that date
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let managedContext = appDelegate.managedObjectContext!
-        
         let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
         
         // Create fetch request for data
@@ -152,8 +149,6 @@ class MonthItemTableViewController: UITableViewController {
     */
     private func removeEventFromPersistentStorage(event: FullEvent) {
         // Delete event
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let managedContext = appDelegate.managedObjectContext!
         let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
         managedContext.deleteObject(event)
         
