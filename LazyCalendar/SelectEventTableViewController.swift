@@ -109,58 +109,64 @@ class SelectEventTableViewController: UITableViewController {
 
         if event!.contacts.count > 0 {
             tableView.beginUpdates()
+            
             contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
             contactsCell.detailTextLabel?.sizeToFit()
-            contactsCell.sizeToFit()
-            if tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!) == nil {
+            
+            if self.tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 0 {
+                contactsCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
-                tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
+                //tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
             }
-            contactsCell.hidden = false
+            
             tableView.endUpdates()
         }
         else {
             tableView.beginUpdates()
+            
             contactsCell.detailTextLabel?.text = nil
             contactsCell.detailTextLabel?.sizeToFit()
-            contactsCell.sizeToFit()
-            if tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!) != nil {
+            
+            if self.tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 1 {
+                contactsCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
-                tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
+                //tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
             }
-            contactsCell.hidden = true
+            
             tableView.endUpdates()
         }
         
         if event!.locations.count > 0 {
             tableView.beginUpdates()
+            
             locationsCell.detailTextLabel?.text = "\(event!.locations.count)"
             locationsCell.detailTextLabel?.sizeToFit()
-            locationsCell.sizeToFit()
-            if tableView.cellForRowAtIndexPath(indexPaths["Locations"]!) == nil {
+            
+            if self.tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 0 {
+                locationsCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
-                tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
+                //tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
             }
-            locationsCell.hidden = false
+            
             tableView.endUpdates()
         }
         else {
             tableView.beginUpdates()
+            
             locationsCell.detailTextLabel?.text = nil
             locationsCell.detailTextLabel?.sizeToFit()
-            locationsCell.sizeToFit()
-            if tableView.cellForRowAtIndexPath(indexPaths["Locations"]!) != nil {
+            
+            if self.tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 1 {
+                locationsCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
-                tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
+                //tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
             }
-            locationsCell.hidden = true
+            
             tableView.endUpdates()
         }
         
         tableView.reloadData()
-        // Must be called after in case the number of rows changes for contacts.
-        //tableView.reloadSections(NSIndexSet(index: sections["Contacts"]!), withRowAnimation: .None)
-        //tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
+        tableView.reloadSections(NSIndexSet(index: sections["Locations"]!), withRowAnimation: .None)
     }
     
     /**
