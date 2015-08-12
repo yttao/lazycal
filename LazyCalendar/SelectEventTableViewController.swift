@@ -304,13 +304,26 @@ extension SelectEventTableViewController: UITableViewDelegate {
         When contacts row is selected, it displays the contacts table view controller that acts as a contact list and contact details view. When locations row is selected, it displays the locations view controller that acts as the locations list and map view.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        // If contacts row selected
+        // Contacts row selected
         if indexPath.section == indexPaths["Contacts"]!.section {
-            showContactsViewController()
+            if addressBookAccessible() {
+                // If address book can be accessed, show contacts view controller.
+                showContactsViewController()
+            }
+            else {
+                // Otherwise display alert stating address book can't be accessed.
+                displayAddressBookInaccessibleAlert()
+            }
         }
-        // If locations row selected, initialize locations view controller
         else if indexPath.section == indexPaths["Locations"]!.section {
-            showLocationsViewController()
+            if locationAccessible() {
+                // If user location can be accessed, show locations view controller.
+                showLocationsViewController()
+            }
+            else {
+                // Otherwise display alert stating location can't be accessed.
+                displayLocationInaccessibleAlert()
+            }
         }
     }
 }

@@ -103,6 +103,9 @@ class LocationsViewController: UIViewController {
         }
     }
     
+    /**
+        Checks if the user location is accessible. If not, display an alert.
+    */
     func checkLocationAccessibility() {
         if isViewLoaded() && view?.window != nil && !locationAccessible() {
             displayLocationInaccessibleAlert()
@@ -112,7 +115,7 @@ class LocationsViewController: UIViewController {
     /**
         When the user location is inaccessible, display an alert stating that the location is inaccessible.
     
-        If the user chooses the "Settings" option, they can change their settings. If the user chooses
+        If the user chooses the "Settings" option, they can change their settings. If the user chooses "Exit", they leave the locations view and return to the previous view.
     */
     override func displayLocationInaccessibleAlert() {
         let alertController = UIAlertController(title: "Cannot Access User Location", message: "You must give permission to access locations to use this feature.", preferredStyle: .Alert)
@@ -122,7 +125,7 @@ class LocationsViewController: UIViewController {
         })
         let exitAlertAction = UIAlertAction(title: "Exit", style: .Default, handler: {
             action in
-            self.dismissViewControllerAnimated(true, completion: nil)
+            navigationController!.popViewControllerAnimated(true)
         })
         alertController.addAction(exitAlertAction)
         alertController.addAction(settingsAlertAction)

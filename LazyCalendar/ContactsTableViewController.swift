@@ -29,6 +29,7 @@ class ContactsTableViewController: UITableViewController {
         
         // Observer for when notification pops up
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "checkAddressBookAccessibility", name: "applicationBecameActive", object: nil)
     }
     
     /**
@@ -236,6 +237,38 @@ class ContactsTableViewController: UITableViewController {
         // Return selected contacts to change event view controller
         let changeEventViewController = self.navigationController!.viewControllers.first as? ChangeEventViewController
         changeEventViewController?.updateContacts(selectedContactIDs)
+    }
+    
+    // MARK: - Methods related to address book accessibility.
+    
+    /**
+        Checks if the user location is accessible. If not, display an alert.
+    */
+    func checkAddressBookAccessibility() {
+        if isViewLoaded() && view?.window != nil && !addressBookAccessible() {
+            displayAddressBookInaccessibleAlert()
+        }
+    }
+    
+    /**
+        When the address book is inaccessible, display an alert stating that the address book is inaccessible.
+    
+        If the user chooses the "Settings" option, they can change their settings. If the user chooses "Exit", they leave the contacts view and return to the previous view.
+    */
+    override func displayAddressBookInaccessibleAlert() {
+        let alertController = UIAlertController(title: "Cannot Access Contacts", message: "You must give permission to access locations to use this feature.", preferredStyle: .Alert)
+        let settingsAlertAction = UIAlertAction(title: "Settings", style: .Default, handler: {
+            action in
+            self.openSettings()
+        })
+        let exitAlertAction = UIAlertAction(title: "Exit", style: .Default, handler: {
+            action in
+            navigationController!.popViewControllerAnimated(true)
+        })
+        alertController.addAction(exitAlertAction)
+        alertController.addAction(settingsAlertAction)
+        
+        presentViewController(alertController, animated: true, completion: nil)
     }
 }
 
