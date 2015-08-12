@@ -538,7 +538,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ContactCell" textLabel="MSY-ja-MEV" detailTextLabel="jcB-1S-E1b" style="IBUITableViewCellStyleSubtitle" id="sCC-Pk-ccW">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ContactCell" textLabel="MSY-ja-MEV" detailTextLabel="jcB-1S-E1b" style="IBUITableViewCellStyleSubtitle" id="sCC-Pk-ccW" customClass="ContactTableViewCell" customModule="LazyCalendar" customModuleProvider="target">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="sCC-Pk-ccW" id="iOa-Qg-de6">
                                     <autoresizingMask key="autoresizingMask"/>

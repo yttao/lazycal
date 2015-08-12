@@ -10,8 +10,4 @@ import UIKit
 
 class CalendarCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var dayLabel: UILabel!
-    
-    required init(coder: NSCoder) {
-        super.init(coder: coder)
-    }
 }

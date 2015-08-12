@@ -9,11 +9,13 @@
 import Foundation
 import UIKit
 
-class ContactsSearchController: UISearchController {
+class SearchController: UISearchController {
     // Custom delegate
-    var contactsSearchControllerDelegate: ContactsSearchControllerDelegate?
+    var searchControllerDelegate: SearchControllerDelegate?
     
-    required init(coder aDecoder: NSCoder) {
+    // MARK: - Initializers
+    
+    /*required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
@@ -23,8 +25,10 @@ class ContactsSearchController: UISearchController {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    }
+    }*/
     
+    /**
+    */
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
     
@@ -32,13 +36,13 @@ class ContactsSearchController: UISearchController {
         
         // Inform the delegate that the search text field size has been calculated.
         if let searchTextField = searchTextField {
-            contactsSearchControllerDelegate?.contactsSearchControllerDidLoadSearchTextField(searchTextField)
+            searchControllerDelegate?.searchControllerDidLoadSearchTextField(searchTextField)
         }
     }
 }
 
 /**
 */
-protocol ContactsSearchControllerDelegate {
-    func contactsSearchControllerDidLoadSearchTextField(searchTextField: UITextField)
+protocol SearchControllerDelegate {
+    func searchControllerDidLoadSearchTextField(searchTextField: UITextField)
 }

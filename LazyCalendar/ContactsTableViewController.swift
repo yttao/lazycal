@@ -18,7 +18,7 @@ class ContactsTableViewController: UITableViewController {
     private var selectedContacts: [ABRecordRef]!
     private var filteredContacts = [ABRecordRef]()
     
-    private var searchController: ContactsSearchController?
+    private var searchController: SearchController?
     // True if searching for new contacts is allowed.
     private var editingEnabled = true
     private var searchTableView: ContactsSearchTableView?
@@ -70,7 +70,7 @@ class ContactsTableViewController: UITableViewController {
     func initializeSearchController() {
         // Create search controller.
         searchController = {
-            let controller = ContactsSearchController(searchResultsController: nil)
+            let controller = SearchController(searchResultsController: nil)
             controller.searchResultsUpdater = self
             controller.dimsBackgroundDuringPresentation = false
             controller.hidesNavigationBarDuringPresentation = false
@@ -83,12 +83,15 @@ class ContactsTableViewController: UITableViewController {
             return controller
         }()
         
+        // Set up the search table view.
+        
+        // Offset the search table view so that it is below the search bar.
         let offset = CGRectOffset(searchController!.searchBar.frame, 0, searchController!.searchBar.frame.height)
-        let frame = CGRectMake(offset.origin.x, offset.origin.y, tableView.frame.width, UITableViewCell().frame.height * 2 / 3)
+        let frame = CGRectMake(offset.origin.x, offset.origin.y, tableView.frame.width, UITableViewCell().frame.height)
         searchTableView = ContactsSearchTableView(frame: frame, style: .Plain)
         searchTableView!.backgroundColor = UIColor.greenColor()
         
-        searchController!.contactsSearchControllerDelegate = searchTableView
+        searchController!.searchControllerDelegate = searchTableView
         
         view.addSubview(searchTableView!)
         view.didAddSubview(searchTableView!)
