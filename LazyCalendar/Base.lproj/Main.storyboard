@@ -1119,8 +1119,8 @@
                             </tableViewSection>
                         </sections>
                         <connections>
-                            <outlet property="dataSource" destination="5kC-gB-dnz" id="34e-6L-GNK"/>
-                            <outlet property="delegate" destination="5kC-gB-dnz" id="KVx-FM-EKW"/>
+                            <outlet property="dataSource" destination="5kC-gB-dnz" id="EaY-ot-Zze"/>
+                            <outlet property="delegate" destination="5kC-gB-dnz" id="XsW-kI-VZo"/>
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Edit Event" id="7Ig-SB-afn" userLabel="Edit Event">

@@ -27,7 +27,7 @@ class LocationsTableViewController: UITableViewController {
     // Search request timer used to provide delay between search requests.
     private var timer: NSTimer?
     
-    // MARK: - Methods for setting up view controller and data.
+    // MARK: - Methods for setting up view controller.
     
     /**
         Sets table view delegate and data source, initializes the selected map items to be empty if no map items were initially passed in, and creates search controller if editing is enabled.
@@ -67,6 +67,8 @@ class LocationsTableViewController: UITableViewController {
         // If search bar is active, presentation context must be defined. If this is not done, the search bar will not be dismissed properly and will be visible in views other than the locations view.
         definesPresentationContext = true
     }
+    
+    // MARK: - Methods related to initializing data.
     
     /**
         Sets whether editing is enabled or not. If editing is enabled, locations can be added and removed. Otherwise, the selected locations are fixed.

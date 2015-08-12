@@ -31,10 +31,13 @@ class LocationsViewController: UIViewController {
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setMapView:", name: "MapViewLoaded", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "checkLocationAccessibility", name: "applicationBecameActive", object: self)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        locationManager.delegate = self
         
         initializeHeightConstraints()
     }
@@ -87,6 +90,8 @@ class LocationsViewController: UIViewController {
         if let identifier = segue.identifier {
             if identifier == locationsTableViewSegue {
                 let locationsTableViewController = segue.destinationViewController as! LocationsTableViewController
+                
+                // Set map, map items, and editing enabled for table view controller.
                 locationsTableViewController.setMapView(mapView)
                 if let mapItems = mapItems {
                     locationsTableViewController.loadData(mapItems)
@@ -98,53 +103,43 @@ class LocationsViewController: UIViewController {
         }
     }
     
-    // MARK: - Methods for showing notifications.
+    func checkLocationAccessibility() {
+        if isViewLoaded() && view?.window != nil && !locationAccessible() {
+            displayLocationInaccessibleAlert()
+        }
+    }
     
     /**
-        Show an alert for the event notification. The alert provides two options: "OK" and "View Event". Tap "OK" to dismiss the alert. Tap "View Event" to show event details.
+        When the user location is inaccessible, display an alert stating that the location is inaccessible.
     
-        This is only called if this view controller is loaded and currently visible.
-    
-        :param: notification The notification that a local notification was received.
+        If the user chooses the "Settings" option, they can change their settings. If the user chooses
     */
-    func showEventNotification(notification: NSNotification) {
-        if isViewLoaded() && view?.window != nil {
-            let localNotification = notification.userInfo!["LocalNotification"] as! UILocalNotification
-            
-            let alertController = UIAlertController(title: "\(localNotification.alertTitle)", message: "\(localNotification.alertBody!)", preferredStyle: .Alert)
-            
-            let viewEventAlertAction = UIAlertAction(title: "View Event", style: .Default, handler: {
-                (action: UIAlertAction!) in
-                let selectEventNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
-                let selectEventTableViewController = selectEventNavigationController.viewControllers.first as! SelectEventTableViewController
-                
-                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-                let managedContext = appDelegate.managedObjectContext!
-                
-                let id = localNotification.userInfo!["id"] as! String
-                let requirements = "(id == %@)"
-                let predicate = NSPredicate(format: requirements, id)
-                
-                let fetchRequest = NSFetchRequest(entityName: "FullEvent")
-                fetchRequest.predicate = predicate
-                
-                var error: NSError? = nil
-                let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as? [FullEvent]
-                
-                if results != nil && results!.count > 0 {
-                    let event = results!.first!
-                    NSNotificationCenter.defaultCenter().postNotificationName("EventSelected", object: self, userInfo: ["Event": event])
-                }
-                
-                self.showViewController(selectEventTableViewController, sender: self)
-            })
-            
-            let okAlertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
-            
-            alertController.addAction(viewEventAlertAction)
-            alertController.addAction(okAlertAction)
-            
-            presentViewController(alertController, animated: true, completion: nil)
+    override func displayLocationInaccessibleAlert() {
+        let alertController = UIAlertController(title: "Cannot Access User Location", message: "You must give permission to access locations to use this feature.", preferredStyle: .Alert)
+        let settingsAlertAction = UIAlertAction(title: "Settings", style: .Default, handler: {
+            action in
+            self.openSettings()
+        })
+        let exitAlertAction = UIAlertAction(title: "Exit", style: .Default, handler: {
+            action in
+            self.dismissViewControllerAnimated(true, completion: nil)
+        })
+        alertController.addAction(exitAlertAction)
+        alertController.addAction(settingsAlertAction)
+        
+        presentViewController(alertController, animated: true, completion: nil)
+    }
+}
+
+extension LocationsViewController: CLLocationManagerDelegate {
+    func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        switch status {
+        case .Denied, .Restricted:
+            displayLocationInaccessibleAlert()
+        case .NotDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        default:
+            break
         }
     }
 }

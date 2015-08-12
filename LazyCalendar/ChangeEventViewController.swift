@@ -102,7 +102,7 @@ class ChangeEventViewController: UITableViewController {
         super.viewDidLoad()
         
         // Get address book
-        if ABAddressBookGetAuthorizationStatus() == .Authorized {
+        if addressBookAccessible() {
             addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
         }
         
@@ -476,65 +476,10 @@ class ChangeEventViewController: UITableViewController {
                 }
                     // If denied permission, display access denied message.
                 else {
-                    self.displayContactsAccessDeniedAlert()
+                    self.displayAddressBookInaccessibleAlert()
                 }
             }
         }
-    }
-    
-    /**
-        Alerts the user that access to contacts is denied or restricted and requests a permissions change by going to settings.
-    
-        This occurs when the user is first prompted for access in `displayContactsAccessRequest` and denies access or in future attempts to press the contacts cell when permission is denied or restricted.
-    */
-    func displayContactsAccessDeniedAlert() {
-        presentPermissionAlertController("Cannot Access Contacts", "You must give permission to access contacts to use this feature.")
-    }
-    
-    /**
-        Displays an alert indicating that notifications are disabled.
-    
-        This occurs when the user attempts to press the alarm switch or select the alarm cell when they have notifications disabled.
-    */
-    func displayNotificationsDisabledAlert() {
-        presentPermissionAlertController("Notifications Disabled", "You must give permission to send notifications to use this feature.")
-    }
-    
-    /**
-        Alerts the user that access to user location is denied or restricted and requests a permissions change by going to settings.
-    
-        This occurs when the user attempts to press the locations cell when permission is denied or restricted.
-    */
-    func displayLocationAccessDeniedAlert() {
-        presentPermissionAlertController("Cannot Access User Location", "You must give permission to access locations to use this feature.")
-    }
-    
-    /**
-        Presents a `UIAlertController` with a given title and message and options to change settings or dismiss the alert.
-    
-        This method is used to present an alert controller stating that permissions to a feature is denied and that settings must be changed in order for said feature to be used. On pressing the "Settings" option, settings will be opened. On pressing the "OK" option, the alert will be dismissed.
-    */
-    func presentPermissionAlertController(title: String?, _ message: String?) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .Alert)
-        let settingsAlertAction = UIAlertAction(title: "Settings", style: .Default, handler: {
-            action in
-            self.openSettings()
-            })
-        let okAlertAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
-        alertController.addAction(settingsAlertAction)
-        alertController.addAction(okAlertAction)
-        
-        presentViewController(alertController, animated: true, completion: nil)
-    }
-    
-    /**
-        Opens the settings menu.
-        
-        This is called when requested access for user information is denied and permissions should be changed.
-    */
-    func openSettings() {
-        let url = NSURL(string: UIApplicationOpenSettingsURLString)
-        UIApplication.sharedApplication().openURL(url!)
     }
     
     /**
@@ -657,19 +602,6 @@ class ChangeEventViewController: UITableViewController {
     }
     
     // MARK: - Methods related to notifications and scheduling notifications.
-    
-    /**
-        Returns a `Bool` indicating whether or not notifications are enabled.
-    
-        Notifications are enabled if alerts, badges, and sound are enabled.
-    */
-    private func notificationsEnabled() -> Bool {
-        let notificationTypes = UIApplication.sharedApplication().currentUserNotificationSettings().types
-        if notificationTypes.rawValue & UIUserNotificationType.Alert.rawValue != 0 && notificationTypes.rawValue & UIUserNotificationType.Badge.rawValue != 0 && notificationTypes.rawValue & UIUserNotificationType.Sound.rawValue != 0 {
-            return true
-        }
-        return false
-    }
     
     /**
         Return a `Bool` indicating whether or not a notification has been scheduled for an event.
@@ -988,54 +920,6 @@ class ChangeEventViewController: UITableViewController {
             }
         }
     }
-    
-    /**
-        Show an alert for the event notification. The alert provides two options: "OK" and "View Event". Tap "OK" to dismiss the alert. Tap "View Event" to show event details.
-    
-        This is only called if this view controller is loaded and currently visible.
-    
-        :param: notification The notification from the subject to the observer.
-    */
-    func showEventNotification(notification: NSNotification) {
-        if isViewLoaded() && view?.window != nil {
-            let localNotification = notification.userInfo!["LocalNotification"] as! UILocalNotification
-            
-            let alertController = UIAlertController(title: "\(localNotification.alertTitle)", message: "\(localNotification.alertBody!)", preferredStyle: .Alert)
-            
-            let viewEventAlertAction = UIAlertAction(title: "View Event", style: .Default, handler: {
-                (action: UIAlertAction!) in
-                let selectEventNavigationController = self.storyboard!.instantiateViewControllerWithIdentifier("SelectEventNavigationController") as! UINavigationController
-                let selectEventTableViewController = selectEventNavigationController.viewControllers.first as! SelectEventTableViewController
-                
-                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-                let managedContext = appDelegate.managedObjectContext!
-                
-                let id = localNotification.userInfo!["id"] as! String
-                let requirements = "(id == %@)"
-                let predicate = NSPredicate(format: requirements, id)
-                
-                let fetchRequest = NSFetchRequest(entityName: "FullEvent")
-                fetchRequest.predicate = predicate
-                
-                var error: NSError? = nil
-                let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as? [FullEvent]
-                
-                if results != nil && results!.count > 0 {
-                    let event = results!.first!
-                    NSNotificationCenter.defaultCenter().postNotificationName("EventSelected", object: self, userInfo: ["Event": event])
-                }
-                
-                self.showViewController(selectEventTableViewController, sender: self)
-            })
-            
-            let okAlertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
-            
-            alertController.addAction(viewEventAlertAction)
-            alertController.addAction(okAlertAction)
-            
-            presentViewController(alertController, animated: true, completion: nil)
-        }
-    }
 }
 
 // MARK: - UITableViewDelegate
@@ -1097,7 +981,7 @@ extension ChangeEventViewController: UITableViewDelegate {
             case .Authorized:
                 showContactsViewController()
             case .Denied, .Restricted:
-                displayContactsAccessDeniedAlert()
+                displayAddressBookInaccessibleAlert()
             case .NotDetermined:
                 displayContactsAccessRequest()
             }
@@ -1110,7 +994,7 @@ extension ChangeEventViewController: UITableViewDelegate {
             case .AuthorizedWhenInUse, .AuthorizedAlways:
                 showLocationsViewController()
             case CLAuthorizationStatus.Restricted, .Denied:
-                displayLocationAccessDeniedAlert()
+                displayLocationInaccessibleAlert()
             case .NotDetermined:
                 NSLog("Error: user location authorization status should already be determined.")
             }
@@ -1129,6 +1013,9 @@ extension ChangeEventViewController: UITableViewDelegate {
 
 // MARK: - UITableViewDataSource
 extension ChangeEventViewController: UITableViewDataSource {
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return sections.count
+    }
     /**
         If the date start or end is not selected, show only the time display and not the picker. If the alarm is off, show only the alarm toggle cell.
     */
@@ -1143,5 +1030,9 @@ extension ChangeEventViewController: UITableViewDataSource {
             return 1
         }
         return super.tableView(tableView, numberOfRowsInSection: section)
+    }
+    
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        return super.tableView(tableView, cellForRowAtIndexPath: indexPath)
     }
 }
