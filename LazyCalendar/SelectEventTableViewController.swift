@@ -212,7 +212,7 @@ class SelectEventTableViewController: UITableViewController {
         // Make array of map items from event points of interest.
         let storedLocations = event!.locations.allObjects as! [Location]
         let mapItems = storedLocations.map({
-            return MapItem(coordinate: $0.coordinate, name: $0.name, address: $0.address)
+            return MapItem(location: $0)
         })
         
         // Load map items into locations view controller.

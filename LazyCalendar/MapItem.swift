@@ -10,9 +10,9 @@ import Foundation
 import MapKit
 
 class MapItem: NSObject, MKAnnotation, Equatable, Hashable {
+    var coordinate: CLLocationCoordinate2D
     var name: String?
     var address: String?
-    var coordinate: CLLocationCoordinate2D
     var title: String? {
         return name
     }
@@ -22,8 +22,19 @@ class MapItem: NSObject, MKAnnotation, Equatable, Hashable {
     var location: CLLocation {
         return CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
     }
-    // Contains additional information about this map item that should be stored (ex: phone number).
     var additionalInfo: [NSObject: AnyObject]?
+    
+    /**
+        Initializes this instance with a `Location` object.
+    
+        :param: location The `Location` corresponding to the `MapItem.
+    */
+    init(location: Location) {
+        coordinate = location.coordinate
+        name = location.name
+        address = location.address
+        super.init()
+    }
     
     /**
         Initializes this instance with coordinate, name, and address.
@@ -35,9 +46,9 @@ class MapItem: NSObject, MKAnnotation, Equatable, Hashable {
         :param: address The address of the item. This is the subtitle of the annotation.
     */
     init(coordinate: CLLocationCoordinate2D, name: String?, address: String?) {
+        self.coordinate = coordinate
         self.name = name
         self.address = address
-        self.coordinate = coordinate
         super.init()
     }
 }

@@ -195,7 +195,7 @@ class ChangeEventViewController: UITableViewController {
         // Load Locations as MapItems
         let storedLocations = event.locations.allObjects as! [Location]
         mapItems = storedLocations.map({
-            return MapItem(coordinate: CLLocationCoordinate2DMake($0.latitude, $0.longitude), name: $0.name, address: $0.address)
+            return MapItem(location: $0)
         })
     }
     
@@ -483,7 +483,7 @@ class ChangeEventViewController: UITableViewController {
         let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
         
         // Load contacts IDs if they exist already.
-        if contactIDs != nil {
+        if contactIDs != nil && contactIDs!.count > 0 {
             contactsTableViewController.loadData(contactIDs!)
         }
         
@@ -496,7 +496,7 @@ class ChangeEventViewController: UITableViewController {
     func showLocationsViewController() {
         let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
         
-        if mapItems != nil {
+        if mapItems != nil && mapItems!.count > 0 {
             locationsViewController.loadData(mapItems!)
         }
         
@@ -542,13 +542,9 @@ class ChangeEventViewController: UITableViewController {
         :returns: The saved event.
     */
     func saveEvent() -> FullEvent {
-        let entity = NSEntityDescription.entityForName("FullEvent", inManagedObjectContext: managedContext)!
-        
         // Create event if it is a new event being created, otherwise just overwrite old data.
         if event == nil {
-            event = FullEvent(entity: entity, insertIntoManagedObjectContext: managedContext)
-            // Assign unique ID if just created.
-            event!.id = NSUUID().UUIDString
+            event = FullEvent(id: NSUUID().UUIDString)
         }
         
         // Set event values
@@ -699,9 +695,8 @@ class ChangeEventViewController: UITableViewController {
                 // Check if the contact has already been stored.
                 let storedContact = getStoredContact(contactID)
                 
-                if storedContact != nil {
+                if let storedContact = storedContact {
                     // If contact exists in storage, add contact to event.
-                    let storedContact = storedContact!
                     storedContacts.addObject(storedContact)
                     
                     addEventRelationship(storedContact)
@@ -721,8 +716,6 @@ class ChangeEventViewController: UITableViewController {
         Removes old contacts from the event.
     
         All contacts that are not currently in `contactIDs` will be removed.
-    
-        :param: event The event to remove contacts from.	
     */
     private func removeOldContacts() {
         let storedContacts = event!.mutableSetValueForKey("contacts")
@@ -735,16 +728,10 @@ class ChangeEventViewController: UITableViewController {
             // Search for stored contact IDs in current contact IDs. If not found, add to set of objects to remove from storage.
             if !contains(contactIDs!, id) {
                 removedContacts.addObject(contact)
+                removeEventRelationship(contact)
             }
         }
         storedContacts.minusSet(removedContacts as Set<NSObject>)
-        
-        for contact in removedContacts {
-            // Remove old contact from stored contacts and inverse relationship.
-            let contact = contact as! Contact
-            storedContacts.removeObject(contact)
-            removeEventRelationship(contact)
-        }
     }
     
     /**
@@ -766,6 +753,9 @@ class ChangeEventViewController: UITableViewController {
         // Execute fetch request for contact
         var error: NSError? = nil
         let storedContact = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Contact
+        if let error = error {
+            NSLog("Error occurred while fetching stored contact: %@", error.localizedDescription)
+        }
         return storedContact
     }
     
@@ -779,20 +769,17 @@ class ChangeEventViewController: UITableViewController {
             let storedLocations = event!.mutableSetValueForKey("locations")
             
             for mapItem in mapItems! {
-                // Get values of interest to be stored.
-                
                 // See if the location has been previously stored.
                 let storedLocation = getStoredLocation(mapItem.coordinate)
                 
-                if storedLocation != nil {
-                    // If location is already stored, add stored location and add inverse.
-                    let storedLocation = storedLocation!
+                if let storedLocation = storedLocation {
+                    // If location is already stored, add stored location and inverse relationship.
                     storedLocations.addObject(storedLocation)
                     addEventRelationship(storedLocation)
                 }
                 else {
                     // If location is new, add new location and add inverse.
-                    let newLocation = Location(coordinate: mapItem.coordinate, name: mapItem.name, address: mapItem.address)
+                    let newLocation = Location(mapItem: mapItem)
                     storedLocations.addObject(newLocation)
                     addEventRelationship(newLocation)
                 }
@@ -813,20 +800,15 @@ class ChangeEventViewController: UITableViewController {
             for location in storedLocations {
                 let location = location as! Location
                 // Convert to map item for comparing with current map items
-                let mapItem = MapItem(coordinate: location.coordinate, name: location.name, address: location.address)
+                let mapItem = MapItem(location: location)
                 
                 if !contains(mapItems!, mapItem) {
                     removedLocations.addObject(location)
+                    removeEventRelationship(location)
                 }
             }
             // Remove old locations
             storedLocations.minusSet(removedLocations as Set<NSObject>)
-            
-            // Remove event from inverse relation.
-            for location in removedLocations {
-                let location = location as! Location
-                removeEventRelationship(location)
-            }
         }
         else {
             // Remove event from all related locations and remove all locations from event.
@@ -863,6 +845,9 @@ class ChangeEventViewController: UITableViewController {
         // Search for location in storage.
         var error: NSError? = nil
         let storedLocation = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Location
+        if let error = error {
+            NSLog("Error occurred while fetching stored location: %@", error.localizedDescription)
+        }
         return storedLocation
     }
     
@@ -939,35 +924,35 @@ extension ChangeEventViewController: UITableViewDelegate {
         selectedIndexPath = indexPath
 
         switch indexPath.section {
-        // Enable text field
         case sections["Name"]!:
+            // Enable text field.
             nameTextField.userInteractionEnabled = true
             nameTextField.becomeFirstResponder()
-        // Show date start picker
         case sections["Start"]!:
+            // Show date start picker.
             tableView.beginUpdates()
             if dateStartPickerCell.hidden {
                 dateStartPickerCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
             }
             tableView.endUpdates()
-        // Show date end picker
         case sections["End"]!:
+            // Show date end picker.
             tableView.beginUpdates()
             if dateEndPickerCell.hidden {
                 dateEndPickerCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
             }
             tableView.endUpdates()
-        // Show notifications disabled alert if notifications are turned off.
         case sections["Alarm"]!:
+            // Show notifications disabled alert if notifications are turned off.
             if indexPath == indexPaths["AlarmToggle"]! {
                 if !alarmSwitch.userInteractionEnabled {
                     displayNotificationsDisabledAlert()
                 }
             }
-        // Ensure permission to access address book, then segue to contacts view.
         case sections["Contacts"]!:
+            // Ensure permission to access address book, then segue to contacts view.
             let authorizationStatus = ABAddressBookGetAuthorizationStatus()
             
             // If contacts access is authorized, show contacts view. Else, display request for access.
@@ -979,18 +964,18 @@ extension ChangeEventViewController: UITableViewDelegate {
             case .NotDetermined:
                 displayContactsAccessRequest()
             }
-        // Ensure permission to access user location, then segue to locations view.
         case sections["Locations"]!:
+            // Ensure permission to access user location, then segue to locations view.
             let authorizationStatus = CLLocationManager.authorizationStatus()
             
             // If user location access is authorized, show location view. Else, display request for access.
             switch authorizationStatus {
             case .AuthorizedWhenInUse, .AuthorizedAlways:
                 showLocationsViewController()
-            case CLAuthorizationStatus.Restricted, .Denied:
+            case .Restricted, .Denied:
                 displayLocationInaccessibleAlert()
             case .NotDetermined:
-                NSLog("Error: user location authorization status should already be determined.")
+                CLLocationManager().requestWhenInUseAuthorization()
             }
         default:
             break

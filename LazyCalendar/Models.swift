@@ -31,6 +31,20 @@ class FullEvent: NSManagedObject, Equatable {
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
+
+    /**
+        Initializes the event with an id.
+    
+        :param: id The unique id of the event.
+    */
+    init(id: String) {
+        let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+        let entity = NSEntityDescription.entityForName("FullEvent", inManagedObjectContext: managedContext)!
+        super.init(entity: entity, insertIntoManagedObjectContext: managedContext)
+        
+        self.id = id
+    }
+    
     /**
         Initializes the event with given arguments.
     
@@ -41,7 +55,6 @@ class FullEvent: NSManagedObject, Equatable {
         :param: alarm A `Bool` indicating whether the event has an alarm.
         :param: alarmTime The time that the alarm will fire if `alarm == true`.
     */
-    
     init(id: String, name: String?, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
         let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
         let entity = NSEntityDescription.entityForName("FullEvent", inManagedObjectContext: managedContext)!
@@ -67,6 +80,7 @@ class Contact: NSManagedObject, Equatable {
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
+    
     /**
         Initializes the contact with given arguments.
     
@@ -74,7 +88,6 @@ class Contact: NSManagedObject, Equatable {
         :param: firstName The contact's first name.
         :param: lastName The contact's last name.
     */
-    
     init(id: ABRecordID, firstName: String?, lastName: String?) {
         let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
         let entity = NSEntityDescription.entityForName("Contact", inManagedObjectContext: managedContext)!
@@ -124,6 +137,16 @@ class Location: NSManagedObject, Equatable {
         self.coordinate = coordinate
         self.name = name
         self.address = address
+    }
+    
+    init(mapItem: MapItem) {
+        let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+        let entity = NSEntityDescription.entityForName("Location", inManagedObjectContext: managedContext)!
+        super.init(entity: entity, insertIntoManagedObjectContext: managedContext)
+        
+        coordinate = mapItem.coordinate
+        name = mapItem.name
+        address = mapItem.address
     }
 }
 
