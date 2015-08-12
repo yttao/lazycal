@@ -219,12 +219,10 @@ class ChangeEventViewController: UITableViewController {
     private func updateDateStartLabels() {
         let dateStartCell = tableView.cellForRowAtIndexPath(indexPaths["Start"]!)
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        //dateStartMainLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
         dateStartCell?.textLabel?.text = dateFormatter.stringFromDate(dateStartPicker.date)
         
         dateFormatter.dateFormat = "h:mm a"
         dateStartCell?.detailTextLabel?.text = dateFormatter.stringFromDate(dateStartPicker.date)
-        //dateStartDetailsLabel.text = dateFormatter.stringFromDate(dateStartPicker.date)
     }
     
     /**
@@ -241,11 +239,9 @@ class ChangeEventViewController: UITableViewController {
     private func updateDateEndLabels() {
         let dateEndCell = tableView.cellForRowAtIndexPath(indexPaths["End"]!)
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        //dateEndMainLabel.text = dateFormatter.stringFromDate(dateEnd)
         dateEndCell?.textLabel?.text = dateFormatter.stringFromDate(dateEnd)
         
         dateFormatter.dateFormat = "h:mm a"
-        //dateEndDetailsLabel.text = dateFormatter.stringFromDate(dateEnd)
         dateEndCell?.detailTextLabel?.text = dateFormatter.stringFromDate(dateEnd)
     }
     
@@ -426,15 +422,13 @@ class ChangeEventViewController: UITableViewController {
         Update alarm time display.
     */
     func updateAlarmTimeLabels() {
-        let alarmTimeCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmTimeDisplay"]!)
+        let alarmTimeCell = alarmTimeDisplayCell
         // Main label shows format: month day, year
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        //alarmTimeMainLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
-        alarmTimeCell?.textLabel?.text = dateFormatter.stringFromDate(alarmTime!)
+        alarmTimeDisplayCell.textLabel?.text = dateFormatter.stringFromDate(alarmTime!)
         
         dateFormatter.dateFormat = "h:mm a"
-        //alarmTimeDetailsLabel.text = dateFormatter.stringFromDate(alarmTimePicker.date)
-        alarmTimeCell?.detailTextLabel?.text = dateFormatter.stringFromDate(alarmTime!)
+        alarmTimeDisplayCell.detailTextLabel?.text = dateFormatter.stringFromDate(alarmTime!)
     }
     
     /**
@@ -474,7 +468,7 @@ class ChangeEventViewController: UITableViewController {
                     
                     self.showContactsViewController()
                 }
-                    // If denied permission, display access denied message.
+                // If denied permission, display access denied message.
                 else {
                     self.displayAddressBookInaccessibleAlert()
                 }
