@@ -51,7 +51,7 @@ class LocationsTableViewController: UITableViewController {
         Initializes the search controller.
     */
     private func initializeSearchController() {
-        searchController = ({
+        searchController = {
             let controller = UISearchController(searchResultsController: nil)
             controller.searchResultsUpdater = self
             controller.dimsBackgroundDuringPresentation = false
@@ -62,7 +62,7 @@ class LocationsTableViewController: UITableViewController {
             self.tableView.tableHeaderView = controller.searchBar
             
             return controller
-        })()
+        }()
         
         // If search bar is active, presentation context must be defined. If this is not done, the search bar will not be dismissed properly and will be visible in views other than the locations view.
         definesPresentationContext = true

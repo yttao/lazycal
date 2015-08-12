@@ -18,10 +18,10 @@ class ContactsTableViewController: UITableViewController {
     private var selectedContacts: [ABRecordRef]!
     private var filteredContacts = [ABRecordRef]()
     
-    private var searchController: UISearchController?
+    private var searchController: ContactsSearchController?
     // True if searching for new contacts is allowed.
     private var editingEnabled = true
-    private var searchTableView: UITableView!
+    private var searchTableView: ContactsSearchTableView?
     
     private let reuseIdentifier = "ContactCell"
     
@@ -69,27 +69,29 @@ class ContactsTableViewController: UITableViewController {
     */
     func initializeSearchController() {
         // Create search controller.
-        searchController = ({
-            let controller = UISearchController(searchResultsController: nil)
+        searchController = {
+            let controller = ContactsSearchController(searchResultsController: nil)
             controller.searchResultsUpdater = self
             controller.dimsBackgroundDuringPresentation = false
             controller.hidesNavigationBarDuringPresentation = false
             controller.searchBar.searchBarStyle = .Default
             controller.searchBar.sizeToFit()
             controller.searchBar.placeholder = "Search for New Contacts"
+            
             self.tableView.tableHeaderView = controller.searchBar
-            //self.searchTableView.tableHeaderView = controller.searchBar
             
             return controller
-        })()
+        }()
         
-        // Create search controller dropdown table view.
         let offset = CGRectOffset(searchController!.searchBar.frame, 0, searchController!.searchBar.frame.height)
-        let frame = CGRectMake(offset.origin.x, offset.origin.y, searchController!.searchBar.frame.width, UITableViewCell().frame.height)
-        searchTableView = UITableView(frame: frame, style: .Plain)
+        let frame = CGRectMake(offset.origin.x, offset.origin.y, tableView.frame.width, UITableViewCell().frame.height * 2 / 3)
+        searchTableView = ContactsSearchTableView(frame: frame, style: .Plain)
+        searchTableView!.backgroundColor = UIColor.greenColor()
         
-        view.addSubview(searchTableView)
-        view.didAddSubview(searchTableView)
+        searchController!.contactsSearchControllerDelegate = searchTableView
+        
+        view.addSubview(searchTableView!)
+        view.didAddSubview(searchTableView!)
     }
     
     /**
