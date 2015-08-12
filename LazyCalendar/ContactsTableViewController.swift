@@ -21,6 +21,7 @@ class ContactsTableViewController: UITableViewController {
     private var searchController: UISearchController?
     // True if searching for new contacts is allowed.
     private var editingEnabled = true
+    private var searchTableView: UITableView!
     
     private let reuseIdentifier = "ContactCell"
     
@@ -64,21 +65,31 @@ class ContactsTableViewController: UITableViewController {
     }
     
     /**
-        Initializes the search controller.
+        Initializes the search controller and the search table view.
     */
     func initializeSearchController() {
+        // Create search controller.
         searchController = ({
             let controller = UISearchController(searchResultsController: nil)
             controller.searchResultsUpdater = self
             controller.dimsBackgroundDuringPresentation = false
+            controller.hidesNavigationBarDuringPresentation = false
+            controller.searchBar.searchBarStyle = .Default
             controller.searchBar.sizeToFit()
             controller.searchBar.placeholder = "Search for New Contacts"
-            controller.hidesNavigationBarDuringPresentation = false
-            
             self.tableView.tableHeaderView = controller.searchBar
+            //self.searchTableView.tableHeaderView = controller.searchBar
             
             return controller
         })()
+        
+        // Create search controller dropdown table view.
+        let offset = CGRectOffset(searchController!.searchBar.frame, 0, searchController!.searchBar.frame.height)
+        let frame = CGRectMake(offset.origin.x, offset.origin.y, searchController!.searchBar.frame.width, UITableViewCell().frame.height)
+        searchTableView = UITableView(frame: frame, style: .Plain)
+        
+        view.addSubview(searchTableView)
+        view.didAddSubview(searchTableView)
     }
     
     /**

@@ -42,6 +42,7 @@ class SelectEventTableViewController: UITableViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData:", name: "EventSelected", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadEvent:", name: "EventSaved", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "applicationBecameActive", object: nil)
     }
     
     override func viewDidLoad() {
