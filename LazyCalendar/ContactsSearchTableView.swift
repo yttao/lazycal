@@ -40,9 +40,10 @@ class ContactsSearchTableView: UITableView {
             allContacts = NSArray()
         }
         
-        // Register contact cell.
+        // Register contact cell so it can be reused.
         registerClass(ContactTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
         
+        // Remove insets to get rid of automatic 15 left inset spacing.
         separatorInset = UIEdgeInsetsZero
         layoutMargins = UIEdgeInsetsZero
     }
@@ -63,9 +64,10 @@ class ContactsSearchTableView: UITableView {
             allContacts = NSArray()
         }
         
-        // Register contact cell.
+        // Register contact cell so it can be reused.
         registerClass(ContactTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
         
+        // Remove insets to get rid of automatic 15 left inset spacing.
         separatorInset = UIEdgeInsetsZero
         layoutMargins = UIEdgeInsetsZero
     }
@@ -77,7 +79,7 @@ class ContactsSearchTableView: UITableView {
         delegate = self
         dataSource = self
         
-        // Set address book and get all contacts
+        // Set address book and get all contacts.
         if ABAddressBookGetAuthorizationStatus() == .Authorized {
             addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
             allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
@@ -86,9 +88,10 @@ class ContactsSearchTableView: UITableView {
             allContacts = NSArray()
         }
         
-        // Register contact cell.
+        // Register contact cell so it can be reused.
         registerClass(ContactTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
         
+        // Remove insets to get rid of automatic 15 left inset spacing.
         separatorInset = UIEdgeInsetsZero
         layoutMargins = UIEdgeInsetsZero
     }
@@ -205,7 +208,7 @@ class ContactsSearchTableView: UITableView {
     }
     
     /**
-        Updates the table view height. The table view height is calculated to be equal to the height of all the cells.
+        Updates the table view height. The table view height is calculated to equal the height of all the cells.
     */
     func updateTableViewHeight() {
         var newHeight: CGFloat = 0.0
@@ -220,7 +223,7 @@ class ContactsSearchTableView: UITableView {
 // MARK: - UITableViewDelegate
 extension ContactsSearchTableView: UITableViewDelegate {
     /**
-        If searching, selection will append to selected contacts and clear the search bar.
+        Selecting a cell will add the contact to the selected contacts and clear the search bar text.
     
         The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
     */
@@ -250,10 +253,10 @@ extension ContactsSearchTableView: UITableViewDataSource {
     }
     
     /**
-        The height of a cell is equal to 2/3 of a standard `UITableViewCell`.
+        The height of a cell is equal to 2/3 the height of a standard `UITableViewCell`.
     */
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return UITableViewCell().frame.height * 2 / 3
+        return UITableViewCell().frame.height * SearchTableView.sizingScaleFactor
     }
     
     /**
@@ -265,6 +268,7 @@ extension ContactsSearchTableView: UITableViewDataSource {
         let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
         if fullName != nil {
             cell.nameLabel.text = fullName
+            cell.infoLabel.text = "foobar"
             // Bold search text in name
             boldSearchTextInLabel(cell.nameLabel)
         }

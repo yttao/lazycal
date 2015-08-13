@@ -23,7 +23,13 @@ class ContactTableViewCell: UITableViewCell {
         nameLabel = textLabel!
         infoLabel = detailTextLabel!
         nameLabel.opaque = true
+        println(nameLabel.font.pointSize)
+        nameLabel.font = UIFont(name: nameLabel.font.fontName, size: nameLabel.font.pointSize * SearchTableView.sizingScaleFactor)
+        nameLabel.sizeToFit()
+        println(nameLabel.font.pointSize)
         infoLabel.opaque = true
+        infoLabel.font = UIFont(name: infoLabel.font.fontName, size: infoLabel.font.pointSize * SearchTableView.sizingScaleFactor)
+        infoLabel.sizeToFit()
         opaque = true
         separatorInset = UIEdgeInsetsZero
         layoutMargins = UIEdgeInsetsZero
@@ -39,6 +45,11 @@ class ContactTableViewCell: UITableViewCell {
         infoLabel = detailTextLabel!
         nameLabel.opaque = true
         infoLabel.opaque = true
+        println(nameLabel.font.pointSize)
+        nameLabel.font = UIFont(name: nameLabel.font.fontName, size: nameLabel.font.pointSize * SearchTableView.sizingScaleFactor)
+        infoLabel.font = UIFont(name: infoLabel.font.fontName, size: infoLabel.font.pointSize * SearchTableView.sizingScaleFactor)
+        nameLabel.sizeToFit()
+        infoLabel.sizeToFit()
         opaque = true
         separatorInset = UIEdgeInsetsZero
         layoutMargins = UIEdgeInsetsZero
