@@ -47,7 +47,6 @@ class ContactsTableViewController: UITableViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        // Address book must be authorized, otherwise throw exception.
         if addressBookAccessible() {
             addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
             allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
@@ -71,7 +70,6 @@ class ContactsTableViewController: UITableViewController {
         // Create search controller.
         searchController = {
             let controller = SearchController(searchResultsController: nil)
-            controller.searchResultsUpdater = self
             controller.dimsBackgroundDuringPresentation = false
             controller.hidesNavigationBarDuringPresentation = false
             controller.searchBar.searchBarStyle = .Default
@@ -87,13 +85,18 @@ class ContactsTableViewController: UITableViewController {
         
         // Offset the search table view so that it is below the search bar.
         let offset = CGRectOffset(searchController!.searchBar.frame, 0, searchController!.searchBar.frame.height)
-        let frame = CGRectMake(offset.origin.x, offset.origin.y, tableView.frame.width, UITableViewCell().frame.height)
+        let frame = CGRectMake(offset.origin.x, offset.origin.y, tableView.frame.width, 0)
         searchTableView = ContactsSearchTableView(frame: frame, style: .Plain)
         searchTableView!.backgroundColor = UIColor.greenColor()
+        searchTableView!.loadData(contactsTableViewController: self, searchController: searchController!)
         
+        // Set search table view as delegate.
         searchController!.searchControllerDelegate = searchTableView
+        searchController!.searchResultsUpdater = searchTableView
+        searchController!.searchBar.delegate = searchTableView
         
-        view.addSubview(searchTableView!)
+        // Overlay search table view on top of selected contacts table view.
+        view.insertSubview(searchTableView!, aboveSubview: tableView)
         view.didAddSubview(searchTableView!)
     }
     
@@ -126,107 +129,31 @@ class ContactsTableViewController: UITableViewController {
     }
     
     /**
-        Filters the search results by the text entered in the search bar.
-
-        :param: searchText The text to filter the results.
-    */
-    func filterContacts(searchText: String) {
-        let block = {
-            (record: AnyObject!, bindings: [NSObject: AnyObject]!) -> Bool in
-            let recordRef: ABRecordRef = record as ABRecordRef
-            
-            // Check if record is already recorded in selected contacts, don't show if already a selected contact.
-            let identicalRecords = self.selectedContacts.filter({
-                ABRecordGetRecordID($0) == ABRecordGetRecordID(recordRef)
-            })
-            if !identicalRecords.isEmpty {
-                return false
-            }
-            
-            // Get name, phone numbers, and emails
-            let name = ABRecordCopyCompositeName(recordRef)?.takeRetainedValue() as? String
-            let phoneNumbersMultivalue: AnyObject? = ABRecordCopyValue(recordRef, kABPersonPhoneProperty)?.takeRetainedValue()
-            let emailsMultivalue: AnyObject? = ABRecordCopyValue(recordRef, kABPersonEmailProperty)?.takeRetainedValue()
-            
-            // Search name for search text
-            if name?.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
-                return true
-            }
-            
-            // Search phone numbers for search text
-            for i in 0..<ABMultiValueGetCount(phoneNumbersMultivalue!) {
-                let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue!, i).takeRetainedValue() as! String
-                if phoneNumber.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
-                    return true
-                }
-            }
-            
-            // Search emails for search text
-            for i in 0..<ABMultiValueGetCount(emailsMultivalue) {
-                let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, i).takeRetainedValue() as! String
-                if email.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
-                    return true
-                }
-            }
-            return false
-        }
-        
-        // Create predicate and filter by predicate
-        let predicate = NSPredicate(block: block)
-        filteredContacts = allContacts.filteredArrayUsingPredicate(predicate) as [ABRecordRef]
-        
-        // Sort results and reload
-        sortRecords(&filteredContacts)
-    }
+        Returns a `Bool` indicating if a contact exists in the currently selected contacts.
     
-    /**
-        Sorts an array of ABRecordRefs alphabetically.
+        :param: recordRef The `ABRecordRef` of the contact to search for in selected contacts.
+        :returns: `true` if the record ID is in the currently selected contacts; `false` otherwise.
     */
-    func sortRecords(inout records: [ABRecordRef]) {
-        // Sort filtered contact IDs by alphabetical name
-        records.sort({
-            let firstFullName = ABRecordCopyCompositeName($0).takeRetainedValue() as! String
-            let secondFullName = ABRecordCopyCompositeName($1).takeRetainedValue() as! String
-            
-            return firstFullName.compare(secondFullName) == .OrderedAscending
+    func recordSelected(recordRef: ABRecordRef) -> Bool {
+        // Filter by ABRecordIDs. If no records are found (recordMatch is empty), return false. Otherwise, return true.
+        let recordMatch = selectedContacts.filter({
+            ABRecordGetRecordID($0) == ABRecordGetRecordID(recordRef)
         })
+        return !recordMatch.isEmpty
     }
     
-    /**
-        Bolds the search bar text in the result cells.
+    func addRecord(recordRef: ABRecordRef) {
+        tableView.beginUpdates()
+        tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: selectedContacts.count, inSection: 0)], withRowAnimation: .Automatic)
+        selectedContacts.append(recordRef)
+        tableView.endUpdates()
+    }
     
-        :param: cell The cell to have bolded text.
-    */
-    func boldSearchTextInLabel(label: UILabel) {
-        let text = label.text!
-        let searchText = searchController!.searchBar.text
-        
-        // Find range of search text
-        let boldRange = text.rangeOfString(searchText, options: .CaseInsensitiveSearch)
-        
-        // Check if search text is in label (can be in main or details label depending on where search text was found).
-        if boldRange != nil {
-            let start = distance(text.startIndex, boldRange!.startIndex)
-            let length = count(searchText)
-            let range = NSMakeRange(start, length)
-            
-            // Make bold font
-            let font = UIFont.boldSystemFontOfSize(label.font.pointSize)
-            
-            // Create attributed text
-            var attributedText = NSMutableAttributedString(string: text)
-            attributedText.beginEditing()
-            attributedText.addAttribute(NSFontAttributeName, value: font, range: range)
-            attributedText.endEditing()
-            
-            // Set text
-            label.attributedText = attributedText
-        }
-        // If search text is not in label, show label with plain text.
-        else {
-            label.attributedText = nil
-            label.text = text
-        }
+    func deleteRecord(recordRef: ABRecordRef, atIndexPath indexPath: NSIndexPath) {
+        tableView.beginUpdates()
+        tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+        selectedContacts.removeAtIndex(indexPath.row)
+        tableView.endUpdates()
     }
     
     /**
@@ -234,7 +161,7 @@ class ContactsTableViewController: UITableViewController {
     
         :returns: `true` if the user is currently searching; `false` otherwise.
     */
-    private func searching() -> Bool {
+    func searching() -> Bool {
         return searchController != nil && searchController!.active && searchController!.searchBar.text != "" && filteredContacts.count > 0
     }
     
@@ -310,15 +237,15 @@ extension ContactsTableViewController: UITableViewDelegate {
         The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if searching() {
+        /*if searching() {
             selectedContacts.append(filteredContacts[indexPath.row])
             searchController?.searchBar.text = nil
-        }
-        else {
+        }*/
+        //else {
             let personViewController = ABPersonViewController()
             personViewController.displayedPerson = selectedContacts[indexPath.row]
             navigationController!.showViewController(personViewController, sender: self)
-        }
+        //}
     }
 }
 
@@ -337,9 +264,9 @@ extension ContactsTableViewController: UITableViewDataSource {
         If the search controller is active, show the filtered contacts. If the search controller is inactive, show the selected contacts.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searching() {
+        /*if searching() {
             return filteredContacts.count
-        }
+        }*/
         return selectedContacts.count
     }
     
@@ -349,9 +276,9 @@ extension ContactsTableViewController: UITableViewDataSource {
         Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        if searching() || !editingEnabled {
+        /*if searching() || !editingEnabled {
             return false
-        }
+        }*/
         return true
     }
     
@@ -360,10 +287,8 @@ extension ContactsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            tableView.beginUpdates()
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-            selectedContacts.removeAtIndex(indexPath.row)
-            tableView.endUpdates()
+            let recordRef: ABRecordRef = selectedContacts[indexPath.row]
+            deleteRecord(recordRef, atIndexPath: indexPath)
         }
     }
     
@@ -376,34 +301,23 @@ extension ContactsTableViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
         
         // Show filtered records
-        if searching() {
+        /*if searching() {
             let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
             if fullName != nil {
                 cell.textLabel!.text = fullName
                 // Bold search text in name
                 boldSearchTextInLabel(cell.textLabel!)
             }
-        }
+        }*/
         // Show selected records
-        else {
+        //else {
             let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row])?.takeRetainedValue() as? String
             if fullName != nil {
                 cell.textLabel!.attributedText = nil
                 cell.textLabel!.text = fullName
             }
-        }
+        //}
         
         return cell
-    }
-}
-
-// MARK: - UISearchResultsUpdating
-extension ContactsTableViewController: UISearchResultsUpdating {
-    /**
-        Updates search results by updating `filteredContacts`.
-    */
-    func updateSearchResultsForSearchController(searchController: UISearchController) {
-        filterContacts(searchController.searchBar.text)
-        tableView.reloadData()
     }
 }

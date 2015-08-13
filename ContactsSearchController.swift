@@ -12,20 +12,8 @@ import UIKit
 class SearchController: UISearchController {
     // Custom delegate
     var searchControllerDelegate: SearchControllerDelegate?
-    
-    // MARK: - Initializers
-    
-    /*required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    override init(searchResultsController: UIViewController!) {
-        super.init(searchResultsController: searchResultsController)
-    }
-    
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    }*/
+
+    // MARK: - Initialization of search controller
     
     /**
     */

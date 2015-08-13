@@ -22,11 +22,13 @@ class ContactTableViewCell: UITableViewCell {
         super.init(coder: aDecoder)
         nameLabel = textLabel!
         infoLabel = detailTextLabel!
+        opaque = true
     }
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: self.style, reuseIdentifier: reuseIdentifier)
         nameLabel = textLabel!
         infoLabel = detailTextLabel!
+        opaque = true
     }
 }
