@@ -87,110 +87,157 @@ class SelectEventTableViewController: UITableViewController {
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
         eventTimeCell?.textLabel?.text = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
         
+        // Start of cell insertion/deletion code.
+        
+        // Disable animations (to prevent insert/delete cell animations).
+        UIView.setAnimationsEnabled(false)
+        
         tableView.beginUpdates()
+        
+        // Handle alarm cells.
         let alarmCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmToggle"]!)
         if !notificationsEnabled() {
-            // If notifications are disabled, the alarm cannot send an alert so it displays "Disabled" and hides the alarm time.
-            alarmCell?.detailTextLabel?.text = "Disabled"
+            // If alarm notifications are disabled
             
-            alarmTimeDisplayCell.textLabel?.text = nil
-            alarmTimeDisplayCell.detailTextLabel?.text = nil
-            
+            // Hide the alarm time display cell if it's visible.
             if tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) == super.tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) {
                 alarmTimeDisplayCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTime"]!], withRowAnimation: .None)
             }
             
+            // If notifications are disabled, the alarm cannot send an alert.
+            
+            // The alarm is disabled, so it says "Disabled".
+            alarmCell?.detailTextLabel?.text = "Disabled"
+            
+            // Hide the alarm time.
+            alarmTimeDisplayCell.textLabel?.text = " "
+            alarmTimeDisplayCell.detailTextLabel?.text = " "
         }
         else if event!.alarm {
-            // If the alarm is enabled, the alarm says "On" and displays the time.
-            alarmCell?.detailTextLabel?.text = "On"
+            // If the alarm is on
             
-            dateFormatter.dateFormat = "MMM dd, yyyy"
-            alarmTimeDisplayCell.textLabel?.text = dateFormatter.stringFromDate(event!.alarmTime!)
-            
-            dateFormatter.dateFormat = "h:mm a"
-            alarmTimeDisplayCell.detailTextLabel?.text = dateFormatter.stringFromDate(event!.alarmTime!)
-            
-            if tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) == 1 {
+            // Show the alarm time display cell if it's hidden.
+            if tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) != super.tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) {
                 alarmTimeDisplayCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["AlarmTime"]!], withRowAnimation: .None)
             }
+            
+            // The alarm says "On".
+            alarmCell?.detailTextLabel?.text = "On"
+            
+            // Display the alarm time.
+            
+            // The alarm main label shows the alarm date.
+            dateFormatter.dateFormat = "MMM dd, yyyy"
+            alarmTimeDisplayCell.textLabel?.text = dateFormatter.stringFromDate(event!.alarmTime!)
+            
+            // The alarm detail label shows the alarm time.
+            dateFormatter.dateFormat = "h:mm a"
+            alarmTimeDisplayCell.detailTextLabel?.text = dateFormatter.stringFromDate(event!.alarmTime!)
         }
         else {
-            // If the alarm is disabled, the alarm says "Off" and hides the time display.
-            alarmCell?.detailTextLabel?.text = "Off"
+            // If the alarm is off
             
-            alarmTimeDisplayCell.textLabel?.text = nil
-            alarmTimeDisplayCell.detailTextLabel?.text = nil
-            
+            // Hide the alarm time display cell if it's visible.
             if tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) == super.tableView(tableView, numberOfRowsInSection: sections["Alarm"]!) {
                 alarmTimeDisplayCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTime"]!], withRowAnimation: .None)
             }
+            
+            // The alarm says "Off".
+            alarmCell?.detailTextLabel?.text = "Off"
+            
+            // Hide the alarm time.
+            alarmTimeDisplayCell.textLabel?.text = " "
+            alarmTimeDisplayCell.detailTextLabel?.text = " "
             
         }
         alarmTimeDisplayCell.textLabel?.sizeToFit()
         alarmTimeDisplayCell.detailTextLabel?.sizeToFit()
 
+        // Handle contacts cell.
         if event!.contacts.count > 0 {
-            // Show contacts cell with number of contacts in detail label if the event has at least one contact.
-            contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
+            // If the event has contacts
             
-            // If contacts row has been removed, add row back.
-            if self.tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 0 {
+            // Show the contacts cell if it's hidden.
+            if tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) != super.tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) {
                 contactsCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
             }
+            
+            // Show the number of contacts.
+            contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
         }
         else {
-            // Hide contacts cell if the event has no contacts.
-            contactsCell.detailTextLabel?.text = nil
+            // If the event does not have contacts
             
-            // If contacts cell exists, delete row.
-            if tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == 1 {
+            // Hide the contacts cell if it's visible.
+            if tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) == super.tableView(tableView, numberOfRowsInSection: sections["Contacts"]!) {
                 contactsCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
             }
+            
+            // Hide the number of contacts.
+            contactsCell.detailTextLabel?.text = " "
         }
         contactsCell.detailTextLabel?.sizeToFit()
         
+        // Handle locations cell.
         if event!.locations.count > 0 {
-            // Show locations cell with number of locations in detail label if the event has at least one location.
-            locationsCell.detailTextLabel?.text = "\(event!.locations.count)"
+            // If the event has locations
             
-            // If locations row has been removed, add row back.
-            if tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 0 {
+            // Show the locations cell if it's hidden.
+            if tableView(tableView, numberOfRowsInSection: sections["Locations"]!) != super.tableView(tableView, numberOfRowsInSection: sections["Locations"]!) {
                 locationsCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
             }
+            
+            // Show the number of locations.
+            locationsCell.detailTextLabel?.text = "\(event!.locations.count)"
         }
         else {
-            // Hide locations cell if the event has no locations.
-            locationsCell.detailTextLabel?.text = nil
+            // If the event does not have locations
             
-            // If locations cell exists, delete row.
-            if tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == 1 {
+            // Hide the locations cell if it's visible.
+            if tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == super.tableView(tableView, numberOfRowsInSection: sections["Locations"]!) {
                 locationsCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
             }
+            
+            // Hide locations cell if the event has no locations.
+            locationsCell.detailTextLabel?.text = " "
         }
         locationsCell.detailTextLabel?.sizeToFit()
+        
+        // End of cell insertion/deletion code.
+        
         tableView.endUpdates()
         
+        // Re-enable animations
+        UIView.setAnimationsEnabled(true)
+        
+        // Reload table data.
         tableView.reloadData()
     }
     
     /**
         Loads the event data.
     
+        This method is called if this view controller is brought up from a local notification.
+    
         :param: notification The notification that an event was selected.
     */
     func loadData(notification: NSNotification) {
-        self.event = notification.userInfo!["Event"] as? FullEvent
+        event = notification.userInfo!["Event"] as? FullEvent
     }
     
-    private func showContactsViewController() {
+    /**
+        Shows the `ContactsTableViewController` for this event.
+    
+        This method is called when the contact cell is selected.
+    */
+    private func showContactsTableViewController() {
         let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
         
         // Get all contact IDs from the event contacts.
@@ -309,7 +356,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
         if indexPath.section == indexPaths["Contacts"]!.section {
             if addressBookAccessible() {
                 // If address book can be accessed, show contacts view controller.
-                showContactsViewController()
+                showContactsTableViewController()
             }
             else {
                 // Otherwise display alert stating address book can't be accessed.

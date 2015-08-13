@@ -20,6 +20,7 @@ extension UIViewController {
     */
     func showEventNotification(notification: NSNotification) {
         if isViewLoaded() && view?.window != nil {
+            
             let localNotification = notification.userInfo!["LocalNotification"] as! UILocalNotification
             
             let alertController = UIAlertController(title: "\(localNotification.alertTitle)", message: "\(localNotification.alertBody!)", preferredStyle: .Alert)

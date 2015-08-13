@@ -33,7 +33,7 @@ class ContactsTableViewController: UITableViewController {
     }
     
     /**
-        Set delegates and data sources, load address book, get contacts, and create the search controller.
+        Set delegates and data sources, create the search controller and remove footer.
     */
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -86,7 +86,6 @@ class ContactsTableViewController: UITableViewController {
         // Set search table view as delegate.
         searchController.searchControllerDelegate = searchTableView
         searchController.searchResultsUpdater = searchTableView
-        searchController.searchBar.delegate = searchTableView
         
         // Overlay search table view on top of selected contacts table view.
         view.insertSubview(searchTableView, aboveSubview: tableView)

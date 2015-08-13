@@ -288,9 +288,6 @@ extension ContactsSearchTableView: UISearchResultsUpdating {
     }
 }
 
-extension ContactsSearchTableView: UISearchBarDelegate {
-}
-
 // MARK: - ContactsSearchControllerDelegate
 extension ContactsSearchTableView: SearchControllerDelegate {
     /**

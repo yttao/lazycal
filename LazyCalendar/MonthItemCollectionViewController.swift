@@ -167,12 +167,12 @@ class MonthItemCollectionViewController: UICollectionViewController {
 // MARK: - UICollectionViewDelegate
 extension MonthItemCollectionViewController: UICollectionViewDelegate {
     /**
-        Day cells are selectable only if they are a valid day cell.
+        Day cells are selectable only if they have a valid number in them.
     */
     override func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         
-        if cell.dayLabel.text != nil {
+        if cell.dayLabel.text?.toInt() != nil {
             return true
         }
         return false

@@ -31,6 +31,8 @@ class FullEvent: NSManagedObject, Equatable {
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
+    
+    // MARK: - Initializers
 
     /**
         Initializes the event with an id.
@@ -53,7 +55,7 @@ class FullEvent: NSManagedObject, Equatable {
         :param: dateStart The start date of the event.
         :param: dateEnd The end date of the event.
         :param: alarm A `Bool` indicating whether the event has an alarm.
-        :param: alarmTime The time that the alarm will fire if `alarm == true`.
+        :param: alarmTime The time that the alarm will fire if `alarm == true`. If `alarm == false`, the `FullEvent`'s `alarmTime` property will be set to `nil` even if a non-`nil` argument is passed in.
     */
     init(id: String, name: String?, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
         let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
@@ -65,7 +67,12 @@ class FullEvent: NSManagedObject, Equatable {
         self.dateStart = dateStart
         self.dateEnd = dateEnd
         self.alarm = alarm
-        self.alarmTime = alarmTime
+        if alarm {
+            self.alarmTime = alarmTime
+        }
+        else {
+            self.alarmTime = nil
+        }
     }
 }
 

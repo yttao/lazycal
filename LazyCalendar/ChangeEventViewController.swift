@@ -274,7 +274,7 @@ class ChangeEventViewController: UITableViewController {
             contactsCell?.detailTextLabel?.text = "\(contactIDs!.count)"
         }
         else {
-            contactsCell?.detailTextLabel?.text = nil
+            contactsCell?.detailTextLabel?.text = " "
         }
         // Resizes contacts cell to fit label.
         contactsCell?.detailTextLabel?.sizeToFit()
@@ -292,7 +292,7 @@ class ChangeEventViewController: UITableViewController {
             locationsCell?.detailTextLabel?.text = "\(mapItems!.count)"
         }
         else {
-            locationsCell?.detailTextLabel?.text = nil
+            locationsCell?.detailTextLabel?.text = " "
         }
         // Resize locations cell to fit label.
         locationsCell?.detailTextLabel?.sizeToFit()
@@ -466,7 +466,7 @@ class ChangeEventViewController: UITableViewController {
                 if granted {
                     self.addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
                     
-                    self.showContactsViewController()
+                    self.showContactsTableViewController()
                 }
                 // If denied permission, display access denied message.
                 else {
@@ -477,30 +477,47 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Shows the contacts view controller.
+        Shows the contacts table view controller.
+    
+        This method is called when the contacts cell is selected. If the user has given access to their address book, the `ContactsViewController` is shown. Otherwise, this method will do nothing.
     */
-    func showContactsViewController() {
-        let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
-        
-        // Load contacts IDs if they exist already.
-        if contactIDs != nil && contactIDs!.count > 0 {
-            contactsTableViewController.loadData(contactIDs!)
+    func showContactsTableViewController() {
+        if addressBookAccessible() {
+            // Check if app has access to address book.
+            
+            // Create contacts table view controller.
+            let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+            
+            // Load contacts.
+            if contactIDs?.count > 0 {
+                contactsTableViewController.loadData(contactIDs!)
+            }
+            
+            // Show view controller.
+            navigationController!.showViewController(contactsTableViewController, sender: self)
         }
-        
-        navigationController!.showViewController(contactsTableViewController, sender: self)
     }
     
     /**
-        Shows the location view controller.
+        Shows the locations view controller.
+    
+        This method is called when the locations cell is selected. If the user has given access to their location, the `LocationsViewController` is shown. Otherwise, this method will do nothing.
     */
     func showLocationsViewController() {
-        let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
-        
-        if mapItems != nil && mapItems!.count > 0 {
-            locationsViewController.loadData(mapItems!)
+        if locationAccessible() {
+            // Check if app has access to user locations.
+            
+            // Create locations view controller.
+            let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
+            
+            // Load data.
+            if mapItems?.count > 0 {
+                locationsViewController.loadData(mapItems!)
+            }
+            
+            // Show view controller.
+            navigationController!.showViewController(locationsViewController, sender: self)
         }
-        
-        navigationController!.showViewController(locationsViewController, sender: self)
     }
     
     /**
@@ -509,30 +526,34 @@ class ChangeEventViewController: UITableViewController {
         :param: indexPath The deselected index path.
     */
     func deselectRowAtIndexPath(indexPath: NSIndexPath) {
+        // Perform deselection action based on the row that was deselected.
+        
         switch indexPath.section {
-            // If deselecting event name field, text field stops being first responder and disables user interaction with it.
         case sections["Name"]!:
+            // If deselecting event name field, text field stops editing.
             nameTextField.userInteractionEnabled = false
             nameTextField.resignFirstResponder()
-            // If deselecting date start field, hide date start picker and show labels
         case sections["Start"]!:
-            tableView.beginUpdates()
+            // If deselecting date start field, hide date start picker and show labels.
             if !dateStartPickerCell.hidden {
+                tableView.beginUpdates()
                 tableView.deleteRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
                 dateStartPickerCell.hidden = true
+                tableView.endUpdates()
             }
-            tableView.endUpdates()
-            // If deselecting date end field, hide date end picker and show labels
         case sections["End"]!:
-            tableView.beginUpdates()
+            // If deselecting date end field, hide date end picker and show labels.
             if !dateEndPickerCell.hidden {
+                tableView.beginUpdates()
                 tableView.deleteRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
                 dateEndPickerCell.hidden = true
+                tableView.endUpdates()
             }
-            tableView.endUpdates()
         default:
             break
         }
+        
+        // Set selected to nil.
         selectedIndexPath = nil
     }
     
@@ -542,32 +563,41 @@ class ChangeEventViewController: UITableViewController {
         :returns: The saved event.
     */
     func saveEvent() -> FullEvent {
-        // Create event if it is a new event being created, otherwise just overwrite old data.
-        if event == nil {
-            event = FullEvent(id: NSUUID().UUIDString)
+        // Set alarm time to nil if alarm is off.
+        if !alarm {
+            alarmTime = nil
         }
         
-        // Set event values
-        event!.name = name
-        event!.dateStart = dateStart!
-        event!.dateEnd = dateEnd!
-        event!.alarm = alarm
+        if let event = event {
+            // Set event info if this is an edited event.
+            event.name = name
+            event.dateStart = dateStart
+            event.dateEnd = dateEnd
+            event.alarm = alarm
+            event.alarmTime = alarmTime
+        }
+        else {
+            // Create event if this is a new event.
+            event = FullEvent(id: NSUUID().UUIDString, name: name, dateStart: dateStart, dateEnd: dateEnd, alarm: alarm, alarmTime: alarmTime)
+        }
+        
+        // Handle notification scheduling.
+        
         if alarm {
-            event!.alarmTime = alarmTime
+            // If the alarm is on
             
-            if notificationTimesChanged(event!) {
-                descheduleNotifications(event!)
+            if notificationTimesChanged() {
+                // If the notification time changed, reschedule the notification for the new time.
+                rescheduleNotifications()
             }
-            if !notificationsScheduled(event!) {
-                scheduleNotifications(event!)
+            else if !notificationsScheduled() {
+                // If notifications haven't been scheduled yet, schedule notifications.
+                scheduleNotifications()
             }
         }
         else {
-            event!.alarmTime = nil
-
-            if notificationsScheduled(event!) {
-                descheduleNotifications(event!)
-            }
+            // If the alarm is off but notifications were scheduled for this event, turn off all event notifications.
+            descheduleNotifications()
         }
         
         addNewContacts()
@@ -582,7 +612,7 @@ class ChangeEventViewController: UITableViewController {
         let allLocations = managedContext.executeFetchRequest(fetchRequest, error: nil) as! [Location]
         println("Total locations: \(allLocations.count)")
         
-        // Save event
+        // Save event, show error if not saved successfully.
         var error: NSError?
         if !managedContext.save(&error) {
             NSLog("Error occurred while saving: %@", error!.localizedDescription)
@@ -595,32 +625,38 @@ class ChangeEventViewController: UITableViewController {
     
     /**
         Return a `Bool` indicating whether or not a notification has been scheduled for an event.
-    
-        :param: event The event to be checked for existing notifications.
-    
+
         :returns: `true` if a notification has been scheduled for this event; `false` otherwise.
     */
-    private func notificationsScheduled(event: FullEvent) -> Bool {
+    private func notificationsScheduled() -> Bool {
+        // Get all scheduled notifications.
         let scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
-        let results = scheduledNotifications.filter({(
-            $0.userInfo!["id"] as! String) == event.id
+        
+        // Search scheduled notifications
+        let results = scheduledNotifications.filter({
+            ($0.userInfo!["id"] as! String) == self.event!.id
             })
         return !results.isEmpty
     }
     
     /**
         Returns a `Bool` indicating whether or not notification times have changed for an event.
-    
-        :param: event The event to be checked for changed notification times.
-    
+
         :returns: `true` if a notification has been scheduled and its notification time has been changed; `false` otherwise.
     */
-    private func notificationTimesChanged(event: FullEvent) -> Bool {
+    private func notificationTimesChanged() -> Bool {
+        // Get all scheduled notifications
         let scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
+        
+        // Find notification for event, and check if notification time changed.
         let results = scheduledNotifications.filter({
-            ($0.userInfo!["id"] as! String) == event.id && event.alarmTime != nil &&
-                $0.fireDate!.compare(event.alarmTime!) != .OrderedSame
+            let alarmTimeExists = self.event!.alarmTime != nil
+            let idMatch = ($0.userInfo!["id"] as! String) == self.event!.id
+            let notificationTimeChanged = $0.fireDate!.compare(self.event!.alarmTime!) != .OrderedSame
+            return alarmTimeExists && idMatch && notificationTimeChanged
         })
+        
+        // If result was found, notification time was changed.
         return !results.isEmpty
     }
     
@@ -628,25 +664,53 @@ class ChangeEventViewController: UITableViewController {
         Schedules the notification for an event.
     
         TODO: make sure this doesn't reschedule a notification after the event has already fired a notification (unless the new alarm time is after current time).
-    
-        :param: event The event to have a scheduled notification.
     */
-    private func scheduleNotifications(event: FullEvent) {
-        NSLog("Event scheduled for time: %@", event.alarmTime!.description)
+    private func scheduleNotifications() {
+        NSLog("Event scheduled for time: %@", event!.alarmTime!.description)
+        // Create notification
         let notification = UILocalNotification()
-        notification.alertTitle = "Event Notification"
         
         // Fill in notification info
-        if event.name != nil {
-            notification.alertBody = "\(event.name!)"
+        if let name = event!.name {
+            notification.alertTitle = "\(name)"
         }
         else {
-            notification.alertBody = "Untitled event"
+            notification.alertTitle = "Event"
+        }
+        if event!.dateStart.compareUnits(otherDate: event!.dateEnd, units: .CalendarUnitDay | .CalendarUnitMonth | .CalendarUnitYear) == .OrderedSame {
+            if event!.dateStart.compareUnits(otherDate: event!.dateEnd, units: .CalendarUnitHour | .CalendarUnitMinute) == .OrderedSame {
+                // If the event date start and end times are the same, show the time in this format:
+                // MMM dd, yyyy
+                // h:mm a
+                
+                dateFormatter.dateFormat = "MMM dd, yyyy"
+                var dateInterval = "\(dateFormatter.stringFromDate(event!.dateStart))\n"
+                dateFormatter.dateFormat = "h:mm a"
+                dateInterval += "\(dateFormatter.stringFromDate(event!.dateStart))"
+                notification.alertBody = dateInterval
+            }
+            else {
+                // If the event date start and end times are different, show the time in this format:
+                // MMM dd, yyyy
+                // h:mm a to h:mm a
+                dateFormatter.dateFormat = "MMM dd, yyyy"
+                var dateInterval = "\(dateFormatter.stringFromDate(event!.dateStart))\n"
+                dateFormatter.dateFormat = "h:mm a"
+                dateInterval += "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
+                notification.alertBody = dateInterval
+            }
+        }
+        else {
+            // If the event date start and end dates are different, show the time in this format:
+            // MMM dd, yyyy h:mm a to MMM dd, yyyy h:mm a
+            dateFormatter.dateFormat = "MMM dd, yyyy h:mm a"
+            let dateInterval = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
+            notification.alertBody = dateInterval
         }
         notification.alertAction = "view"
-        notification.fireDate = event.alarmTime
+        notification.fireDate = event!.alarmTime
         notification.soundName = UILocalNotificationDefaultSoundName
-        notification.userInfo = ["id": event.id]
+        notification.userInfo = ["id": event!.id]
         notification.category = "LAZYCALENDAR_CATEGORY"
         
         // Schedule notification
@@ -656,21 +720,42 @@ class ChangeEventViewController: UITableViewController {
     /**
         Deschedules the notification for an event.
     
-        :param: event The event that has notifications to deschedule.
+        This method will do nothing if no notifications are scheduled.
     */
-    private func descheduleNotifications(event: FullEvent) {
-        NSLog("Event descheduled for event: %@", event.id)
-        // Get all notifications
+    private func descheduleNotifications() {
+        NSLog("Event descheduled for event: %@", event!.id)
+        // Get all schedule notifications.
         var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
         
-        // Get notifications to remove
+        // Get notifications to remove.
         let notifications = scheduledNotifications.filter({(
-            $0.userInfo!["id"] as! String) == event.id
+            $0.userInfo!["id"] as! String) == self.event!.id
         })
         
-        // Cancel notifications
+        // Cancel notifications.
         for notification in notifications {
             UIApplication.sharedApplication().cancelLocalNotification(notification)
+        }
+    }
+    
+    /**
+        Reschedules the notification for an event.
+    
+        This method will do nothing if no notifications are scheduled.
+    */
+    private func rescheduleNotifications() {
+        NSLog("Event rescheduled for time: %@", event!.alarmTime!)
+        // Get all schedule notifications.
+        var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
+        
+        // Get notification to reschedule.
+        let notification = scheduledNotifications.filter({(
+            $0.userInfo!["id"] as! String) == self.event!.id
+        }).first
+        
+        // Reschedule notification time.
+        if let notification = notification {
+            notification.fireDate == event!.alarmTime
         }
     }
     
@@ -678,8 +763,6 @@ class ChangeEventViewController: UITableViewController {
     
     /**
         Adds new contacts to the event.
-    
-        :param: event The event to add contacts to.
     */
     private func addNewContacts() {
         // Check that there are any contact IDs to add.
@@ -958,7 +1041,7 @@ extension ChangeEventViewController: UITableViewDelegate {
             // If contacts access is authorized, show contacts view. Else, display request for access.
             switch authorizationStatus {
             case .Authorized:
-                showContactsViewController()
+                showContactsTableViewController()
             case .Denied, .Restricted:
                 displayAddressBookInaccessibleAlert()
             case .NotDetermined:

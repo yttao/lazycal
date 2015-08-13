@@ -13,13 +13,12 @@ let month = calendar.component(NSCalendarUnit.CalendarUnitMonth, fromDate: NSDat
 
 let numDaysInMonth = calendar.rangeOfUnit(NSCalendarUnit.CalendarUnitDay, inUnit: NSCalendarUnit.CalendarUnitMonth, forDate: NSDate())
 
-var a: Int32 = 7
-var b: Int32 = 7
-var c: Bool = a == b
-
-var s: String? = nil
-var t: String? = "test"
-s == t
-s = "test"
-s == t
-
+var a: [NSDate]?
+let test1: Bool = a?.count > 0
+if a?.count > 0 {
+    println("Hi")
+}
+a = [NSDate]()
+let test2: Bool = a?.count > 0
+let test3: Bool = nil < -INT64_MAX
+let test4: Bool = nil != 0
