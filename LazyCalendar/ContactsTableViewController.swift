@@ -61,6 +61,9 @@ class ContactsTableViewController: UITableViewController {
         }
         // Hides search controller on segue.
         definesPresentationContext = true
+        
+        // Set footer to 0 to hide extra cells
+        tableView.tableFooterView = UIView(frame: CGRectZero)
     }
     
     /**
@@ -157,15 +160,6 @@ class ContactsTableViewController: UITableViewController {
     }
     
     /**
-        Returns `true` if the user is currently searching for a location; `false` otherwise.
-    
-        :returns: `true` if the user is currently searching; `false` otherwise.
-    */
-    func searching() -> Bool {
-        return searchController != nil && searchController!.active && searchController!.searchBar.text != "" && filteredContacts.count > 0
-    }
-    
-    /**
         On view exit, updates the change event view controller contacts.
     */
     override func viewWillDisappear(animated: Bool) {
@@ -237,15 +231,9 @@ extension ContactsTableViewController: UITableViewDelegate {
         The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        /*if searching() {
-            selectedContacts.append(filteredContacts[indexPath.row])
-            searchController?.searchBar.text = nil
-        }*/
-        //else {
-            let personViewController = ABPersonViewController()
-            personViewController.displayedPerson = selectedContacts[indexPath.row]
-            navigationController!.showViewController(personViewController, sender: self)
-        //}
+        let personViewController = ABPersonViewController()
+        personViewController.displayedPerson = selectedContacts[indexPath.row]
+        navigationController!.showViewController(personViewController, sender: self)
     }
 }
 
@@ -264,9 +252,6 @@ extension ContactsTableViewController: UITableViewDataSource {
         If the search controller is active, show the filtered contacts. If the search controller is inactive, show the selected contacts.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        /*if searching() {
-            return filteredContacts.count
-        }*/
         return selectedContacts.count
     }
     
@@ -276,9 +261,6 @@ extension ContactsTableViewController: UITableViewDataSource {
         Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        /*if searching() || !editingEnabled {
-            return false
-        }*/
         return true
     }
     
@@ -299,24 +281,12 @@ extension ContactsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
-        
-        // Show filtered records
-        /*if searching() {
-            let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
-            if fullName != nil {
-                cell.textLabel!.text = fullName
-                // Bold search text in name
-                boldSearchTextInLabel(cell.textLabel!)
-            }
-        }*/
-        // Show selected records
-        //else {
-            let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row])?.takeRetainedValue() as? String
-            if fullName != nil {
-                cell.textLabel!.attributedText = nil
-                cell.textLabel!.text = fullName
-            }
-        //}
+
+        let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row])?.takeRetainedValue() as? String
+        if fullName != nil {
+            cell.textLabel?.attributedText = nil
+            cell.textLabel?.text = fullName
+        }
         
         return cell
     }

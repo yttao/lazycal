@@ -42,10 +42,12 @@ class ContactsSearchTableView: UITableView {
         
         // Register contact cell.
         registerClass(ContactTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        
+        separatorInset = UIEdgeInsetsZero
+        layoutMargins = UIEdgeInsetsZero
     }
     
     override init(frame: CGRect) {
-        
         super.init(frame: frame)
         
         // Set delegate and data source.
@@ -63,6 +65,9 @@ class ContactsSearchTableView: UITableView {
         
         // Register contact cell.
         registerClass(ContactTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        
+        separatorInset = UIEdgeInsetsZero
+        layoutMargins = UIEdgeInsetsZero
     }
     
     override init(frame: CGRect, style: UITableViewStyle) {
@@ -83,6 +88,9 @@ class ContactsSearchTableView: UITableView {
         
         // Register contact cell.
         registerClass(ContactTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        
+        separatorInset = UIEdgeInsetsZero
+        layoutMargins = UIEdgeInsetsZero
     }
     
     /**
@@ -144,7 +152,6 @@ class ContactsSearchTableView: UITableView {
         
         // Sort results and reload
         sortRecords(&filteredContacts)
-        println("Filtered contacts: \(filteredContacts.count)")
     }
     
     /**
@@ -254,9 +261,6 @@ extension ContactsSearchTableView: UITableViewDataSource {
     */
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! ContactTableViewCell
-        // Set cell width to match table view width
-        let cellFrame = CGRectMake(cell.frame.origin.x, cell.frame.origin.y, tableView.frame.width, cell.frame.height)
-        cell.frame = cellFrame
         
         let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
         if fullName != nil {

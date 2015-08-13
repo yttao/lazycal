@@ -22,13 +22,26 @@ class ContactTableViewCell: UITableViewCell {
         super.init(coder: aDecoder)
         nameLabel = textLabel!
         infoLabel = detailTextLabel!
+        nameLabel.opaque = true
+        infoLabel.opaque = true
         opaque = true
+        separatorInset = UIEdgeInsetsZero
+        layoutMargins = UIEdgeInsetsZero
+        backgroundColor = UIColor.whiteColor()
     }
     
+    /**
+        Initialize `ContactTableViewCell` with a given style and reuse identifier.
+    */
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: self.style, reuseIdentifier: reuseIdentifier)
         nameLabel = textLabel!
         infoLabel = detailTextLabel!
+        nameLabel.opaque = true
+        infoLabel.opaque = true
         opaque = true
+        separatorInset = UIEdgeInsetsZero
+        layoutMargins = UIEdgeInsetsZero
+        backgroundColor = UIColor.whiteColor()
     }
 }
