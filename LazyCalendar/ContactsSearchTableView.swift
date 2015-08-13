@@ -18,8 +18,7 @@ class ContactsSearchTableView: UITableView {
     private var allContacts: NSArray!
     
     private let reuseIdentifier = "ContactCell"
-    private var contactCell: UITableViewCell?
-    
+
     // Maximum number of displayed search results
     private let maxSearchResults = 5
     
@@ -41,7 +40,7 @@ class ContactsSearchTableView: UITableView {
         }
         
         // Register contact cell so it can be reused.
-        registerClass(ContactTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        registerClass(SearchTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
         
         // Remove insets to get rid of automatic 15 left inset spacing.
         separatorInset = UIEdgeInsetsZero
@@ -65,7 +64,7 @@ class ContactsSearchTableView: UITableView {
         }
         
         // Register contact cell so it can be reused.
-        registerClass(ContactTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        registerClass(SearchTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
         
         // Remove insets to get rid of automatic 15 left inset spacing.
         separatorInset = UIEdgeInsetsZero
@@ -89,7 +88,7 @@ class ContactsSearchTableView: UITableView {
         }
         
         // Register contact cell so it can be reused.
-        registerClass(ContactTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        registerClass(SearchTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
         
         // Remove insets to get rid of automatic 15 left inset spacing.
         separatorInset = UIEdgeInsetsZero
@@ -260,17 +259,17 @@ extension ContactsSearchTableView: UITableViewDataSource {
     }
     
     /**
-        Creates a `ContactTableViewCell` with the contact's name and info.
+        Creates a `SearchTableViewCell` with the contact's name and info.
     */
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! ContactTableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! SearchTableViewCell
         
         let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
         if fullName != nil {
-            cell.nameLabel.text = fullName
-            cell.infoLabel.text = "foobar"
+            cell.mainLabel.text = fullName
+            cell.subLabel.text = "foobar"
             // Bold search text in name
-            boldSearchTextInLabel(cell.nameLabel)
+            boldSearchTextInLabel(cell.mainLabel)
         }
         
         return cell

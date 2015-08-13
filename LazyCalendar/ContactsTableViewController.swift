@@ -12,19 +12,18 @@ import AddressBookUI
 import CoreData
 
 class ContactsTableViewController: UITableViewController {
-    private var addressBookRef: ABAddressBookRef!
-    
-    private var allContacts: NSArray!
+    // Currently selected contacts
     private var selectedContacts: [ABRecordRef]!
-    private var filteredContacts = [ABRecordRef]()
-    
-    private var searchController: SearchController?
     // True if searching for new contacts is allowed.
     private var editingEnabled = true
-    private var searchTableView: ContactsSearchTableView?
-    
+    // Cell reuse identifier
     private let reuseIdentifier = "ContactCell"
     
+    // MARK: - Methods for initializing table view controller.
+    
+    /**
+        On initialization, add self as observer for event notifications and application activation.
+    */
     required init(coder aDecoder: NSCoder!) {
         super.init(coder: aDecoder)
         
@@ -47,14 +46,6 @@ class ContactsTableViewController: UITableViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        if addressBookAccessible() {
-            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-            allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
-        }
-        else {
-            allContacts = NSArray()
-        }
-        
         // Create and configure search controller
         if editingEnabled {
             initializeSearchController()
@@ -71,7 +62,7 @@ class ContactsTableViewController: UITableViewController {
     */
     func initializeSearchController() {
         // Create search controller.
-        searchController = {
+        let searchController: SearchController = {
             let controller = SearchController(searchResultsController: nil)
             controller.dimsBackgroundDuringPresentation = false
             controller.hidesNavigationBarDuringPresentation = false
@@ -87,37 +78,39 @@ class ContactsTableViewController: UITableViewController {
         // Set up the search table view.
         
         // Offset the search table view so that it is below the search bar.
-        let offset = CGRectOffset(searchController!.searchBar.frame, 0, searchController!.searchBar.frame.height)
+        let offset = CGRectOffset(searchController.searchBar.frame, 0, searchController.searchBar.frame.height)
         let frame = CGRectMake(offset.origin.x, offset.origin.y, tableView.frame.width, 0)
-        searchTableView = ContactsSearchTableView(frame: frame, style: .Plain)
-        searchTableView!.backgroundColor = UIColor.greenColor()
-        searchTableView!.loadData(contactsTableViewController: self, searchController: searchController!)
+        let searchTableView = ContactsSearchTableView(frame: frame, style: .Plain)
+        searchTableView.loadData(contactsTableViewController: self, searchController: searchController)
         
         // Set search table view as delegate.
-        searchController!.searchControllerDelegate = searchTableView
-        searchController!.searchResultsUpdater = searchTableView
-        searchController!.searchBar.delegate = searchTableView
+        searchController.searchControllerDelegate = searchTableView
+        searchController.searchResultsUpdater = searchTableView
+        searchController.searchBar.delegate = searchTableView
         
         // Overlay search table view on top of selected contacts table view.
-        view.insertSubview(searchTableView!, aboveSubview: tableView)
-        view.didAddSubview(searchTableView!)
+        view.insertSubview(searchTableView, aboveSubview: tableView)
+        view.didAddSubview(searchTableView)
     }
     
     /**
         Loads initial contact IDs data.
     
+        If the address book is accessible, the contacts will be loaded. If not, no data will be loaded.
+    
         :param: contactIDs The array of contact IDs.
     */
     func loadData(contactIDs: [ABRecordID]) {
         if addressBookAccessible() {
-            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-        }
-        
-        selectedContacts = [ABRecordRef]()
-        
-        for ID in contactIDs {
-            if let person: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, ID)?.takeUnretainedValue() {
-                selectedContacts.append(person!)
+            let addressBookRef: ABAddressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
+            
+            selectedContacts = [ABRecordRef]()
+            
+            for ID in contactIDs {
+                let person: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, ID)?.takeUnretainedValue()
+                if let person: ABRecordRef = person {
+                    selectedContacts.append(person)
+                }
             }
         }
     }
@@ -130,6 +123,8 @@ class ContactsTableViewController: UITableViewController {
     func setEditingEnabled(enabled: Bool) {
         editingEnabled = enabled
     }
+    
+    // MARK: - Methods for accessing and handling records.
     
     /**
         Returns a `Bool` indicating if a contact exists in the currently selected contacts.
@@ -145,6 +140,11 @@ class ContactsTableViewController: UITableViewController {
         return !recordMatch.isEmpty
     }
     
+    /**
+        Adds a record to the selected records.
+    
+        :param: recordRef The record to add.
+    */
     func addRecord(recordRef: ABRecordRef) {
         tableView.beginUpdates()
         tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: selectedContacts.count, inSection: 0)], withRowAnimation: .Automatic)
@@ -152,12 +152,20 @@ class ContactsTableViewController: UITableViewController {
         tableView.endUpdates()
     }
     
+    /**
+        Deletes a record from the selected records.
+    
+        :param: recordRef The record to delete.
+        :param: indexPath The indexPath of the deleted record.
+    */
     func deleteRecord(recordRef: ABRecordRef, atIndexPath indexPath: NSIndexPath) {
         tableView.beginUpdates()
         tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
         selectedContacts.removeAtIndex(indexPath.row)
         tableView.endUpdates()
     }
+    
+    // MARK: - Methods for exiting view controller.
     
     /**
         On view exit, updates the change event view controller contacts.
@@ -211,6 +219,7 @@ class ContactsTableViewController: UITableViewController {
 
 // MARK: - UITableViewDelegate
 extension ContactsTableViewController: UITableViewDelegate {
+    // MARK: - Methods for editing.
     /**
         Prevents indenting for showing circular edit button on the left when editing.
     */
@@ -224,6 +233,8 @@ extension ContactsTableViewController: UITableViewDelegate {
     override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
         return .Delete
     }
+    
+    // MARK: - Methods for selecting.
     
     /**
         If searching, selection will append to selected contacts and clear the search bar.
@@ -239,6 +250,8 @@ extension ContactsTableViewController: UITableViewDelegate {
 
 // MARK: - UITableViewDataSource
 extension ContactsTableViewController: UITableViewDataSource {
+    // MARK: - Methods for counting sections and rows.
+    
     /**
         There is 1 section in the contacts list.
     */
@@ -254,6 +267,27 @@ extension ContactsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return selectedContacts.count
     }
+    
+    // MARK: - Methods for setting up cells.
+    
+    /**
+        Configures each cell in table view with contact information.
+    
+        The prototype cells have a main text label and detail text label. The main text label displays the contact's first and last name. The detail text label (for now) displays the contact's main phone number.
+    */
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
+        
+        let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row])?.takeRetainedValue() as? String
+        if fullName != nil {
+            cell.textLabel?.attributedText = nil
+            cell.textLabel?.text = fullName
+        }
+        
+        return cell
+    }
+    
+    // MARK: - Methods for editing.
     
     /**
         Allow table cells to be deleted.
@@ -272,22 +306,5 @@ extension ContactsTableViewController: UITableViewDataSource {
             let recordRef: ABRecordRef = selectedContacts[indexPath.row]
             deleteRecord(recordRef, atIndexPath: indexPath)
         }
-    }
-    
-    /**
-        Configures each cell in table view with contact information.
-    
-        The prototype cells have a main text label and detail text label. The main text label displays the contact's first and last name. The detail text label (for now) displays the contact's main phone number.
-    */
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
-
-        let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row])?.takeRetainedValue() as? String
-        if fullName != nil {
-            cell.textLabel?.attributedText = nil
-            cell.textLabel?.text = fullName
-        }
-        
-        return cell
     }
 }
