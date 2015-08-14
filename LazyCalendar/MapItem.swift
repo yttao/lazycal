@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Kim. All rights reserved.
 //
 
-import Foundation
 import MapKit
 
 class MapItem: NSObject, MKAnnotation, Equatable, Hashable {
@@ -61,9 +60,8 @@ func ==(lhs: MapItem, rhs: MapItem) -> Bool {
     let addressMatch = lhs.address == rhs.address
     
     // Floating point comparisons
-    let EPSILON = pow(10.0, -10.0)
-    let latitudeMatch = fabs(lhs.coordinate.latitude - rhs.coordinate.latitude) < EPSILON
-    let longitudeMatch = fabs(lhs.coordinate.longitude - rhs.coordinate.longitude) < EPSILON
+    let latitudeMatch = fabs(lhs.coordinate.latitude - rhs.coordinate.latitude) < Math.epsilon
+    let longitudeMatch = fabs(lhs.coordinate.longitude - rhs.coordinate.longitude) < Math.epsilon
     let coordinateMatch = latitudeMatch && longitudeMatch
     return coordinateMatch && nameMatch && addressMatch
 }

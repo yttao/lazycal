@@ -249,7 +249,7 @@ class SelectEventTableViewController: UITableViewController {
         // Load contact IDs into contacts table view controller.
         contactsTableViewController.loadData(contactIDs)
         // Disable searching for new contacts.
-        contactsTableViewController.setEditingEnabled(false)
+        contactsTableViewController.editingEnabled = false
         
         navigationController!.showViewController(contactsTableViewController, sender: self)
     }
@@ -266,7 +266,7 @@ class SelectEventTableViewController: UITableViewController {
         // Load map items into locations view controller.
         locationsViewController.loadData(mapItems)
         // Disable searching for new locations.
-        locationsViewController.setEditingEnabled(false)
+        locationsViewController.editingEnabled = false
         
         // Show locations view controller
         navigationController!.showViewController(locationsViewController, sender: self)
@@ -298,12 +298,24 @@ class SelectEventTableViewController: UITableViewController {
 
 // MARK: - UITableViewDelegate
 extension SelectEventTableViewController: UITableViewDelegate {
+    // MARK: - Methods for header and footer views.
+    
     /**
         If there are no rows in the section, header height is 0. Otherwise default header height.
     */
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
-            return CGFloat(0)
+            return CGFloat(Math.epsilon)
+        }
+        return super.tableView(tableView, heightForHeaderInSection: section)
+    }
+    
+    /**
+        If there are no rows in the section, footer height is 0. Otherwise default footer height.
+    */
+    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
+            return CGFloat(Math.epsilon)
         }
         return super.tableView(tableView, heightForHeaderInSection: section)
     }
@@ -333,19 +345,9 @@ extension SelectEventTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath == indexPaths["AlarmTime"] && alarmTimeDisplayCell.hidden {
-            return CGFloat(0)
+            return CGFloat(Math.epsilon)
         }
         return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
-    }
-    
-    /**
-        If there are no rows in the section, footer height is 0. Otherwise default footer height.
-    */
-    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
-            return CGFloat(0)
-        }
-        return super.tableView(tableView, heightForHeaderInSection: section)
     }
     
     /**

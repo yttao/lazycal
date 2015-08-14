@@ -22,7 +22,7 @@ class LocationsViewController: UIViewController {
     private let locationsMapViewSegue = "LocationsMapViewSegue"
     
     private var mapItems: [MapItem]?
-    private var editingEnabled: Bool?
+    var editingEnabled: Bool?
     
     // MARK: - Methods for initializing view controller and data.
     
@@ -49,15 +49,6 @@ class LocationsViewController: UIViewController {
     */
     func loadData(mapItems: [MapItem]) {
         self.mapItems = mapItems
-    }
-    
-    /**
-        Sets whether or not editing is enabled.
-    
-        :param: enabled `true` if editing is enabled; `false` otherwise.
-    */
-    func setEditingEnabled(enabled: Bool) {
-        editingEnabled = enabled
     }
 
     /**
@@ -97,7 +88,7 @@ class LocationsViewController: UIViewController {
                     locationsTableViewController.loadData(mapItems)
                 }
                 if let editingEnabled = editingEnabled {
-                    locationsTableViewController.setEditingEnabled(editingEnabled)
+                    locationsTableViewController.editingEnabled = editingEnabled
                 }
             }
         }

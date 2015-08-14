@@ -6,14 +6,14 @@
 //  Copyright (c) 2015 Kim. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import CoreData
 import AddressBook
 import CoreLocation
 
-extension UIViewController {
-    // MARK: - Methods related to notifications permissions.
+extension NSObject {
+    // MARK: - Methods related to checking permissions.
+    
     /**
         Returns a `Bool` indicating whether or not notifications are enabled.
     
@@ -27,13 +27,15 @@ extension UIViewController {
         return false
     }
     
-    /**
-        Displays an alert indicating that notifications are disabled.
+    // MARK: - Methods related to user location access.
     
-        This occurs when the user attempts to press the alarm switch or select the alarm cell when they have notifications disabled.
+    /**
+        Returns a `Bool` indicating if the user location is accessible.
+    
+        :returns: A `Bool` indicating whether or not the user location is accessible.
     */
-    func displayNotificationsDisabledAlert() {
-        presentPermissionAlertController("Notifications Disabled", "You must give permission to send notifications to use this feature.")
+    func locationAccessible() -> Bool {
+        return CLLocationManager.authorizationStatus() == .AuthorizedWhenInUse || CLLocationManager.authorizationStatus() == .AuthorizedAlways
     }
     
     // MARK: - Methods related to address book access.
@@ -46,6 +48,19 @@ extension UIViewController {
     func addressBookAccessible() -> Bool {
         return ABAddressBookGetAuthorizationStatus() == .Authorized
     }
+}
+
+extension UIViewController {
+    // MARK: - Methods related to creating alerts for specific permissions.
+    
+    /**
+        Displays an alert indicating that notifications are disabled.
+    
+        This occurs when the user attempts to press the alarm switch or select the alarm cell when they have notifications disabled.
+    */
+    func displayNotificationsDisabledAlert() {
+        presentPermissionAlertController("Notifications Disabled", "You must give permission to send notifications to use this feature.")
+    }
 
     /**
         Alerts the user that access to contacts is denied or restricted and requests a permissions change by going to settings.
@@ -54,17 +69,6 @@ extension UIViewController {
     */
     func displayAddressBookInaccessibleAlert() {
         presentPermissionAlertController("Cannot Access Contacts", "You must give permission to access contacts to use this feature.")
-    }
-    
-    // MARK: - Methods related to user location access.
-    
-    /**
-        Returns a `Bool` indicating if the user location is accessible.
-    
-        :returns: A `Bool` indicating whether or not the user location is accessible.
-    */
-    func locationAccessible() -> Bool {
-        return CLLocationManager.authorizationStatus() == .AuthorizedWhenInUse || CLLocationManager.authorizationStatus() == .AuthorizedAlways
     }
     
     /**

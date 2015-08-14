@@ -13,7 +13,7 @@ import AddressBookUI
 import CoreLocation
 
 class LocationsTableViewController: UITableViewController {
-    private var editingEnabled = true
+    var editingEnabled = true
     
     var selectedMapItems: [MapItem]!
     // Map items shown when searching for locations
@@ -45,7 +45,7 @@ class LocationsTableViewController: UITableViewController {
             initializeSearchController()
         }
         
-        tableView.tableFooterView = UIView(frame: CGRectZero)
+        //tableView.tableFooterView = UIView(frame: CGRectZero)
     }
     
     /**
@@ -59,7 +59,7 @@ class LocationsTableViewController: UITableViewController {
             controller.hidesNavigationBarDuringPresentation = false
             controller.searchBar.searchBarStyle = .Default
             controller.searchBar.sizeToFit()
-            controller.searchBar.placeholder = "Search for New Contacts"
+            controller.searchBar.placeholder = "Search for Places"
             
             self.tableView.tableHeaderView = controller.searchBar
             
@@ -87,15 +87,6 @@ class LocationsTableViewController: UITableViewController {
     }
     
     // MARK: - Methods related to initializing data.
-    
-    /**
-        Sets whether editing is enabled or not. If editing is enabled, locations can be added and removed. Otherwise, the selected locations are fixed.
-    
-        :param: enabled `true` if editing is enabled; `false` otherwise.
-    */
-    func setEditingEnabled(enabled: Bool) {
-        editingEnabled = enabled
-    }
     
     /**
         Loads initial selected locations.
@@ -140,7 +131,6 @@ class LocationsTableViewController: UITableViewController {
         tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: selectedMapItems.count, inSection: 0)], withRowAnimation: .Automatic)
         selectedMapItems.append(mapItem)
         tableView.endUpdates()
-        tableView.reloadData()
     }
     
     // MARK: - Methods for deleting map items.
@@ -206,6 +196,22 @@ extension LocationsTableViewController: UITableViewDelegate {
         NSNotificationCenter.defaultCenter().postNotificationName("LocationChanged", object: self, userInfo: ["Location": mapItem.location])
     }
     
+    // MARK: - Methods for setting up headers and footers.
+    
+    /**
+        Hide footer view.
+    */
+    override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return UIView(frame: CGRectZero)
+    }
+    
+    /**
+        Footer height is zero.
+    */
+    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat(Math.epsilon)
+    }
+    
     // MARK: - Methods related to editing appearance.
     
     /**
@@ -241,8 +247,6 @@ extension LocationsTableViewController: UITableViewDataSource {
         return selectedMapItems.count
     }
     
-    // MARK: - Methods for setting up cell content.
-    
     /**
         Display cell with name as text label and address as detail text label.
     */
@@ -267,10 +271,10 @@ extension LocationsTableViewController: UITableViewDataSource {
         Note: If `tableView.editing = true`, the left circular edit option will appear. If locations are being searched or editing is disabled, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        /*if searching() || !editingEnabled {
-            return false
-        }*/
-        return true
+        if editingEnabled {
+            return true
+        }
+        return false
     }
     
     /**

@@ -15,7 +15,7 @@ class ContactsTableViewController: UITableViewController {
     // Currently selected contacts
     private var selectedContacts: [ABRecordRef]!
     // True if searching for new contacts is allowed.
-    private var editingEnabled = true
+    var editingEnabled = true
     // Cell reuse identifier
     private let reuseIdentifier = "ContactCell"
     
@@ -50,11 +50,6 @@ class ContactsTableViewController: UITableViewController {
         if editingEnabled {
             initializeSearchController()
         }
-        // Hides search controller on segue.
-        definesPresentationContext = true
-        
-        // Set footer to 0 to hide extra cells
-        tableView.tableFooterView = UIView(frame: CGRectZero)
     }
     
     /**
@@ -68,7 +63,7 @@ class ContactsTableViewController: UITableViewController {
             controller.hidesNavigationBarDuringPresentation = false
             controller.searchBar.searchBarStyle = .Default
             controller.searchBar.sizeToFit()
-            controller.searchBar.placeholder = "Search for New Contacts"
+            controller.searchBar.placeholder = "Search for Contacts"
             
             self.tableView.tableHeaderView = controller.searchBar
             
@@ -90,6 +85,9 @@ class ContactsTableViewController: UITableViewController {
         // Overlay search table view on top of selected contacts table view.
         view.insertSubview(searchTableView, aboveSubview: tableView)
         view.didAddSubview(searchTableView)
+        
+        // Hides search controller on segue.
+        definesPresentationContext = true
     }
     
     /**
@@ -112,15 +110,6 @@ class ContactsTableViewController: UITableViewController {
                 }
             }
         }
-    }
-    
-    /**
-        Sets editing enabled. If enabled, contacts can be added and removed. Otherwise, selected contacts are fixed.
-    
-        :param: enabled `true` if search is enabled; `false` otherwise.
-    */
-    func setEditingEnabled(enabled: Bool) {
-        editingEnabled = enabled
     }
     
     // MARK: - Methods for accessing and handling records.
@@ -218,7 +207,24 @@ class ContactsTableViewController: UITableViewController {
 
 // MARK: - UITableViewDelegate
 extension ContactsTableViewController: UITableViewDelegate {
+    // MARK: - Methods for setting up headers and footers.
+
+    /**
+        Hide footer view.
+    */
+    override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return UIView(frame: CGRectZero)
+    }
+    
+    /**
+        Height for footer is zero.
+    */
+    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return CGFloat(Math.epsilon)
+    }
+    
     // MARK: - Methods for editing.
+    
     /**
         Prevents indenting for showing circular edit button on the left when editing.
     */
@@ -233,7 +239,7 @@ extension ContactsTableViewController: UITableViewDelegate {
         return .Delete
     }
     
-    // MARK: - Methods for selecting.
+    // MARK: - Methods for selecting cells.
     
     /**
         If searching, selection will append to selected contacts and clear the search bar.
@@ -294,7 +300,10 @@ extension ContactsTableViewController: UITableViewDataSource {
         Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return true
+        if editingEnabled {
+           return true
+        }
+        return false
     }
     
     /**

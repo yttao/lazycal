@@ -53,12 +53,14 @@ class ContactsSearchTableView: SearchTableView {
     
     /**
         Initializes the view.
+    
+        :param: reuseIdentifier The cell reuse identifier.
     */
     override func initializeView(reuseIdentifier: String) {
         filteredContacts = [ABRecordRef]()
         
         // Set address book and get all contacts.
-        if ABAddressBookGetAuthorizationStatus() == .Authorized {
+        if addressBookAccessible() {
             addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
             allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
         }
@@ -84,7 +86,7 @@ class ContactsSearchTableView: SearchTableView {
     
         :param: searchText The text to filter the results.
     */
-    func filterContacts(searchText: String) {
+    override func filterSearchResults() {
         let block = {
             (record: AnyObject!, bindings: [NSObject: AnyObject]!) -> Bool in
             let recordRef: ABRecordRef = record as ABRecordRef
@@ -100,14 +102,14 @@ class ContactsSearchTableView: SearchTableView {
             let emailsMultivalue: AnyObject? = ABRecordCopyValue(recordRef, kABPersonEmailProperty)?.takeRetainedValue()
             
             // Search name for search text
-            if name?.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
+            if name?.rangeOfString(self.searchText!, options: .CaseInsensitiveSearch) != nil {
                 return true
             }
             
             // Search phone numbers for search text
             for i in 0..<ABMultiValueGetCount(phoneNumbersMultivalue!) {
                 let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue!, i).takeRetainedValue() as! String
-                if phoneNumber.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
+                if phoneNumber.rangeOfString(self.searchText!, options: .CaseInsensitiveSearch) != nil {
                     return true
                 }
             }
@@ -115,7 +117,7 @@ class ContactsSearchTableView: SearchTableView {
             // Search emails for search text
             for i in 0..<ABMultiValueGetCount(emailsMultivalue) {
                 let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, i).takeRetainedValue() as! String
-                if email.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
+                if email.rangeOfString(self.searchText!, options: .CaseInsensitiveSearch) != nil {
                     return true
                 }
             }
@@ -142,55 +144,6 @@ class ContactsSearchTableView: SearchTableView {
             return firstFullName.compare(secondFullName) == .OrderedAscending
         })
     }
-    
-    /**
-        Bolds the search bar text in the result cells.
-    
-        :param: cell The cell to have bolded text.
-    */
-    func boldSearchTextInLabel(label: UILabel) {
-        let text = label.text!
-        let searchText = searchController!.searchBar.text
-        
-        // Find range of search text
-        let boldRange = text.rangeOfString(searchText, options: .CaseInsensitiveSearch)
-        
-        // Check if search text is in label (can be in main or details label depending on where search text was found).
-        if boldRange != nil {
-            let start = distance(text.startIndex, boldRange!.startIndex)
-            let length = count(searchText)
-            let range = NSMakeRange(start, length)
-            
-            // Make bold font
-            let font = UIFont.boldSystemFontOfSize(label.font.pointSize)
-            
-            // Create attributed text
-            var attributedText = NSMutableAttributedString(string: text)
-            attributedText.beginEditing()
-            attributedText.addAttribute(NSFontAttributeName, value: font, range: range)
-            attributedText.endEditing()
-            
-            // Set text
-            label.attributedText = attributedText
-        }
-            // If search text is not in label, show label with plain text.
-        else {
-            label.attributedText = nil
-            label.text = text
-        }
-    }
-    
-    /**
-        Updates the table view height. The table view height is calculated to equal the height of all the cells.
-    */
-    func updateTableViewHeight() {
-        var newHeight: CGFloat = 0.0
-        for i in 0..<tableView(self, numberOfRowsInSection: 0) {
-            newHeight += tableView(self, heightForRowAtIndexPath: NSIndexPath(forRow: i, inSection: 0))
-        }
-        let newFrame = CGRectMake(frame.origin.x, frame.origin.y, frame.width, newHeight)
-        frame = newFrame
-    }
 }
 
 // MARK: - UITableViewDelegate
@@ -208,30 +161,6 @@ extension ContactsSearchTableView: UITableViewDelegate {
 
 // MARK: - UITableViewDataSource
 extension ContactsSearchTableView: UITableViewDataSource {
-    /**
-        There is one section in the table view.
-    */
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    /**
-        The number of search results equals the number of contacts found or the maximum number of search results allowed.
-    */
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if filteredContacts.count <= maxSearchResults {
-            return filteredContacts.count
-        }
-        return maxSearchResults
-    }
-    
-    /**
-        The height of a cell is equal to 2/3 the height of a standard `UITableViewCell`.
-    */
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return UITableViewCell().frame.height * SearchTableView.sizingScaleFactor
-    }
-    
     /**
         Creates a `SearchTableViewCell` with the contact's name and info.
     */
@@ -256,25 +185,7 @@ extension ContactsSearchTableView: UISearchResultsUpdating {
         Updates search results by updating `filteredContacts`.
     */
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        filterContacts(searchController.searchBar.text)
-        updateTableViewHeight()
+        filterSearchResults()
         reloadData()
-    }
-}
-
-// MARK: - ContactsSearchControllerDelegate
-extension ContactsSearchTableView: SearchControllerDelegate {
-    /**
-        When the text field of the search controller loads, set the offset so that it matches the text field's offset and resize the contacts search table width to be the same as the text field.
-    */
-    func searchControllerDidLoadSearchTextField(searchTextField: UITextField) {
-        // Simulate cancel button size.
-        let cancelButton = UIButton()
-        cancelButton.titleLabel!.text = "Cancel"
-        cancelButton.titleLabel!.sizeToFit()
-        
-        // Resize width to search text field's width minus the size of the cancel button.
-        let newFrame = CGRectMake(searchTextField.frame.origin.x, frame.origin.y, searchTextField.frame.width - cancelButton.titleLabel!.frame.width - searchTextField.frame.origin.x, frame.height)
-        frame = newFrame
     }
 }

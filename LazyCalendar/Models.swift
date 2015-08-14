@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Kim. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import AddressBook
 import CoreData
@@ -191,9 +190,8 @@ func ==(lhs: Contact, rhs: Contact) -> Bool {
     :returns: `true` if the `Locations` have the same `name`, `address`, and coordinates (`latitude` and `longitude`) properties match; `false` otherwise.
 */
 func ==(lhs: Location, rhs: Location) -> Bool {
-    let EPSILON = pow(10.0, -10.0)
-    let latitudeMatch = fabs(lhs.latitude - rhs.latitude) < EPSILON
-    let longitudeMatch = fabs(lhs.longitude - rhs.longitude) < EPSILON
+    let latitudeMatch = fabs(lhs.latitude - rhs.latitude) < Math.epsilon
+    let longitudeMatch = fabs(lhs.longitude - rhs.longitude) < Math.epsilon
     let coordinateMatch = latitudeMatch && longitudeMatch
     
     let nameMatch = lhs.name == rhs.name

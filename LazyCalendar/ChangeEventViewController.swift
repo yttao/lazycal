@@ -11,7 +11,6 @@ import MapKit
 import CoreData
 import AddressBook
 import AddressBookUI
-import CoreLocation
 
 class ChangeEventViewController: UITableViewController {
     // Event data to store
@@ -71,9 +70,6 @@ class ChangeEventViewController: UITableViewController {
     private var addressBookRef: ABAddressBookRef?
     
     private let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
-    
-    // Amount of error allowed for floating points
-    private let EPSILON = pow(10.0, -10.0)
     
     // MARK: - Methods for initializing view controller.
     
@@ -767,7 +763,7 @@ class ChangeEventViewController: UITableViewController {
         TODO: make sure this doesn't reschedule a notification after the event has already fired a notification (unless the new alarm time is after current time).
     */
     private func scheduleNotifications() {
-        NSLog("Event scheduled for time: %@", event!.alarmTime!.description)
+        NSLog("Event scheduled for time: %@", event!.alarmTime!)
         // Create notification
         let notification = UILocalNotification()
         
@@ -983,7 +979,7 @@ class ChangeEventViewController: UITableViewController {
         
         // A stored location and the map item's location are considered the same if they have the same coordinates (matching latitude and longitude).
         let requirements = "((latitude - %d) < %d AND (latitude - %d) > %d) AND ((longitude - %d) < %d AND (longitude - %d) > %d)"
-        let predicate = NSPredicate(format: requirements, argumentArray: [latitude, EPSILON, longitude, -EPSILON, longitude, EPSILON, longitude, -EPSILON])
+        let predicate = NSPredicate(format: requirements, argumentArray: [latitude, Math.epsilon, longitude, -Math.epsilon, longitude, Math.epsilon, longitude, -Math.epsilon])
         fetchRequest.predicate = predicate
         
         // Search for location in storage.
@@ -1047,6 +1043,8 @@ class ChangeEventViewController: UITableViewController {
 
 // MARK: - UITableViewDelegate
 extension ChangeEventViewController: UITableViewDelegate {
+    // MARK: - Methods for heights.
+    
     /**
         If cell contains a date picker, cell height is height of date picker. Otherwise use default cell height.
     */
@@ -1058,6 +1056,8 @@ extension ChangeEventViewController: UITableViewDelegate {
         }
         return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
     }
+    
+    // MARK: - Methods for selection and deselection.
     
     /**
         Performs actions based on selected index path.
@@ -1076,6 +1076,11 @@ extension ChangeEventViewController: UITableViewDelegate {
 
 // MARK: - UITableViewDataSource
 extension ChangeEventViewController: UITableViewDataSource {
+    // MARK: - Methods for sections and rows.
+    
+    /**
+        The number of sections in the table view.
+    */
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return sections.count
     }
@@ -1101,6 +1106,9 @@ extension ChangeEventViewController: UITableViewDataSource {
         return super.tableView(tableView, numberOfRowsInSection: section)
     }
     
+    /**
+        Creates the cell at an index path.
+    */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
 

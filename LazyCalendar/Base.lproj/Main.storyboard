@@ -853,7 +853,7 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Start" id="5FB-ZN-YiS">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="9Np-jS-dhf" detailTextLabel="Hzn-E8-NVL" style="IBUITableViewCellStyleValue1" id="9gk-gi-1qg" userLabel="DateStart">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="9Np-jS-dhf" detailTextLabel="Hzn-E8-NVL" style="IBUITableViewCellStyleValue1" id="9gk-gi-1qg" userLabel="DateStart">
                                         <rect key="frame" x="0.0" y="201" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="9gk-gi-1qg" id="moM-ng-mmg">
@@ -905,7 +905,7 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="End" id="fxf-sh-VR8">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="Dpl-jU-l7d" detailTextLabel="T3v-zK-MqL" style="IBUITableViewCellStyleValue1" id="OMl-Va-giW" userLabel="DateEnd">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="Dpl-jU-l7d" detailTextLabel="T3v-zK-MqL" style="IBUITableViewCellStyleValue1" id="OMl-Va-giW" userLabel="DateEnd">
                                         <rect key="frame" x="0.0" y="288" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="OMl-Va-giW" id="hor-TU-yGg">

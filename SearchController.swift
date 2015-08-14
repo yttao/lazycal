@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Kim. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 class SearchController: UISearchController {
@@ -29,8 +28,7 @@ class SearchController: UISearchController {
     }
 }
 
-/**
-*/
+// MARK: - SearchControllerDelegate
 protocol SearchControllerDelegate {
     func searchControllerDidLoadSearchTextField(searchTextField: UITextField)
 }
