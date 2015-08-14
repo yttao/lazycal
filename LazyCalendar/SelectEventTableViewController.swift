@@ -313,7 +313,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
-            return nil
+            return UIView(frame: CGRectZero)
         }
         return super.tableView(tableView, viewForHeaderInSection: section)
     }
@@ -323,7 +323,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         if self.tableView(tableView, numberOfRowsInSection: section) == 0 {
-            return nil
+            return UIView(frame: CGRectZero)
         }
         return super.tableView(tableView, viewForFooterInSection: section)
     }

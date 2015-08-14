@@ -637,7 +637,7 @@
                         <sections>
                             <tableViewSection headerTitle="Details" id="rNu-aA-pvm" userLabel="EventDetails">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Name" textLabel="jF5-0l-0Lh" style="IBUITableViewCellStyleDefault" id="CXJ-H8-nbk" userLabel="Name">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" textLabel="jF5-0l-0Lh" style="IBUITableViewCellStyleDefault" id="CXJ-H8-nbk" userLabel="Name">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CXJ-H8-nbk" id="HwO-A8-JTZ">
                                             <autoresizingMask key="autoresizingMask"/>
@@ -651,7 +651,7 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="NhU-cS-MgM" style="IBUITableViewCellStyleDefault" id="5zh-Hf-wBd" userLabel="Time">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" textLabel="NhU-cS-MgM" style="IBUITableViewCellStyleDefault" id="5zh-Hf-wBd" userLabel="Time">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="5zh-Hf-wBd" id="cCS-SA-WAb">
                                             <autoresizingMask key="autoresizingMask"/>
@@ -669,7 +669,7 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Alarm" id="aDo-JR-gwk" userLabel="Alarm">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="u88-Co-JWb" detailTextLabel="KhG-Ie-Wyq" style="IBUITableViewCellStyleValue1" id="Gx3-4t-m3E" userLabel="Alarm">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" textLabel="u88-Co-JWb" detailTextLabel="KhG-Ie-Wyq" style="IBUITableViewCellStyleValue1" id="Gx3-4t-m3E" userLabel="Alarm">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Gx3-4t-m3E" id="v2U-XB-TmO">
                                             <autoresizingMask key="autoresizingMask"/>
@@ -689,7 +689,7 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="gx4-vy-IpG" detailTextLabel="Vzg-iG-oT3" style="IBUITableViewCellStyleValue1" id="lNb-xl-Gh6" userLabel="AlarmTimeDisplay">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" textLabel="gx4-vy-IpG" detailTextLabel="Vzg-iG-oT3" style="IBUITableViewCellStyleValue1" id="lNb-xl-Gh6" userLabel="AlarmTimeDisplay">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="lNb-xl-Gh6" id="Hvd-bz-4ew">
                                             <autoresizingMask key="autoresizingMask"/>
@@ -822,7 +822,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="G6a-oI-15j">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <sections>
                             <tableViewSection headerTitle="Event" id="bnP-ET-twe">
                                 <cells>
@@ -1009,7 +1009,7 @@
                                             <bool key="isElement" value="YES"/>
                                         </accessibility>
                                     </tableViewCell>
-                                    <tableViewCell hidden="YES" contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="y6A-4J-vUt" detailTextLabel="c3A-gU-fLz" style="IBUITableViewCellStyleValue1" id="9rW-qa-4iV" userLabel="AlarmTimeDisplay">
+                                    <tableViewCell hidden="YES" contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="y6A-4J-vUt" detailTextLabel="c3A-gU-fLz" style="IBUITableViewCellStyleValue1" id="9rW-qa-4iV" userLabel="AlarmTimeDisplay">
                                         <rect key="frame" x="0.0" y="463" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="9rW-qa-4iV" id="ian-ch-yiL">
@@ -1061,7 +1061,7 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Contacts" id="5Ki-Vh-Hzc">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="vjA-bz-VwY" detailTextLabel="wVU-SB-9Bl" style="IBUITableViewCellStyleValue1" id="Ezz-sn-kZC" userLabel="Contacts">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="vjA-bz-VwY" detailTextLabel="wVU-SB-9Bl" style="IBUITableViewCellStyleValue1" id="Ezz-sn-kZC" userLabel="Contacts">
                                         <rect key="frame" x="0.0" y="375" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Ezz-sn-kZC" id="dkH-1Q-oou">
@@ -1090,7 +1090,7 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Locations" id="vWD-ZD-nOY" userLabel="Locations">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="Y9b-Ga-7eU" detailTextLabel="QoJ-OJ-5YO" style="IBUITableViewCellStyleValue1" id="8IK-rC-OP3" userLabel="Locations">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="Y9b-Ga-7eU" detailTextLabel="QoJ-OJ-5YO" style="IBUITableViewCellStyleValue1" id="8IK-rC-OP3" userLabel="Locations">
                                         <rect key="frame" x="0.0" y="375" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="8IK-rC-OP3" id="DcD-pd-Hbd">

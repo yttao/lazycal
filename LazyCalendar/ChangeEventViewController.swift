@@ -362,13 +362,13 @@ class ChangeEventViewController: UITableViewController {
         if alarmTimeDisplayCell.hidden {
             tableView.insertRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .Automatic)
         }
-        if alarmTimePickerCell.hidden {
+        /*if alarmTimePickerCell.hidden {
             tableView.insertRowsAtIndexPaths([indexPaths["AlarmTimePicker"]!], withRowAnimation: .Automatic)
-        }
+        }*/
         
         alarmDateToggleCell.hidden = false
         alarmTimeDisplayCell.hidden = false
-        alarmTimePickerCell.hidden = false
+        //alarmTimePickerCell.hidden = false
         
         tableView.endUpdates()
     }
@@ -577,10 +577,18 @@ class ChangeEventViewController: UITableViewController {
             tableView.endUpdates()
         case sections["Alarm"]!:
             // Show notifications disabled alert if notifications are turned off.
-            if indexPath == indexPaths["AlarmToggle"]! {
+            if indexPath == indexPaths["AlarmToggle"] {
                 if !alarmSwitch.userInteractionEnabled {
                     displayNotificationsDisabledAlert()
                 }
+            }
+            else if indexPath == indexPaths["AlarmTimeDisplay"] {
+                tableView.beginUpdates()
+                if alarmTimePickerCell.hidden {
+                    alarmTimePickerCell.hidden = false
+                    tableView.insertRowsAtIndexPaths([indexPaths["AlarmTimePicker"]!], withRowAnimation: .None)
+                }
+                tableView.endUpdates()
             }
         case sections["Contacts"]!:
             // Ensure permission to access address book, then segue to contacts view.
@@ -640,6 +648,13 @@ class ChangeEventViewController: UITableViewController {
                 tableView.beginUpdates()
                 tableView.deleteRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
                 dateEndPickerCell.hidden = true
+                tableView.endUpdates()
+            }
+        case sections["Alarm"]!:
+            if selectedIndexPath == indexPaths["AlarmTimeDisplay"] {
+                tableView.beginUpdates()
+                alarmTimePickerCell.hidden = true
+                tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTimePicker"]!], withRowAnimation: .None)
                 tableView.endUpdates()
             }
         default:
@@ -1075,8 +1090,13 @@ extension ChangeEventViewController: UITableViewDataSource {
         else if section == sections["End"] && dateEndPickerCell.hidden {
             return 1
         }
-        else if section == sections["Alarm"] && alarmDateToggleCell.hidden && alarmTimeDisplayCell.hidden && alarmTimeDisplayCell.hidden {
-            return 1
+        else if section == sections["Alarm"] && alarmTimePickerCell.hidden {
+            if alarmDateToggleCell.hidden && alarmTimeDisplayCell.hidden {
+                return 1
+            }
+            else {
+                return 3
+            }
         }
         return super.tableView(tableView, numberOfRowsInSection: section)
     }
