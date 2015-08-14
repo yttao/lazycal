@@ -18,6 +18,7 @@ class ContactsSearchTableView: SearchTableView {
             selectedResultsTableViewController = newValue
         }
     }
+    
     private var filteredContacts: [ABRecordRef] {
         get {
             return searchResults
@@ -35,29 +36,25 @@ class ContactsSearchTableView: SearchTableView {
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        initializeView()
+        initializeView("ContactCell")
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        initializeView()
+        initializeView("ContactCell")
     }
     
     override init(frame: CGRect, style: UITableViewStyle) {
         super.init(frame: frame, style: style)
         
-        initializeView()
+        initializeView("ContactCell")
     }
     
-    private func initializeView() {
-        // Set delegate and data source.
-        delegate = self
-        dataSource = self
-        
-        // Set reuse identifier
-        reuseIdentifier = "ContactCell"
-        
+    /**
+        Initializes the view.
+    */
+    override func initializeView(reuseIdentifier: String) {
         filteredContacts = [ABRecordRef]()
         
         // Set address book and get all contacts.
@@ -69,12 +66,7 @@ class ContactsSearchTableView: SearchTableView {
             allContacts = NSArray()
         }
         
-        // Register contact cell so it can be reused.
-        registerClass(SearchTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
-        
-        // Remove insets to get rid of automatic 15 left inset spacing.
-        separatorInset = UIEdgeInsetsZero
-        layoutMargins = UIEdgeInsetsZero
+        super.initializeView(reuseIdentifier)
     }
     
     /**
@@ -226,7 +218,7 @@ extension ContactsSearchTableView: UITableViewDataSource {
     /**
         The number of search results equals the number of contacts found or the maximum number of search results allowed.
     */
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if filteredContacts.count <= maxSearchResults {
             return filteredContacts.count
         }
@@ -243,7 +235,7 @@ extension ContactsSearchTableView: UITableViewDataSource {
     /**
         Creates a `SearchTableViewCell` with the contact's name and info.
     */
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! SearchTableViewCell
         
         let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String

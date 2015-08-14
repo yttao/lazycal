@@ -80,12 +80,12 @@ class SelectEventTableViewController: UITableViewController {
         Refreshes the event information displayed.
     */
     func reloadData() {
-        let eventNameCell = tableView.cellForRowAtIndexPath(indexPaths["Name"]!)
-        eventNameCell?.textLabel?.text = event!.name
+        let eventNameCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Name"]!)
+        eventNameCell.textLabel?.text = event!.name
         
-        let eventTimeCell = tableView.cellForRowAtIndexPath(indexPaths["Time"]!)
+        let eventTimeCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Time"]!)
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
-        eventTimeCell?.textLabel?.text = dateFormatter.stringFromDateInterval(fromDate: event!.dateStart, toDate: event!.dateEnd)
+        eventTimeCell.textLabel?.text = dateFormatter.stringFromDateInterval(fromDate: event!.dateStart, toDate: event!.dateEnd)
         
         // Start of cell insertion/deletion code.
         
@@ -95,7 +95,7 @@ class SelectEventTableViewController: UITableViewController {
         tableView.beginUpdates()
         
         // Handle alarm cells.
-        let alarmCell = tableView.cellForRowAtIndexPath(indexPaths["AlarmToggle"]!)
+        let alarmCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["AlarmToggle"]!)
         if !notificationsEnabled() {
             // If alarm notifications are disabled
             
@@ -108,7 +108,7 @@ class SelectEventTableViewController: UITableViewController {
             // If notifications are disabled, the alarm cannot send an alert.
             
             // The alarm is disabled, so it says "Disabled".
-            alarmCell?.detailTextLabel?.text = "Disabled"
+            alarmCell.detailTextLabel?.text = "Disabled"
             
             // Hide the alarm time.
             alarmTimeDisplayCell.textLabel?.text = " "
@@ -124,7 +124,7 @@ class SelectEventTableViewController: UITableViewController {
             }
             
             // The alarm says "On".
-            alarmCell?.detailTextLabel?.text = "On"
+            alarmCell.detailTextLabel?.text = "On"
             
             // Display the alarm time.
             
@@ -146,7 +146,7 @@ class SelectEventTableViewController: UITableViewController {
             }
             
             // The alarm says "Off".
-            alarmCell?.detailTextLabel?.text = "Off"
+            alarmCell.detailTextLabel?.text = "Off"
             
             // Hide the alarm time.
             alarmTimeDisplayCell.textLabel?.text = " "
@@ -409,5 +409,13 @@ extension SelectEventTableViewController: UITableViewDataSource {
             return nil
         }
         return super.tableView(tableView, titleForHeaderInSection: section)
+    }
+    
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
+        
+        cell.setNeedsDisplay()
+        
+        return cell
     }
 }

@@ -20,6 +20,7 @@ class LocationsSearchTableView: SearchTableView {
             selectedResultsTableViewController = newValue
         }
     }
+    
     private var filteredMapItems: [MapItem] {
         get {
             return searchResults as! [MapItem]
@@ -36,34 +37,25 @@ class LocationsSearchTableView: SearchTableView {
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        initializeView()
+        initializeView("LocationCell")
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        initializeView()
+        initializeView("LocationCell")
     }
     
     override init(frame: CGRect, style: UITableViewStyle) {
         super.init(frame: frame, style: style)
         
-        initializeView()
+        initializeView("LocationCell")
     }
     
-    private func initializeView() {
-        // Set delegate and data source.
-        delegate = self
-        dataSource = self
-        
+    override func initializeView(reuseIdentifier: String) {
         filteredMapItems = [MapItem]()
         
-        reuseIdentifier = "LocationCell"
-        registerClass(SearchTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
-        
-        // Remove insets to get rid of automatic 15 left inset spacing.
-        separatorInset = UIEdgeInsetsZero
-        layoutMargins = UIEdgeInsetsZero
+        super.initializeView("LocationCell")
     }
     
     /**
@@ -231,7 +223,7 @@ extension LocationsSearchTableView: UITableViewDataSource {
     /**
         The number of rows is the number of search results.
     */
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         println(filteredMapItems.count)
         if filteredMapItems.count <= maxSearchResults {
             return filteredMapItems.count
@@ -251,7 +243,7 @@ extension LocationsSearchTableView: UITableViewDataSource {
     /**
         Display cell with name as text label and address as detail text label.
     */
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! SearchTableViewCell
         
         let mapItem = filteredMapItems[indexPath.row]

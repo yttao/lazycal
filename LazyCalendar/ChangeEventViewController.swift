@@ -117,7 +117,7 @@ class ChangeEventViewController: UITableViewController {
         // Disable text field user interaction, needed to allow proper table view row selection
         nameTextField.userInteractionEnabled = false
         
-        // If using a pre-existing event, load data from event.
+        // Using information from loadData:, set initial values for UI elements.
         nameTextField.text = name
         dateStartPicker.date = dateStart
         dateEndPicker.date = dateEnd
@@ -134,13 +134,14 @@ class ChangeEventViewController: UITableViewController {
         reloadData()
     }
     
+    /**
+        Reloads the table view data.
+    */
     func reloadData() {
         updateDateStart()
         updateDateEnd()
-        // Enable/disable alarm switch depending on settings
         updateAlarmSwitchEnabled()
         updateAlarm()
-        updateAlarmTime()
         updateContactsLabel()
         updateLocationsLabel()
         tableView.reloadData()
@@ -149,7 +150,7 @@ class ChangeEventViewController: UITableViewController {
     /**
         Adds the necessary targets for actions.
     */
-    private func addTargets() {
+    func addTargets() {
         nameTextField.addTarget(self, action: "updateName", forControlEvents: .EditingChanged)
         dateStartPicker.addTarget(self, action: "updateDateStart", forControlEvents: .ValueChanged)
         dateEndPicker.addTarget(self, action: "updateDateEnd", forControlEvents: .ValueChanged)
@@ -185,11 +186,14 @@ class ChangeEventViewController: UITableViewController {
         dateStart = event.dateStart
         dateEnd = event.dateEnd
         alarm = event.alarm
+        
+        let test = event.dateStart
+        // Set alarm time if it is available, otherwise it is the default alarm time.
         if event.alarmTime != nil {
             alarmTime = event.alarmTime
         }
         else {
-            alarmTime = event.dateStart
+            alarmTime = dateStart
         }
         
         // Load Contacts as ABRecordIDs
@@ -208,27 +212,35 @@ class ChangeEventViewController: UITableViewController {
     // MARK: - Methods related to updating data.
     
     /**
+        Update event name.
+    */
+    func updateName() {
+        name = nameTextField.text
+    }
+    
+    /**
         Update date start info.
     */
     func updateDateStart() {
         dateStart = dateStartPicker.date
         updateDateStartLabels()
         
-        updateDateEndPicker()
+        updateDateEndPickerMinimumDate()
         
         updateAlarm()
     }
     
     /**
-        Update date start labels.
+        Update the date start labels.
     */
-    private func updateDateStartLabels() {
-        let dateStartCell = tableView.cellForRowAtIndexPath(indexPaths["Start"]!)
+    func updateDateStartLabels() {
+        let dateStartCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Start"]!)
+        
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        dateStartCell?.textLabel?.text = dateFormatter.stringFromDate(dateStartPicker.date)
+        dateStartCell.textLabel?.text = dateFormatter.stringFromDate(dateStart)
         
         dateFormatter.dateFormat = "h:mm a"
-        dateStartCell?.detailTextLabel?.text = dateFormatter.stringFromDate(dateStartPicker.date)
+        dateStartCell.detailTextLabel?.text = dateFormatter.stringFromDate(dateStart)
     }
     
     /**
@@ -240,103 +252,39 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Update date end labels.
+        Updates the date end labels.
     */
-    private func updateDateEndLabels() {
-        let dateEndCell = tableView.cellForRowAtIndexPath(indexPaths["End"]!)
+    func updateDateEndLabels() {
+        let dateEndCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["End"]!)
+        
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        dateEndCell?.textLabel?.text = dateFormatter.stringFromDate(dateEnd)
+        dateEndCell.textLabel?.text = dateFormatter.stringFromDate(dateEnd)
         
         dateFormatter.dateFormat = "h:mm a"
-        dateEndCell?.detailTextLabel?.text = dateFormatter.stringFromDate(dateEnd)
+        dateEndCell.detailTextLabel?.text = dateFormatter.stringFromDate(dateEnd)
     }
     
-    
     /**
-        When date start picker is changed, update the minimum date to ensure the date end is not before the date start.
+        Updates the date end picker minimum date so that it is not before the date start.
     
         The date end picker should not be able to choose a date before the date start, so it should have a lower limit placed on the date it can choose.
     */
-    private func updateDateEndPicker() {
+    func updateDateEndPickerMinimumDate() {
         let originalDate = dateEndPicker.date
         dateEndPicker.minimumDate = dateStart
 
         // If the old date end comes after the new date start, change the old date end to equal the new date start.
         if originalDate.compare(dateStart) == .OrderedAscending {
-            dateEndPicker.date = dateStart
-            updateDateEnd()
+            resetDateEndPickerDate()
         }
-        dateEndPicker.reloadInputViews()
     }
     
     /**
-        Updates the contacts detail label.
-    
-        The contacts detail label does not display a number if no contacts have been selected yet or if the number of contacts selected is zero. Otherwise, if at least one contact is selected, it displays the number of contacts.
+        Resets the date end to the date start.
     */
-    private func updateContactsLabel() {
-        let contactsCell = tableView.cellForRowAtIndexPath(indexPaths["Contacts"]!)
-        if contactIDs != nil && contactIDs!.count > 0 {
-            contactsCell?.detailTextLabel?.text = "\(contactIDs!.count)"
-        }
-        else {
-            contactsCell?.detailTextLabel?.text = " "
-        }
-        // Resizes contacts cell to fit label.
-        contactsCell?.detailTextLabel?.sizeToFit()
-    }
-    
-    /**
-        Updates the contacts detail label.
-    
-        Note: this method is called by `tableView(cellForRowAtIndexPath:)` and is used to properly add the contacts count when the contacts cell is not visible in the initial scroll view (when the view controller first loads). The subviews of the contacts cell (including the detail text label) do not exist until the contacts cell is visible in the view. The detail text label cannot be updated until it exists as a subview of the contacts cell. Therefore, when the contacts cell does scroll into view, `tableView(cellForRowAtIndexPath:)` is called (with the subviews laid out, including the detail text label) and the contact label can be properly updated.
-    
-        :param: cell The contact cell.
-    */
-    private func updateContactsLabel(cell: UITableViewCell) {
-        if contactIDs != nil && contactIDs!.count > 0 {
-            cell.detailTextLabel?.text = "\(contactIDs!.count)"
-        }
-        else {
-            cell.detailTextLabel?.text = " "
-        }
-        // Resizes contacts cell to fit label.
-        cell.detailTextLabel?.sizeToFit()
-    }
-    
-    /**
-        Updates the locations detail label.
-        
-        The locations detail label does not display a number if no map items have been selected yet or if the number of map items selected is zero. Otherwise, if at least one map item is selected, it displays the number of map items.
-    */
-    private func updateLocationsLabel() {
-        let locationsCell = tableView.cellForRowAtIndexPath(indexPaths["Locations"]!)
-        if mapItems != nil && mapItems!.count > 0 {
-            locationsCell?.detailTextLabel?.text = "\(mapItems!.count)"
-        }
-        else {
-            locationsCell?.detailTextLabel?.text = " "
-        }
-        // Resize locations cell to fit label.
-        locationsCell?.detailTextLabel?.sizeToFit()
-    }
-    
-    /**
-        Updates the locations detail label.
-    
-        Note: this method is called by `tableView(cellForRowAtIndexPath:)` and is used to properly add the locations count if the locations cell is not visible in the initial scroll view (when the view controller first loads). The subviews of the locations cell (including the detail text label) do not exist until the locations cell is visible in the view. The detail text label cannot be updated until it exists as a subview of the locations cell. Therefore, when the locations cell does scroll into view, `tableView(cellForRowAtIndexPath:)` is called (with the subviews laid out, including the detail text label) and the contact label can be properly updated.
-    
-        :param: cell The locations cell.
-    */
-    private func updateLocationsLabel(cell: UITableViewCell) {
-        if mapItems != nil && mapItems!.count > 0 {
-            cell.detailTextLabel?.text = "\(mapItems!.count)"
-        }
-        else {
-            cell.detailTextLabel?.text = " "
-        }
-        // Resize locations cell to fit label.
-        cell.detailTextLabel?.sizeToFit()
+    func resetDateEndPickerDate() {
+        dateEndPicker.date = dateStart
+        updateDateEnd()
     }
     
     /**
@@ -353,8 +301,8 @@ class ChangeEventViewController: UITableViewController {
             alarmSwitch.on = false
             alarm = false
             alarmSwitch.userInteractionEnabled = false
-            showFewerAlarmOptions()
         }
+        updateAlarmOptions()
     }
     
     /**
@@ -370,27 +318,35 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Updates the alarm.
-    
-        Turning the alarm switch on shows more alarm options while turning it off shows fewer alarm options.
+        Updates the alarm and the alarm options.
     */
     func updateAlarm() {
         alarm = alarmSwitch.on
         
-        if alarmSwitch.on {
+        updateAlarmTime()
+        updateAlarmOptions()
+    }
+    
+    /**
+        Updates if the alarm options are shown or not.
+    
+        If the alarm is on, alarm options are shown. If the alarm is off, alarm options are hidden.
+    */
+    func updateAlarmOptions() {
+        if alarm {
             showMoreAlarmOptions()
         }
         else {
-            showFewerAlarmOptions()
             resetAlarmTime()
+            showFewerAlarmOptions()
         }
     }
     
     /**
-        Update the alarm time if the alarm is off.
+        Update the alarm time if the alarm is off. The default alarm time is the date start.
     */
     func resetAlarmTime() {
-        alarmTimePicker.date = dateStartPicker.date
+        alarmTimePicker.date = dateStart
         updateAlarmTime()
     }
     
@@ -442,13 +398,6 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Update event name.
-    */
-    func updateName() {
-        name = nameTextField.text
-    }
-    
-    /**
         Update alarm time.
     */
     func updateAlarmTime() {
@@ -457,11 +406,11 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Update alarm time display.
+        Updates the alarm time display.
     */
     func updateAlarmTimeLabels() {
         let alarmTimeCell = alarmTimeDisplayCell
-        // Main label shows format: month day, year
+        
         dateFormatter.dateFormat = "MMM dd, yyyy"
         alarmTimeDisplayCell.textLabel?.text = dateFormatter.stringFromDate(alarmTime!)
         
@@ -480,6 +429,25 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
+        Updates the contacts detail label.
+    
+        The contacts detail label does not display a number if no contacts have been selected yet or if the number of contacts selected is zero. Otherwise, if at least one contact is selected, it displays the number of contacts.
+    */
+    func updateContactsLabel() {
+        let contactsCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Contacts"]!)
+        
+        if contactIDs != nil && contactIDs!.count > 0 {
+            contactsCell.detailTextLabel?.text = "\(contactIDs!.count)"
+        }
+        else {
+            contactsCell.detailTextLabel?.text = " "
+        }
+        
+        // Resizes contacts cell to fit label.
+        contactsCell.detailTextLabel?.sizeToFit()
+    }
+    
+    /**
         Updates the map items.
     
         :param: mapItems The map items that were selected.
@@ -487,6 +455,24 @@ class ChangeEventViewController: UITableViewController {
     func updateMapItems(mapItems: [MapItem]) {
         self.mapItems = mapItems
         updateLocationsLabel()
+    }
+    
+    /**
+        Updates the locations detail label.
+    
+        The locations detail label does not display a number if no map items have been selected yet or if the number of map items selected is zero. Otherwise, if at least one map item is selected, it displays the number of map items.
+    */
+    func updateLocationsLabel() {
+        let locationsCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Locations"]!)
+        
+        if mapItems != nil && mapItems!.count > 0 {
+            locationsCell.detailTextLabel?.text = "\(mapItems!.count)"
+        }
+        else {
+            locationsCell.detailTextLabel?.text = " "
+        }
+        
+        locationsCell.detailTextLabel?.sizeToFit()
     }
     
     // MARK: - Methods related to user permissions.
@@ -558,6 +544,75 @@ class ChangeEventViewController: UITableViewController {
         }
     }
     
+    // MARK: - Methods for selecting and deselecting cells.
+    
+    /**
+        Performs selection at index path.
+    
+        :param: indexPath The selected index path.
+    */
+    func selectRowAtIndexPath(indexPath: NSIndexPath) {
+        selectedIndexPath = indexPath
+        
+        switch indexPath.section {
+        case sections["Name"]!:
+            // Enable text field.
+            nameTextField.userInteractionEnabled = true
+            nameTextField.becomeFirstResponder()
+        case sections["Start"]!:
+            // Show date start picker.
+            tableView.beginUpdates()
+            if dateStartPickerCell.hidden {
+                dateStartPickerCell.hidden = false
+                tableView.insertRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
+            }
+            tableView.endUpdates()
+        case sections["End"]!:
+            // Show date end picker.
+            tableView.beginUpdates()
+            if dateEndPickerCell.hidden {
+                dateEndPickerCell.hidden = false
+                tableView.insertRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
+            }
+            tableView.endUpdates()
+        case sections["Alarm"]!:
+            // Show notifications disabled alert if notifications are turned off.
+            if indexPath == indexPaths["AlarmToggle"]! {
+                if !alarmSwitch.userInteractionEnabled {
+                    displayNotificationsDisabledAlert()
+                }
+            }
+        case sections["Contacts"]!:
+            // Ensure permission to access address book, then segue to contacts view.
+            let authorizationStatus = ABAddressBookGetAuthorizationStatus()
+            
+            // If contacts access is authorized, show contacts view. Else, display request for access.
+            switch authorizationStatus {
+            case .Authorized:
+                showContactsTableViewController()
+            case .Denied, .Restricted:
+                displayAddressBookInaccessibleAlert()
+            case .NotDetermined:
+                displayContactsAccessRequest()
+            }
+        case sections["Locations"]!:
+            // Ensure permission to access user location, then segue to locations view.
+            let authorizationStatus = CLLocationManager.authorizationStatus()
+            
+            // If user location access is authorized, show location view. Else, display request for access.
+            switch authorizationStatus {
+            case .AuthorizedWhenInUse, .AuthorizedAlways:
+                showLocationsViewController()
+            case .Restricted, .Denied:
+                displayLocationInaccessibleAlert()
+            case .NotDetermined:
+                CLLocationManager().requestWhenInUseAuthorization()
+            }
+        default:
+            break
+        }
+    }
+    
     /**
         Performs deselection at index path.
         
@@ -594,6 +649,8 @@ class ChangeEventViewController: UITableViewController {
         // Set selected to nil.
         selectedIndexPath = nil
     }
+    
+    // MARK: - Methods for saving the event.
     
     /**
         Saves an event's data.
@@ -991,67 +1048,7 @@ extension ChangeEventViewController: UITableViewDelegate {
         Performs actions based on selected index path.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let cell = tableView.cellForRowAtIndexPath(indexPath)!
-
-        selectedIndexPath = indexPath
-
-        switch indexPath.section {
-        case sections["Name"]!:
-            // Enable text field.
-            nameTextField.userInteractionEnabled = true
-            nameTextField.becomeFirstResponder()
-        case sections["Start"]!:
-            // Show date start picker.
-            tableView.beginUpdates()
-            if dateStartPickerCell.hidden {
-                dateStartPickerCell.hidden = false
-                tableView.insertRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
-            }
-            tableView.endUpdates()
-        case sections["End"]!:
-            // Show date end picker.
-            tableView.beginUpdates()
-            if dateEndPickerCell.hidden {
-                dateEndPickerCell.hidden = false
-                tableView.insertRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
-            }
-            tableView.endUpdates()
-        case sections["Alarm"]!:
-            // Show notifications disabled alert if notifications are turned off.
-            if indexPath == indexPaths["AlarmToggle"]! {
-                if !alarmSwitch.userInteractionEnabled {
-                    displayNotificationsDisabledAlert()
-                }
-            }
-        case sections["Contacts"]!:
-            // Ensure permission to access address book, then segue to contacts view.
-            let authorizationStatus = ABAddressBookGetAuthorizationStatus()
-            
-            // If contacts access is authorized, show contacts view. Else, display request for access.
-            switch authorizationStatus {
-            case .Authorized:
-                showContactsTableViewController()
-            case .Denied, .Restricted:
-                displayAddressBookInaccessibleAlert()
-            case .NotDetermined:
-                displayContactsAccessRequest()
-            }
-        case sections["Locations"]!:
-            // Ensure permission to access user location, then segue to locations view.
-            let authorizationStatus = CLLocationManager.authorizationStatus()
-            
-            // If user location access is authorized, show location view. Else, display request for access.
-            switch authorizationStatus {
-            case .AuthorizedWhenInUse, .AuthorizedAlways:
-                showLocationsViewController()
-            case .Restricted, .Denied:
-                displayLocationInaccessibleAlert()
-            case .NotDetermined:
-                CLLocationManager().requestWhenInUseAuthorization()
-            }
-        default:
-            break
-        }
+        selectRowAtIndexPath(indexPath)
     }
     
     /**
@@ -1067,14 +1064,15 @@ extension ChangeEventViewController: UITableViewDataSource {
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return sections.count
     }
+    
     /**
         If the date start or end is not selected, show only the time display and not the picker. If the alarm is off, show only the alarm toggle cell.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == sections["Start"]! && dateStartPickerCell.hidden {
+        if section == sections["Start"] && dateStartPickerCell.hidden {
             return 1
         }
-        else if section == sections["End"]! && dateEndPickerCell.hidden {
+        else if section == sections["End"] && dateEndPickerCell.hidden {
             return 1
         }
         else if section == sections["Alarm"] && alarmDateToggleCell.hidden && alarmTimeDisplayCell.hidden && alarmTimeDisplayCell.hidden {
@@ -1085,14 +1083,8 @@ extension ChangeEventViewController: UITableViewDataSource {
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
-        
-        
-        if indexPath == indexPaths["Contacts"]! {
-            updateContactsLabel(cell)
-        }
-        else if indexPath == indexPaths["Locations"]! {
-            updateLocationsLabel(cell)
-        }
+
+        cell.setNeedsDisplay()
         
         return cell
     }
