@@ -14,8 +14,8 @@ class SearchTableView: UITableView {
     
     var searchResults: [AnyObject]!
     
-    var searchController: SearchController!
-    var selectedResultsTableViewController: UITableViewController!
+    var searchController: UISearchController?
+    var selectedResultsTableViewController: UITableViewController?
     
     var reuseIdentifier: String!
     

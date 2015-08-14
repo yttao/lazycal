@@ -85,6 +85,7 @@ class ChangeEventViewController: UITableViewController {
         
         // Observer for when notification pops up
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateAlarmSwitchEnabled", name: "applicationBecameActive", object: nil)
     }
     
     /**
@@ -130,6 +131,10 @@ class ChangeEventViewController: UITableViewController {
     */
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        reloadData()
+    }
+    
+    func reloadData() {
         updateDateStart()
         updateDateEnd()
         // Enable/disable alarm switch depending on settings
@@ -138,6 +143,7 @@ class ChangeEventViewController: UITableViewController {
         updateAlarmTime()
         updateContactsLabel()
         updateLocationsLabel()
+        tableView.reloadData()
     }
     
     /**
@@ -278,7 +284,24 @@ class ChangeEventViewController: UITableViewController {
         }
         // Resizes contacts cell to fit label.
         contactsCell?.detailTextLabel?.sizeToFit()
-        tableView.reloadRowsAtIndexPaths([indexPaths["Contacts"]!], withRowAnimation: .None)
+    }
+    
+    /**
+        Updates the contacts detail label.
+    
+        Note: this method is called by `tableView(cellForRowAtIndexPath:)` and is used to properly add the contacts count when the contacts cell is not visible in the initial scroll view (when the view controller first loads). The subviews of the contacts cell (including the detail text label) do not exist until the contacts cell is visible in the view. The detail text label cannot be updated until it exists as a subview of the contacts cell. Therefore, when the contacts cell does scroll into view, `tableView(cellForRowAtIndexPath:)` is called (with the subviews laid out, including the detail text label) and the contact label can be properly updated.
+    
+        :param: cell The contact cell.
+    */
+    private func updateContactsLabel(cell: UITableViewCell) {
+        if contactIDs != nil && contactIDs!.count > 0 {
+            cell.detailTextLabel?.text = "\(contactIDs!.count)"
+        }
+        else {
+            cell.detailTextLabel?.text = " "
+        }
+        // Resizes contacts cell to fit label.
+        cell.detailTextLabel?.sizeToFit()
     }
     
     /**
@@ -296,15 +319,30 @@ class ChangeEventViewController: UITableViewController {
         }
         // Resize locations cell to fit label.
         locationsCell?.detailTextLabel?.sizeToFit()
-        tableView.reloadRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
     }
     
     /**
-    Updates whether or not the alarm switch is enabled.
+        Updates the locations detail label.
     
-    The alarm switch can be toggled if user notifications are allowed. Otherwise, the alarm switch cannot be toggled.
+        Note: this method is called by `tableView(cellForRowAtIndexPath:)` and is used to properly add the locations count if the locations cell is not visible in the initial scroll view (when the view controller first loads). The subviews of the locations cell (including the detail text label) do not exist until the locations cell is visible in the view. The detail text label cannot be updated until it exists as a subview of the locations cell. Therefore, when the locations cell does scroll into view, `tableView(cellForRowAtIndexPath:)` is called (with the subviews laid out, including the detail text label) and the contact label can be properly updated.
     
-    TODO: also possibly do a check on if notification settings have changed from true -> false and all notifications are silenced properly.
+        :param: cell The locations cell.
+    */
+    private func updateLocationsLabel(cell: UITableViewCell) {
+        if mapItems != nil && mapItems!.count > 0 {
+            cell.detailTextLabel?.text = "\(mapItems!.count)"
+        }
+        else {
+            cell.detailTextLabel?.text = " "
+        }
+        // Resize locations cell to fit label.
+        cell.detailTextLabel?.sizeToFit()
+    }
+    
+    /**
+        Updates whether or not the alarm switch is enabled.
+    
+        The alarm switch can be toggled if user notifications are allowed. Otherwise, the alarm switch cannot be toggled.
     */
     func updateAlarmSwitchEnabled() {
         let settings = UIApplication.sharedApplication().currentUserNotificationSettings()
@@ -1046,6 +1084,16 @@ extension ChangeEventViewController: UITableViewDataSource {
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        return super.tableView(tableView, cellForRowAtIndexPath: indexPath)
+        let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
+        
+        
+        if indexPath == indexPaths["Contacts"]! {
+            updateContactsLabel(cell)
+        }
+        else if indexPath == indexPaths["Locations"]! {
+            updateLocationsLabel(cell)
+        }
+        
+        return cell
     }
 }

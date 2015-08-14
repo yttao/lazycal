@@ -210,7 +210,7 @@ extension ContactsSearchTableView: UITableViewDelegate {
     */
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         contactsTableViewController.addRecord(filteredContacts[indexPath.row])
-        searchController.searchBar.text = nil
+        searchController!.searchBar.text = nil
     }
 }
 

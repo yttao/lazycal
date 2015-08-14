@@ -213,7 +213,7 @@ extension LocationsSearchTableView: UITableViewDelegate {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let mapItem = filteredMapItems[indexPath.row]
         locationsTableViewController.addNewMapItem(mapItem)
-        searchController.searchBar.text = nil
+        searchController!.searchBar.text = nil
     }
 }
 
