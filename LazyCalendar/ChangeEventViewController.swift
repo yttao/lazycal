@@ -584,16 +584,8 @@ class ChangeEventViewController: UITableViewController {
         // Handle notification scheduling.
         
         if alarm {
-            // If the alarm is on
-            
-            if notificationTimesChanged() {
-                // If the notification time changed, reschedule the notification for the new time.
-                rescheduleNotifications()
-            }
-            else if !notificationsScheduled() {
-                // If notifications haven't been scheduled yet, schedule notifications.
-                scheduleNotifications()
-            }
+            // If the alarm is on, reschedule any notifications for this event.
+            rescheduleNotifications()
         }
         else {
             // If the alarm is off but notifications were scheduled for this event, turn off all event notifications.
@@ -650,10 +642,9 @@ class ChangeEventViewController: UITableViewController {
         
         // Find notification for event, and check if notification time changed.
         let results = scheduledNotifications.filter({
-            let alarmTimeExists = self.event!.alarmTime != nil
             let idMatch = ($0.userInfo!["id"] as! String) == self.event!.id
             let notificationTimeChanged = $0.fireDate!.compare(self.event!.alarmTime!) != .OrderedSame
-            return alarmTimeExists && idMatch && notificationTimeChanged
+            return idMatch && notificationTimeChanged
         })
         
         // If result was found, notification time was changed.
@@ -677,36 +668,7 @@ class ChangeEventViewController: UITableViewController {
         else {
             notification.alertTitle = "Event"
         }
-        if event!.dateStart.compareUnits(otherDate: event!.dateEnd, units: .CalendarUnitDay | .CalendarUnitMonth | .CalendarUnitYear) == .OrderedSame {
-            if event!.dateStart.compareUnits(otherDate: event!.dateEnd, units: .CalendarUnitHour | .CalendarUnitMinute) == .OrderedSame {
-                // If the event date start and end times are the same, show the time in this format:
-                // MMM dd, yyyy
-                // h:mm a
-                
-                dateFormatter.dateFormat = "MMM dd, yyyy"
-                var dateInterval = "\(dateFormatter.stringFromDate(event!.dateStart))\n"
-                dateFormatter.dateFormat = "h:mm a"
-                dateInterval += "\(dateFormatter.stringFromDate(event!.dateStart))"
-                notification.alertBody = dateInterval
-            }
-            else {
-                // If the event date start and end times are different, show the time in this format:
-                // MMM dd, yyyy
-                // h:mm a to h:mm a
-                dateFormatter.dateFormat = "MMM dd, yyyy"
-                var dateInterval = "\(dateFormatter.stringFromDate(event!.dateStart))\n"
-                dateFormatter.dateFormat = "h:mm a"
-                dateInterval += "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
-                notification.alertBody = dateInterval
-            }
-        }
-        else {
-            // If the event date start and end dates are different, show the time in this format:
-            // MMM dd, yyyy h:mm a to MMM dd, yyyy h:mm a
-            dateFormatter.dateFormat = "MMM dd, yyyy h:mm a"
-            let dateInterval = "\(dateFormatter.stringFromDate(event!.dateStart)) to \(dateFormatter.stringFromDate(event!.dateEnd))"
-            notification.alertBody = dateInterval
-        }
+        notification.alertBody = dateFormatter.stringFromDateInterval(fromDate: event!.dateStart, toDate: event!.dateEnd)
         notification.alertAction = "view"
         notification.fireDate = event!.alarmTime
         notification.soundName = UILocalNotificationDefaultSoundName
@@ -744,19 +706,8 @@ class ChangeEventViewController: UITableViewController {
         This method will do nothing if no notifications are scheduled.
     */
     private func rescheduleNotifications() {
-        NSLog("Event rescheduled for time: %@", event!.alarmTime!)
-        // Get all schedule notifications.
-        var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
-        
-        // Get notification to reschedule.
-        let notification = scheduledNotifications.filter({(
-            $0.userInfo!["id"] as! String) == self.event!.id
-        }).first
-        
-        // Reschedule notification time.
-        if let notification = notification {
-            notification.fireDate == event!.alarmTime
-        }
+        descheduleNotifications()
+        scheduleNotifications()
     }
     
     // MARK: - Methods for handling contacts when saving.

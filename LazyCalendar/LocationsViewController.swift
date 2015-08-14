@@ -92,7 +92,7 @@ class LocationsViewController: UIViewController {
                 let locationsTableViewController = segue.destinationViewController as! LocationsTableViewController
                 
                 // Set map, map items, and editing enabled for table view controller.
-                locationsTableViewController.setMapView(mapView)
+                locationsTableViewController.mapView = mapView
                 if let mapItems = mapItems {
                     locationsTableViewController.loadData(mapItems)
                 }

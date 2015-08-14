@@ -81,7 +81,7 @@ class ContactsTableViewController: UITableViewController {
         let offset = CGRectOffset(searchController.searchBar.frame, 0, searchController.searchBar.frame.height)
         let frame = CGRectMake(offset.origin.x, offset.origin.y, tableView.frame.width, 0)
         let searchTableView = ContactsSearchTableView(frame: frame, style: .Plain)
-        searchTableView.loadData(contactsTableViewController: self, searchController: searchController)
+        searchTableView.loadData(selectedResultsTableViewController: self, searchController: searchController)
         
         // Set search table view as delegate.
         searchController.searchControllerDelegate = searchTableView

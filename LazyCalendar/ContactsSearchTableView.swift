@@ -9,74 +9,56 @@
 import UIKit
 import AddressBook
 
-class ContactsSearchTableView: UITableView {
-    private var contactsTableViewController: ContactsTableViewController!
-    private var searchController: SearchController!
-    private var filteredContacts = [ABRecordRef]()
+class ContactsSearchTableView: SearchTableView {
+    private var contactsTableViewController: ContactsTableViewController! {
+        get {
+            return selectedResultsTableViewController as! ContactsTableViewController
+        }
+        set {
+            selectedResultsTableViewController = newValue
+        }
+    }
+    private var filteredContacts: [ABRecordRef] {
+        get {
+            return searchResults
+        }
+        set {
+            searchResults = newValue
+        }
+    }
     
     private var addressBookRef: ABAddressBookRef!
     private var allContacts: NSArray!
-    
-    private let reuseIdentifier = "ContactCell"
-
-    // Maximum number of displayed search results
-    private let maxSearchResults = 5
     
     // MARK: - Initializers
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        // Set delegate and data source.
-        delegate = self
-        dataSource = self
-        
-        if ABAddressBookGetAuthorizationStatus() == .Authorized {
-            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-            allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
-        }
-        else {
-            allContacts = NSArray()
-        }
-        
-        // Register contact cell so it can be reused.
-        registerClass(SearchTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
-        
-        // Remove insets to get rid of automatic 15 left inset spacing.
-        separatorInset = UIEdgeInsetsZero
-        layoutMargins = UIEdgeInsetsZero
+        initializeView()
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        // Set delegate and data source.
-        delegate = self
-        dataSource = self
-        
-        // Set address book and get all contacts
-        if ABAddressBookGetAuthorizationStatus() == .Authorized {
-            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-            allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
-        }
-        else {
-            allContacts = NSArray()
-        }
-        
-        // Register contact cell so it can be reused.
-        registerClass(SearchTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
-        
-        // Remove insets to get rid of automatic 15 left inset spacing.
-        separatorInset = UIEdgeInsetsZero
-        layoutMargins = UIEdgeInsetsZero
+        initializeView()
     }
     
     override init(frame: CGRect, style: UITableViewStyle) {
         super.init(frame: frame, style: style)
         
+        initializeView()
+    }
+    
+    private func initializeView() {
         // Set delegate and data source.
         delegate = self
         dataSource = self
+        
+        // Set reuse identifier
+        reuseIdentifier = "ContactCell"
+        
+        filteredContacts = [ABRecordRef]()
         
         // Set address book and get all contacts.
         if ABAddressBookGetAuthorizationStatus() == .Authorized {
@@ -100,8 +82,8 @@ class ContactsSearchTableView: UITableView {
     
         :param: contactsTableViewController The `ContactsTableViewController` that contains this table view.
     */
-    func loadData(#contactsTableViewController: ContactsTableViewController, searchController: SearchController) {
-        self.contactsTableViewController = contactsTableViewController
+    override func loadData(#selectedResultsTableViewController: UITableViewController, searchController: SearchController) {
+        self.contactsTableViewController = selectedResultsTableViewController as! ContactsTableViewController
         self.searchController = searchController
     }
     
