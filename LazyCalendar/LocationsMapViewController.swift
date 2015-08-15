@@ -42,9 +42,9 @@ class LocationsMapViewController: UIViewController {
         
         mapView.delegate = self
         
-        mapButton.layer.borderColor = mapButton.titleLabel?.textColor.CGColor
-        mapButton.layer.borderWidth = 1.0
-        mapButton.layer.cornerRadius = 4.0
+        mapButton.addTarget(self, action: "showMapOptions", forControlEvents: .TouchDown)
+        mapView.addSubview(mapButton)
+        mapView.didAddSubview(mapButton)
             
         NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
     }
@@ -110,6 +110,39 @@ class LocationsMapViewController: UIViewController {
                 }
             }
         })
+    }
+    
+    // MARK: - Methods related to controlling the map button.
+    
+    /**
+        When the map button is selected, show more options.
+    */
+    func showMapOptions() {
+        mapButton.hidden = true
+        
+        let mapSegmentedControl = UISegmentedControl()
+        mapSegmentedControl.setTranslatesAutoresizingMaskIntoConstraints(false)
+        mapSegmentedControl.insertSegmentWithTitle("First", atIndex: 0, animated: false)
+        mapSegmentedControl.insertSegmentWithTitle("Second", atIndex: 1, animated: false)
+        mapSegmentedControl.sizeToFit()
+        
+        // Add animation for appearance
+        let animation = CATransition()
+        animation.duration = 0.1
+        animation.type = kCATransitionMoveIn
+        animation.subtype = kCATransitionFromRight
+        mapSegmentedControl.layer.addAnimation(animation, forKey: nil)
+        
+        mapView.addSubview(mapSegmentedControl)
+        mapView.didAddSubview(mapSegmentedControl)
+        
+        let trailingConstraint = NSLayoutConstraint(item: mapSegmentedControl, attribute: .Trailing, relatedBy: .Equal, toItem: mapView, attribute: .Trailing, multiplier: 1, constant: -8)
+        let bottomConstraint = NSLayoutConstraint(item: mapSegmentedControl, attribute: .Bottom, relatedBy: .Equal, toItem: mapView, attribute: .Bottom, multiplier: 1, constant: -8)
+        let heightConstraint = NSLayoutConstraint(item: mapSegmentedControl, attribute: .Height, relatedBy: .Equal, toItem: mapButton, attribute: .Height, multiplier: 1, constant: 0)
+        
+        mapView.addConstraint(trailingConstraint)
+        mapView.addConstraint(bottomConstraint)
+        mapView.addConstraint(heightConstraint)
     }
 }
 
