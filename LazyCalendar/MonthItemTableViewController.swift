@@ -23,6 +23,8 @@ class MonthItemTableViewController: UITableViewController {
     
     private let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
     
+    // MARK: - Initialization
+    
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
@@ -46,9 +48,9 @@ class MonthItemTableViewController: UITableViewController {
     /**
         On month change, reload navigation title to match month and show events for the first day of the month.
     
-        Note: this method is not called when the page view controller is first initialized because it is created after the page view controller.
+        This method is not called when the page view controller is first initialized in `initializePageViewController` because it is created after the page view controller.
     
-       :param: notification The notification that the month has changed.
+        :param: notification The notification that the month has changed.
     */
     func changeMonth(notification: NSNotification) {
         let monthItemCollectionViewController = notification.userInfo!["ViewController"] as? MonthItemCollectionViewController
@@ -67,7 +69,7 @@ class MonthItemTableViewController: UITableViewController {
     }
     
     /**
-        Reloads the events
+        Reloads the events.
     */
     func reloadEvents() {
         showEvents(date)
@@ -192,7 +194,7 @@ class MonthItemTableViewController: UITableViewController {
     }
     
     /**
-        Leaves event details back to main view.
+        Leaves event details back to month view.
     */
     @IBAction func leaveEventDetails(segue: UIStoryboardSegue) {
     }
@@ -226,7 +228,7 @@ extension MonthItemTableViewController: UITableViewDelegate {
 // MARK: - UITableViewDataSource
 extension MonthItemTableViewController: UITableViewDataSource {
     /**
-        There is 1 section in the table.
+        There is one section in the table.
     */
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
@@ -242,7 +244,7 @@ extension MonthItemTableViewController: UITableViewDataSource {
     /**
         Allow table cells to be deleted.
     
-        Note: If tableView.editing = true, the left circular edit option will appear.
+        Note: If `tableView.editing = true`, the left circular edit option will appear.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         return true
@@ -266,12 +268,8 @@ extension MonthItemTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         let event = events[indexPath.row]
-        if let name = event.name {
-            cell.textLabel?.text = name
-        }
-        else {
-            cell.textLabel?.text = nil
-        }
+        cell.textLabel?.text = event.name
+        cell.detailTextLabel?.text = NSDateFormatter().stringFromDateInterval(fromDate: event.dateStart, toDate: event.dateEnd)
         
         return cell
     }

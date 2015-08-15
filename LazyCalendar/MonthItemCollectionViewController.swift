@@ -250,8 +250,6 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
 extension MonthItemCollectionViewController: UICollectionViewDelegateFlowLayout {
     /**
         Determines size of one cell.
-        
-        Note: due to the iOS Simulator, the rightmost cell is cut off slightly because it has a scrollbar. The sizing is correct on an actual device.
     */
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         return CGSize(width: collectionView.bounds.size.width /

@@ -1221,17 +1221,29 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="DR5-Nt-yqP">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="236"/>
                             </mapView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J8C-GB-Y66">
+                                <rect key="frame" x="532" y="198" width="60" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="60" id="h0e-pl-qKy"/>
+                                </constraints>
+                                <state key="normal" title="Button">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="DR5-Nt-yqP" firstAttribute="trailing" secondItem="FqO-4f-W2v" secondAttribute="trailing" id="FBL-4N-WdQ"/>
+                            <constraint firstItem="J8C-GB-Y66" firstAttribute="trailing" secondItem="DR5-Nt-yqP" secondAttribute="trailing" constant="-8" id="eei-y1-r1w"/>
                             <constraint firstItem="DR5-Nt-yqP" firstAttribute="bottom" secondItem="kur-TQ-NMj" secondAttribute="top" id="fyH-K5-Dlm"/>
                             <constraint firstItem="DR5-Nt-yqP" firstAttribute="leading" secondItem="FqO-4f-W2v" secondAttribute="leading" id="jPz-5g-yTy"/>
                             <constraint firstItem="DR5-Nt-yqP" firstAttribute="top" secondItem="1I2-eA-Unm" secondAttribute="bottom" id="oMi-fn-aLp"/>
+                            <constraint firstItem="J8C-GB-Y66" firstAttribute="bottom" secondItem="DR5-Nt-yqP" secondAttribute="bottom" constant="-8" id="wtu-np-pZn"/>
                         </constraints>
                     </view>
                     <toolbarItems/>
                     <connections>
+                        <outlet property="mapButton" destination="J8C-GB-Y66" id="nj5-gK-m3W"/>
                         <outlet property="mapView" destination="DR5-Nt-yqP" id="Adt-Is-Hf4"/>
                     </connections>
                 </viewController>

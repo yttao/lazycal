@@ -78,6 +78,8 @@ class LocationsSearchTableView: SearchTableView {
     
     /**
         Filters the search results by the text entered in the search bar.
+    
+        **Note**: When using the iOS Simulator, it may fail to find search results and display the message "The network connection was lost." in the console. To fix this, restart the iOS Simulator.
     */
     override func filterSearchResults() {
         if searchText != nil && searchText != "" {
@@ -104,7 +106,7 @@ class LocationsSearchTableView: SearchTableView {
                     let mkMapItems = response.mapItems as! [MKMapItem]
                     // Convert to [MapItem]
                     let mapItems = mkMapItems.map({
-                        return MapItem(coordinate: $0.placemark.coordinate, name: $0.name, address: self.stringFromAddressDictionary($0.placemark.addressDictionary))
+                        return MapItem(coordinate: $0.placemark.coordinate, name: $0.name, addressDictionary: $0.placemark.addressDictionary)
                     })
                     // Show only MapItems that aren't already present in selected map items.
                     self.filteredMapItems = mapItems.filter({
@@ -118,33 +120,6 @@ class LocationsSearchTableView: SearchTableView {
             filteredMapItems.removeAll(keepCapacity: false)
             reloadData()
         }
-    }
-    
-    // MARK: - Methods for formatting data.
-    
-    /**
-        Makes an address string out of the available information in the address dictionary.
-    
-        The address string is created in two steps:
-    
-        * Create a multiline address with all information.
-    
-        The address string created by `ABCreateStringWithAddressDictionary:` is a multiline address usually created the following format (if any parts of the address are unavailable, they do not appear):
-    
-        Street address
-    
-        City State Zip code
-    
-        Country
-    
-        * Replace newlines with spaces.
-    
-        The newlines are then replaced with spaces using `stringByReplacingOccurrencesOfString:withString:` because the `subtitle` property of `MKAnnotation` can only display single line strings.
-    
-        :param: addressDictionary A dictionary of address information.
-    */
-    private func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String {
-        return ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: " ")
     }
 }
 

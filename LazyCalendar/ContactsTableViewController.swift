@@ -168,7 +168,7 @@ class ContactsTableViewController: UITableViewController {
         }
         
         // Return selected contacts to change event view controller
-        let changeEventViewController = self.navigationController!.viewControllers.first as? ChangeEventViewController
+        let changeEventViewController = navigationController!.viewControllers.first as? ChangeEventViewController
         changeEventViewController?.updateContacts(selectedContactIDs)
     }
     
@@ -295,9 +295,9 @@ extension ContactsTableViewController: UITableViewDataSource {
     // MARK: - Methods for editing.
     
     /**
-        Allow table cells to be deleted.
+        Allow table cells to be deleted by swiping left for a delete button if editing is enabled.
     
-        Note: If tableView.editing = true, the left circular edit option will appear. If contacts are being searched, the table cannot be edited.
+        Note: If `tableView.editing = true`, the left circular edit option will appear.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         if editingEnabled {

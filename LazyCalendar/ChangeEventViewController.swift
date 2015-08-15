@@ -1019,15 +1019,6 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Makes an address string out of the available information in the address dictionary.
-    
-        :param: addressDictionary A dictionary of address information.
-    */
-    private func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String {
-        return ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: " ")
-    }
-    
-    /**
         On saving events, save event and inform observers that an event was saved.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

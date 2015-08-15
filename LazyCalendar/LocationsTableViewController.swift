@@ -94,7 +94,7 @@ class LocationsTableViewController: UITableViewController {
         :param: mapItems The initial selected map items.
     */
     func loadData(mapItems: [MapItem]) {
-        self.selectedMapItems = mapItems
+        selectedMapItems = mapItems
         
         // Add all annotations to map view.
         mapView?.addAnnotations(selectedMapItems)
@@ -171,6 +171,23 @@ class LocationsTableViewController: UITableViewController {
         tableView.endUpdates()
     }
     
+    // MARK: - Methods for navigation.
+    
+    /**
+        Gets a set of directions from one place to another.
+    
+        :param: from The first location.
+        :param: to The second location.
+        :returns: The directions from the first location to the second location.
+    */
+    func getDirections(fromLocation source: MKMapItem, toLocation destination: MKMapItem) -> MKDirections {
+        let request = MKDirectionsRequest()
+        request.setSource(source)
+        request.setDestination(destination)
+        request.transportType = .Any
+        return MKDirections(request: request)
+    }
+    
     // MARK: - Methods related to exiting view controller.
     
     /**
@@ -193,7 +210,12 @@ extension LocationsTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let mapItem = selectedMapItems[indexPath.row]
-        NSNotificationCenter.defaultCenter().postNotificationName("LocationChanged", object: self, userInfo: ["Location": mapItem.location])
+        
+        // Get navigation directions from current location to selected map item.
+        let directions = getDirections(fromLocation: MKMapItem.mapItemForCurrentLocation(), toLocation: mapItem.getMKMapItem())
+        
+        // Send notification that location was selected.
+        NSNotificationCenter.defaultCenter().postNotificationName("LocationSelected", object: self, userInfo: ["Location": mapItem.location, "Directions": directions])
     }
     
     // MARK: - Methods for setting up headers and footers.
@@ -266,7 +288,7 @@ extension LocationsTableViewController: UITableViewDataSource {
     // MARK: - Methods related to editing.
     
     /**
-        Allow table cells to be deleted by swiping left for a delete button.
+        Allow table cells to be deleted by swiping left for a delete button if editing is enabled.
     
         Note: If `tableView.editing = true`, the left circular edit option will appear. If locations are being searched or editing is disabled, the table cannot be edited.
     */

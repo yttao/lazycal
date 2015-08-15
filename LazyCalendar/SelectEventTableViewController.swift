@@ -71,7 +71,7 @@ class SelectEventTableViewController: UITableViewController {
     func reloadEvent(notification: NSNotification) {
         // Update info that was just edited
         let notifiedEvent = notification.userInfo!["Event"] as! FullEvent
-        if self.event!.id == notifiedEvent.id {
+        if event!.id == notifiedEvent.id {
             reloadData()
         }
     }
