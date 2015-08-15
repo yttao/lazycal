@@ -15,13 +15,54 @@ import QuartzCore
 class LocationsMapViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var mapButton: UIButton!
-    
+    @IBOutlet weak var mapSegmentedControl: UISegmentedControl!
     private let locationManager = CLLocationManager()
     
+    @IBAction func testSelect(sender: UISegmentedControl) {
+        let subviews = sender.subviews as! [UIView]
+        
+        let first = sender.subviews[2] as! UIView
+        first.removeFromSuperview()
+        
+        // Add animation for appearance
+        let animation = CATransition()
+        animation.duration = 0.1
+        animation.type = kCATransitionFade
+        first.layer.addAnimation(animation, forKey: nil)
+        
+        let maskLayer = CAShapeLayer(layer: first.layer)
+        let maskPath = UIBezierPath(roundedRect: first.bounds, byRoundingCorners: UIRectCorner.BottomRight | UIRectCorner.TopRight, cornerRadii: CGSizeMake(4, 4))
+        first
+        maskLayer.path = maskPath.CGPath
+        first.layer.mask = maskLayer
+        first.layer.backgroundColor = UIColor.redColor().CGColor
+        first.layer.opaque = false
+        first.layer.opacity = 0.6
+        
+        sender.addSubview(first)
+        sender.didAddSubview(first)
+        sender.selectedSegmentIndex = 0
+        sender.selectedSegmentIndex = -1
+    }
+
     // The current directions
     private var directions: MKDirections?
     // The currently displayed route
     private var route: MKRoute?
+    
+    private var selectedMapItem: MapItem? {
+        let annotation = mapView.selectedAnnotations.first as? MapItem
+        if let annotation = annotation {
+            return annotation
+        }
+        return nil
+    }
+    private var navigateEnabled: Bool {
+        return mapSegmentedControl.selectedSegmentIndex == 1
+    }
+    private var directionsEnabled: Bool {
+        return mapSegmentedControl.selectedSegmentIndex == 2
+    }
     
     // MARK: - Methods for initializing view controller and data.
     
@@ -31,7 +72,7 @@ class LocationsMapViewController: UIViewController {
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "selectLocation:", name: "LocationSelected", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "selectMapItem:", name: "MapItemSelected", object: nil)
     }
     
     override func viewDidLoad() {
@@ -42,10 +83,19 @@ class LocationsMapViewController: UIViewController {
         
         mapView.delegate = self
         
+        mapButton.hidden = true
         mapButton.addTarget(self, action: "showMapOptions", forControlEvents: .TouchDown)
         mapView.addSubview(mapButton)
         mapView.didAddSubview(mapButton)
-            
+        
+        mapSegmentedControl.tintColor = UIColor.redColor()
+        mapSegmentedControl.layer.cornerRadius = 4
+        mapSegmentedControl.layer.borderColor = UIColor.redColor().CGColor
+        mapSegmentedControl.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor.redColor()], forState: .Normal)
+
+        mapView.addSubview(mapSegmentedControl)
+        mapView.didAddSubview(mapSegmentedControl)
+        
         NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
     }
     
@@ -56,14 +106,13 @@ class LocationsMapViewController: UIViewController {
     
         :param: notification The notification that a location has been selected.
     */
-    func selectLocation(notification: NSNotification) {
-        let location = notification.userInfo!["Location"] as! CLLocation
-        centerMap(location)
+    func selectMapItem(notification: NSNotification) {
+        let mapItem = notification.userInfo!["MapItem"] as! MapItem
         
-        // Cancel old directions calculation.
-        directions?.cancel()
-        directions = notification.userInfo!["Directions"] as? MKDirections
-        drawDirections(directions!)
+        // Center map on location.
+        centerMap(mapItem.location)
+        
+        mapView.selectAnnotation(mapItem, animated: false)
     }
     
     /**
@@ -81,11 +130,11 @@ class LocationsMapViewController: UIViewController {
     /**
         Draws the directions from the current location to a location upon notification.
     
-        :param: notification The notification that the directions should be drawn.
+        Calculate the directions and draw the directions on the map view.
     */
-    func drawDirections(directions: MKDirections) {
+    func drawDirections() {
         // Calculate directions.
-        directions.calculateDirectionsWithCompletionHandler({
+        directions?.calculateDirectionsWithCompletionHandler({
             (response: MKDirectionsResponse?, error: NSError?) in
             if let error = error {
                 // Display error if there is one.
@@ -120,12 +169,6 @@ class LocationsMapViewController: UIViewController {
     func showMapOptions() {
         mapButton.hidden = true
         
-        let mapSegmentedControl = UISegmentedControl()
-        mapSegmentedControl.setTranslatesAutoresizingMaskIntoConstraints(false)
-        mapSegmentedControl.insertSegmentWithTitle("First", atIndex: 0, animated: false)
-        mapSegmentedControl.insertSegmentWithTitle("Second", atIndex: 1, animated: false)
-        mapSegmentedControl.sizeToFit()
-        
         // Add animation for appearance
         let animation = CATransition()
         animation.duration = 0.1
@@ -133,16 +176,37 @@ class LocationsMapViewController: UIViewController {
         animation.subtype = kCATransitionFromRight
         mapSegmentedControl.layer.addAnimation(animation, forKey: nil)
         
-        mapView.addSubview(mapSegmentedControl)
-        mapView.didAddSubview(mapSegmentedControl)
-        
-        let trailingConstraint = NSLayoutConstraint(item: mapSegmentedControl, attribute: .Trailing, relatedBy: .Equal, toItem: mapView, attribute: .Trailing, multiplier: 1, constant: -8)
-        let bottomConstraint = NSLayoutConstraint(item: mapSegmentedControl, attribute: .Bottom, relatedBy: .Equal, toItem: mapView, attribute: .Bottom, multiplier: 1, constant: -8)
-        let heightConstraint = NSLayoutConstraint(item: mapSegmentedControl, attribute: .Height, relatedBy: .Equal, toItem: mapButton, attribute: .Height, multiplier: 1, constant: 0)
-        
-        mapView.addConstraint(trailingConstraint)
-        mapView.addConstraint(bottomConstraint)
-        mapView.addConstraint(heightConstraint)
+        mapSegmentedControl.hidden = false
+    }
+    
+    /**
+        Updates the current set of directions. If no map item is currently selected, the directions are `nil`.
+    */
+    func updateDirections() {
+        directions?.cancel()
+        if let selectedMapItem = selectedMapItem {
+            directions = getDirections(fromLocation: MKMapItem.mapItemForCurrentLocation(), toLocation: selectedMapItem.getMKMapItem())
+        }
+        else {
+            directions = nil
+        }
+    }
+    
+    // MARK: - Methods for navigation.
+    
+    /**
+        Gets a set of directions from one place to another.
+    
+        :param: source The start location.
+        :param: destination The end location.
+        :returns: The directions from the first location to the second location.
+    */
+    func getDirections(fromLocation source: MKMapItem, toLocation destination: MKMapItem) -> MKDirections {
+        let request = MKDirectionsRequest()
+        request.setSource(source)
+        request.setDestination(destination)
+        request.transportType = .Any
+        return MKDirections(request: request)
     }
 }
 
@@ -159,6 +223,16 @@ extension LocationsMapViewController: MKMapViewDelegate {
             return renderer
         }
         return nil
+    }
+    
+    /**
+        When the annotation view is selected and the segmented control is currently on "Navigation", draw directions to the annotation.
+    */
+    func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
+        updateDirections()
+        if let selectedMapItem = selectedMapItem {
+            drawDirections()
+        }
     }
 }
 

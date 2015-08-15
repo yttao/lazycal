@@ -171,23 +171,6 @@ class LocationsTableViewController: UITableViewController {
         tableView.endUpdates()
     }
     
-    // MARK: - Methods for navigation.
-    
-    /**
-        Gets a set of directions from one place to another.
-    
-        :param: from The first location.
-        :param: to The second location.
-        :returns: The directions from the first location to the second location.
-    */
-    func getDirections(fromLocation source: MKMapItem, toLocation destination: MKMapItem) -> MKDirections {
-        let request = MKDirectionsRequest()
-        request.setSource(source)
-        request.setDestination(destination)
-        request.transportType = .Any
-        return MKDirections(request: request)
-    }
-    
     // MARK: - Methods related to exiting view controller.
     
     /**
@@ -206,16 +189,11 @@ extension LocationsTableViewController: UITableViewDelegate {
     // MARK: - Methods related to selecting cells.
     
     /**
-        Selection will send out a notification that the location to focus on has changed and center the map on the selected location.
+        Selection will send out a notification that a map iem was selected.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let mapItem = selectedMapItems[indexPath.row]
-        
-        // Get navigation directions from current location to selected map item.
-        let directions = getDirections(fromLocation: MKMapItem.mapItemForCurrentLocation(), toLocation: mapItem.getMKMapItem())
-        
-        // Send notification that location was selected.
-        NSNotificationCenter.defaultCenter().postNotificationName("LocationSelected", object: self, userInfo: ["Location": mapItem.location, "Directions": directions])
+        NSNotificationCenter.defaultCenter().postNotificationName("MapItemSelected", object: self, userInfo: ["MapItem": mapItem])
     }
     
     // MARK: - Methods for setting up headers and footers.
