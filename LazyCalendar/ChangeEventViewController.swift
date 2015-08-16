@@ -703,12 +703,6 @@ class ChangeEventViewController: UITableViewController {
         
         addNewLocations()
         removeOldLocations()
-        let count = event!.mutableSetValueForKey("locations").count
-        println("Event locations: \(count)")
-        
-        let fetchRequest = NSFetchRequest(entityName: "Location")
-        let allLocations = managedContext.executeFetchRequest(fetchRequest, error: nil) as! [Location]
-        println("Total locations: \(allLocations.count)")
         
         // Save event, show error if not saved successfully.
         var error: NSError?

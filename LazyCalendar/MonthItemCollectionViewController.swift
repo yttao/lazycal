@@ -20,8 +20,8 @@ class MonthItemCollectionViewController: UICollectionViewController {
     private let cellsInMonth = 42
     
     // Colors used
-    private let backgroundColor = UIColor(red: 125, green: 255, blue: 125, alpha: 0)
-    private let selectedColor = UIColor.yellowColor()
+    private var backgroundColor: UIColor!
+    private var selectedColor: UIColor!
     
     // Calendar cell reuse identifier
     private let reuseIdentifier = "DayCell"
@@ -61,6 +61,9 @@ class MonthItemCollectionViewController: UICollectionViewController {
         collectionView!.dataSource = self
         
         collectionView!.scrollEnabled = false
+        
+        backgroundColor = collectionView!.backgroundColor
+        selectedColor = UIColor(red: 0, green: 255, blue: 0, alpha: 0.4)
     }
     
     /**

@@ -7,9 +7,12 @@
 //
 
 import UIKit
+import QuartzCore
 
 class MultipleSelectionSegmentedControl: UISegmentedControl {
     var selectedSegmentIndices = Set<Int>()
+    
+    var cornerRadius: CGFloat = 4.0
     
     // MARK: - Initializers
     
@@ -19,22 +22,28 @@ class MultipleSelectionSegmentedControl: UISegmentedControl {
         momentary = false
         
         addTarget(self, action: "toggleSegment", forControlEvents: .ValueChanged)
+        
+        layer.cornerRadius = cornerRadius
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         momentary = false
+        
+        addTarget(self, action: "toggleSegment", forControlEvents: .ValueChanged)
+        
+        layer.cornerRadius = cornerRadius
     }
     
     override init(items: [AnyObject]) {
         super.init(items: items)
         
         momentary = false
-        for subview in subviews {
-            let subview = subview as? UIView
-            subview?.tintColor = UIColor.clearColor()
-        }
+        
+        addTarget(self, action: "toggleSegment", forControlEvents: .ValueChanged)
+        
+        layer.cornerRadius = cornerRadius
     }
     
     // MARK: - Methods related to selection.
@@ -50,38 +59,83 @@ class MultipleSelectionSegmentedControl: UISegmentedControl {
         else {
             deselectSegment(atIndex: selectedSegmentIndex)
         }
-        // Deselect index (to allow reselection later)
-        selectedSegmentIndex = -1
     }
     
     /**
         Selects the segment at an index.
     */
     func selectSegment(atIndex index: Int) {
-        selectedSegmentIndices.insert(index)
+        println(selectedSegmentIndex)
         
         let sortedSegments = sortedSegmentsByXCoordinate()
+        let segment = sortedSegments[selectedSegmentIndex]
+        segment.removeFromSuperview()
         
-        for segment in sortedSegments {
-            segment.removeFromSuperview()
-            segment.backgroundColor = backgroundColor
-        }
+        // Add animation for selection
+        let animation = CATransition()
+        animation.duration = 0.1
+        animation.type = kCATransitionFade
+        segment.layer.addAnimation(animation, forKey: nil)
         
-        for selectedSegmentIndex in selectedSegmentIndices {
-            sortedSegments[selectedSegmentIndex].backgroundColor = tintColor
-            sortedSegments[selectedSegmentIndex].tintColor = backgroundColor
+        if segment == sortedSegments.first {
+            let maskLayer = CAShapeLayer(layer: segment.layer)
+            let maskPath = UIBezierPath(roundedRect: segment.bounds, byRoundingCorners: .BottomLeft | .TopLeft, cornerRadii: CGSizeMake(layer.cornerRadius, layer.cornerRadius))
+            maskLayer.path = maskPath.CGPath
+            segment.layer.mask = maskLayer
         }
+        else if segment == sortedSegments.last {
+            let maskLayer = CAShapeLayer(layer: segment.layer)
+            let maskPath = UIBezierPath(roundedRect: segment.bounds, byRoundingCorners: .BottomRight | .TopRight, cornerRadii: CGSizeMake(layer.cornerRadius, layer.cornerRadius))
+            maskLayer.path = maskPath.CGPath
+            segment.layer.mask = maskLayer
+        }
+        segment.layer.opacity = layer.opacity
+        segment.layer.backgroundColor = tintColor.CGColor
         
-        for segment in sortedSegments {
-            addSubview(segment)
-            didAddSubview(segment)
-        }
+        addSubview(segment)
+        didAddSubview(segment)
+        
+        selectedSegmentIndices.insert(index)
+        
+        selectedSegmentIndex = -1
     }
     
     // MARK: - Methods related to deselection.
     
     func deselectSegment(atIndex index: Int) {
+        println(selectedSegmentIndex)
+        let deselectedSegmentIndex = index
+        let sortedSegments = sortedSegmentsByXCoordinate()
+        let segment = sortedSegments[deselectedSegmentIndex]
+        segment.removeFromSuperview()
+        
+        // Add animation for deselection
+        let animation = CATransition()
+        animation.duration = 0.1
+        animation.type = kCATransitionFade
+        segment.layer.addAnimation(animation, forKey: nil)
+        
+        if segment == sortedSegments.first {
+            let maskLayer = CAShapeLayer(layer: segment.layer)
+            let maskPath = UIBezierPath(roundedRect: segment.bounds, byRoundingCorners: .BottomLeft | .TopLeft, cornerRadii: CGSizeMake(layer.cornerRadius, layer.cornerRadius))
+            maskLayer.path = maskPath.CGPath
+            segment.layer.mask = maskLayer
+        }
+        else if segment == sortedSegments.last {
+            let maskLayer = CAShapeLayer(layer: segment.layer)
+            let maskPath = UIBezierPath(roundedRect: segment.bounds, byRoundingCorners: .BottomRight | .TopRight, cornerRadii: CGSizeMake(layer.cornerRadius, layer.cornerRadius))
+            maskLayer.path = maskPath.CGPath
+            segment.layer.mask = maskLayer
+        }
+        segment.layer.opacity = layer.opacity
+        segment.layer.backgroundColor = UIColor.clearColor().CGColor
+        
+        addSubview(segment)
+        didAddSubview(segment)
+        
         selectedSegmentIndices.remove(index)
+        
+        selectedSegmentIndex = -1
     }
     
     /**
@@ -100,6 +154,24 @@ class MultipleSelectionSegmentedControl: UISegmentedControl {
     func sortedSegmentsByXCoordinate() -> [UIView] {
         // Get UIViews from subviews
         let views = subviews.map({
+            return $0 as! UIView
+        })
+        // Sort views by x coordinate
+        let sortedViews = views.sorted({
+            let firstX = $0.frame.origin.x
+            let secondX = $1.frame.origin.x
+            
+            return firstX < secondX
+        })
+        return sortedViews
+    }
+    
+    /**
+        Returns an array of segments (as `UIViews`)
+    */
+    static func sortSegmentsByXCoordinate(control: UISegmentedControl) -> [UIView] {
+        // Get UIViews from subviews
+        let views = control.subviews.map({
             return $0 as! UIView
         })
         // Sort views by x coordinate

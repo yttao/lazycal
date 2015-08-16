@@ -1,5 +1,5 @@
 //
-//  Permissions.swift
+//  Settings.swift
 //  LazyCalendar
 //
 //  Created by Ying Tao on 8/11/15.
