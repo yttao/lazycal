@@ -20,7 +20,7 @@ class LocationsMapViewController: UIViewController {
     private let testSegmentedControl = MultipleSelectionSegmentedControl(items: ["Less", "Navigate", "Directions"])
     
     @IBAction func testSelect(sender: UISegmentedControl) {
-        // LOGIC FOR SHOWING SELECTION
+        /*// LOGIC FOR SHOWING SELECTION
         let subviews = sender.subviews as! [UIView]
         
         let sortedViews = MultipleSelectionSegmentedControl.sortSegmentsByXCoordinate(sender)
@@ -44,7 +44,7 @@ class LocationsMapViewController: UIViewController {
         sender.addSubview(first)
         sender.didAddSubview(first)
         
-        sender.selectedSegmentIndex = -1
+        sender.selectedSegmentIndex = -1*/
     }
 
     // The current directions

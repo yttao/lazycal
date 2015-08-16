@@ -1315,6 +1315,16 @@
                     <view key="view" contentMode="scaleToFill" id="IyX-z0-l0t">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="sak-D0-jz8">
+                                <rect key="frame" x="239" y="564" width="123" height="29"/>
+                                <segments>
+                                    <segment title="First"/>
+                                    <segment title="Second"/>
+                                    <segment title=""/>
+                                </segments>
+                            </segmentedControl>
+                        </subviews>
                         <color key="backgroundColor" red="0.4210526316" green="0.74342105260000002" blue="0.80949321549999997" alpha="0.29999999999999999" colorSpace="calibratedRGB"/>
                     </view>
                 </viewController>

@@ -63,6 +63,7 @@ class MonthItemCollectionViewController: UICollectionViewController {
         collectionView!.scrollEnabled = false
         
         backgroundColor = collectionView!.backgroundColor
+        println(backgroundColor)
         selectedColor = UIColor(red: 0, green: 255, blue: 0, alpha: 0.4)
     }
     

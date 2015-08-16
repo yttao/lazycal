@@ -9,7 +9,7 @@
 import UIKit
 
 class TestViewController: UIViewController {
-    var testSegmentedControl = MultipleSelectionSegmentedControl(items: ["First", "Second", "Third"])
+    var testSegmentedControl = MultipleSelectionSegmentedControl(items: ["First", "Second", "Third", "Fourth"])
 
     override func viewDidLoad() {
         super.viewDidLoad()
