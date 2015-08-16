@@ -15,37 +15,8 @@ import QuartzCore
 class LocationsMapViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var mapButton: UIButton!
-    @IBOutlet weak var mapSegmentedControl: UISegmentedControl!
     private let locationManager = CLLocationManager()
-    private let testSegmentedControl = MultipleSelectionSegmentedControl(items: ["Less", "Navigate", "Directions"])
-    
-    @IBAction func testSelect(sender: UISegmentedControl) {
-        /*// LOGIC FOR SHOWING SELECTION
-        let subviews = sender.subviews as! [UIView]
-        
-        let sortedViews = MultipleSelectionSegmentedControl.sortSegmentsByXCoordinate(sender)
-        let first = sortedViews[sender.selectedSegmentIndex]
-        first.removeFromSuperview()
-        
-        // Add animation for appearance
-        let animation = CATransition()
-        animation.duration = 0.1
-        animation.type = kCATransitionFade
-        first.layer.addAnimation(animation, forKey: nil)
-        
-        let maskLayer = CAShapeLayer(layer: first.layer)
-        let maskPath = UIBezierPath(roundedRect: first.bounds, byRoundingCorners: UIRectCorner.BottomRight | UIRectCorner.TopRight, cornerRadii: CGSizeMake(4, 4))
-        first
-        maskLayer.path = maskPath.CGPath
-        first.layer.mask = maskLayer
-        first.layer.backgroundColor = sender.tintColor.CGColor
-        first.layer.opacity = sender.layer.opacity
-        
-        sender.addSubview(first)
-        sender.didAddSubview(first)
-        
-        sender.selectedSegmentIndex = -1*/
-    }
+    private let mapSegmentedControl = MultipleSelectionSegmentedControl(items: ["Less", "Navigate", "Directions"])
 
     // The current directions
     private var directions: MKDirections?
@@ -90,22 +61,14 @@ class LocationsMapViewController: UIViewController {
         mapView.addSubview(mapButton)
         mapView.didAddSubview(mapButton)
         
-        mapView.addSubview(testSegmentedControl)
-        mapView.didAddSubview(testSegmentedControl)
-        
-        testSegmentedControl.setTranslatesAutoresizingMaskIntoConstraints(false)
-        let trailingConstraint = NSLayoutConstraint(item: testSegmentedControl, attribute: .Trailing, relatedBy: .Equal, toItem: mapView, attribute: .Trailing, multiplier: 1, constant: -8)
-        let bottomConstraint = NSLayoutConstraint(item: testSegmentedControl, attribute: .Bottom, relatedBy: .Equal, toItem: mapView, attribute: .Bottom, multiplier: 1, constant: -8)
-        mapView.addConstraints([trailingConstraint, bottomConstraint])
-        
-        mapSegmentedControl.hidden = true
-        /*mapSegmentedControl.tintColor = UIColor.redColor()
-        mapSegmentedControl.layer.cornerRadius = 4
-        mapSegmentedControl.layer.borderColor = UIColor.redColor().CGColor
-        mapSegmentedControl.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor.redColor()], forState: .Normal)*/
-
         mapView.addSubview(mapSegmentedControl)
         mapView.didAddSubview(mapSegmentedControl)
+        
+        mapSegmentedControl.setTranslatesAutoresizingMaskIntoConstraints(false)
+        let trailingConstraint = NSLayoutConstraint(item: mapSegmentedControl, attribute: .Trailing, relatedBy: .Equal, toItem: mapSegmentedControl.superview, attribute: .Trailing, multiplier: 1, constant: -8)
+        let bottomConstraint = NSLayoutConstraint(item: mapSegmentedControl, attribute: .Bottom, relatedBy: .Equal, toItem: mapSegmentedControl.superview, attribute: .Bottom, multiplier: 1, constant: -8)
+        mapView.addConstraint(trailingConstraint)
+        mapView.addConstraint(bottomConstraint)
         
         NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
     }

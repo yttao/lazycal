@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2iT-2R-id9">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="yT2-qU-bNq">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -73,10 +73,10 @@
         <scene sceneID="pal-py-Puj">
             <objects>
                 <collectionViewController storyboardIdentifier="MonthItemCollectionViewController" title="MonthItemCollectionViewController" id="pQA-1g-TTb" userLabel="MonthItemCollectionViewController" customClass="MonthItemCollectionViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="aWd-qS-SnV">
+                    <collectionView key="view" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="aWd-qS-SnV">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" red="0.42105263157894735" green="0.74342105263157898" blue="0.80949321546052633" alpha="0.29999999999999999" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="0.42105263157894735" green="0.74342105263157898" blue="0.80949321546052633" alpha="0.35000000000000003" colorSpace="calibratedRGB"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="EaN-K2-v9q">
                             <size key="itemSize" width="50" height="50"/>
                             <size key="headerReferenceSize" width="50" height="40"/>
@@ -112,7 +112,7 @@
                         <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MonthItemCollectionHeaderView" id="lPe-fG-aLl" customClass="MonthItemCollectionHeaderView" customModule="LazyCalendar" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="0.0" width="600" height="40"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <color key="backgroundColor" red="0.39473684210526316" green="0.69078947368421051" blue="0.35526315789473684" alpha="0.40000000000000002" colorSpace="calibratedRGB"/>
+                            <color key="backgroundColor" red="0.0" green="0.80000000000000004" blue="0.20000000000000001" alpha="0.5" colorSpace="calibratedRGB"/>
                         </collectionReusableView>
                         <connections>
                             <outlet property="dataSource" destination="pQA-1g-TTb" id="uZc-fE-1Qp"/>
@@ -1221,19 +1221,8 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="DR5-Nt-yqP">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="236"/>
                             </mapView>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" translatesAutoresizingMaskIntoConstraints="NO" id="naZ-tA-Fgn">
-                                <rect key="frame" x="365" y="200" width="227" height="29"/>
-                                <segments>
-                                    <segment title="Less"/>
-                                    <segment title="Navigate"/>
-                                    <segment title="Directions"/>
-                                </segments>
-                                <connections>
-                                    <action selector="testSelect:" destination="pkJ-xm-n9t" eventType="valueChanged" id="nAK-im-ZRT"/>
-                                </connections>
-                            </segmentedControl>
                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="detailDisclosure" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hAS-5y-ncV">
-                                <rect key="frame" x="570" y="200" width="22" height="28"/>
+                                <rect key="frame" x="570" y="206" width="22" height="22"/>
                                 <state key="normal">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -1242,20 +1231,16 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="DR5-Nt-yqP" firstAttribute="trailing" secondItem="FqO-4f-W2v" secondAttribute="trailing" id="FBL-4N-WdQ"/>
-                            <constraint firstAttribute="trailing" secondItem="naZ-tA-Fgn" secondAttribute="trailing" constant="8" id="HPN-JE-f2H"/>
-                            <constraint firstItem="kur-TQ-NMj" firstAttribute="top" secondItem="hAS-5y-ncV" secondAttribute="bottom" constant="8" id="Kl5-4h-sCz"/>
-                            <constraint firstAttribute="trailing" secondItem="hAS-5y-ncV" secondAttribute="trailing" constant="8" id="QAt-ih-gis"/>
+                            <constraint firstItem="hAS-5y-ncV" firstAttribute="bottom" secondItem="kur-TQ-NMj" secondAttribute="top" constant="-8" id="Kl5-4h-sCz"/>
+                            <constraint firstItem="hAS-5y-ncV" firstAttribute="trailing" secondItem="FqO-4f-W2v" secondAttribute="trailing" constant="-8" id="QAt-ih-gis"/>
                             <constraint firstItem="DR5-Nt-yqP" firstAttribute="bottom" secondItem="kur-TQ-NMj" secondAttribute="top" id="fyH-K5-Dlm"/>
                             <constraint firstItem="DR5-Nt-yqP" firstAttribute="leading" secondItem="FqO-4f-W2v" secondAttribute="leading" id="jPz-5g-yTy"/>
                             <constraint firstItem="DR5-Nt-yqP" firstAttribute="top" secondItem="1I2-eA-Unm" secondAttribute="bottom" id="oMi-fn-aLp"/>
-                            <constraint firstItem="naZ-tA-Fgn" firstAttribute="centerY" secondItem="hAS-5y-ncV" secondAttribute="centerY" id="tog-a6-Xv9"/>
-                            <constraint firstItem="kur-TQ-NMj" firstAttribute="top" secondItem="naZ-tA-Fgn" secondAttribute="bottom" constant="8" id="y6c-XZ-RcQ"/>
                         </constraints>
                     </view>
                     <toolbarItems/>
                     <connections>
                         <outlet property="mapButton" destination="hAS-5y-ncV" id="HG7-nF-dfl"/>
-                        <outlet property="mapSegmentedControl" destination="naZ-tA-Fgn" id="0RG-h9-LOT"/>
                         <outlet property="mapView" destination="DR5-Nt-yqP" id="Adt-Is-Hf4"/>
                     </connections>
                 </viewController>
@@ -1307,7 +1292,7 @@
         <!--A_TEST-->
         <scene sceneID="48c-b6-tce">
             <objects>
-                <viewController title="A_TEST" id="2iT-2R-id9" customClass="TestViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="TEST" title="A_TEST" id="2iT-2R-id9" customClass="TestViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Hja-bB-H50"/>
                         <viewControllerLayoutGuide type="bottom" id="9rk-X6-fJ0"/>

@@ -12,6 +12,7 @@ import QuartzCore
 class MultipleSelectionSegmentedControl: UISegmentedControl {
     var selectedSegmentIndices = Set<Int>()
     
+    // Segmented control corner radius
     var cornerRadius: CGFloat {
         get {
             return layer.cornerRadius
@@ -21,7 +22,8 @@ class MultipleSelectionSegmentedControl: UISegmentedControl {
         }
     }
     
-    var animationTime = 1.5
+    // Animation time on pressing button
+    var animationTime = 0.3
     
     // MARK: - Initializers
     
@@ -83,8 +85,10 @@ class MultipleSelectionSegmentedControl: UISegmentedControl {
     func selectSegment(atIndex index: Int) {
         let sortedSegments = sortedSegmentsByXCoordinate()
         let segment = sortedSegments[selectedSegmentIndex]
-
-        segment.layer.backgroundColor = tintColor.CGColor
+        
+        UIView.animateWithDuration(animationTime, animations: {
+            segment.layer.backgroundColor = self.tintColor.CGColor
+        })
         
         selectedSegmentIndices.insert(index)
         
@@ -100,8 +104,10 @@ class MultipleSelectionSegmentedControl: UISegmentedControl {
         let deselectedSegmentIndex = index
         let sortedSegments = sortedSegmentsByXCoordinate()
         let segment = sortedSegments[deselectedSegmentIndex]
-
-        segment.layer.backgroundColor = backgroundColor?.CGColor ?? UIColor.clearColor().CGColor
+        
+        UIView.animateWithDuration(animationTime, animations: {
+            segment.layer.backgroundColor = self.backgroundColor?.CGColor ?? UIColor.clearColor().CGColor
+        })
         
         selectedSegmentIndices.remove(index)
         

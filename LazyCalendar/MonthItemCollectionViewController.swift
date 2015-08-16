@@ -20,7 +20,7 @@ class MonthItemCollectionViewController: UICollectionViewController {
     private let cellsInMonth = 42
     
     // Colors used
-    private var backgroundColor: UIColor!
+    private var deselectedColor: UIColor!
     private var selectedColor: UIColor!
     
     // Calendar cell reuse identifier
@@ -45,6 +45,8 @@ class MonthItemCollectionViewController: UICollectionViewController {
     // Size of header
     private let headerHeight: CGFloat = 30
     
+    var animationTime = 0.2
+    
     required init(coder aDecoder: NSCoder) {
         daysInMonth = [Int?](count: cellsInMonth, repeatedValue: nil)
         
@@ -62,9 +64,8 @@ class MonthItemCollectionViewController: UICollectionViewController {
         
         collectionView!.scrollEnabled = false
         
-        backgroundColor = collectionView!.backgroundColor
-        println(backgroundColor)
-        selectedColor = UIColor(red: 0, green: 255, blue: 0, alpha: 0.4)
+        selectedColor = UIColor(red: 0, green: 0.8, blue: 0.2, alpha: 0.5)
+        deselectedColor = UIColor.clearColor()
     }
     
     /**
@@ -117,7 +118,9 @@ class MonthItemCollectionViewController: UICollectionViewController {
         :param: cell The cell to select.
     */
     func selectCell(cell: CalendarCollectionViewCell) {
-        cell.backgroundColor = selectedColor
+        UIView.animateWithDuration(animationTime, animations: {
+            cell.backgroundColor = self.selectedColor
+        })
         selectedCell = cell
         
         // Update selected date components
@@ -134,7 +137,10 @@ class MonthItemCollectionViewController: UICollectionViewController {
     */
     func deselectSelectedCell() {
         if let cell = selectedCell {
-            cell.backgroundColor = backgroundColor
+            UIView.animateWithDuration(animationTime, animations: {
+                cell.backgroundColor = self.deselectedColor
+            })
+            
             selectedCell = nil
         }
     }
@@ -244,8 +250,9 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
     */
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryViewOfKind(UICollectionElementKindSectionHeader, withReuseIdentifier: "MonthItemCollectionHeaderView", forIndexPath: indexPath) as! MonthItemCollectionHeaderView
-        // Create constraints to space labels properly
-        header.createConstraints()
+        // Create constraints to space labels properly and borders for separation.
+        header.addConstraints()
+        header.addBorders()
         return header
     }
 }

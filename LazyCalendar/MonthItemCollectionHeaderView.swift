@@ -29,17 +29,17 @@ class MonthItemCollectionHeaderView: UICollectionReusableView {
     /**
         Sets up the label constraints.
     */
-    func createConstraints() {
+    func addConstraints() {
         // Add width, height, and center Y constraints
-        for i in 0..<weekdayLabels.count {
+        for weekdayLabel in weekdayLabels {
             // Allows custom constraints to be added
-            weekdayLabels[i].setTranslatesAutoresizingMaskIntoConstraints(false)
+            weekdayLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
             
-            let widthConstraint = NSLayoutConstraint(item: weekdayLabels[i], attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: frame.width / 7)
-            let heightConstraint = NSLayoutConstraint(item: weekdayLabels[i], attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: frame.size.height)
-            let centerYConstraint = NSLayoutConstraint(item: weekdayLabels[i], attribute: .CenterY, relatedBy: .Equal, toItem: self, attribute: .CenterY, multiplier: 1.0, constant: 0)
+            let widthConstraint = NSLayoutConstraint(item: weekdayLabel, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: frame.width / 7)
+            let heightConstraint = NSLayoutConstraint(item: weekdayLabel, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: frame.size.height)
+            let centerYConstraint = NSLayoutConstraint(item: weekdayLabel, attribute: .CenterY, relatedBy: .Equal, toItem: self, attribute: .CenterY, multiplier: 1.0, constant: 0)
             
-            weekdayLabels[i].addConstraints([widthConstraint, heightConstraint])
+            weekdayLabel.addConstraints([widthConstraint, heightConstraint])
             addConstraint(centerYConstraint)
         }
         
@@ -50,6 +50,17 @@ class MonthItemCollectionHeaderView: UICollectionReusableView {
         for i in 1..<weekdayLabels.count {
             let leadingConstraint = NSLayoutConstraint(item: weekdayLabels[i], attribute: .Leading, relatedBy: .Equal, toItem: weekdayLabels[i - 1], attribute: .Trailing, multiplier: 1.0, constant: 0)
             addConstraint(leadingConstraint)
+        }
+    }
+    
+    /**
+        Adds borders to labels.
+    */
+    func addBorders() {
+        for weekdayLabel in weekdayLabels {
+            weekdayLabel.layer.borderColor = UIColor.grayColor().CGColor
+            weekdayLabel.layer.opacity = weekdayLabel.superview!.layer.opacity
+            weekdayLabel.layer.borderWidth = 1
         }
     }
     
