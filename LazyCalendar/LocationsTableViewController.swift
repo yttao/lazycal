@@ -15,6 +15,17 @@ import CoreLocation
 class LocationsTableViewController: UITableViewController {
     var editingEnabled = true
     
+    // Directions being shown by table view. If nil, table view does not show directions.
+    var directions: [MKRouteStep]?
+    
+    // If true, the table view is showing directions to a location. If false, the table view is showing locations.
+    var showingDirections: Bool {
+        if directions != nil {
+            return true
+        }
+        return false
+    }
+    
     var selectedMapItems: [MapItem]!
     // Map items shown when searching for locations
     private var filteredMapItems = [MapItem]()
@@ -27,6 +38,13 @@ class LocationsTableViewController: UITableViewController {
     private var timer: NSTimer?
     
     // MARK: - Methods for setting up view controller.
+    
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "toggleDirections:", name: "DirectionsRequested", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "toggleDirections:", name: "DirectionsDismissed", object: nil)
+    }
     
     /**
         Sets table view delegate and data source, initializes the selected map items to be empty if no map items were initially passed in, and creates search controller if editing is enabled.
@@ -44,8 +62,6 @@ class LocationsTableViewController: UITableViewController {
         if editingEnabled {
             initializeSearchController()
         }
-        
-        //tableView.tableFooterView = UIView(frame: CGRectZero)
     }
     
     /**
@@ -171,6 +187,20 @@ class LocationsTableViewController: UITableViewController {
         tableView.endUpdates()
     }
     
+    // MARK: - Methods related to showing and hiding direction.
+    
+    /**
+        Shows directions when notified.
+    
+        :param: notification The notification that the table view should show directions.
+    */
+    func toggleDirections(notification: NSNotification) {
+        directions = notification.userInfo?["Directions"] as? [MKRouteStep]
+        
+        // Reload table view with directions (if there are any) or with locations (if directions = nil).
+        tableView.reloadData()
+    }
+    
     // MARK: - Methods related to exiting view controller.
     
     /**
@@ -189,11 +219,21 @@ extension LocationsTableViewController: UITableViewDelegate {
     // MARK: - Methods related to selecting cells.
     
     /**
-        Selection will send out a notification that a map iem was selected.
+        Selecting a location will send out a notification that a map item was selected. Selecting a direction will send out a notification that a direction was selected.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let mapItem = selectedMapItems[indexPath.row]
-        NSNotificationCenter.defaultCenter().postNotificationName("MapItemSelected", object: self, userInfo: ["MapItem": mapItem])
+        // Select either direction or location.
+        
+        if showingDirections {
+            // If selecting a direction, send a notice that
+            let direction = directions![indexPath.row]
+            NSNotificationCenter.defaultCenter().postNotificationName("DirectionSelected", object: self, userInfo: ["Direction": direction])
+        }
+        else {
+            let mapItem = selectedMapItems[indexPath.row]
+            NSNotificationCenter.defaultCenter().postNotificationName("MapItemSelected", object: self, userInfo: ["MapItem": mapItem])
+        }
+        
     }
     
     // MARK: - Methods for setting up headers and footers.
@@ -244,6 +284,9 @@ extension LocationsTableViewController: UITableViewDataSource {
         The number of rows is the number of selected map items.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if showingDirections {
+            return directions!.count
+        }
         return selectedMapItems.count
     }
     
@@ -253,11 +296,21 @@ extension LocationsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         
-        let mapItem = selectedMapItems[indexPath.row]
-        let name = mapItem.name
-        let address = mapItem.address
-        cell.textLabel?.text = name
-        cell.detailTextLabel?.text = address
+        // Use cell for either showing direction or location.
+        
+        if showingDirections {
+            // If showing directions, main label shows instruction.
+            let direction = directions![indexPath.row]
+            cell.textLabel?.text = direction.instructions
+        }
+        else {
+            // If showing locations, main label shows name and detail label shows address.
+            let mapItem = selectedMapItems[indexPath.row]
+            let name = mapItem.name
+            let address = mapItem.address
+            cell.textLabel?.text = name
+            cell.detailTextLabel?.text = address
+        }
         
         return cell
     }
@@ -271,7 +324,7 @@ extension LocationsTableViewController: UITableViewDataSource {
         Note: If `tableView.editing = true`, the left circular edit option will appear. If locations are being searched or editing is disabled, the table cannot be edited.
     */
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        if editingEnabled {
+        if editingEnabled && !showingDirections {
             return true
         }
         return false

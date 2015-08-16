@@ -52,6 +52,7 @@ class LocationsMapViewController: UIViewController {
         super.init(coder: aDecoder)
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "selectMapItem:", name: "MapItemSelected", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "selectDirection:", name: "DirectionSelected", object: nil)
     }
     
     /**
@@ -132,6 +133,16 @@ class LocationsMapViewController: UIViewController {
     }
     
     /**
+    
+    */
+    func selectDirection(notification: NSNotification) {
+        let direction = notification.userInfo!["Direction"] as! MKRouteStep
+        let directionRectangle = direction.polyline.boundingMapRect
+        
+        mapView?.setVisibleMapRect(directionRectangle, animated: true)
+    }
+    
+    /**
         Centers the map on the specified location with the given region radius.
     
         :param: location The location to center the map on.
@@ -141,64 +152,6 @@ class LocationsMapViewController: UIViewController {
         mapView.showsUserLocation = true
         let coordinateRegion = MKCoordinateRegionMakeWithDistance(location.coordinate, regionRadius * 2.0, regionRadius * 2.0)
         mapView.setRegion(coordinateRegion, animated: true)
-    }
-    
-    /**
-        Calculates the directions and shows them if navigation is enabled.
-    
-        Calculate the directions and draw the directions on the map view.
-    */
-    func calculateDirections() {
-        // Calculate directions.
-        directions?.calculateDirectionsWithCompletionHandler({
-            (response: MKDirectionsResponse?, error: NSError?) in
-            if let error = error {
-                // Display error if there is one.
-                NSLog("Error occurred when calculating directions: %@", error.localizedDescription)
-            }
-            else if let response = response, newRoutes = response.routes as? [MKRoute] {
-                // Get routes
-                for newRoute in newRoutes {
-                    // Erase old route
-                    if let oldRoute = self.route {
-                        self.mapView.removeOverlay(oldRoute.polyline)
-                    }
-                    
-                    // Set new route.
-                    self.route = newRoute
-                    
-                    if self.navigateEnabled {
-                        self.showRoute()
-                    }
-                    else {
-                        self.hideRoute()
-                    }
-                    
-                    let steps = self.route!.steps as! [MKRouteStep]
-                    for step in steps {
-                        println(step.instructions)
-                    }
-                }
-            }
-        })
-    }
-    
-    /**
-        Shows the navigation route on the map. If there is no route to draw on the map, this method does nothing.
-    */
-    func showRoute() {
-        if let route = route {
-            mapView.addOverlay(route.polyline, level: .AboveRoads)
-        }
-    }
-    
-    /**
-        Hides the navigation route on the map. If there is no route drawn on the map, this method does nothing.
-    */
-    func hideRoute() {
-        if let route = route {
-            mapView.removeOverlay(route.polyline)
-        }
     }
     
     // MARK: - Methods related to controlling the map button.
@@ -221,10 +174,13 @@ class LocationsMapViewController: UIViewController {
     // MARK: - Methods related to controlling the map segmented control.
     
     /**
-        When the map segmented control "Less" button is selected, hide options.
+        When the map segmented control "Less" button is selected, hide options and hide the route and directions, if shown by the view.
     */
     func hideMapOptions() {
         mapSegmentedControl.deselectAllSegments()
+        
+        hideRoute()
+        hideDirections()
         
         // Add animation for hiding.
         let animation = CATransition()
@@ -256,10 +212,18 @@ class LocationsMapViewController: UIViewController {
                     hideRoute()
                 }
             }
-            else if toggledSegmentIndex == 2 && mapSegmentedControl.selectedSegment(toggledSegmentIndex) && selectedMapItem != nil {
+            else if toggledSegmentIndex == 2 {
+                if mapSegmentedControl.selectedSegment(toggledSegmentIndex) && selectedMapItem != nil {
+                    showDirections()
+                }
+                else if !mapSegmentedControl.selectedSegment(toggledSegmentIndex) {
+                    hideDirections()
+                }
             }
         }
     }
+    
+    // MARK: - Methods for handling directions.
     
     /**
         Updates the current set of directions. If no map item is currently selected, the directions are `nil`.
@@ -273,8 +237,6 @@ class LocationsMapViewController: UIViewController {
             directions = nil
         }
     }
-    
-    // MARK: - Methods for navigation.
     
     /**
         Gets a set of directions from one place to another.
@@ -290,10 +252,87 @@ class LocationsMapViewController: UIViewController {
         request.transportType = .Any
         return MKDirections(request: request)
     }
+    
+    /**
+        Calculates the directions and shows them if navigation is enabled.
+    
+        Calculate the directions and draw the directions on the map view.
+    */
+    func calculateDirections() {
+        // Calculate directions (or immediately execute completion handler if directions have been calculated already).
+        directions?.calculateDirectionsWithCompletionHandler({
+            (response: MKDirectionsResponse?, error: NSError?) in
+            if let error = error {
+                // Display error if there is one.
+                NSLog("Error occurred when calculating directions: %@", error.localizedDescription)
+            }
+            else if let response = response, newRoutes = response.routes as? [MKRoute] {
+                // Get routes
+                for newRoute in newRoutes {
+                    // Erase old route
+                    if let oldRoute = self.route {
+                        self.mapView.removeOverlay(oldRoute.polyline)
+                    }
+                    
+                    // Set new route.
+                    self.route = newRoute
+                    
+                    if self.navigateEnabled {
+                        self.showRoute()
+                    }
+                    else {
+                        self.hideRoute()
+                    }
+                }
+            }
+        })
+    }
+    
+    // MARK: - Methods for showing and hiding the navigation route.
+    
+    /**
+        Shows the navigation route on the map. If there is no route to draw on the map, this method does nothing.
+    */
+    func showRoute() {
+        if let route = route {
+            mapView.addOverlay(route.polyline, level: .AboveRoads)
+        }
+    }
+    
+    /**
+        Hides the navigation route on the map. If there is no route drawn on the map, this method does nothing.
+    */
+    func hideRoute() {
+        if let route = route {
+            mapView.removeOverlay(route.polyline)
+        }
+    }
+    
+    // MARK: - Methods for showing an hiding the navigation directions.
+    
+    /**
+        Show the navigation directions on the table view. If there is no route, this method does nothing.
+    */
+    func showDirections() {
+        if let route = route {
+            NSNotificationCenter.defaultCenter().postNotificationName("DirectionsRequested", object: self, userInfo: ["Directions": route.steps as! [MKRouteStep]])
+        }
+    }
+    
+    /**
+        Hides the navigation directions on the table view. If there is no directions shown, this method does nothing.
+    */
+    func hideDirections() {
+        if let route = route {
+            NSNotificationCenter.defaultCenter().postNotificationName("DirectionsDismissed", object: self, userInfo: nil)
+        }
+    }
 }
 
 // MARK: - MKMapViewDelegate
 extension LocationsMapViewController: MKMapViewDelegate {
+    // MARK: - Methods for rendering overlays.
+    
     /**
         Renders the navigation directions overlay line.
     */
@@ -307,12 +346,18 @@ extension LocationsMapViewController: MKMapViewDelegate {
         return nil
     }
     
+    // MARK: - Methods for selecting annotations.
+    
     /**
         When the annotation view is selected and the segmented control is currently on "Navigation", draw directions to the annotation.
     */
     func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
         updateDirections()
         calculateDirections()
+        
+        if directionsEnabled {
+            showDirections()
+        }
     }
 }
 
