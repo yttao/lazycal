@@ -12,6 +12,8 @@ import QuartzCore
 class MultipleSelectionSegmentedControl: UISegmentedControl {
     var selectedSegmentIndices = Set<Int>()
     
+    var toggledIndex: Int?
+    
     // Segmented control corner radius
     var cornerRadius: CGFloat {
         get {
@@ -22,7 +24,7 @@ class MultipleSelectionSegmentedControl: UISegmentedControl {
         }
     }
     
-    // Animation time on pressing button
+    // Animation time on pressing segment
     var animationTime = 0.3
     
     // MARK: - Initializers
@@ -83,35 +85,57 @@ class MultipleSelectionSegmentedControl: UISegmentedControl {
         :param: index The index of the segment to select.
     */
     func selectSegment(atIndex index: Int) {
-        let sortedSegments = sortedSegmentsByXCoordinate()
-        let segment = sortedSegments[selectedSegmentIndex]
+        // Index becomes the segment index that was just toggled.
+        toggledIndex = index
         
+        // Get selected segment.
+        let sortedSegments = sortedSegmentsByXCoordinate()
+        let segment = sortedSegments[index]
+        
+        // Change segment color to match segmented control color.
         UIView.animateWithDuration(animationTime, animations: {
             segment.layer.backgroundColor = self.tintColor.CGColor
         })
         
+        // Select segment index.
         selectedSegmentIndices.insert(index)
-        
         selectedSegmentIndex = -1
     }
     
     /**
-        Deselects teh segment at an index.
+        Deselects the segment at an index.
     
         :param: index The index of the segment to deselect.
     */
     func deselectSegment(atIndex index: Int) {
-        let deselectedSegmentIndex = index
-        let sortedSegments = sortedSegmentsByXCoordinate()
-        let segment = sortedSegments[deselectedSegmentIndex]
+        // Index becomes the segment index that was just toggled.
+        toggledIndex = index
         
+        // Get deselected segment.
+        let sortedSegments = sortedSegmentsByXCoordinate()
+        let segment = sortedSegments[index]
+        
+        // Change segment color to match segmented control background color (or clear if there is no background color).
         UIView.animateWithDuration(animationTime, animations: {
             segment.layer.backgroundColor = self.backgroundColor?.CGColor ?? UIColor.clearColor().CGColor
         })
         
+        // Deselect segment index.
         selectedSegmentIndices.remove(index)
-        
         selectedSegmentIndex = -1
+    }
+    
+    /**
+        Deselects all segments.
+    */
+    func deselectAllSegments() {
+        // Deselect each segment.
+        for index in selectedSegmentIndices {
+            deselectSegment(atIndex: index)
+        }
+        
+        // Set last toggled index to nil.
+        toggledIndex = nil
     }
     
     /**

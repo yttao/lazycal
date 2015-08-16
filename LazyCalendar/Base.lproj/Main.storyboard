@@ -1289,10 +1289,10 @@
             </objects>
             <point key="canvasLocation" x="928" y="1987"/>
         </scene>
-        <!--A_TEST-->
+        <!--Test-->
         <scene sceneID="48c-b6-tce">
             <objects>
-                <viewController storyboardIdentifier="TEST" title="A_TEST" id="2iT-2R-id9" customClass="TestViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="TEST" title="Test" id="2iT-2R-id9" customClass="TestViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Hja-bB-H50"/>
                         <viewControllerLayoutGuide type="bottom" id="9rk-X6-fJ0"/>
@@ -1315,7 +1315,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="p0B-16-GIB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1482" y="2117"/>
+            <point key="canvasLocation" x="1505" y="3102"/>
         </scene>
     </scenes>
 </document>

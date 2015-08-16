@@ -16,25 +16,31 @@ class LocationsMapViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var mapButton: UIButton!
     private let locationManager = CLLocationManager()
-    private let mapSegmentedControl = MultipleSelectionSegmentedControl(items: ["Less", "Navigate", "Directions"])
+    private let mapSegmentedControl = MultipleSelectionSegmentedControl()
 
+    // Segments of map segmented control (in order).
+    private let controlSegments = ["Less", "Navigate", "Directions"]
+    
+    // True if navigate segment is enabled.
+    private var navigateEnabled: Bool {
+        return mapSegmentedControl.selectedSegment(1)
+    }
+    // True if directions segment is enabled.
+    private var directionsEnabled: Bool {
+        return mapSegmentedControl.selectedSegment(2)
+    }
+    
     // The current directions
     private var directions: MKDirections?
     // The currently displayed route
     private var route: MKRoute?
     
     private var selectedMapItem: MapItem? {
-        let annotation = mapView.selectedAnnotations.first as? MapItem
+        let annotation = mapView.selectedAnnotations?.first as? MapItem
         if let annotation = annotation {
             return annotation
         }
         return nil
-    }
-    private var navigateEnabled: Bool {
-        return mapSegmentedControl.selectedSegmentIndex == 1
-    }
-    private var directionsEnabled: Bool {
-        return mapSegmentedControl.selectedSegmentIndex == 2
     }
     
     // MARK: - Methods for initializing view controller and data.
@@ -48,6 +54,9 @@ class LocationsMapViewController: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "selectMapItem:", name: "MapItemSelected", object: nil)
     }
     
+    /**
+        Set up delegates, start tracking location, set up buttons, and send notification that map view is loaded.
+    */
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -56,21 +65,54 @@ class LocationsMapViewController: UIViewController {
         
         mapView.delegate = self
         
-        mapButton.hidden = true
-        mapButton.addTarget(self, action: "showMapOptions", forControlEvents: .TouchDown)
+        setupMapButton()
+        setupMapSegmentedControl()
+        
+        NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
+    }
+    
+    /**
+        Sets up the map button.
+    
+        Adds the map button as a subview of the map view and sets `showMapOptions` as a selector when the map button is touched.
+    */
+    private func setupMapButton() {
+        // Add subview.
         mapView.addSubview(mapButton)
         mapView.didAddSubview(mapButton)
         
+        // Add target.
+        mapButton.addTarget(self, action: "showMapOptions", forControlEvents: .TouchDown)
+    }
+    
+    /**
+        Sets up the map segmented control.
+    
+        Sets up the segments, adds the map segmented control as a subview of the map view, sets up constraints for positioning, sets `toggleMapOption` as a selector when a map button is touched, and hides map segmented control.
+    */
+    private func setupMapSegmentedControl() {
+        // Set up segments.
+        for (index, title) in enumerate(controlSegments) {
+            mapSegmentedControl.insertSegmentWithTitle(title, atIndex: index, animated: false)
+        }
+        mapSegmentedControl.sizeToFit()
+        
+        // Add subview.
         mapView.addSubview(mapSegmentedControl)
         mapView.didAddSubview(mapSegmentedControl)
         
+        // Set up constraints.
         mapSegmentedControl.setTranslatesAutoresizingMaskIntoConstraints(false)
         let trailingConstraint = NSLayoutConstraint(item: mapSegmentedControl, attribute: .Trailing, relatedBy: .Equal, toItem: mapSegmentedControl.superview, attribute: .Trailing, multiplier: 1, constant: -8)
         let bottomConstraint = NSLayoutConstraint(item: mapSegmentedControl, attribute: .Bottom, relatedBy: .Equal, toItem: mapSegmentedControl.superview, attribute: .Bottom, multiplier: 1, constant: -8)
         mapView.addConstraint(trailingConstraint)
         mapView.addConstraint(bottomConstraint)
         
-        NSNotificationCenter.defaultCenter().postNotificationName("MapViewLoaded", object: self, userInfo: ["MapView": mapView])
+        // Add target.
+        mapSegmentedControl.addTarget(self, action: "toggleMapOption", forControlEvents: .ValueChanged)
+        
+        // Hide segmented control.
+        mapSegmentedControl.hidden = true
     }
     
     // MARK: - Methods for controlling map view.
@@ -86,7 +128,7 @@ class LocationsMapViewController: UIViewController {
         // Center map on location.
         centerMap(mapItem.location)
         
-        mapView.selectAnnotation(mapItem, animated: false)
+        mapView.selectAnnotation(mapItem, animated: true)
     }
     
     /**
@@ -102,11 +144,11 @@ class LocationsMapViewController: UIViewController {
     }
     
     /**
-        Draws the directions from the current location to a location upon notification.
+        Calculates the directions and shows them if navigation is enabled.
     
         Calculate the directions and draw the directions on the map view.
     */
-    func drawDirections() {
+    func calculateDirections() {
         // Calculate directions.
         directions?.calculateDirectionsWithCompletionHandler({
             (response: MKDirectionsResponse?, error: NSError?) in
@@ -122,9 +164,15 @@ class LocationsMapViewController: UIViewController {
                         self.mapView.removeOverlay(oldRoute.polyline)
                     }
                     
-                    // Draw new route
-                    self.mapView.addOverlay(newRoute.polyline, level: .AboveRoads)
+                    // Set new route.
                     self.route = newRoute
+                    
+                    if self.navigateEnabled {
+                        self.showRoute()
+                    }
+                    else {
+                        self.hideRoute()
+                    }
                     
                     let steps = self.route!.steps as! [MKRouteStep]
                     for step in steps {
@@ -135,22 +183,82 @@ class LocationsMapViewController: UIViewController {
         })
     }
     
+    /**
+        Shows the navigation route on the map. If there is no route to draw on the map, this method does nothing.
+    */
+    func showRoute() {
+        if let route = route {
+            mapView.addOverlay(route.polyline, level: .AboveRoads)
+        }
+    }
+    
+    /**
+        Hides the navigation route on the map. If there is no route drawn on the map, this method does nothing.
+    */
+    func hideRoute() {
+        if let route = route {
+            mapView.removeOverlay(route.polyline)
+        }
+    }
+    
     // MARK: - Methods related to controlling the map button.
     
     /**
         When the map button is selected, show more options.
     */
     func showMapOptions() {
-        mapButton.hidden = true
-        
-        // Add animation for appearance
+        // Add animation for appearance.
         let animation = CATransition()
         animation.duration = 0.1
         animation.type = kCATransitionMoveIn
         animation.subtype = kCATransitionFromRight
-        mapSegmentedControl.layer.addAnimation(animation, forKey: nil)
+        mapSegmentedControl.layer.addAnimation(animation, forKey: "Show")
         
+        mapButton.hidden = true
         mapSegmentedControl.hidden = false
+    }
+    
+    // MARK: - Methods related to controlling the map segmented control.
+    
+    /**
+        When the map segmented control "Less" button is selected, hide options.
+    */
+    func hideMapOptions() {
+        mapSegmentedControl.deselectAllSegments()
+        
+        // Add animation for hiding.
+        let animation = CATransition()
+        animation.duration = 0.1
+        animation.type = kCATransitionMoveIn
+        animation.subtype = kCATransitionFromRight
+        mapSegmentedControl.layer.addAnimation(animation, forKey: "Hide")
+        
+        mapSegmentedControl.hidden = true
+        mapButton.hidden = false
+    }
+    
+    /**
+        Toggles the map option that was just touched on the map segmented control.
+    */
+    func toggleMapOption() {
+        // Get segment index that was just toggled.
+        if let toggledSegmentIndex = mapSegmentedControl.toggledIndex {
+            // Take action based on toggled segment.
+            
+            if toggledSegmentIndex == 0 {
+                hideMapOptions()
+            }
+            else if toggledSegmentIndex == 1 {
+                if mapSegmentedControl.selectedSegment(toggledSegmentIndex) && selectedMapItem != nil {
+                    calculateDirections()
+                }
+                else if !mapSegmentedControl.selectedSegment(toggledSegmentIndex) {
+                    hideRoute()
+                }
+            }
+            else if toggledSegmentIndex == 2 && mapSegmentedControl.selectedSegment(toggledSegmentIndex) && selectedMapItem != nil {
+            }
+        }
     }
     
     /**
@@ -193,7 +301,7 @@ extension LocationsMapViewController: MKMapViewDelegate {
         if overlay is MKPolyline {
             let renderer = MKPolylineRenderer(overlay: overlay)
             renderer.strokeColor = UIColor.blueColor()
-            renderer.lineWidth = 5
+            renderer.lineWidth = 3
             return renderer
         }
         return nil
@@ -204,9 +312,7 @@ extension LocationsMapViewController: MKMapViewDelegate {
     */
     func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
         updateDirections()
-        if let selectedMapItem = selectedMapItem {
-            drawDirections()
-        }
+        calculateDirections()
     }
 }
 
