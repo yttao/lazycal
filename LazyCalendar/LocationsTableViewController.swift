@@ -302,6 +302,8 @@ extension LocationsTableViewController: UITableViewDataSource {
             // If showing directions, main label shows instruction.
             let direction = directions![indexPath.row]
             cell.textLabel?.text = direction.instructions
+            cell.detailTextLabel?.text = nil
+            cell.detailTextLabel?.sizeToFit()
         }
         else {
             // If showing locations, main label shows name and detail label shows address.
@@ -310,6 +312,7 @@ extension LocationsTableViewController: UITableViewDataSource {
             let address = mapItem.address
             cell.textLabel?.text = name
             cell.detailTextLabel?.text = address
+            cell.detailTextLabel?.sizeToFit()
         }
         
         return cell

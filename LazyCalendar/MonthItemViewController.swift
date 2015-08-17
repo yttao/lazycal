@@ -94,11 +94,11 @@ class MonthItemViewController: UIViewController {
         if segue.identifier != nil && segue.identifier! == segueIdentifier {
             let calendar = NSCalendar.currentCalendar()
             
-            // Set initial date as the currently selected date and hours/minutes as current hours/minutes.
+            // Set initial date as the currently selected date and time as current hour.
             let currentTime = calendar.components(.CalendarUnitHour | .CalendarUnitMinute, fromDate: NSDate())
             let dateComponents = calendar.components(units, fromDate: date!)
             dateComponents.hour = currentTime.hour
-            dateComponents.minute = currentTime.minute
+            dateComponents.minute = 0
             let initialDate = calendar.dateFromComponents(dateComponents)
             
             // Find view controller for adding events

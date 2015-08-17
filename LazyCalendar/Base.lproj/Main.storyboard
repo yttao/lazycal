@@ -92,7 +92,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Day" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tBi-WE-vSe">
-                                            <rect key="frame" x="10" y="8" width="30" height="21"/>
+                                            <rect key="frame" x="10" y="15" width="30" height="21"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
@@ -101,8 +101,8 @@
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
                                 <constraints>
-                                    <constraint firstItem="tBi-WE-vSe" firstAttribute="top" secondItem="eYf-hv-Hc4" secondAttribute="topMargin" id="5dh-xF-klb"/>
                                     <constraint firstAttribute="centerX" secondItem="tBi-WE-vSe" secondAttribute="centerX" id="dhT-Aq-xiz"/>
+                                    <constraint firstAttribute="centerY" secondItem="tBi-WE-vSe" secondAttribute="centerY" id="rOf-13-tbl"/>
                                 </constraints>
                                 <connections>
                                     <outlet property="dayLabel" destination="tBi-WE-vSe" id="bRj-Rz-NSK"/>
@@ -112,7 +112,7 @@
                         <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MonthItemCollectionHeaderView" id="lPe-fG-aLl" customClass="MonthItemCollectionHeaderView" customModule="LazyCalendar" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="0.0" width="600" height="40"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <color key="backgroundColor" red="0.0" green="0.80000000000000004" blue="0.20000000000000001" alpha="0.5" colorSpace="calibratedRGB"/>
+                            <color key="backgroundColor" red="0.0" green="1" blue="0.16052631578947371" alpha="0.40000000000000002" colorSpace="calibratedRGB"/>
                         </collectionReusableView>
                         <connections>
                             <outlet property="dataSource" destination="pQA-1g-TTb" id="uZc-fE-1Qp"/>
@@ -199,7 +199,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
                         <sections>
-                            <tableViewSection headerTitle="Event" id="Jxk-rW-Cv4">
+                            <tableViewSection headerTitle="Event Name" id="Jxk-rW-Cv4">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="AwU-zA-sIe" userLabel="Name">
                                         <rect key="frame" x="0.0" y="114" width="320" height="44"/>
@@ -226,7 +226,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Start" id="MAz-wX-5TJ">
+                            <tableViewSection headerTitle="Start Date" id="MAz-wX-5TJ">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="Wql-f1-NyL" detailTextLabel="Vpb-DU-M9h" style="IBUITableViewCellStyleValue1" id="PM5-Lt-ovr" userLabel="DateStart">
                                         <rect key="frame" x="0.0" y="201" width="320" height="44"/>
@@ -260,7 +260,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="zfx-ZB-R9Q">
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="5" translatesAutoresizingMaskIntoConstraints="NO" id="zfx-ZB-R9Q">
                                                     <rect key="frame" x="140" y="-59" width="320" height="162"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="459734896.46758801">
                                                         <!--2015-07-28 00:08:16 +0000-->
@@ -278,7 +278,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="End" id="alo-7e-9Yq">
+                            <tableViewSection headerTitle="End Date" id="alo-7e-9Yq">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="RBF-96-ZwI" detailTextLabel="RI1-Hc-M5s" style="IBUITableViewCellStyleValue1" id="WF6-ZY-Wwk" userLabel="DateEnd">
                                         <rect key="frame" x="0.0" y="288" width="320" height="44"/>
@@ -312,7 +312,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="ZBj-rj-h7a">
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="5" translatesAutoresizingMaskIntoConstraints="NO" id="ZBj-rj-h7a">
                                                     <rect key="frame" x="140" y="-59" width="320" height="162"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="459734949.25761002">
                                                         <!--2015-07-28 00:09:09 +0000-->
@@ -824,7 +824,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <sections>
-                            <tableViewSection headerTitle="Event" id="bnP-ET-twe">
+                            <tableViewSection headerTitle="Event Name" id="bnP-ET-twe">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="ePA-mq-kkl" userLabel="Name">
                                         <rect key="frame" x="0.0" y="114" width="320" height="44"/>
@@ -851,7 +851,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Start" id="5FB-ZN-YiS">
+                            <tableViewSection headerTitle="Start Date" id="5FB-ZN-YiS">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="9Np-jS-dhf" detailTextLabel="Hzn-E8-NVL" style="IBUITableViewCellStyleValue1" id="9gk-gi-1qg" userLabel="DateStart">
                                         <rect key="frame" x="0.0" y="201" width="320" height="44"/>
@@ -885,7 +885,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="2sB-aU-n8X">
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="5" translatesAutoresizingMaskIntoConstraints="NO" id="2sB-aU-n8X">
                                                     <rect key="frame" x="140" y="-60" width="320" height="162"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="459737874.68402898">
                                                         <!--2015-07-28 00:57:54 +0000-->
@@ -903,7 +903,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="End" id="fxf-sh-VR8">
+                            <tableViewSection headerTitle="End Date" id="fxf-sh-VR8">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="Dpl-jU-l7d" detailTextLabel="T3v-zK-MqL" style="IBUITableViewCellStyleValue1" id="OMl-Va-giW" userLabel="DateEnd">
                                         <rect key="frame" x="0.0" y="288" width="320" height="44"/>
@@ -937,7 +937,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="iBf-hF-ryz">
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="5" translatesAutoresizingMaskIntoConstraints="NO" id="iBf-hF-ryz">
                                                     <rect key="frame" x="140" y="-60" width="320" height="162"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="459737914.76700503">
                                                         <!--2015-07-28 00:58:34 +0000-->

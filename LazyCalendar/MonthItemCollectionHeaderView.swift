@@ -12,6 +12,8 @@ class MonthItemCollectionHeaderView: UICollectionReusableView {
     private let weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     private var weekdayLabels = [UILabel]()
     
+    private let borderColor = UIColor(red: 0.1, green: 0.5, blue: 0.9, alpha: 0.8)
+    
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
@@ -57,10 +59,14 @@ class MonthItemCollectionHeaderView: UICollectionReusableView {
         Adds borders to labels.
     */
     func addBorders() {
-        for weekdayLabel in weekdayLabels {
-            weekdayLabel.layer.borderColor = UIColor.grayColor().CGColor
-            weekdayLabel.layer.opacity = weekdayLabel.superview!.layer.opacity
-            weekdayLabel.layer.borderWidth = 1
+        for i in 1..<weekdayLabels.count {
+            let weekdayLabel = weekdayLabels[i]
+            weekdayLabel.clipsToBounds = true
+            let leftBorderLayer = CALayer(layer: weekdayLabel.layer)
+            leftBorderLayer.borderColor = borderColor.CGColor
+            leftBorderLayer.borderWidth = 1
+            leftBorderLayer.frame = CGRectMake(0, 0, 1, weekdayLabel.bounds.height + 30)
+            weekdayLabel.layer.addSublayer(leftBorderLayer)
         }
     }
     

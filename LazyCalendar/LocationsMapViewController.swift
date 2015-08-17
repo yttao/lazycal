@@ -19,7 +19,7 @@ class LocationsMapViewController: UIViewController {
     private let mapSegmentedControl = MultipleSelectionSegmentedControl()
 
     // Segments of map segmented control (in order).
-    private let controlSegments = ["Less", "Navigate", "Directions"]
+    private let controlSegments = [">", "Navigate", "Directions"]
     
     // True if navigate segment is enabled.
     private var navigateEnabled: Bool {
@@ -163,7 +163,7 @@ class LocationsMapViewController: UIViewController {
         // Add animation for appearance.
         let animation = CATransition()
         animation.duration = 0.1
-        animation.type = kCATransitionMoveIn
+        animation.type = kCATransitionPush
         animation.subtype = kCATransitionFromRight
         mapSegmentedControl.layer.addAnimation(animation, forKey: "Show")
         
@@ -177,16 +177,13 @@ class LocationsMapViewController: UIViewController {
         When the map segmented control "Less" button is selected, hide options and hide the route and directions, if shown by the view.
     */
     func hideMapOptions() {
-        mapSegmentedControl.deselectAllSegments()
-        
-        hideRoute()
-        hideDirections()
+        mapSegmentedControl.deselectSegment(atIndex: 0)
         
         // Add animation for hiding.
         let animation = CATransition()
         animation.duration = 0.1
-        animation.type = kCATransitionMoveIn
-        animation.subtype = kCATransitionFromRight
+        animation.type = kCATransitionPush
+        animation.subtype = kCATransitionFromLeft
         mapSegmentedControl.layer.addAnimation(animation, forKey: "Hide")
         
         mapSegmentedControl.hidden = true
@@ -254,9 +251,7 @@ class LocationsMapViewController: UIViewController {
     }
     
     /**
-        Calculates the directions and shows them if navigation is enabled.
-    
-        Calculate the directions and draw the directions on the map view.
+        Calculates the directions and shows the route on the map if navigation is enabled.
     */
     func calculateDirections() {
         // Calculate directions (or immediately execute completion handler if directions have been calculated already).
@@ -349,12 +344,15 @@ extension LocationsMapViewController: MKMapViewDelegate {
     // MARK: - Methods for selecting annotations.
     
     /**
-        When the annotation view is selected and the segmented control is currently on "Navigation", draw directions to the annotation.
+        Select the annotation and find the directions for that annotation.
     */
     func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
         updateDirections()
         calculateDirections()
         
+        if navigateEnabled {
+            showRoute()
+        }
         if directionsEnabled {
             showDirections()
         }

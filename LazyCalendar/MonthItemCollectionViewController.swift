@@ -118,9 +118,12 @@ class MonthItemCollectionViewController: UICollectionViewController {
         :param: cell The cell to select.
     */
     func selectCell(cell: CalendarCollectionViewCell) {
+        // Color cell with animation.
         UIView.animateWithDuration(animationTime, animations: {
             cell.backgroundColor = self.selectedColor
         })
+        
+        // Select cell.
         selectedCell = cell
         
         // Update selected date components
@@ -137,10 +140,12 @@ class MonthItemCollectionViewController: UICollectionViewController {
     */
     func deselectSelectedCell() {
         if let cell = selectedCell {
+            // Decolor cell with animation.
             UIView.animateWithDuration(animationTime, animations: {
                 cell.backgroundColor = self.deselectedColor
             })
             
+            // Deselect cell.
             selectedCell = nil
         }
     }
@@ -221,6 +226,12 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
         // Set day number for cell (if it is a valid cell in that month
         if let day = daysInMonth[indexPath.row] {
             cell.dayLabel.text = String(day)
+            
+            // Add layer to draw circle.
+            let layer = CAShapeLayer(layer: cell.layer)
+            let circleMask = UIBezierPath(ovalInRect: cell.bounds)
+            layer.path = circleMask.CGPath
+            cell.layer.mask = layer
             
             // If no cell has been selected and the cell's day matches the date components day, select the cell.
             if selectedCell == nil {

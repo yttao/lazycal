@@ -112,6 +112,7 @@ class ChangeEventViewController: UITableViewController {
         
         // Disable text field user interaction, needed to allow proper table view row selection
         nameTextField.userInteractionEnabled = false
+        nameTextField.delegate = self
         
         // Using information from loadData:, set initial values for UI elements.
         nameTextField.text = name
@@ -1100,5 +1101,15 @@ extension ChangeEventViewController: UITableViewDataSource {
         cell.setNeedsDisplay()
         
         return cell
+    }
+}
+
+extension ChangeEventViewController: UITextFieldDelegate {
+    /**
+        When the return button is pressed, resign the text field to hide the keyboard.
+    */
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        nameTextField.resignFirstResponder()
+        return true
     }
 }
