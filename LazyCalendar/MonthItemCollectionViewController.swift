@@ -9,7 +9,7 @@
 import UIKit
 
 class MonthItemCollectionViewController: UICollectionViewController {
-    var dateIndex: NSDate?
+    var dateIndex: NSDate!
     var dateComponents: NSDateComponents?
     
     // 7 days in a week
@@ -93,9 +93,9 @@ class MonthItemCollectionViewController: UICollectionViewController {
         monthStartWeekday = getMonthStartWeekday(components)
         
         // Create date index, ensure it is set to day 1 in the month.
-        let dateIndexComponents = components.copy()  as? NSDateComponents
-        dateIndexComponents!.day = 1
-        dateIndex = calendar.dateFromComponents(dateIndexComponents!)
+        let dateIndexComponents = components.copy()  as! NSDateComponents
+        dateIndexComponents.day = 1
+        dateIndex = calendar.dateFromComponents(dateIndexComponents)!
         
         let numDays = calendar.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: calendar.dateFromComponents(components)!).length
         
@@ -196,6 +196,12 @@ extension MonthItemCollectionViewController: UICollectionViewDelegate {
     override func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         
+        // If cell is same as already selected cell, don't reselect.
+        if selectedCell != nil && cell == selectedCell {
+            return false
+        }
+        
+        // Check for valid number.
         if cell.dayLabel.text?.toInt() != nil {
             return true
         }
