@@ -58,7 +58,7 @@ class MonthItemCollectionHeaderView: UICollectionReusableView {
     /**
         Adds borders to labels.
     */
-    func addBorders() {
+    /*func addBorders() {
         for i in 1..<weekdayLabels.count {
             let weekdayLabel = weekdayLabels[i]
             weekdayLabel.clipsToBounds = true
@@ -68,7 +68,7 @@ class MonthItemCollectionHeaderView: UICollectionReusableView {
             leftBorderLayer.frame = CGRectMake(0, 0, 1, weekdayLabel.bounds.height + 30)
             weekdayLabel.layer.addSublayer(leftBorderLayer)
         }
-    }
+    }*/
     
     /**
         Adds labels as subviews.

@@ -12,6 +12,7 @@ import AddressBookUI
 import CoreData
 
 class ContactsTableViewController: UITableViewController {
+    private let addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
     // Currently selected contacts
     private var selectedContacts: [ABRecordRef]!
     // True if searching for new contacts is allowed.
@@ -99,7 +100,6 @@ class ContactsTableViewController: UITableViewController {
     */
     func loadData(contactIDs: [ABRecordID]) {
         if addressBookAccessible() {
-            let addressBookRef: ABAddressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
             
             selectedContacts = [ABRecordRef]()
             
@@ -283,10 +283,26 @@ extension ContactsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
         
-        let fullName = ABRecordCopyCompositeName(selectedContacts[indexPath.row])?.takeRetainedValue() as? String
+        let contact: ABRecordRef = selectedContacts[indexPath.row]
+        let fullName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() as? String
         if fullName != nil {
             cell.textLabel?.attributedText = nil
             cell.textLabel?.text = fullName
+        }
+        
+        let phoneNumbersMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
+        let emailsMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
+        
+        if ABMultiValueGetCount(phoneNumbersMultivalue) > 0 {
+            let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue, 0)?.takeRetainedValue() as! String
+            cell.detailTextLabel?.text = phoneNumber
+        }
+        else if ABMultiValueGetCount(emailsMultivalue) > 0 {
+            let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, 0)?.takeRetainedValue() as! String
+            cell.detailTextLabel?.text = email
+        }
+        else {
+            cell.detailTextLabel?.text = " "
         }
         
         return cell

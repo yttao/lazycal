@@ -102,27 +102,24 @@ class MonthItemPageViewController: UIPageViewController {
 // MARK: - UIPageViewControllerDelegate
 extension MonthItemPageViewController: UIPageViewControllerDelegate {
     /**
-        After scrolling, switch months.
+        When scrolling to the next month, switch months to the new month view.
     
         On month switch, change date components to reflect current month and clear selections from past months.
     */
-    func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
-        let newMonth = pageViewController.viewControllers.first! as! MonthItemCollectionViewController
-        let oldMonth = previousViewControllers.first! as! MonthItemCollectionViewController
+    func pageViewController(pageViewController: UIPageViewController, willTransitionToViewControllers pendingViewControllers: [AnyObject]) {
+        let oldMonth = pageViewController.viewControllers.first! as! MonthItemCollectionViewController
+        let newMonth = pendingViewControllers.first as! MonthItemCollectionViewController
         
         NSNotificationCenter.defaultCenter().postNotificationName("MonthChanged", object: self, userInfo: ["ViewController": newMonth])
         
         // Change current month based on whether you went to previous or next month
-        if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) ==
-            NSComparisonResult.OrderedAscending) {
+        if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) == .OrderedAscending) {
                 goToNextMonth()
-                oldMonth.clearSelected()
         }
-        else if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) ==
-            NSComparisonResult.OrderedDescending) {
+        else if (oldMonth.dateIndex!.compare(newMonth.dateIndex!) == .OrderedDescending) {
                 goToPrevMonth()
-                oldMonth.clearSelected()
         }
+        oldMonth.clearSelected()
     }
 }
 

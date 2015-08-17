@@ -10,7 +10,7 @@ import UIKit
 
 class SearchTableView: UITableView {
     // Scale factor used by search table views.
-    static let sizingScaleFactor: CGFloat = 2.0 / 3.0
+    static let sizingScaleFactor: CGFloat = 3.0 / 4.0
 
     var searchResults: [AnyObject]!
     var searchController: UISearchController?

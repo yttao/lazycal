@@ -67,7 +67,7 @@ class ChangeEventViewController: UITableViewController {
     // Currently selected index path
     private var selectedIndexPath: NSIndexPath?
     
-    private var addressBookRef: ABAddressBookRef?
+    private var addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
     
     private let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
     
@@ -97,11 +97,6 @@ class ChangeEventViewController: UITableViewController {
     */
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Get address book
-        if addressBookAccessible() {
-            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-        }
         
         // Set tableview delegate and data source
         tableView.delegate = self

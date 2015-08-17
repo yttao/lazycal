@@ -45,6 +45,7 @@ class MonthItemCollectionViewController: UICollectionViewController {
     // Size of header
     private let headerHeight: CGFloat = 30
     
+    // Animation time for selection/deselection
     var animationTime = 0.2
     
     required init(coder aDecoder: NSCoder) {
@@ -118,6 +119,14 @@ class MonthItemCollectionViewController: UICollectionViewController {
         :param: cell The cell to select.
     */
     func selectCell(cell: CalendarCollectionViewCell) {
+        // Add circle mask if cell doesn't have one.
+        if cell.layer.mask == nil {
+            let circleLayer = CAShapeLayer(layer: cell.layer)
+            let circlePath = UIBezierPath(ovalInRect: cell.bounds)
+            circleLayer.path = circlePath.CGPath
+            cell.layer.mask = circleLayer
+        }
+        
         // Color cell with animation.
         UIView.animateWithDuration(animationTime, animations: {
             cell.backgroundColor = self.selectedColor
@@ -227,12 +236,6 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
         if let day = daysInMonth[indexPath.row] {
             cell.dayLabel.text = String(day)
             
-            // Add layer to draw circle.
-            let layer = CAShapeLayer(layer: cell.layer)
-            let circleMask = UIBezierPath(ovalInRect: cell.bounds)
-            layer.path = circleMask.CGPath
-            cell.layer.mask = layer
-            
             // If no cell has been selected and the cell's day matches the date components day, select the cell.
             if selectedCell == nil {
                 let dayToSelect = dateComponents!.day
@@ -263,7 +266,7 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
         let header = collectionView.dequeueReusableSupplementaryViewOfKind(UICollectionElementKindSectionHeader, withReuseIdentifier: "MonthItemCollectionHeaderView", forIndexPath: indexPath) as! MonthItemCollectionHeaderView
         // Create constraints to space labels properly and borders for separation.
         header.addConstraints()
-        header.addBorders()
+        //header.addBorders()
         return header
     }
 }

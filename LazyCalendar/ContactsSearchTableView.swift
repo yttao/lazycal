@@ -28,7 +28,8 @@ class ContactsSearchTableView: SearchTableView {
         }
     }
     
-    private var addressBookRef: ABAddressBookRef!
+    private let addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
+    
     private var allContacts: NSArray!
     
     // MARK: - Initializers
@@ -61,7 +62,6 @@ class ContactsSearchTableView: SearchTableView {
         
         // Set address book and get all contacts.
         if addressBookAccessible() {
-            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
             allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
         }
         else {
@@ -107,7 +107,7 @@ class ContactsSearchTableView: SearchTableView {
             }
             
             // Search phone numbers for search text
-            for i in 0..<ABMultiValueGetCount(phoneNumbersMultivalue!) {
+            for i in 0..<ABMultiValueGetCount(phoneNumbersMultivalue) {
                 let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue!, i).takeRetainedValue() as! String
                 if phoneNumber.rangeOfString(self.searchText!, options: .CaseInsensitiveSearch) != nil {
                     return true
@@ -167,10 +167,26 @@ extension ContactsSearchTableView: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! SearchTableViewCell
         
-        let fullName = ABRecordCopyCompositeName(filteredContacts[indexPath.row])?.takeRetainedValue() as? String
+        let contact: ABRecordRef = filteredContacts[indexPath.row]
+        let fullName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() as? String
         if fullName != nil {
             cell.mainLabel.text = fullName
-            cell.subLabel.text = "foobar"
+            
+            let phoneNumbersMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
+            let emailsMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
+            
+            if ABMultiValueGetCount(phoneNumbersMultivalue) > 0 {
+                let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue, 0)?.takeRetainedValue() as! String
+                cell.subLabel.text = phoneNumber
+            }
+            else if ABMultiValueGetCount(emailsMultivalue) > 0 {
+                let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, 0)?.takeRetainedValue() as! String
+                cell.subLabel.text = email
+            }
+            else {
+                cell.subLabel.text = " "
+            }
+            
             // Bold search text in name
             boldSearchTextInLabel(cell.mainLabel)
         }
