@@ -37,6 +37,7 @@ class MonthItemCollectionViewController: UICollectionViewController {
     private let calendar = NSCalendar.currentCalendar()
     // Currently selected cell
     private var selectedCell: CalendarCollectionViewCell?
+    private var selectedIndexPath: NSIndexPath?
     
     // Start weekday
     private var monthStartWeekday = 0
@@ -118,7 +119,7 @@ class MonthItemCollectionViewController: UICollectionViewController {
     
         :param: cell The cell to select.
     */
-    func selectCell(cell: CalendarCollectionViewCell) {
+    func selectCell(cell: CalendarCollectionViewCell, indexPath: NSIndexPath) {
         // Add circle mask if cell doesn't have one.
         if cell.layer.mask == nil {
             let circleLayer = CAShapeLayer(layer: cell.layer)
@@ -134,6 +135,7 @@ class MonthItemCollectionViewController: UICollectionViewController {
         
         // Select cell.
         selectedCell = cell
+        selectedIndexPath = indexPath
         
         // Update selected date components
         dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
@@ -156,6 +158,7 @@ class MonthItemCollectionViewController: UICollectionViewController {
             
             // Deselect cell.
             selectedCell = nil
+            selectedIndexPath = nil
         }
     }
     
@@ -197,7 +200,7 @@ extension MonthItemCollectionViewController: UICollectionViewDelegate {
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         
         // If cell is same as already selected cell, don't reselect.
-        if selectedCell != nil && cell == selectedCell {
+        if cell == selectedCell {
             return false
         }
         
@@ -219,7 +222,7 @@ extension MonthItemCollectionViewController: UICollectionViewDelegate {
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! CalendarCollectionViewCell
         
         // Select cell
-        selectCell(cell)
+        selectCell(cell, indexPath: indexPath)
     }
     
     /**
@@ -242,14 +245,10 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
         if let day = daysInMonth[indexPath.row] {
             cell.dayLabel.text = String(day)
             
-            // If no cell has been selected and the cell's day matches the date components day, select the cell.
-            if selectedCell == nil {
-                let dayToSelect = dateComponents!.day
-                
-                if day == dayToSelect {
-                    selectCell(cell)
-                }
-            }
+            /*if selectedCell == nil && day == dateComponents!.day {
+                let indexPath = NSIndexPath(forItem: dateComponents!.day + monthStartWeekday - 2, inSection: 0)
+                selectCell(cell, indexPath: indexPath)
+            }*/
         }
         else {
             cell.dayLabel.text = nil
@@ -258,11 +257,22 @@ extension MonthItemCollectionViewController: UICollectionViewDataSource {
         return cell
     }
     
+    override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
     /**
         Determines number of items in month.
     */
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return cellsInMonth
+    }
+    
+    override func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+        let cell = cell as! CalendarCollectionViewCell
+        if selectedCell == nil && cell.dayLabel.text?.toInt() == dateComponents!.day {
+            selectCell(cell, indexPath: indexPath)
+        }
     }
     
     /**

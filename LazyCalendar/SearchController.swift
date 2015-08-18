@@ -15,14 +15,13 @@ class SearchController: UISearchController {
     // MARK: - Initialization of search controller
     
     /**
+        When the search controller will appear, notify the delegate that the search text field loaded.
     */
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-    
-        let searchTextField = searchBar.valueForKey("_searchField") as? UITextField
-        
+
         // Inform the delegate that the search text field size has been calculated.
-        if let searchTextField = searchTextField {
+        if let searchTextField = searchBar.valueForKey("_searchField") as? UITextField {
             searchControllerDelegate?.searchControllerDidLoadSearchTextField(searchTextField)
         }
     }

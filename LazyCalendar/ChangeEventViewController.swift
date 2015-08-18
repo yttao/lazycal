@@ -107,6 +107,7 @@ class ChangeEventViewController: UITableViewController {
         
         // Disable text field user interaction, needed to allow proper table view row selection
         nameTextField.userInteractionEnabled = false
+        nameTextField.autocapitalizationType = .Sentences
         nameTextField.delegate = self
         
         // Using information from loadData:, set initial values for UI elements.

@@ -28,28 +28,30 @@ class ContactsSearchTableView: SearchTableView {
         }
     }
     
+    private var allContacts: NSArray!
+    
     private let addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
     
-    private var allContacts: NSArray!
+    let cellReuseIdentifier = "ContactCell"
     
     // MARK: - Initializers
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        initializeView("ContactCell")
+        initializeView(cellReuseIdentifier)
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        initializeView("ContactCell")
+        initializeView(cellReuseIdentifier)
     }
     
     override init(frame: CGRect, style: UITableViewStyle) {
         super.init(frame: frame, style: style)
         
-        initializeView("ContactCell")
+        initializeView(cellReuseIdentifier)
     }
     
     /**
@@ -68,6 +70,8 @@ class ContactsSearchTableView: SearchTableView {
             allContacts = NSArray()
         }
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateContacts", name: "applicationBecameActive", object: nil)
+        
         super.initializeView(reuseIdentifier)
     }
     
@@ -80,6 +84,8 @@ class ContactsSearchTableView: SearchTableView {
         self.contactsTableViewController = selectedResultsTableViewController as! ContactsTableViewController
         self.searchController = searchController
     }
+    
+    // MARK: - Methods for searching, handling, and updating information in the search controller.
     
     /**
         Filters the search results by the text entered in the search bar.
@@ -144,6 +150,18 @@ class ContactsSearchTableView: SearchTableView {
             return firstFullName.compare(secondFullName) == .OrderedAscending
         })
     }
+    
+    // MARK: - Methods for updating information.
+    
+    /**
+        Updates the array of all contacts.
+    */
+    func updateContacts() {
+        // Get new contacts if any were added while app was inactive.
+        if addressBookAccessible() {
+            allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
+        }
+    }
 }
 
 // MARK: - UITableViewDelegate
@@ -161,6 +179,8 @@ extension ContactsSearchTableView: UITableViewDelegate {
 
 // MARK: - UITableViewDataSource
 extension ContactsSearchTableView: UITableViewDataSource {
+    // MARK: - Methods for creating cells.
+    
     /**
         Creates a `SearchTableViewCell` with the contact's name and info.
     */
@@ -168,27 +188,34 @@ extension ContactsSearchTableView: UITableViewDataSource {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! SearchTableViewCell
         
         let contact: ABRecordRef = filteredContacts[indexPath.row]
-        let fullName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() as? String
-        if fullName != nil {
+        
+        // If contact has a name, main label displays name.
+        if let fullName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() as? String {
             cell.mainLabel.text = fullName
-            
-            let phoneNumbersMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
-            let emailsMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
-            
-            if ABMultiValueGetCount(phoneNumbersMultivalue) > 0 {
-                let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue, 0)?.takeRetainedValue() as! String
-                cell.subLabel.text = phoneNumber
-            }
-            else if ABMultiValueGetCount(emailsMultivalue) > 0 {
-                let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, 0)?.takeRetainedValue() as! String
-                cell.subLabel.text = email
-            }
-            else {
-                cell.subLabel.text = " "
-            }
-            
             // Bold search text in name
             boldSearchTextInLabel(cell.mainLabel)
+        }
+        
+        // Get phone numbers and e-mails for contact.
+        let phoneNumbersMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
+        let emailsMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
+        
+        // If contact has an e-mail, sub label displays. e-mail.
+        if ABMultiValueGetCount(emailsMultivalue) > 0 {
+            let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, 0)?.takeRetainedValue() as! String
+            cell.subLabel.text = email
+        }
+        else {
+            cell.subLabel.text = " "
+        }
+        
+        // If contact has a phone number, detail label displays phone number.
+        if ABMultiValueGetCount(phoneNumbersMultivalue) > 0 {
+            let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue, 0)?.takeRetainedValue() as! String
+            cell.detailLabel.text = phoneNumber
+        }
+        else {
+            cell.detailLabel.text = " "
         }
         
         return cell

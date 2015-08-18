@@ -34,24 +34,26 @@ class LocationsSearchTableView: SearchTableView {
     // The current local search
     private var search: MKLocalSearch?
     
+    private let cellReuseIdentifier = "LocationCell"
+    
     // MARK: - Initializers
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        initializeView("LocationCell")
+        initializeView(cellReuseIdentifier)
     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        initializeView("LocationCell")
+        initializeView(cellReuseIdentifier)
     }
     
     override init(frame: CGRect, style: UITableViewStyle) {
         super.init(frame: frame, style: style)
         
-        initializeView("LocationCell")
+        initializeView(cellReuseIdentifier)
     }
     
     /**
@@ -62,7 +64,7 @@ class LocationsSearchTableView: SearchTableView {
     override func initializeView(reuseIdentifier: String) {
         filteredMapItems = [MapItem]()
         
-        super.initializeView("LocationCell")
+        super.initializeView(reuseIdentifier)
     }
     
     /**

@@ -22,8 +22,8 @@ class MonthItemViewController: UIViewController {
     private var date: NSDate?
     
     // Initializer
-    required init(coder: NSCoder) {
-        super.init(coder: coder)
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
         
         // Observer for when notification pops up
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)

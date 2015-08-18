@@ -55,6 +55,8 @@ class LocationsTableViewController: UITableViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
+        tableView.registerClass(TwoDetailTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        
         if selectedMapItems == nil {
             selectedMapItems = [MapItem]()
         }
@@ -294,25 +296,29 @@ extension LocationsTableViewController: UITableViewDataSource {
         Display cell with name as text label and address as detail text label.
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! TwoDetailTableViewCell
         
         // Use cell for either showing direction or location.
         
         if showingDirections {
             // If showing directions, main label shows instruction.
             let direction = directions![indexPath.row]
-            cell.textLabel?.text = direction.instructions
-            cell.detailTextLabel?.text = nil
-            cell.detailTextLabel?.sizeToFit()
+            cell.mainLabel.text = direction.instructions
+            cell.subLabel.text = nil
+            cell.detailLabel.text = nil
+            cell.subLabel.sizeToFit()
+            cell.detailLabel.sizeToFit()
         }
         else {
             // If showing locations, main label shows name and detail label shows address.
             let mapItem = selectedMapItems[indexPath.row]
             let name = mapItem.name
             let address = mapItem.address
-            cell.textLabel?.text = name
-            cell.detailTextLabel?.text = address
-            cell.detailTextLabel?.sizeToFit()
+            cell.mainLabel.text = name
+            cell.subLabel.text = address
+            cell.detailLabel.text = nil
+            cell.subLabel.sizeToFit()
+            cell.detailLabel.sizeToFit()
         }
         
         return cell

@@ -47,6 +47,8 @@ class ContactsTableViewController: UITableViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
+        tableView.registerClass(TwoDetailTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        
         // Create and configure search controller
         if editingEnabled {
             initializeSearchController()
@@ -281,29 +283,36 @@ extension ContactsTableViewController: UITableViewDataSource {
         The prototype cells have a main text label and detail text label. The main text label displays the contact's first and last name. The detail text label (for now) displays the contact's main phone number.
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! TwoDetailTableViewCell
+        cell.accessoryType = .DisclosureIndicator
         
         let contact: ABRecordRef = selectedContacts[indexPath.row]
-        let fullName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() as? String
-        if fullName != nil {
-            cell.textLabel?.attributedText = nil
-            cell.textLabel?.text = fullName
+        
+        // Main label displays name.
+        if let fullName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() as? String {
+            cell.mainLabel.attributedText = nil
+            cell.mainLabel.text = fullName
         }
         
         let phoneNumbersMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
         let emailsMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
         
-        if ABMultiValueGetCount(phoneNumbersMultivalue) > 0 {
-            let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue, 0)?.takeRetainedValue() as! String
-            cell.detailTextLabel?.text = phoneNumber
-        }
-        else if ABMultiValueGetCount(emailsMultivalue) > 0 {
+        if ABMultiValueGetCount(emailsMultivalue) > 0 {
             let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, 0)?.takeRetainedValue() as! String
-            cell.detailTextLabel?.text = email
+            cell.subLabel.text = email
         }
         else {
-            cell.detailTextLabel?.text = " "
+            cell.subLabel.text = " "
         }
+        
+        if ABMultiValueGetCount(phoneNumbersMultivalue) > 0 {
+            let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue, 0)?.takeRetainedValue() as! String
+            cell.detailLabel.text = phoneNumber
+        }
+        else {
+            cell.detailLabel.text = " "
+        }
+        
         
         return cell
     }

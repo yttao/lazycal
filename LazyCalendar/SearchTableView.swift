@@ -39,9 +39,12 @@ class SearchTableView: UITableView {
         delegate = self
         dataSource = self
         
-        // Remove insets to get rid of automatic 15 left inset spacing.
+        // Remove edge insets (get rid of automatic table view separator spacing).
         separatorInset = UIEdgeInsetsZero
         layoutMargins = UIEdgeInsetsZero
+        
+        // Make search results opaque.
+        opaque = true
     }
     
     /**
