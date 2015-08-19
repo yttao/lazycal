@@ -21,8 +21,6 @@ class ContactsTableViewController: UITableViewController {
     private let reuseIdentifier = "ContactCell"
     // True if displaying contact addresses.
     var addressMode = false
-    // Selected addresses if in address mode.
-    private var selectedAddresses: [ABRecordRef]?
     
     // MARK: - Methods for initializing table view controller.
     
@@ -47,6 +45,16 @@ class ContactsTableViewController: UITableViewController {
             selectedContacts = [ABRecordRef]()
         }
         
+        // Create and configure search controller
+        if editingEnabled {
+            initializeSearchController()
+        }
+        
+        
+        if addressMode {
+            tableView.allowsMultipleSelection = true
+        }
+        
         // Set table view delegate and data source
         tableView.delegate = self
         tableView.dataSource = self
@@ -55,11 +63,6 @@ class ContactsTableViewController: UITableViewController {
         
         tableView.bounces = false
         tableView.alwaysBounceVertical = false
-        
-        // Create and configure search controller
-        if editingEnabled {
-            initializeSearchController()
-        }
     }
     
     /**
@@ -177,8 +180,18 @@ class ContactsTableViewController: UITableViewController {
         }
         
         // Return selected contacts to change event view controller
-        let changeEventViewController = navigationController!.viewControllers.first as? ChangeEventViewController
-        changeEventViewController?.updateContacts(selectedContactIDs)
+        if let changeEventViewController = navigationController!.viewControllers.first as? ChangeEventViewController {
+            changeEventViewController.updateContacts(selectedContactIDs)
+            
+            let locationsViewController = navigationController!.viewControllers.filter({
+                return $0 is LocationsViewController
+            }).first as? LocationsViewController
+            if let locationsViewController = locationsViewController {
+                println("Locations view controller")
+                // TODO: Make reference to contained view controllers in LocationsViewController.
+            }
+        }
+        
     }
     
     // MARK: - Methods related to address book accessibility.
@@ -251,14 +264,32 @@ extension ContactsTableViewController: UITableViewDelegate {
     // MARK: - Methods for selecting cells.
     
     /**
-        If searching, selection will append to selected contacts and clear the search bar.
-    
-        The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
+        If in normal mode, selecting a cell will show the contact's details. If in address mode, the cell will display a check mark to indicate that it is selected.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let personViewController = ABPersonViewController()
-        personViewController.displayedPerson = selectedContacts[indexPath.row]
-        navigationController!.showViewController(personViewController, sender: self)
+        if addressMode {
+            // Otherwise, put check mark.
+            if let cell = tableView.cellForRowAtIndexPath(indexPath) {
+                cell.accessoryType = .Checkmark
+            }
+        }
+        else {
+            // If in normal mode, show contact details.
+            let personViewController = ABPersonViewController()
+            personViewController.displayedPerson = selectedContacts[indexPath.row]
+            navigationController!.showViewController(personViewController, sender: self)
+        }
+    }
+    
+    /**
+        If in address mode, deselecting a cell will remove the check mark to indicate that it is deselected.
+    */
+    override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
+        if addressMode {
+            if let cell = tableView.cellForRowAtIndexPath(indexPath) {
+                cell.accessoryType = .None
+            }
+        }
     }
 }
 
@@ -292,20 +323,17 @@ extension ContactsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! TwoDetailTableViewCell
         
-        let contact: ABRecordRef = selectedContacts[indexPath.row]
-        
-        
+        let record: ABRecordRef = selectedContacts[indexPath.row]
         
         // Main label displays name.
-        if let fullName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() as? String {
+        if let fullName = ABRecordCopyCompositeName(record)?.takeRetainedValue() as? String {
             cell.mainLabel.attributedText = nil
             cell.mainLabel.text = fullName
         }
         
         if addressMode {
-            
-            // Sub label displays address.
-            if let addressMultiValue: ABMultiValueRef = ABRecordCopyValue(contact, kABPersonAddressProperty)?.takeRetainedValue() {
+            // If in address mode, sub label displays address.
+            if let addressMultiValue: ABMultiValueRef = ABRecordCopyValue(record, kABPersonAddressProperty)?.takeRetainedValue() {
                 for i in 0..<ABMultiValueGetCount(addressMultiValue) {
                     if let addressDictionary = ABMultiValueCopyValueAtIndex(addressMultiValue, i)?.takeRetainedValue() as? NSDictionary {
                         if let addressDictionary = addressDictionary as? Dictionary<NSObject, AnyObject> {
@@ -317,10 +345,11 @@ extension ContactsTableViewController: UITableViewDataSource {
             }
         }
         else {
+            // If in normal mode, sub label shows disclosure indicator.
             cell.accessoryType = .DisclosureIndicator
             
-            let phoneNumbersMultiValue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
-            let emailsMultiValue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
+            let phoneNumbersMultiValue: ABMultiValueRef? = ABRecordCopyValue(record, kABPersonPhoneProperty)?.takeRetainedValue()
+            let emailsMultiValue: ABMultiValueRef? = ABRecordCopyValue(record, kABPersonEmailProperty)?.takeRetainedValue()
             
             // Sub label shows e-mail.
             if ABMultiValueGetCount(emailsMultiValue) > 0 {
