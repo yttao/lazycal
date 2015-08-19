@@ -85,7 +85,7 @@ class MapItem: NSObject, MKAnnotation, Equatable, Hashable {
         :param: addressDictionary A dictionary of address information.
     */
     static func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String {
-        return ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: " ")
+        return ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: ", ")
     }
     
     /**

@@ -496,7 +496,7 @@ class ChangeEventViewController: UITableViewController {
     /**
         Shows the contacts table view controller.
     
-        This method is called when the contacts cell is selected. If the user has given access to their address book, the `ContactsViewController` is shown. Otherwise, this method will do nothing.
+        This method is called when the contacts cell is selected. If the user has given access to their address book, the `ContactsTableViewController` is shown. Otherwise, this method will do nothing.
     */
     func showContactsTableViewController() {
         if addressBookAccessible() {
@@ -529,7 +529,10 @@ class ChangeEventViewController: UITableViewController {
             
             // Load data.
             if mapItems?.count > 0 {
-                locationsViewController.loadData(mapItems!)
+                locationsViewController.loadData(mapItems: mapItems!)
+            }
+            if contactIDs?.count > 0 {
+                locationsViewController.loadData(contactIDs: contactIDs!)
             }
             
             // Show view controller.

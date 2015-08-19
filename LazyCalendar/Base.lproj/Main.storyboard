@@ -622,8 +622,15 @@
                             <constraint firstItem="e0W-pQ-BKE" firstAttribute="trailing" secondItem="kSX-Qy-LuF" secondAttribute="trailing" id="Snq-s1-DyN"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Locations" id="an9-ox-IHB"/>
+                    <navigationItem key="navigationItem" title="Locations" id="an9-ox-IHB">
+                        <barButtonItem key="rightBarButtonItem" title="Contacts" id="Ofb-PI-Amz">
+                            <connections>
+                                <action selector="contactsBarButtonItemPressed:" destination="o8H-hp-xnq" id="vyR-w1-9zq"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
+                        <outlet property="contactsBarButtonItem" destination="Ofb-PI-Amz" id="XG3-oC-CVr"/>
                         <outlet property="locationsMapViewContainer" destination="ycY-d1-N9G" id="1z5-6t-hcb"/>
                         <outlet property="locationsTableViewContainer" destination="e0W-pQ-BKE" id="ZJi-VK-G8n"/>
                     </connections>

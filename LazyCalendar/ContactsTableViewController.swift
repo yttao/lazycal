@@ -19,6 +19,8 @@ class ContactsTableViewController: UITableViewController {
     var editingEnabled = true
     // Cell reuse identifier
     private let reuseIdentifier = "ContactCell"
+    // True if displaying contact addresses.
+    var addressMode = false
     
     // MARK: - Methods for initializing table view controller.
     
@@ -294,25 +296,41 @@ extension ContactsTableViewController: UITableViewDataSource {
             cell.mainLabel.text = fullName
         }
         
-        let phoneNumbersMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
-        let emailsMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
-        
-        if ABMultiValueGetCount(emailsMultivalue) > 0 {
-            let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, 0)?.takeRetainedValue() as! String
-            cell.subLabel.text = email
+        if addressMode {
+            // Sub label displays address.
+            if let addressMultiValue: ABMultiValueRef = ABRecordCopyValue(contact, kABPersonAddressProperty)?.takeRetainedValue() {
+                for i in 0..<ABMultiValueGetCount(addressMultiValue) {
+                    if let addressDictionary = ABMultiValueCopyValueAtIndex(addressMultiValue, i)?.takeRetainedValue() as? NSDictionary {
+                        if let addressDictionary = addressDictionary as? Dictionary<NSObject, AnyObject> {
+                            let address = MapItem.stringFromAddressDictionary(addressDictionary)
+                            cell.subLabel.text = address
+                        }
+                    }
+                }
+            }
         }
         else {
-            cell.subLabel.text = " "
+            let phoneNumbersMultiValue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
+            let emailsMultiValue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
+            
+            // Sub label shows e-mail.
+            if ABMultiValueGetCount(emailsMultiValue) > 0 {
+                let email = ABMultiValueCopyValueAtIndex(emailsMultiValue, 0)?.takeRetainedValue() as! String
+                cell.subLabel.text = email
+            }
+            else {
+                cell.subLabel.text = " "
+            }
+            
+            // Detail label shows phone number.
+            if ABMultiValueGetCount(phoneNumbersMultiValue) > 0 {
+                let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultiValue, 0)?.takeRetainedValue() as! String
+                cell.detailLabel.text = phoneNumber
+            }
+            else {
+                cell.detailLabel.text = " "
+            }
         }
-        
-        if ABMultiValueGetCount(phoneNumbersMultivalue) > 0 {
-            let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue, 0)?.takeRetainedValue() as! String
-            cell.detailLabel.text = phoneNumber
-        }
-        else {
-            cell.detailLabel.text = " "
-        }
-        
         
         return cell
     }

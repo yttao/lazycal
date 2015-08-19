@@ -104,8 +104,10 @@ class ContactsSearchTableView: SearchTableView {
             
             // Get name, phone numbers, and emails
             let name = ABRecordCopyCompositeName(recordRef)?.takeRetainedValue() as? String
-            let phoneNumbersMultivalue: AnyObject? = ABRecordCopyValue(recordRef, kABPersonPhoneProperty)?.takeRetainedValue()
-            let emailsMultivalue: AnyObject? = ABRecordCopyValue(recordRef, kABPersonEmailProperty)?.takeRetainedValue()
+            
+            let phoneNumbersMultivalue: ABMultiValueRef? = ABRecordCopyValue(recordRef, kABPersonPhoneProperty)?.takeRetainedValue()
+            
+            let emailsMultivalue: ABMultiValueRef? = ABRecordCopyValue(recordRef, kABPersonEmailProperty)?.takeRetainedValue()
             
             // Search name for search text
             if name?.rangeOfString(self.searchText!, options: .CaseInsensitiveSearch) != nil {

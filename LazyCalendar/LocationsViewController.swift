@@ -9,10 +9,13 @@
 import UIKit
 import MapKit
 import CoreData
+import AddressBook
 
 class LocationsViewController: UIViewController {
     @IBOutlet weak var locationsMapViewContainer: UIView!
     @IBOutlet weak var locationsTableViewContainer: UIView!
+    
+    @IBOutlet weak var contactsBarButtonItem: UIBarButtonItem!
     
     private let locationManager = CLLocationManager()
     
@@ -22,33 +25,43 @@ class LocationsViewController: UIViewController {
     private let locationsMapViewSegue = "LocationsMapViewSegue"
     
     private var mapItems: [MapItem]?
+    private var contactIDs: [ABRecordID]?
     var editingEnabled: Bool?
     
-    // MARK: - Methods for initializing view controller and data.
+    // MARK: - Methods for initialization.
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setMapView:", name: "MapViewLoaded", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "showEventNotification:", name: "EventNotificationReceived", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "checkLocationAccessibility", name: "applicationBecameActive", object: self)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadData", name: "applicationBecameActive", object: self)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         locationManager.delegate = self
+
+        initializeContactsBarButtonItem()
         
         initializeHeightConstraints()
     }
     
     /**
-        Loads initial data about map items in the view.
-    
-        :param: mapItems The initial map items in the view.
+        Initializes the contacts bar button item to show or hide based on whether or not there are selected contacts. If there are selected contacts, show the button. If not, hide the button.
     */
-    func loadData(mapItems: [MapItem]) {
-        self.mapItems = mapItems
+    private func initializeContactsBarButtonItem() {
+        if contactIDs?.count > 0 {
+            // Show the button if there are contacts.
+            contactsBarButtonItem.enabled = true
+            contactsBarButtonItem.title = "Contacts"
+        }
+        else {
+            // Otherwise hide the button.
+            contactsBarButtonItem.enabled = false
+            contactsBarButtonItem.title = nil
+        }
     }
 
     /**
@@ -70,7 +83,79 @@ class LocationsViewController: UIViewController {
         mapView = notification.userInfo!["MapView"] as? MKMapView
     }
     
+    // MARK: - Methods for loading data.
+    
+    /**
+        Loads initial data about map items in the view.
+    
+        :param: mapItems The initial map items in the view.
+    */
+    func loadData(#mapItems: [MapItem]) {
+        self.mapItems = mapItems
+    }
+    
+    /**
+        Loads initial data about contacts in the view.
+    
+        :param: contactIDs The `ABRecordIDs` of the event's contacts.
+    */
+    func loadData(#contactIDs: [ABRecordID]) {
+        self.contactIDs = contactIDs
+    }
+    
     // MARK: - Methods for segueing.
+    
+    /**
+        When the contacts bar button item is pressed, check if address book access is given and show the contacts table view controller if it is granted. If not, display an alert.
+    
+        :param: sender The event sender.
+    */
+    @IBAction func contactsBarButtonItemPressed(sender: AnyObject) {
+        if let sender = sender as? UIBarButtonItem {
+            if addressBookAccessible() {
+                showContactsTableViewController()
+            }
+            else {
+                displayAddressBookInaccessibleAlert()
+            }
+        }
+    }
+    
+    /**
+        Shows the contacts table view controller.
+    
+        This method is called when the contacts bar button item is pressed. If the user has given access to their address book, the `ContactsTableViewController` is shown. Otherwise, this method will do nothing.
+    */
+    func showContactsTableViewController() {
+        if addressBookAccessible() {
+            // Check if app has access to address book.
+            
+            // Create contacts table view controller.
+            let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
+            
+            // Load contacts that have
+            if contactIDs?.count > 0 {
+                var contactIDsWithAddresses = [ABRecordID]()
+                
+                let addressBookRef: ABAddressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
+                
+                for contactID in contactIDs! {
+                    if let record: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, contactID)?.takeUnretainedValue() {
+                        if let addressMultivalue: ABMultiValueRef = ABRecordCopyValue(record, kABPersonAddressProperty)?.takeRetainedValue() {
+                            contactIDsWithAddresses.append(contactID)
+                        }
+                    }
+                }
+                
+                contactsTableViewController.loadData(contactIDsWithAddresses)
+            }
+            contactsTableViewController.addressMode = true
+            contactsTableViewController.editingEnabled = false
+            
+            // Show view controller.
+            navigationController!.showViewController(contactsTableViewController, sender: self)
+        }
+    }
     
     /**
         When locations table view is about to be created, set map view and load initial map items.
@@ -97,9 +182,13 @@ class LocationsViewController: UIViewController {
     /**
         Checks if the user location is accessible. If not, display an alert.
     */
-    func checkLocationAccessibility() {
-        if isViewLoaded() && view?.window != nil && !locationAccessible() {
-            displayLocationInaccessibleAlert()
+    func reloadData() {
+        if isViewLoaded() && view?.window != nil {
+            
+            
+            if !locationAccessible() {
+                displayLocationInaccessibleAlert()
+            }
         }
     }
     

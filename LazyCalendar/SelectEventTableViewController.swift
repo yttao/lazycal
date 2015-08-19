@@ -264,7 +264,7 @@ class SelectEventTableViewController: UITableViewController {
         })
         
         // Load map items into locations view controller.
-        locationsViewController.loadData(mapItems)
+        locationsViewController.loadData(mapItems: mapItems)
         // Disable searching for new locations.
         locationsViewController.editingEnabled = false
         
