@@ -21,6 +21,8 @@ class ContactsTableViewController: UITableViewController {
     private let reuseIdentifier = "ContactCell"
     // True if displaying contact addresses.
     var addressMode = false
+    // Selected addresses if in address mode.
+    private var selectedAddresses: [ABRecordRef]?
     
     // MARK: - Methods for initializing table view controller.
     
@@ -50,6 +52,9 @@ class ContactsTableViewController: UITableViewController {
         tableView.dataSource = self
         
         tableView.registerClass(TwoDetailTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        
+        tableView.bounces = false
+        tableView.alwaysBounceVertical = false
         
         // Create and configure search controller
         if editingEnabled {
@@ -286,7 +291,7 @@ extension ContactsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! TwoDetailTableViewCell
-        cell.accessoryType = .DisclosureIndicator
+        
         
         let contact: ABRecordRef = selectedContacts[indexPath.row]
         
@@ -297,6 +302,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         }
         
         if addressMode {
+            
             // Sub label displays address.
             if let addressMultiValue: ABMultiValueRef = ABRecordCopyValue(contact, kABPersonAddressProperty)?.takeRetainedValue() {
                 for i in 0..<ABMultiValueGetCount(addressMultiValue) {
@@ -310,6 +316,8 @@ extension ContactsTableViewController: UITableViewDataSource {
             }
         }
         else {
+            cell.accessoryType = .DisclosureIndicator
+            
             let phoneNumbersMultiValue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
             let emailsMultiValue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
             

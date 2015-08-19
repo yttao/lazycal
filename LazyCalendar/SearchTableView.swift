@@ -34,6 +34,9 @@ class SearchTableView: UITableView {
         // Set reuse identifier and register search table view cell so it can be reused.
         self.reuseIdentifier = reuseIdentifier
         registerClass(SearchTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+       
+        bounces = false
+        alwaysBounceVertical = false
         
         // Set delegate and data source.
         delegate = self

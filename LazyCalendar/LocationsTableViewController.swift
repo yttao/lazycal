@@ -57,6 +57,9 @@ class LocationsTableViewController: UITableViewController {
         
         tableView.registerClass(TwoDetailTableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
         
+        tableView.bounces = false
+        tableView.alwaysBounceVertical = false
+        
         if selectedMapItems == nil {
             selectedMapItems = [MapItem]()
         }
