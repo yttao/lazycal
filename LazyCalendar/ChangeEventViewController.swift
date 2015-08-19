@@ -412,16 +412,6 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Updates the contact IDs.
-    
-        :param: contacts The contacts IDs that were selected.
-    */
-    func updateContacts(contactIDs: [ABRecordID]) {
-        self.contactIDs = contactIDs
-        updateContactsLabel()
-    }
-    
-    /**
         Updates the contacts detail label.
     
         The contacts detail label does not display a number if no contacts have been selected yet or if the number of contacts selected is zero. Otherwise, if at least one contact is selected, it displays the number of contacts.
@@ -509,6 +499,7 @@ class ChangeEventViewController: UITableViewController {
             if contactIDs?.count > 0 {
                 contactsTableViewController.loadData(contactIDs!)
             }
+            contactsTableViewController.delegate = self
             
             // Show view controller.
             navigationController!.showViewController(contactsTableViewController, sender: self)
@@ -1103,6 +1094,7 @@ extension ChangeEventViewController: UITableViewDataSource {
     }
 }
 
+// MARK: - UITextFieldDelegate
 extension ChangeEventViewController: UITextFieldDelegate {
     /**
         When the return button is pressed, resign the text field to hide the keyboard.
@@ -1110,5 +1102,18 @@ extension ChangeEventViewController: UITextFieldDelegate {
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         nameTextField.resignFirstResponder()
         return true
+    }
+}
+
+// MARK: - ContactsTableViewControllerDelegate
+extension ChangeEventViewController: ContactsTableViewControllerDelegate {
+    /**
+        Updates the contact IDs.
+    
+        :param: contacts The contacts IDs that were selected.
+    */
+    func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID]?) {
+        self.contactIDs = contactIDs
+        updateContactsLabel()
     }
 }

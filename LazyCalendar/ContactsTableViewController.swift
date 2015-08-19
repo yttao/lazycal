@@ -12,6 +12,8 @@ import AddressBookUI
 import CoreData
 
 class ContactsTableViewController: UITableViewController {
+    var delegate: ContactsTableViewControllerDelegate?
+    
     private let addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
     // Currently selected contacts
     private var selectedContacts: [ABRecordRef]!
@@ -173,25 +175,39 @@ class ContactsTableViewController: UITableViewController {
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         
-        // Get IDs of selected contacts
-        var selectedContactIDs = [ABRecordID]()
-        for contact in selectedContacts {
-            selectedContactIDs.append(ABRecordGetRecordID(contact))
-        }
-        
-        // Return selected contacts to change event view controller
-        if let changeEventViewController = navigationController!.viewControllers.first as? ChangeEventViewController {
-            changeEventViewController.updateContacts(selectedContactIDs)
-            
-            let locationsViewController = navigationController!.viewControllers.filter({
-                return $0 is LocationsViewController
-            }).first as? LocationsViewController
-            if let locationsViewController = locationsViewController {
-                println("Locations view controller")
-                // TODO: Make reference to contained view controllers in LocationsViewController.
+        // If there is a delegate, inform that delegate of the contacts of interest.
+        if let delegate = delegate {
+            if addressMode {
+                var selectedContactIDs = [ABRecordID]()
+                
+                if let selectedIndexPaths = tableView.indexPathsForSelectedRows() as? [NSIndexPath] {
+                    println(tableView.indexPathsForSelectedRows())
+                    let selectedIndexPaths = tableView.indexPathsForSelectedRows() as? [NSIndexPath]
+                    let selectedRows = selectedIndexPaths?.map({
+                        return $0.row
+                    })
+                    
+                    // Add selected contacts.
+                    if let selectedRows = selectedRows {
+                        for selectedRow in selectedRows {
+                            let contact: ABRecordRef = selectedContacts[selectedRow]
+                            selectedContactIDs.append(ABRecordGetRecordID(contact))
+                        }
+                    }
+                }
+                // Inform delegate of updated contact IDs.
+                delegate.contactsTableViewControllerDidUpdateContacts(selectedContactIDs)
+            }
+            else {
+                // Convert contacts to their IDs
+                let selectedContactIDs = selectedContacts.map({
+                    return ABRecordGetRecordID($0)
+                })
+                
+                // Inform delegate of updated contact IDs.
+                delegate.contactsTableViewControllerDidUpdateContacts(selectedContactIDs)
             }
         }
-        
     }
     
     // MARK: - Methods related to address book accessibility.
@@ -396,4 +412,8 @@ extension ContactsTableViewController: UITableViewDataSource {
             deleteRecord(recordRef, atIndexPath: indexPath)
         }
     }
+}
+
+protocol ContactsTableViewControllerDelegate {
+    func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID]?)
 }

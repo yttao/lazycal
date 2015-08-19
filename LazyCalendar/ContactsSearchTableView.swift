@@ -70,7 +70,7 @@ class ContactsSearchTableView: SearchTableView {
             allContacts = NSArray()
         }
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateContacts", name: "applicationBecameActive", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateAllContacts", name: "applicationBecameActive", object: nil)
         
         super.initializeView(reuseIdentifier)
     }
@@ -158,7 +158,7 @@ class ContactsSearchTableView: SearchTableView {
     /**
         Updates the array of all contacts.
     */
-    func updateContacts() {
+    func updateAllContacts() {
         // Get new contacts if any were added while app was inactive.
         if addressBookAccessible() {
             allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray

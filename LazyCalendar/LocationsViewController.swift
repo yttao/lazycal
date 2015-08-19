@@ -24,6 +24,9 @@ class LocationsViewController: UIViewController {
     private let locationsTableViewSegue = "LocationsTableViewSegue"
     private let locationsMapViewSegue = "LocationsMapViewSegue"
     
+    var locationsTableViewController: LocationsTableViewController!
+    var locationsMapViewController: LocationsMapViewController!
+    
     private var mapItems: [MapItem]?
     private var contactIDs: [ABRecordID]?
     var editingEnabled: Bool?
@@ -152,20 +155,22 @@ class LocationsViewController: UIViewController {
             contactsTableViewController.addressMode = true
             contactsTableViewController.editingEnabled = false
             
+            contactsTableViewController.delegate = locationsTableViewController
+            
             // Show view controller.
             navigationController!.showViewController(contactsTableViewController, sender: self)
         }
     }
     
     /**
-        When locations table view is about to be created, set map view and load initial map items.
+        When locations table view is about to be created, set map view and load initial map items. Also set `locationsTableViewController` and `locationsMapViewController` fields.
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         super.prepareForSegue(segue, sender: sender)
         
         if let identifier = segue.identifier {
             if identifier == locationsTableViewSegue {
-                let locationsTableViewController = segue.destinationViewController as! LocationsTableViewController
+                locationsTableViewController = segue.destinationViewController as! LocationsTableViewController
                 
                 // Set map, map items, and editing enabled for table view controller.
                 locationsTableViewController.mapView = mapView
@@ -175,6 +180,9 @@ class LocationsViewController: UIViewController {
                 if let editingEnabled = editingEnabled {
                     locationsTableViewController.editingEnabled = editingEnabled
                 }
+            }
+            else if identifier == locationsMapViewSegue {
+                locationsMapViewController = segue.destinationViewController as! LocationsMapViewController
             }
         }
     }
@@ -214,6 +222,7 @@ class LocationsViewController: UIViewController {
     }
 }
 
+// MARK: - CLLocationManagerDelegate
 extension LocationsViewController: CLLocationManagerDelegate {
     func locationManager(manager: CLLocationManager!, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
         switch status {

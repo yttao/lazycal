@@ -27,8 +27,6 @@ class LocationsTableViewController: UITableViewController {
     }
     
     var selectedMapItems: [MapItem]!
-    // Map items shown when searching for locations
-    private var filteredMapItems = [MapItem]()
 
     weak var mapView: MKMapView?
 
@@ -36,6 +34,9 @@ class LocationsTableViewController: UITableViewController {
     
     // Search request timer used to provide delay between search requests.
     private var timer: NSTimer?
+    
+    var contactIDs: [ABRecordID]?
+    private var addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
     
     // MARK: - Methods for setting up view controller.
     
@@ -348,6 +349,39 @@ extension LocationsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             deleteSelectedMapItem(selectedMapItems[indexPath.row], atIndexPath: indexPath)
+        }
+    }
+}
+
+// MARK: - ContactsTableViewControllerDelegate
+extension LocationsTableViewController: ContactsTableViewControllerDelegate {
+    func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID]?) {
+        self.contactIDs = contactIDs
+        
+        if let contactIDs = contactIDs {
+            for contactID in contactIDs {
+                if let contact: ABRecord = ABAddressBookGetPersonWithRecordID(addressBookRef, contactID)?.takeRetainedValue() {
+                    if let addressMultiValue: ABMultiValueRef = ABRecordCopyValue(contact, kABPersonAddressProperty)?.takeRetainedValue() {
+                        for i in 0..<ABMultiValueGetCount(addressMultiValue) {
+                            if let addressDictionary = ABMultiValueCopyValueAtIndex(addressMultiValue, i)?.takeRetainedValue() as? NSDictionary {
+                                if let addressDictionary = addressDictionary as? Dictionary<NSObject, AnyObject> {
+                                    CLGeocoder().geocodeAddressDictionary(addressDictionary, completionHandler: {
+                                        (results: [AnyObject]!, error: NSError!) in
+                                        if let error = error {
+                                            // Give description of error if there is one.
+                                            NSLog("Error occurred when geocoding contact address :%@", error.localizedDescription)
+                                        }
+                                        else {
+                                            // Add contact address to map items.
+                                            
+                                        }
+                                    })
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
