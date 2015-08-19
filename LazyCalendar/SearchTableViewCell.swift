@@ -36,6 +36,12 @@ class SearchTableViewCell: TwoDetailTableViewCell {
         initializeLabels()
     }
     
+    override init() {
+        super.init()
+        
+        initializeLabels()
+    }
+    
     private func initializeLabels() {
         mainLabel.font = UIFont(name: mainLabel.font.fontName, size: mainLabel.font.pointSize * SearchTableView.sizingScaleFactor)
         subLabel.font = UIFont(name: subLabel.font.fontName, size: subLabel.font.pointSize * SearchTableView.sizingScaleFactor)

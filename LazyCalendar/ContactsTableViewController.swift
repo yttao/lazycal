@@ -292,8 +292,9 @@ extension ContactsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! TwoDetailTableViewCell
         
-        
         let contact: ABRecordRef = selectedContacts[indexPath.row]
+        
+        
         
         // Main label displays name.
         if let fullName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() as? String {

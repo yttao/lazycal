@@ -133,7 +133,7 @@ extension SearchTableView: UITableViewDelegate {
         The height of a cell is equal to 2/3 the height of a standard `UITableViewCell`.
     */
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return UITableViewCell().frame.height * SearchTableView.sizingScaleFactor
+        return SearchTableViewCell().frame.height * SearchTableView.sizingScaleFactor
     }
 }
 

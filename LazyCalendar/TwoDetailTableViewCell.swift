@@ -70,7 +70,7 @@ class TwoDetailTableViewCell: UITableViewCell {
         
         // Add constraints to position the detail label.
         detailLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
-        let trailingConstraint = NSLayoutConstraint(item: detailLabel, attribute: .Trailing, relatedBy: .Equal, toItem: detailLabel.superview, attribute: .Trailing, multiplier: 1, constant: 2)
+        let trailingConstraint = NSLayoutConstraint(item: detailLabel, attribute: .Trailing, relatedBy: .Equal, toItem: detailLabel.superview, attribute: .Trailing, multiplier: 1, constant: -2)
         let centerYConstraint = NSLayoutConstraint(item: detailLabel, attribute: .CenterY, relatedBy: .Equal, toItem: detailLabel.superview, attribute: .CenterY, multiplier: 1, constant: 0)
         addConstraint(trailingConstraint)
         addConstraint(centerYConstraint)
