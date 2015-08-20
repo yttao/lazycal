@@ -150,13 +150,26 @@ extension LocationsSearchTableView: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! SearchTableViewCell
+        cell.removeAllWidthConstraints()
         
         let mapItem = filteredMapItems[indexPath.row]
-        let name = mapItem.name
-        let address = mapItem.address
-        cell.mainLabel.text = name
-        cell.subLabel.text = address
+        if let name = mapItem.name {
+            cell.mainLabel.text = name
+        }
+        else {
+            cell.mainLabel.text = " "
+        }
+        if let address = mapItem.address {
+            cell.subLabel.text = address
+        }
+        else {
+            cell.subLabel.text = " "
+        }
+        cell.detailLabel.text = " "
         boldSearchTextInLabel(cell.mainLabel)
+        cell.mainLabel.sizeToFit()
+        cell.subLabel.sizeToFit()
+        cell.detailLabel.sizeToFit()
         
         return cell
     }

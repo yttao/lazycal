@@ -9,12 +9,15 @@
 import UIKit
 import AddressBook
 import CoreData
-import CoreLocation
+import MapKit
 
-class LZLocation: NSManagedObject, Equatable {
+class LZLocation: NSManagedObject, Equatable, MKAnnotation {
+    // MARK: - Constants
     private static let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
     private static let entity = NSEntityDescription.entityForName("LZLocation", inManagedObjectContext: LZLocation.managedContext)!
 
+    // MARK: - Persistent storage properties
+    
     @NSManaged var latitude: Double
     @NSManaged var longitude: Double
     
@@ -22,6 +25,8 @@ class LZLocation: NSManagedObject, Equatable {
     @NSManaged var address: String?
     
     @NSManaged var events: NSSet
+    
+    // MARK: - Non-stored/computed properties.
     
     var coordinate: CLLocationCoordinate2D {
         get {
@@ -33,8 +38,25 @@ class LZLocation: NSManagedObject, Equatable {
         }
     }
     
+    var addressDictionary: [NSObject: AnyObject]?
+    
+    var location: CLLocation {
+        return CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+    }
+    
+    var additionalInfo: [NSObject: AnyObject]?
+    
     var storedEvents: NSMutableSet {
         return mutableSetValueForKey("events")
+    }
+    
+    // MARK: - MKAnnotation properties
+    
+    var title: String? {
+        return name
+    }
+    var subtitle: String? {
+        return address
     }
     
     // MARK: - Initializers
@@ -66,6 +88,8 @@ class LZLocation: NSManagedObject, Equatable {
         address = mapItem.address
     }
     
+    // MARK: - Search functions
+    
     /**
         Searches the stored locations for a given location.
     
@@ -93,6 +117,7 @@ class LZLocation: NSManagedObject, Equatable {
         if let error = error {
             NSLog("Error occurred while fetching stored location: %@", error.localizedDescription)
         }
+        
         return storedLocation
     }
 }

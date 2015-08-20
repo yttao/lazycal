@@ -135,11 +135,28 @@ class MonthItemTableViewController: UITableViewController {
         // Deschedule all notifications
         descheduleNotificationsForDeletedEvent(event)
         
+        removeEventRelations(event)
+        
         // Remove from persistent storage
         removeEventFromPersistentStorage(event)
         
         // Remove from event
         removeEventFromTableView(event, atIndexPath: indexPath)
+    }
+    
+    private func removeEventRelations(event: FullEvent) {
+        let storedContacts = event.mutableSetValueForKey("contacts")
+        let storedLocations = event.mutableSetValueForKey("locations")
+        
+        for storedContact in storedContacts {
+            let storedContact = storedContact as! Contact
+            event.removeRelation(storedContact)
+        }
+        
+        for storedLocation in storedLocations {
+            let storedLocation = storedLocation as! Location
+            event.removeRelation(storedLocation)
+        }
     }
     
     /**
@@ -149,7 +166,6 @@ class MonthItemTableViewController: UITableViewController {
     */
     private func removeEventFromPersistentStorage(event: FullEvent) {
         // Delete event
-        let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
         managedContext.deleteObject(event)
         
         // Save changes

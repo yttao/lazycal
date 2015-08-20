@@ -90,9 +90,14 @@ class MapItem: NSObject, MKAnnotation, Equatable, Hashable {
         The newlines are then replaced with spaces using `stringByReplacingOccurrencesOfString:withString:` because the `subtitle` property of `MKAnnotation` can only display single line strings.
     
         :param: addressDictionary A dictionary of address information.
+        :returns: The address dictionary in string form. If the address is an empty string, this returns nil.
     */
-    static func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String {
-        return ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: ", ")
+    static func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String? {
+        let address = ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: ", ")
+        if address != "" {
+            return address
+        }
+        return nil
     }
     
     /**

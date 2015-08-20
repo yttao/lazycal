@@ -427,7 +427,6 @@ class ChangeEventViewController: UITableViewController {
         else {
             contactsCell.detailTextLabel?.text = " "
         }
-        contactsCell.detailTextLabel?.sizeToFit()
     }
     
     /**
@@ -454,8 +453,6 @@ class ChangeEventViewController: UITableViewController {
         else {
             locationsCell.detailTextLabel?.text = " "
         }
-        
-        locationsCell.detailTextLabel?.sizeToFit()
     }
     
     // MARK: - Methods related to user permissions.
@@ -497,8 +494,9 @@ class ChangeEventViewController: UITableViewController {
             
             // Load contacts.
             if contactIDs?.count > 0 {
-                contactsTableViewController.loadData(contactIDs!)
+                contactsTableViewController.loadData(contactIDs: contactIDs!)
             }
+            contactsTableViewController.loadData(event: event)
             contactsTableViewController.delegate = self
             
             // Show view controller.
@@ -525,6 +523,7 @@ class ChangeEventViewController: UITableViewController {
             if contactIDs?.count > 0 {
                 locationsViewController.loadData(contactIDs: contactIDs!)
             }
+            locationsViewController.loadData(event: event!)
             
             // Show view controller.
             navigationController!.showViewController(locationsViewController, sender: self)
@@ -1084,8 +1083,6 @@ extension ChangeEventViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
-        
-        cell.setNeedsDisplay()
         
         return cell
     }

@@ -24,6 +24,13 @@ class ContactsTableViewController: UITableViewController {
     // True if displaying contact addresses.
     var addressMode = false
     
+    var event: FullEvent!
+    /**
+    var selectedContacts: [LZContact] {
+        return event.contacts
+    }
+    */
+    
     // MARK: - Methods for initializing table view controller.
     
     /**
@@ -112,7 +119,7 @@ class ContactsTableViewController: UITableViewController {
     
         :param: contactIDs The array of contact IDs.
     */
-    func loadData(contactIDs: [ABRecordID]) {
+    func loadData(#contactIDs: [ABRecordID]) {
         if addressBookAccessible() {
             
             selectedContacts = [ABRecordRef]()
@@ -124,6 +131,10 @@ class ContactsTableViewController: UITableViewController {
                 }
             }
         }
+    }
+    
+    func loadData(#event: FullEvent) {
+        self.event = event
     }
     
     // MARK: - Methods for accessing and handling records.
@@ -349,13 +360,16 @@ extension ContactsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! TwoDetailTableViewCell
-        
+
         let record: ABRecordRef = selectedContacts[indexPath.row]
         
         // Main label displays name.
         if let fullName = ABRecordCopyCompositeName(record)?.takeRetainedValue() as? String {
             cell.mainLabel.attributedText = nil
             cell.mainLabel.text = fullName
+        }
+        else {
+            cell.mainLabel.text = " "
         }
         
         if addressMode {

@@ -38,6 +38,8 @@ class LocationsTableViewController: UITableViewController {
     var contactIDs: Set<ABRecordID>?
     private var addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
     
+    var selectedIndexPath: NSIndexPath?
+    
     // MARK: - Methods for setting up view controller.
     
     required init(coder aDecoder: NSCoder) {
@@ -205,6 +207,11 @@ class LocationsTableViewController: UITableViewController {
         
         // Reload table view with directions (if there are any) or with locations (if directions = nil).
         tableView.reloadData()
+        
+        // If returning to showing map items and a map item was previously selected, reselect it.
+        if selectedIndexPath != nil && !showingDirections {
+            tableView.selectRowAtIndexPath(selectedIndexPath, animated: false, scrollPosition: .None)
+        }
     }
     
     func displayLocationNotFoundAlert(address: String) {
@@ -248,6 +255,7 @@ extension LocationsTableViewController: UITableViewDelegate {
         else {
             let mapItem = selectedMapItems[indexPath.row]
             NSNotificationCenter.defaultCenter().postNotificationName("MapItemSelected", object: self, userInfo: ["MapItem": mapItem])
+            selectedIndexPath = indexPath
         }
         
     }
@@ -318,23 +326,35 @@ extension LocationsTableViewController: UITableViewDataSource {
         if showingDirections {
             // If showing directions, main label shows instruction.
             let direction = directions![indexPath.row]
-            cell.mainLabel.text = direction.instructions
+            if direction.instructions != "" {
+                cell.mainLabel.text = direction.instructions
+            }
+            else {
+                cell.mainLabel.text = " "
+            }
             cell.subLabel.text = " "
             cell.detailLabel.text = " "
-            cell.subLabel.sizeToFit()
-            cell.detailLabel.sizeToFit()
         }
         else {
             // If showing locations, main label shows name and detail label shows address.
             let mapItem = selectedMapItems[indexPath.row]
-            let name = mapItem.name
-            let address = mapItem.address
-            cell.mainLabel.text = name
-            cell.subLabel.text = address
+            if let name = mapItem.name {
+                cell.mainLabel.text = name
+            }
+            else {
+                cell.mainLabel.text = " "
+            }
+            if let address = mapItem.address {
+                cell.subLabel.text = address
+            }
+            else {
+                cell.subLabel.text = " "
+            }
             cell.detailLabel.text = " "
-            cell.subLabel.sizeToFit()
-            cell.detailLabel.sizeToFit()
         }
+        cell.mainLabel.sizeToFit()
+        cell.subLabel.sizeToFit()
+        cell.detailLabel.sizeToFit()
         
         return cell
     }

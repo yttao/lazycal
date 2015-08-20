@@ -23,7 +23,7 @@ class TwoDetailTableViewCell: UITableViewCell {
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-
+        
         initializeLabels()
     }
     
@@ -53,10 +53,7 @@ class TwoDetailTableViewCell: UITableViewCell {
         initializeLabels()
     }
     
-    /**
-        Initializes the labels.
-    */
-    private func initializeLabels() {
+    func initializeLabels() {
         // Set up main and sub labels.
         mainLabel = textLabel!
         subLabel = detailTextLabel!
@@ -103,6 +100,7 @@ class TwoDetailTableViewCell: UITableViewCell {
         addConstraints(labelPositionConstraints)
         addConstraints(labelSizeConstraints)
     }
+    
     
     /**
         Removes the width constraint from the specified label. If the label is not the `mainLabel`, `subLabel`, or `detailLabel`, the method does nothing.

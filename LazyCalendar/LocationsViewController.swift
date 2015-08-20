@@ -31,6 +31,8 @@ class LocationsViewController: UIViewController {
     private var contactIDs: [ABRecordID]?
     var editingEnabled: Bool?
     
+    var event: FullEvent!
+    
     // MARK: - Methods for initialization.
     
     required init(coder aDecoder: NSCoder) {
@@ -106,6 +108,10 @@ class LocationsViewController: UIViewController {
         self.contactIDs = contactIDs
     }
     
+    func loadData(#event: FullEvent) {
+        self.event = event
+    }
+    
     // MARK: - Methods for segueing.
     
     /**
@@ -150,7 +156,7 @@ class LocationsViewController: UIViewController {
                     }
                 }
                 
-                contactsTableViewController.loadData(contactIDsWithAddresses)
+                contactsTableViewController.loadData(contactIDs: contactIDsWithAddresses)
             }
             contactsTableViewController.addressMode = true
             contactsTableViewController.editingEnabled = false

@@ -12,8 +12,11 @@ import CoreData
 import CoreLocation
 
 class LZEvent: NSManagedObject, Equatable {
+    // MARK: - Constants
     private static let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
     private static let entity = NSEntityDescription.entityForName("LZEvent", inManagedObjectContext: LZEvent.managedContext)!
+    
+    // MARK - Persistent storage properties
     
     @NSManaged var id: String
     
@@ -27,6 +30,8 @@ class LZEvent: NSManagedObject, Equatable {
     
     @NSManaged var contacts: NSSet
     @NSManaged var locations: NSSet
+    
+    // MARK: - Computed properties
     
     var storedContacts: NSMutableSet {
         return mutableSetValueForKey("contacts")
@@ -86,33 +91,42 @@ class LZEvent: NSManagedObject, Equatable {
     
     /**
         Adds a location to the event.
+    
+        :param: location The location to add.
     */
     func addLocation(location: LZLocation) {
         storedLocations.addObject(location)
+        addRelationship(location)
     }
     
     /**
         Removes a location from the event.
+    
+        :param: location The location to remove.
     */
     func removeLocation(location: LZLocation) {
-        // Find location to remove.
         storedLocations.removeObject(location)
+        removeRelationship(location)
     }
     
     /**
-        Removes the event from its relationship with another object.
+        Adds a contact to the event.
     
-        First, it removes the event from its inverse. Then, it checks if the relationship still has associated events. If not, the object is no longer needed and the object is removed from persistent storage. For example, if a `Location` has no related events anymore, it will be deleted.
-    
-        :param: relatedObject The object that was related to the event.
+        :param: contact The contact to add.
     */
-    func removeRelationship(relatedObject: NSManagedObject) {
-        let inverse = relatedObject.mutableSetValueForKey("events")
-        inverse.removeObject(self)
-        
-        if inverse.count == 0 {
-            LZEvent.managedContext.deleteObject(relatedObject)
-        }
+    func addContact(contact: LZContact) {
+        storedContacts.addObject(contact)
+        addRelationship(contact)
+    }
+    
+    /**
+        Removes a contact from the event.
+    
+        :param: contact The contact to remove.
+    */
+    func removeContact(contact: LZContact) {
+        storedContacts.removeObject(contact)
+        removeRelationship(contact)
     }
     
     /**
@@ -121,9 +135,23 @@ class LZEvent: NSManagedObject, Equatable {
         :param: relatedObject The object that is related to the event.
     */
     func addRelationship(relatedObject: NSManagedObject) {
-        // Add inverse relation
         let inverse = relatedObject.mutableSetValueForKey("events")
         inverse.addObject(self)
+    }
+    
+    /**
+        Removes the event from its relationship with another object. It then checks if the relationship still has associated events. If not, the object is no longer needed and the object is removed from persistent storage.
+    
+        :param: relatedObject The object that was related to the event.
+    */
+    func removeRelationship(relatedObject: NSManagedObject) {
+        let inverse = relatedObject.mutableSetValueForKey("events")
+        inverse.removeObject(self)
+        
+        // Remove object if it has no associated events.
+        if inverse.count == 0 {
+            LZEvent.managedContext.deleteObject(relatedObject)
+        }
     }
 }
 

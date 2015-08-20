@@ -31,6 +31,14 @@ class FullEvent: NSManagedObject, Equatable {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
+    init() {
+        let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+        let entity = NSEntityDescription.entityForName("FullEvent", inManagedObjectContext: managedContext)!
+        super.init(entity: entity, insertIntoManagedObjectContext: managedContext)
+        
+        self.id = NSUUID().UUIDString
+    }
+    
     // MARK: - Initializers
 
     /**
@@ -71,6 +79,16 @@ class FullEvent: NSManagedObject, Equatable {
         }
         else {
             self.alarmTime = nil
+        }
+    }
+    
+    func removeRelation(relatedObject: NSManagedObject) {
+        let storedEvents = relatedObject.mutableSetValueForKey("events")
+        storedEvents.removeObject(self)
+        
+        if storedEvents.count == 0 {
+            let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+            managedContext.deleteObject(relatedObject)
         }
     }
 }

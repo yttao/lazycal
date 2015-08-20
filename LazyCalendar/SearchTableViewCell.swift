@@ -18,7 +18,7 @@ class SearchTableViewCell: TwoDetailTableViewCell {
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        initializeLabels()
+        //initializeLabels()
     }
     
     /**
@@ -27,31 +27,28 @@ class SearchTableViewCell: TwoDetailTableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .Subtitle, reuseIdentifier: reuseIdentifier)
         
-        initializeLabels()
+        //initializeLabels()
     }
     
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         
-        initializeLabels()
+        //initializeLabels()
     }
     
     override init() {
         super.init()
         
-        initializeLabels()
+        //initializeLabels()
     }
     
-    private func initializeLabels() {
+    override func initializeLabels() {
+        super.initializeLabels()
+        
         // Scale font sizes with search size scale.
         mainLabel.font = UIFont(name: mainLabel.font.fontName, size: mainLabel.font.pointSize * SearchTableView.sizingScaleFactor)
         subLabel.font = UIFont(name: subLabel.font.fontName, size: subLabel.font.pointSize * SearchTableView.sizingScaleFactor)
         detailLabel.font = UIFont(name: mainLabel.font.fontName, size: mainLabel.font.pointSize * SearchTableView.sizingScaleFactor)
-
-        // Scale constraints with search size scale.
-        for labelPositionConstraint in labelPositionConstraints {
-            labelPositionConstraint.constant = labelPositionConstraint.constant * SearchTableView.sizingScaleFactor
-        }
         
         mainLabel.opaque = true
         subLabel.opaque = true
@@ -60,5 +57,10 @@ class SearchTableViewCell: TwoDetailTableViewCell {
         
         separatorInset = UIEdgeInsetsZero
         layoutMargins = UIEdgeInsetsZero
+        
+        // Scale constraints with search size scale.
+        for labelPositionConstraint in labelPositionConstraints {
+            labelPositionConstraint.constant = labelPositionConstraint.constant * SearchTableView.sizingScaleFactor
+        }
     }
 }

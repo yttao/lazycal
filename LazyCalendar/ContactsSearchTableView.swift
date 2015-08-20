@@ -198,6 +198,9 @@ extension ContactsSearchTableView: UITableViewDataSource {
             // Bold search text in name
             boldSearchTextInLabel(cell.mainLabel)
         }
+        else {
+            cell.mainLabel.text = " "
+        }
         
         // Get phone numbers and e-mails for contact.
         let phoneNumbersMultiValue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
@@ -220,6 +223,9 @@ extension ContactsSearchTableView: UITableViewDataSource {
         else {
             cell.detailLabel.text = " "
         }
+        cell.mainLabel.sizeToFit()
+        cell.subLabel.sizeToFit()
+        cell.detailLabel.sizeToFit()
         
         return cell
     }

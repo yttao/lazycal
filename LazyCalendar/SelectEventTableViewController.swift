@@ -151,9 +151,8 @@ class SelectEventTableViewController: UITableViewController {
             // Hide the alarm time.
             alarmTimeDisplayCell.textLabel?.text = " "
             alarmTimeDisplayCell.detailTextLabel?.text = " "
-            
         }
-        alarmTimeDisplayCell.textLabel?.sizeToFit()
+        alarmCell.detailTextLabel?.sizeToFit()
         alarmTimeDisplayCell.detailTextLabel?.sizeToFit()
 
         // Handle contacts cell.
@@ -247,7 +246,8 @@ class SelectEventTableViewController: UITableViewController {
         })
         
         // Load contact IDs into contacts table view controller.
-        contactsTableViewController.loadData(contactIDs)
+        contactsTableViewController.loadData(contactIDs: contactIDs)
+        contactsTableViewController.loadData(event: event!)
         // Disable searching for new contacts.
         contactsTableViewController.editingEnabled = false
         
@@ -265,6 +265,7 @@ class SelectEventTableViewController: UITableViewController {
         
         // Load map items into locations view controller.
         locationsViewController.loadData(mapItems: mapItems)
+        locationsViewController.loadData(event: event!)
         // Disable searching for new locations.
         locationsViewController.editingEnabled = false
         
@@ -415,8 +416,6 @@ extension SelectEventTableViewController: UITableViewDataSource {
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
-        
-        cell.setNeedsDisplay()
         
         return cell
     }
