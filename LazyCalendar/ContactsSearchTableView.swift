@@ -203,21 +203,21 @@ extension ContactsSearchTableView: UITableViewDataSource {
         let emailsMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
         
         // If contact has an e-mail, sub label displays. e-mail.
-        if ABMultiValueGetCount(emailsMultivalue) > 0 {
+        if ABMultiValueGetCount(emailsMultivalue) != 0 {
             let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, 0)?.takeRetainedValue() as! String
             cell.subLabel.text = email
         }
         else {
-            cell.subLabel.text = " "
+            cell.subLabel.text = nil
         }
         
         // If contact has a phone number, detail label displays phone number.
-        if ABMultiValueGetCount(phoneNumbersMultivalue) > 0 {
+        if ABMultiValueGetCount(phoneNumbersMultivalue) != 0 {
             let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue, 0)?.takeRetainedValue() as! String
             cell.detailLabel.text = phoneNumber
         }
         else {
-            cell.detailLabel.text = " "
+            cell.detailLabel.text = nil
         }
         
         return cell

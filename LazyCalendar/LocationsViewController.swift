@@ -55,7 +55,7 @@ class LocationsViewController: UIViewController {
         Initializes the contacts bar button item to show or hide based on whether or not there are selected contacts. If there are selected contacts, show the button. If not, hide the button.
     */
     private func initializeContactsBarButtonItem() {
-        if contactIDs?.count > 0 {
+        if contactIDs?.count != 0 {
             // Show the button if there are contacts.
             contactsBarButtonItem.enabled = true
             contactsBarButtonItem.title = "Contacts"
@@ -137,7 +137,7 @@ class LocationsViewController: UIViewController {
             let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
             
             // Load contacts that have
-            if contactIDs?.count > 0 {
+            if contactIDs?.count != 0 {
                 var contactIDsWithAddresses = [ABRecordID]()
                 
                 let addressBookRef: ABAddressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()

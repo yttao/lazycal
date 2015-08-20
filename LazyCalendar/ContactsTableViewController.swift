@@ -143,6 +143,18 @@ class ContactsTableViewController: UITableViewController {
     }
     
     /**
+        Gets the address dictionary from an `ABRecordRef`. If the record does not have an address, this returns `nil`.
+    */
+    static func getAddressDictionary(recordRef: ABRecordRef) -> [NSObject: AnyObject]? {
+        let addressBookRef: ABAddressBook? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
+        if let addressMultiValue: ABMultiValueRef = ABRecordCopyValue(recordRef, kABPersonAddressProperty)?.takeRetainedValue() {
+            let addressDictionary = ABMultiValueCopyValueAtIndex(addressMultiValue, 0)?.takeRetainedValue() as? Dictionary<NSObject, AnyObject>
+            return addressDictionary
+        }
+        return nil
+    }
+    
+    /**
         Adds a record to the selected records.
     
         :param: recordRef The record to add.
@@ -181,7 +193,6 @@ class ContactsTableViewController: UITableViewController {
                 var selectedContactIDs = [ABRecordID]()
                 
                 if let selectedIndexPaths = tableView.indexPathsForSelectedRows() as? [NSIndexPath] {
-                    println(tableView.indexPathsForSelectedRows())
                     let selectedIndexPaths = tableView.indexPathsForSelectedRows() as? [NSIndexPath]
                     let selectedRows = selectedIndexPaths?.map({
                         return $0.row
@@ -348,16 +359,11 @@ extension ContactsTableViewController: UITableViewDataSource {
         }
         
         if addressMode {
+            cell.removeAllWidthConstraints()
             // If in address mode, sub label displays address.
-            if let addressMultiValue: ABMultiValueRef = ABRecordCopyValue(record, kABPersonAddressProperty)?.takeRetainedValue() {
-                for i in 0..<ABMultiValueGetCount(addressMultiValue) {
-                    if let addressDictionary = ABMultiValueCopyValueAtIndex(addressMultiValue, i)?.takeRetainedValue() as? NSDictionary {
-                        if let addressDictionary = addressDictionary as? Dictionary<NSObject, AnyObject> {
-                            let address = MapItem.stringFromAddressDictionary(addressDictionary)
-                            cell.subLabel.text = address
-                        }
-                    }
-                }
+            if let addressDictionary = ContactsTableViewController.getAddressDictionary(record) {
+                let address = MapItem.stringFromAddressDictionary(addressDictionary)
+                cell.subLabel.text = address
             }
         }
         else {
@@ -368,23 +374,26 @@ extension ContactsTableViewController: UITableViewDataSource {
             let emailsMultiValue: ABMultiValueRef? = ABRecordCopyValue(record, kABPersonEmailProperty)?.takeRetainedValue()
             
             // Sub label shows e-mail.
-            if ABMultiValueGetCount(emailsMultiValue) > 0 {
+            if ABMultiValueGetCount(emailsMultiValue) != 0 {
                 let email = ABMultiValueCopyValueAtIndex(emailsMultiValue, 0)?.takeRetainedValue() as! String
                 cell.subLabel.text = email
             }
             else {
-                cell.subLabel.text = " "
+                cell.subLabel.text = nil
             }
             
             // Detail label shows phone number.
-            if ABMultiValueGetCount(phoneNumbersMultiValue) > 0 {
+            if ABMultiValueGetCount(phoneNumbersMultiValue) != 0 {
                 let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultiValue, 0)?.takeRetainedValue() as! String
                 cell.detailLabel.text = phoneNumber
             }
             else {
-                cell.detailLabel.text = " "
+                cell.detailLabel.text = nil
             }
         }
+        cell.mainLabel.sizeToFit()
+        cell.subLabel.sizeToFit()
+        cell.detailLabel.sizeToFit()
         
         return cell
     }
@@ -415,5 +424,5 @@ extension ContactsTableViewController: UITableViewDataSource {
 }
 
 protocol ContactsTableViewControllerDelegate {
-    func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID]?)
+    func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID])
 }

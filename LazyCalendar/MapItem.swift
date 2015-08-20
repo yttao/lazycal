@@ -61,6 +61,13 @@ class MapItem: NSObject, MKAnnotation, Equatable, Hashable {
         super.init()
     }
     
+    init(mkMapItem: MKMapItem) {
+        coordinate = mkMapItem.placemark.coordinate
+        name = mkMapItem.name
+        addressDictionary = mkMapItem.placemark.addressDictionary
+        self.address = MapItem.stringFromAddressDictionary(mkMapItem.placemark.addressDictionary)
+    }
+    
     // MARK: - Methods for formatting data.
     
     /**

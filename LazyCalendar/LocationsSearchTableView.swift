@@ -108,7 +108,7 @@ class LocationsSearchTableView: SearchTableView {
                     let mkMapItems = response.mapItems as! [MKMapItem]
                     // Convert to [MapItem]
                     let mapItems = mkMapItems.map({
-                        return MapItem(coordinate: $0.placemark.coordinate, name: $0.name, addressDictionary: $0.placemark.addressDictionary)
+                        return MapItem(mkMapItem: $0)
                     })
                     // Show only MapItems that aren't already present in selected map items.
                     self.filteredMapItems = mapItems.filter({

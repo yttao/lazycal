@@ -43,9 +43,15 @@ class SearchTableViewCell: TwoDetailTableViewCell {
     }
     
     private func initializeLabels() {
+        // Scale font sizes with search size scale.
         mainLabel.font = UIFont(name: mainLabel.font.fontName, size: mainLabel.font.pointSize * SearchTableView.sizingScaleFactor)
         subLabel.font = UIFont(name: subLabel.font.fontName, size: subLabel.font.pointSize * SearchTableView.sizingScaleFactor)
         detailLabel.font = UIFont(name: mainLabel.font.fontName, size: mainLabel.font.pointSize * SearchTableView.sizingScaleFactor)
+
+        // Scale constraints with search size scale.
+        for labelPositionConstraint in labelPositionConstraints {
+            labelPositionConstraint.constant = labelPositionConstraint.constant * SearchTableView.sizingScaleFactor
+        }
         
         mainLabel.opaque = true
         subLabel.opaque = true

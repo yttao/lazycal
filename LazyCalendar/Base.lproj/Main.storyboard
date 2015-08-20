@@ -564,9 +564,9 @@
                                         <constraint firstItem="0HX-Li-Fdz" firstAttribute="leading" secondItem="RU6-QT-iCd" secondAttribute="leading" id="6v0-WD-Y4W"/>
                                         <constraint firstAttribute="trailing" secondItem="HJy-Pu-Ghg" secondAttribute="trailing" constant="2" id="9JF-lU-5Nq"/>
                                         <constraint firstAttribute="centerY" secondItem="HJy-Pu-Ghg" secondAttribute="centerY" id="BsL-VK-vzF"/>
-                                        <constraint firstItem="0HX-Li-Fdz" firstAttribute="bottom" secondItem="e4t-eI-zTm" secondAttribute="bottomMargin" constant="4" id="F0y-5t-ofp"/>
-                                        <constraint firstAttribute="topMargin" secondItem="RU6-QT-iCd" secondAttribute="top" constant="3" id="ae1-Cu-O5Y"/>
-                                        <constraint firstItem="RU6-QT-iCd" firstAttribute="leading" secondItem="e4t-eI-zTm" secondAttribute="leadingMargin" constant="7" id="dY4-or-tI4"/>
+                                        <constraint firstItem="RU6-QT-iCd" firstAttribute="top" secondItem="e4t-eI-zTm" secondAttribute="top" constant="5" id="TGS-hN-0Vt"/>
+                                        <constraint firstAttribute="bottom" secondItem="0HX-Li-Fdz" secondAttribute="bottom" constant="4" id="ped-zZ-XH9"/>
+                                        <constraint firstItem="RU6-QT-iCd" firstAttribute="leading" secondItem="e4t-eI-zTm" secondAttribute="leading" constant="15" id="v3u-lR-fKA"/>
                                         <constraint firstItem="RU6-QT-iCd" firstAttribute="bottom" secondItem="0HX-Li-Fdz" secondAttribute="top" id="zy5-ar-1Z4"/>
                                     </constraints>
                                 </tableViewCellContentView>

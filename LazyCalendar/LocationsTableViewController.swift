@@ -35,7 +35,7 @@ class LocationsTableViewController: UITableViewController {
     // Search request timer used to provide delay between search requests.
     private var timer: NSTimer?
     
-    var contactIDs: [ABRecordID]?
+    var contactIDs: Set<ABRecordID>?
     private var addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
     
     // MARK: - Methods for setting up view controller.
@@ -207,6 +207,16 @@ class LocationsTableViewController: UITableViewController {
         tableView.reloadData()
     }
     
+    func displayLocationNotFoundAlert(address: String) {
+        if presentingViewController == nil {
+            let alertController = UIAlertController(title: "Invalid contact address", message: "\(address) was not found. Check that it is a valid address.", preferredStyle: .Alert)
+            let okAlertAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+            alertController.addAction(okAlertAction)
+            
+            presentViewController(alertController, animated: true, completion: nil)
+        }
+    }
+    
     // MARK: - Methods related to exiting view controller.
     
     /**
@@ -301,6 +311,7 @@ extension LocationsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! TwoDetailTableViewCell
+        cell.removeAllWidthConstraints()
         
         // Use cell for either showing direction or location.
         
@@ -355,30 +366,73 @@ extension LocationsTableViewController: UITableViewDataSource {
 
 // MARK: - ContactsTableViewControllerDelegate
 extension LocationsTableViewController: ContactsTableViewControllerDelegate {
-    func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID]?) {
-        self.contactIDs = contactIDs
+    func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID]) {
+        if self.contactIDs == nil {
+            self.contactIDs = Set<ABRecordID>()
+        }
         
-        if let contactIDs = contactIDs {
-            for contactID in contactIDs {
-                if let contact: ABRecord = ABAddressBookGetPersonWithRecordID(addressBookRef, contactID)?.takeRetainedValue() {
-                    if let addressMultiValue: ABMultiValueRef = ABRecordCopyValue(contact, kABPersonAddressProperty)?.takeRetainedValue() {
-                        for i in 0..<ABMultiValueGetCount(addressMultiValue) {
-                            if let addressDictionary = ABMultiValueCopyValueAtIndex(addressMultiValue, i)?.takeRetainedValue() as? NSDictionary {
-                                if let addressDictionary = addressDictionary as? Dictionary<NSObject, AnyObject> {
-                                    CLGeocoder().geocodeAddressDictionary(addressDictionary, completionHandler: {
-                                        (results: [AnyObject]!, error: NSError!) in
-                                        if let error = error {
-                                            // Give description of error if there is one.
-                                            NSLog("Error occurred when geocoding contact address :%@", error.localizedDescription)
-                                        }
-                                        else {
-                                            // Add contact address to map items.
-                                            
-                                        }
-                                    })
+        for contactID in contactIDs {
+            if let contact: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, contactID)?.takeUnretainedValue() {
+                if let addressDictionary = ContactsTableViewController.getAddressDictionary(contact) {
+                    
+                    CLGeocoder().geocodeAddressDictionary(addressDictionary, completionHandler: {
+                        (placemarks: [AnyObject]?, error: NSError?) in
+                        if let error = error {
+                            // Give description of error if there is one.
+                            NSLog("Error occurred when geocoding contact address :%@", error.localizedDescription)
+                        }
+                        else {
+                            // Add contact address to map items.
+                            let clPlacemark = placemarks!.first as! CLPlacemark
+                            let mkPlacemark = MKPlacemark(placemark: clPlacemark)
+                            let mkMapItem = MKMapItem(placemark: mkPlacemark)
+                            if let contactName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() {
+                                mkMapItem.name = contactName as String
+                            }
+                            
+                            // Create and add new map item only if found address matches dictionary address.
+                            if MapItem.stringFromAddressDictionary(mkMapItem.placemark.addressDictionary) == MapItem.stringFromAddressDictionary(addressDictionary) {
+                                self.contactIDs!.insert(contactID)
+                                
+                                let mapItem = MapItem(mkMapItem: mkMapItem)
+                                
+                                if !contains(self.selectedMapItems, mapItem) {
+                                    self.addNewMapItem(mapItem)
                                 }
                             }
+                            // Otherwise, give warning that address was not found.
+                            else {
+                                self.displayLocationNotFoundAlert(MapItem.stringFromAddressDictionary(addressDictionary))
+                            }
                         }
+                    })
+                }
+            }
+        }
+        
+        let contactIDsArray = Array(self.contactIDs!)
+        let removedContactIDs = contactIDsArray.filter({
+            if !contains(contactIDs, $0) {
+                return true
+            }
+            return false
+        })
+        
+        for removedContactID in removedContactIDs {
+            if let contact: ABRecord = ABAddressBookGetPersonWithRecordID(addressBookRef, removedContactID)?.takeUnretainedValue() {
+                
+                if let addressDictionary = ContactsTableViewController.getAddressDictionary(contact) {
+                    let address = MapItem.stringFromAddressDictionary(addressDictionary)
+                    let removedMapItem = selectedMapItems.filter({
+                        println($0.address)
+                        println(address)
+                        return $0.address == address
+                    }).first
+                    if let removedMapItem = removedMapItem {
+                        self.contactIDs!.remove(removedContactID)
+                        let mapItemIndex = find(selectedMapItems, removedMapItem)
+                        let indexPath = NSIndexPath(forRow: mapItemIndex!, inSection: 0)
+                        deleteSelectedMapItem(removedMapItem, atIndexPath: indexPath)
                     }
                 }
             }

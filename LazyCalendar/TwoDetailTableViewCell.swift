@@ -16,6 +16,9 @@ class TwoDetailTableViewCell: UITableViewCell {
     var subLabel: UILabel!
     var detailLabel: UILabel!
     
+    var labelPositionConstraints = [NSLayoutConstraint]()
+    var labelSizeConstraints = [NSLayoutConstraint]()
+    
     // MARK: - Initializers
     
     required init(coder aDecoder: NSCoder) {
@@ -68,11 +71,65 @@ class TwoDetailTableViewCell: UITableViewCell {
         contentView.addSubview(detailLabel)
         contentView.didAddSubview(detailLabel)
         
-        // Add constraints to position the detail label.
+        // Main label and sub label constraints are made such that they match the constraints to make the default subtitle style. The only difference is that the labels have a width constraint as well.
+        
+        // Add constraints to position and size the main label.
+        mainLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
+        let mainLabelLeadingConstraint = NSLayoutConstraint(item: mainLabel, attribute: .Leading, relatedBy: .Equal, toItem: mainLabel.superview, attribute: .Leading, multiplier: 1, constant: 15)
+        let mainLabelTopConstraint = NSLayoutConstraint(item: mainLabel, attribute: .Top, relatedBy: .Equal, toItem: mainLabel.superview, attribute: .Top, multiplier: 1, constant: 5)
+        let mainLabelWidthConstraint = NSLayoutConstraint(item: mainLabel, attribute: .Width, relatedBy: NSLayoutRelation.LessThanOrEqual, toItem: mainLabel.superview, attribute: .Width, multiplier: 0.5, constant: 0)
+        labelPositionConstraints.extend([mainLabelLeadingConstraint, mainLabelTopConstraint])
+        labelSizeConstraints.append(mainLabelWidthConstraint)
+        
+        // Add constraints to position and size the sub label.
+        subLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
+        let subLabelLeadingConstraint = NSLayoutConstraint(item: subLabel, attribute: .Leading, relatedBy: .Equal, toItem: mainLabel, attribute: .Leading, multiplier: 1, constant: 0)
+        let subLabelTopConstraint = NSLayoutConstraint(item: subLabel, attribute: .Top, relatedBy: .Equal, toItem: mainLabel, attribute: .Bottom, multiplier: 1, constant: 0)
+        let subLabelWidthConstraint = NSLayoutConstraint(item: subLabel, attribute: .Width, relatedBy: NSLayoutRelation.LessThanOrEqual, toItem: subLabel.superview, attribute: .Width, multiplier: 0.5, constant: 0)
+        labelPositionConstraints.extend([subLabelLeadingConstraint, subLabelTopConstraint])
+        labelSizeConstraints.append(subLabelWidthConstraint)
+        
+        // Detail label constraints are made such that it appears on the right side of the cell similar to right detail style cells. It also has a width constraint similar to the main and sub labels.
+        
+        // Add constraints to position and size the detail label.
         detailLabel.setTranslatesAutoresizingMaskIntoConstraints(false)
-        let trailingConstraint = NSLayoutConstraint(item: detailLabel, attribute: .Trailing, relatedBy: .Equal, toItem: detailLabel.superview, attribute: .Trailing, multiplier: 1, constant: -2)
-        let centerYConstraint = NSLayoutConstraint(item: detailLabel, attribute: .CenterY, relatedBy: .Equal, toItem: detailLabel.superview, attribute: .CenterY, multiplier: 1, constant: 0)
-        addConstraint(trailingConstraint)
-        addConstraint(centerYConstraint)
+        let detailLabelTrailingConstraint = NSLayoutConstraint(item: detailLabel, attribute: .Trailing, relatedBy: .Equal, toItem: detailLabel.superview, attribute: .Trailing, multiplier: 1, constant: -2)
+        let detailLabelCenterYConstraint = NSLayoutConstraint(item: detailLabel, attribute: .CenterY, relatedBy: .Equal, toItem: detailLabel.superview, attribute: .CenterY, multiplier: 1, constant: 0)
+        let detailLabelWidthConstraint = NSLayoutConstraint(item: detailLabel, attribute: .Width, relatedBy: NSLayoutRelation.LessThanOrEqual, toItem: detailLabel.superview, attribute: .Width, multiplier: 0.5, constant: 0)
+        labelPositionConstraints.extend([detailLabelTrailingConstraint, detailLabelCenterYConstraint])
+        labelSizeConstraints.append(detailLabelWidthConstraint)
+        
+        // Add all constraints.
+        addConstraints(labelPositionConstraints)
+        addConstraints(labelSizeConstraints)
+    }
+    
+    /**
+        Removes the width constraint from the specified label. If the label is not the `mainLabel`, `subLabel`, or `detailLabel`, the method does nothing.
+    
+        :param: label The label to remove the width constraint from.
+    */
+    func removeWidthConstraint(onLabel label: UILabel) {
+        // Find width constraint.
+        let widthConstraint = labelSizeConstraints.filter({
+            let itemMatch = $0.firstItem as? UILabel == label
+            let attributeMatch = $0.firstAttribute == .Width
+            return itemMatch && attributeMatch
+        }).first
+        
+        // If width constraint is found, remove it.
+        if let widthConstraint = widthConstraint {
+            removeConstraint(widthConstraint)
+            let index = find(labelSizeConstraints, widthConstraint)!
+            labelSizeConstraints.removeAtIndex(index)
+        }
+    }
+    
+    /**
+        Removes all width constraints on the labels.
+    */
+    func removeAllWidthConstraints() {
+        removeConstraints(labelSizeConstraints)
+        labelSizeConstraints.removeAll(keepCapacity: false)
     }
 }
