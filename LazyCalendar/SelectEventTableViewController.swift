@@ -111,8 +111,8 @@ class SelectEventTableViewController: UITableViewController {
             alarmCell.detailTextLabel?.text = "Disabled"
             
             // Hide the alarm time.
-            alarmTimeDisplayCell.textLabel?.text = nil
-            alarmTimeDisplayCell.detailTextLabel?.text = nil
+            alarmTimeDisplayCell.textLabel?.text = " "
+            alarmTimeDisplayCell.detailTextLabel?.text = " "
         }
         else if event!.alarm {
             // If the alarm is on
@@ -149,15 +149,15 @@ class SelectEventTableViewController: UITableViewController {
             alarmCell.detailTextLabel?.text = "Off"
             
             // Hide the alarm time.
-            alarmTimeDisplayCell.textLabel?.text = nil
-            alarmTimeDisplayCell.detailTextLabel?.text = nil
+            alarmTimeDisplayCell.textLabel?.text = " "
+            alarmTimeDisplayCell.detailTextLabel?.text = " "
             
         }
         alarmTimeDisplayCell.textLabel?.sizeToFit()
         alarmTimeDisplayCell.detailTextLabel?.sizeToFit()
 
         // Handle contacts cell.
-        if event!.contacts.count != 0 {
+        if event!.contacts.count > 0 {
             // If the event has contacts
             
             // Show the contacts cell if it's hidden.
@@ -179,12 +179,12 @@ class SelectEventTableViewController: UITableViewController {
             }
             
             // Hide the number of contacts.
-            contactsCell.detailTextLabel?.text = nil
+            contactsCell.detailTextLabel?.text = " "
         }
         contactsCell.detailTextLabel?.sizeToFit()
         
         // Handle locations cell.
-        if event!.locations.count != 0 {
+        if event!.locations.count > 0 {
             // If the event has locations
             
             // Show the locations cell if it's hidden.
@@ -206,7 +206,7 @@ class SelectEventTableViewController: UITableViewController {
             }
             
             // Hide locations cell if the event has no locations.
-            locationsCell.detailTextLabel?.text = nil
+            locationsCell.detailTextLabel?.text = " "
         }
         locationsCell.detailTextLabel?.sizeToFit()
         

@@ -319,8 +319,8 @@ extension LocationsTableViewController: UITableViewDataSource {
             // If showing directions, main label shows instruction.
             let direction = directions![indexPath.row]
             cell.mainLabel.text = direction.instructions
-            cell.subLabel.text = nil
-            cell.detailLabel.text = nil
+            cell.subLabel.text = " "
+            cell.detailLabel.text = " "
             cell.subLabel.sizeToFit()
             cell.detailLabel.sizeToFit()
         }
@@ -331,7 +331,7 @@ extension LocationsTableViewController: UITableViewDataSource {
             let address = mapItem.address
             cell.mainLabel.text = name
             cell.subLabel.text = address
-            cell.detailLabel.text = nil
+            cell.detailLabel.text = " "
             cell.subLabel.sizeToFit()
             cell.detailLabel.sizeToFit()
         }
@@ -383,26 +383,23 @@ extension LocationsTableViewController: ContactsTableViewControllerDelegate {
                         }
                         else {
                             // Add contact address to map items.
-                            let clPlacemark = placemarks!.first as! CLPlacemark
-                            let mkPlacemark = MKPlacemark(placemark: clPlacemark)
+                            let placemarks = placemarks as! [CLPlacemark]
+                            let placemark = placemarks.first
+                            let mkPlacemark = MKPlacemark(placemark: placemark)
                             let mkMapItem = MKMapItem(placemark: mkPlacemark)
                             if let contactName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() {
                                 mkMapItem.name = contactName as String
                             }
-                            
+                            let address = MapItem.stringFromAddressDictionary(addressDictionary)
+                            let foundAddress = MapItem.stringFromAddressDictionary(mkMapItem.placemark.addressDictionary)
+                                
                             // Create and add new map item only if found address matches dictionary address.
-                            if MapItem.stringFromAddressDictionary(mkMapItem.placemark.addressDictionary) == MapItem.stringFromAddressDictionary(addressDictionary) {
-                                self.contactIDs!.insert(contactID)
-                                
-                                let mapItem = MapItem(mkMapItem: mkMapItem)
-                                
-                                if !contains(self.selectedMapItems, mapItem) {
-                                    self.addNewMapItem(mapItem)
-                                }
-                            }
-                            // Otherwise, give warning that address was not found.
-                            else {
-                                self.displayLocationNotFoundAlert(MapItem.stringFromAddressDictionary(addressDictionary))
+                            self.contactIDs!.insert(contactID)
+                            
+                            let mapItem = MapItem(mkMapItem: mkMapItem)
+                                    
+                            if !contains(self.selectedMapItems, mapItem) {
+                                self.addNewMapItem(mapItem)
                             }
                         }
                     })

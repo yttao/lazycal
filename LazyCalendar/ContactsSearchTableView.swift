@@ -174,7 +174,8 @@ extension ContactsSearchTableView: UITableViewDelegate {
         The filter ensures that search results will not show contacts that are already selected, so this method cannot add duplicate contacts.
     */
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        contactsTableViewController.addRecord(filteredContacts[indexPath.row])
+        let contact: ABRecordRef = filteredContacts[indexPath.row]
+        contactsTableViewController.addContact(contact)
         searchController!.searchBar.text = nil
     }
 }
@@ -199,25 +200,25 @@ extension ContactsSearchTableView: UITableViewDataSource {
         }
         
         // Get phone numbers and e-mails for contact.
-        let phoneNumbersMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
-        let emailsMultivalue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
+        let phoneNumbersMultiValue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonPhoneProperty)?.takeRetainedValue()
+        let emailsMultiValue: ABMultiValueRef? = ABRecordCopyValue(contact, kABPersonEmailProperty)?.takeRetainedValue()
         
         // If contact has an e-mail, sub label displays. e-mail.
-        if ABMultiValueGetCount(emailsMultivalue) != 0 {
-            let email = ABMultiValueCopyValueAtIndex(emailsMultivalue, 0)?.takeRetainedValue() as! String
+        if ABMultiValueGetCount(emailsMultiValue) > 0 {
+            let email = ABMultiValueCopyValueAtIndex(emailsMultiValue, 0)?.takeRetainedValue() as! String
             cell.subLabel.text = email
         }
         else {
-            cell.subLabel.text = nil
+            cell.subLabel.text = " "
         }
         
         // If contact has a phone number, detail label displays phone number.
-        if ABMultiValueGetCount(phoneNumbersMultivalue) != 0 {
-            let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultivalue, 0)?.takeRetainedValue() as! String
+        if ABMultiValueGetCount(phoneNumbersMultiValue) > 0 {
+            let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultiValue, 0)?.takeRetainedValue() as! String
             cell.detailLabel.text = phoneNumber
         }
         else {
-            cell.detailLabel.text = nil
+            cell.detailLabel.text = " "
         }
         
         return cell

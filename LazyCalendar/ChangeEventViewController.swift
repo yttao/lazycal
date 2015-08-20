@@ -22,7 +22,7 @@ class ChangeEventViewController: UITableViewController {
     private var contactIDs: [ABRecordID]?
     private var mapItems: [MapItem]?
     
-    private var event: FullEvent?
+    private var event: FullEvent!
     
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
@@ -166,6 +166,8 @@ class ChangeEventViewController: UITableViewController {
         alarm = false
         alarmTime = dateStart
         contactIDs = nil
+        
+        event = FullEvent()
     }
     
     /**
@@ -419,11 +421,11 @@ class ChangeEventViewController: UITableViewController {
     func updateContactsLabel() {
         let contactsCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Contacts"]!)
         
-        if contactIDs?.count != 0 {
+        if contactIDs?.count > 0 {
             contactsCell.detailTextLabel?.text = "\(contactIDs!.count)"
         }
         else {
-            contactsCell.detailTextLabel?.text = nil
+            contactsCell.detailTextLabel?.text = " "
         }
         contactsCell.detailTextLabel?.sizeToFit()
     }
@@ -446,11 +448,11 @@ class ChangeEventViewController: UITableViewController {
     func updateLocationsLabel() {
         let locationsCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Locations"]!)
         
-        if mapItems != nil && mapItems!.count != 0 {
+        if mapItems?.count > 0 {
             locationsCell.detailTextLabel?.text = "\(mapItems!.count)"
         }
         else {
-            locationsCell.detailTextLabel?.text = nil
+            locationsCell.detailTextLabel?.text = " "
         }
         
         locationsCell.detailTextLabel?.sizeToFit()
@@ -494,7 +496,7 @@ class ChangeEventViewController: UITableViewController {
             let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
             
             // Load contacts.
-            if contactIDs?.count != 0 {
+            if contactIDs?.count > 0 {
                 contactsTableViewController.loadData(contactIDs!)
             }
             contactsTableViewController.delegate = self
@@ -517,10 +519,10 @@ class ChangeEventViewController: UITableViewController {
             let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
             
             // Load data.
-            if mapItems?.count != 0 {
+            if mapItems?.count > 0 {
                 locationsViewController.loadData(mapItems: mapItems!)
             }
-            if contactIDs?.count != 0 {
+            if contactIDs?.count > 0 {
                 locationsViewController.loadData(contactIDs: contactIDs!)
             }
             
@@ -662,19 +664,13 @@ class ChangeEventViewController: UITableViewController {
         if !alarm {
             alarmTime = nil
         }
-        
-        if let event = event {
-            // Set event info if this is an edited event.
-            event.name = name
-            event.dateStart = dateStart
-            event.dateEnd = dateEnd
-            event.alarm = alarm
-            event.alarmTime = alarmTime
-        }
-        else {
-            // Create event if this is a new event.
-            event = FullEvent(id: NSUUID().UUIDString, name: name, dateStart: dateStart, dateEnd: dateEnd, alarm: alarm, alarmTime: alarmTime)
-        }
+
+        // Set event info if this is an edited event.
+        event.name = name
+        event.dateStart = dateStart
+        event.dateEnd = dateEnd
+        event.alarm = alarm
+        event.alarmTime = alarmTime
         
         // Handle notification scheduling.
         
@@ -806,7 +802,7 @@ class ChangeEventViewController: UITableViewController {
     */
     private func addNewContacts() {
         // Check that there are any contact IDs to add.
-        if contactIDs != nil && contactIDs!.count != 0 {
+        if contactIDs?.count > 0 {
             let storedContacts = event!.mutableSetValueForKey("contacts")
             
             for contactID in contactIDs! {
@@ -888,7 +884,7 @@ class ChangeEventViewController: UITableViewController {
         Adds new locations to the event.
     */
     private func addNewLocations() {
-        if mapItems?.count != 0 {
+        if mapItems?.count > 0 {
             let storedLocations = event!.mutableSetValueForKey("locations")
             
             for mapItem in mapItems! {
@@ -916,7 +912,7 @@ class ChangeEventViewController: UITableViewController {
     private func removeOldLocations() {
         let storedLocations = event!.mutableSetValueForKey("locations")
         
-        if mapItems?.count != 0 {
+        if mapItems?.count > 0 {
             var removedLocations = NSMutableSet()
             
             // Find points of interest to remove
@@ -1011,6 +1007,9 @@ class ChangeEventViewController: UITableViewController {
                 let event = saveEvent()
                 NSNotificationCenter.defaultCenter().postNotificationName("EventSaved", object: self, userInfo: ["Event": event])
             }
+            else if identifier == "CancelEventSegue" || identifier == "CancelEventEditSegue" {
+                managedContext.rollback()
+            }
         }
     }
 }
@@ -1085,7 +1084,7 @@ extension ChangeEventViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
-
+        
         cell.setNeedsDisplay()
         
         return cell

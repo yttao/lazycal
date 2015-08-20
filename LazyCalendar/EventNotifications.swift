@@ -42,7 +42,7 @@ extension UIViewController {
                 var error: NSError? = nil
                 let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as? [FullEvent]
                 
-                if results != nil && results!.count != 0 {
+                if results?.count > 0 {
                     let event = results!.first!
                     NSNotificationCenter.defaultCenter().postNotificationName("EventSelected", object: self, userInfo: ["Event": event])
                 }

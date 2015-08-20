@@ -159,7 +159,7 @@ class ContactsTableViewController: UITableViewController {
     
         :param: recordRef The record to add.
     */
-    func addRecord(recordRef: ABRecordRef) {
+    func addContact(recordRef: ABRecordRef) {
         tableView.beginUpdates()
         tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: selectedContacts.count, inSection: 0)], withRowAnimation: .Automatic)
         selectedContacts.append(recordRef)
@@ -172,7 +172,7 @@ class ContactsTableViewController: UITableViewController {
         :param: recordRef The record to delete.
         :param: indexPath The indexPath of the deleted record.
     */
-    func deleteRecord(recordRef: ABRecordRef, atIndexPath indexPath: NSIndexPath) {
+    func deleteContact(recordRef: ABRecordRef, atIndexPath indexPath: NSIndexPath) {
         tableView.beginUpdates()
         tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
         selectedContacts.removeAtIndex(indexPath.row)
@@ -374,21 +374,21 @@ extension ContactsTableViewController: UITableViewDataSource {
             let emailsMultiValue: ABMultiValueRef? = ABRecordCopyValue(record, kABPersonEmailProperty)?.takeRetainedValue()
             
             // Sub label shows e-mail.
-            if ABMultiValueGetCount(emailsMultiValue) != 0 {
+            if ABMultiValueGetCount(emailsMultiValue) > 0 {
                 let email = ABMultiValueCopyValueAtIndex(emailsMultiValue, 0)?.takeRetainedValue() as! String
                 cell.subLabel.text = email
             }
             else {
-                cell.subLabel.text = nil
+                cell.subLabel.text = " "
             }
             
             // Detail label shows phone number.
-            if ABMultiValueGetCount(phoneNumbersMultiValue) != 0 {
+            if ABMultiValueGetCount(phoneNumbersMultiValue) > 0 {
                 let phoneNumber = ABMultiValueCopyValueAtIndex(phoneNumbersMultiValue, 0)?.takeRetainedValue() as! String
                 cell.detailLabel.text = phoneNumber
             }
             else {
-                cell.detailLabel.text = nil
+                cell.detailLabel.text = " "
             }
         }
         cell.mainLabel.sizeToFit()
@@ -417,8 +417,8 @@ extension ContactsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let recordRef: ABRecordRef = selectedContacts[indexPath.row]
-            deleteRecord(recordRef, atIndexPath: indexPath)
+            let contact: ABRecordRef = selectedContacts[indexPath.row]
+            deleteContact(contact, atIndexPath: indexPath)
         }
     }
 }
