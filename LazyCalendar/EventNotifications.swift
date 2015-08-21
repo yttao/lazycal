@@ -36,11 +36,11 @@ extension UIViewController {
                 let requirements = "(id == %@)"
                 let predicate = NSPredicate(format: requirements, id)
                 
-                let fetchRequest = NSFetchRequest(entityName: "FullEvent")
+                let fetchRequest = NSFetchRequest(entityName: "LZEvent")
                 fetchRequest.predicate = predicate
                 
                 var error: NSError? = nil
-                let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as? [FullEvent]
+                let results = managedContext.executeFetchRequest(fetchRequest, error: &error) as? [LZEvent]
                 
                 if results?.count > 0 {
                     let event = results!.first!

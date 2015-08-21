@@ -26,12 +26,11 @@ class LocationsViewController: UIViewController {
     
     var locationsTableViewController: LocationsTableViewController!
     var locationsMapViewController: LocationsMapViewController!
-    
-    private var mapItems: [MapItem]?
+
     private var contactIDs: [ABRecordID]?
     var editingEnabled: Bool?
     
-    var event: FullEvent!
+    var event: LZEvent!
     
     // MARK: - Methods for initialization.
     
@@ -57,7 +56,7 @@ class LocationsViewController: UIViewController {
         Initializes the contacts bar button item to show or hide based on whether or not there are selected contacts. If there are selected contacts, show the button. If not, hide the button.
     */
     private func initializeContactsBarButtonItem() {
-        if contactIDs?.count > 0 {
+        if event.contacts.count > 0 {
             // Show the button if there are contacts.
             contactsBarButtonItem.enabled = true
             contactsBarButtonItem.title = "Contacts"
@@ -90,25 +89,7 @@ class LocationsViewController: UIViewController {
     
     // MARK: - Methods for loading data.
     
-    /**
-        Loads initial data about map items in the view.
-    
-        :param: mapItems The initial map items in the view.
-    */
-    func loadData(#mapItems: [MapItem]) {
-        self.mapItems = mapItems
-    }
-    
-    /**
-        Loads initial data about contacts in the view.
-    
-        :param: contactIDs The `ABRecordIDs` of the event's contacts.
-    */
-    func loadData(#contactIDs: [ABRecordID]) {
-        self.contactIDs = contactIDs
-    }
-    
-    func loadData(#event: FullEvent) {
+    func loadData(#event: LZEvent) {
         self.event = event
     }
     
@@ -142,25 +123,10 @@ class LocationsViewController: UIViewController {
             // Create contacts table view controller.
             let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
             
-            // Load contacts that have
-            if contactIDs?.count > 0 {
-                var contactIDsWithAddresses = [ABRecordID]()
-                
-                let addressBookRef: ABAddressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-                
-                for contactID in contactIDs! {
-                    if let record: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, contactID)?.takeUnretainedValue() {
-                        if let addressMultivalue: ABMultiValueRef = ABRecordCopyValue(record, kABPersonAddressProperty)?.takeRetainedValue() {
-                            contactIDsWithAddresses.append(contactID)
-                        }
-                    }
-                }
-                
-                contactsTableViewController.loadData(contactIDs: contactIDsWithAddresses)
-            }
             contactsTableViewController.addressMode = true
             contactsTableViewController.editingEnabled = false
             
+            contactsTableViewController.loadData(event: event)
             contactsTableViewController.delegate = locationsTableViewController
             
             // Show view controller.
@@ -180,9 +146,7 @@ class LocationsViewController: UIViewController {
                 
                 // Set map, map items, and editing enabled for table view controller.
                 locationsTableViewController.mapView = mapView
-                if let mapItems = mapItems {
-                    locationsTableViewController.loadData(mapItems)
-                }
+                locationsTableViewController.loadData(event: event)
                 if let editingEnabled = editingEnabled {
                     locationsTableViewController.editingEnabled = editingEnabled
                 }

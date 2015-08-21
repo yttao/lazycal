@@ -146,10 +146,10 @@ class ContactsSearchTableView: SearchTableView {
     func sortRecords(inout records: [ABRecordRef]) {
         // Sort filtered contact IDs by alphabetical name
         records.sort({
-            let firstFullName = ABRecordCopyCompositeName($0).takeRetainedValue() as! String
-            let secondFullName = ABRecordCopyCompositeName($1).takeRetainedValue() as! String
+            let firstName = ABRecordCopyCompositeName($0).takeRetainedValue() as! String
+            let secondName = ABRecordCopyCompositeName($1).takeRetainedValue() as! String
             
-            return firstFullName.compare(secondFullName) == .OrderedAscending
+            return firstName.compare(secondName) == .OrderedAscending
         })
     }
     
@@ -223,10 +223,7 @@ extension ContactsSearchTableView: UITableViewDataSource {
         else {
             cell.detailLabel.text = " "
         }
-        cell.mainLabel.sizeToFit()
-        cell.subLabel.sizeToFit()
-        cell.detailLabel.sizeToFit()
-        
+
         return cell
     }
 }

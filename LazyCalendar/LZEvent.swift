@@ -28,16 +28,16 @@ class LZEvent: NSManagedObject, Equatable {
     @NSManaged var alarm: Bool
     @NSManaged var alarmTime: NSDate?
     
-    @NSManaged var contacts: NSSet
-    @NSManaged var locations: NSSet
+    @NSManaged var contacts: NSOrderedSet
+    @NSManaged var locations: NSOrderedSet
     
     // MARK: - Computed properties
     
-    var storedContacts: NSMutableSet {
-        return mutableSetValueForKey("contacts")
+    var storedContacts: NSMutableOrderedSet {
+        return mutableOrderedSetValueForKey("contacts")
     }
-    var storedLocations: NSMutableSet {
-        return mutableSetValueForKey("locations")
+    var storedLocations: NSMutableOrderedSet {
+        return mutableOrderedSetValueForKey("locations")
     }
     
     // MARK: - Initializers
@@ -71,7 +71,7 @@ class LZEvent: NSManagedObject, Equatable {
         :param: dateStart The start date of the event.
         :param: dateEnd The end date of the event.
         :param: alarm A `Bool` indicating whether the event has an alarm.
-        :param: alarmTime The time that the alarm will fire if `alarm == true`. If `alarm == false`, the `FullEvent`'s `alarmTime` property will be set to `nil` even if a non-`nil` argument is passed in.
+        :param: alarmTime The time that the alarm will fire if `alarm == true`. If `alarm == false`, the `LZEvent`'s `alarmTime` property will be set to `nil` even if a non-`nil` argument is passed in.
     */
     init(id: String, name: String?, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
         super.init(entity: LZEvent.entity, insertIntoManagedObjectContext: LZEvent.managedContext)
@@ -96,7 +96,7 @@ class LZEvent: NSManagedObject, Equatable {
     */
     func addLocation(location: LZLocation) {
         storedLocations.addObject(location)
-        addRelationship(location)
+        addRelation(location)
     }
     
     /**
@@ -106,7 +106,7 @@ class LZEvent: NSManagedObject, Equatable {
     */
     func removeLocation(location: LZLocation) {
         storedLocations.removeObject(location)
-        removeRelationship(location)
+        removeRelation(location)
     }
     
     /**
@@ -116,7 +116,7 @@ class LZEvent: NSManagedObject, Equatable {
     */
     func addContact(contact: LZContact) {
         storedContacts.addObject(contact)
-        addRelationship(contact)
+        addRelation(contact)
     }
     
     /**
@@ -126,15 +126,15 @@ class LZEvent: NSManagedObject, Equatable {
     */
     func removeContact(contact: LZContact) {
         storedContacts.removeObject(contact)
-        removeRelationship(contact)
+        removeRelation(contact)
     }
     
     /**
         Adds the event to its relationship with another object.
     
-        :param: relatedObject The object that is related to the event.
+        :param: relatedObject The object that is associated with the event.
     */
-    func addRelationship(relatedObject: NSManagedObject) {
+    func addRelation(relatedObject: NSManagedObject) {
         let inverse = relatedObject.mutableSetValueForKey("events")
         inverse.addObject(self)
     }
@@ -142,9 +142,9 @@ class LZEvent: NSManagedObject, Equatable {
     /**
         Removes the event from its relationship with another object. It then checks if the relationship still has associated events. If not, the object is no longer needed and the object is removed from persistent storage.
     
-        :param: relatedObject The object that was related to the event.
+        :param: relatedObject The object that was associated with the event.
     */
-    func removeRelationship(relatedObject: NSManagedObject) {
+    func removeRelation(relatedObject: NSManagedObject) {
         let inverse = relatedObject.mutableSetValueForKey("events")
         inverse.removeObject(self)
         
@@ -152,6 +152,23 @@ class LZEvent: NSManagedObject, Equatable {
         if inverse.count == 0 {
             LZEvent.managedContext.deleteObject(relatedObject)
         }
+    }
+    
+    static func getStoredEvents(#lowerDate: NSDate, upperDate: NSDate) -> [LZEvent] {
+        // Create fetch request for data
+        let fetchRequest = NSFetchRequest(entityName: "LZEvent")
+        
+        // To show an event, the time interval from dateStart to dateEnd must fall between lowerDate and upperDate.
+        // (dateStart >= lower && dateStart < upper) || (dateEnd >= lower && dateEnd < upper) || (dateStart < lower && dateEnd >= lower) || (dateStart < upper && dateEnd >= upper)
+        let requirements = "(dateStart >= %@ AND dateStart < %@) OR (dateEnd >= %@ AND dateEnd < %@) OR (dateStart <= %@ AND dateEnd >= %@) OR (dateStart <= %@ AND dateEnd >= %@)"
+        let predicate = NSPredicate(format: requirements, lowerDate, upperDate, lowerDate, upperDate, lowerDate, lowerDate, upperDate, upperDate)
+        fetchRequest.predicate = predicate
+        
+        // Execute fetch request
+        var error: NSError? = nil
+        let storedEvents = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [LZEvent]
+        
+        return storedEvents
     }
 }
 

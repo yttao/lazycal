@@ -21,7 +21,7 @@ class SelectEventTableViewController: UITableViewController {
     @IBOutlet weak var locationsCell: UITableViewCell!
     
     // Selected event, must exist for data to be loaded properly.
-    private var event: FullEvent?
+    var event: LZEvent!
     
     // Section headers associated with section numbers
     private let sections = ["Details": 0, "Alarm": 1, "Contacts": 2, "Locations": 3]
@@ -58,9 +58,7 @@ class SelectEventTableViewController: UITableViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        if event != nil {
-            reloadData()
-        }
+        reloadData()
     }
     
     /**
@@ -70,8 +68,8 @@ class SelectEventTableViewController: UITableViewController {
     */
     func reloadEvent(notification: NSNotification) {
         // Update info that was just edited
-        let notifiedEvent = notification.userInfo!["Event"] as! FullEvent
-        if event!.id == notifiedEvent.id {
+        let notifiedEvent = notification.userInfo!["Event"] as! LZEvent
+        if event.id == notifiedEvent.id {
             reloadData()
         }
     }
@@ -81,11 +79,11 @@ class SelectEventTableViewController: UITableViewController {
     */
     func reloadData() {
         let eventNameCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Name"]!)
-        eventNameCell.textLabel?.text = event!.name
+        eventNameCell.textLabel?.text = event.name
         
         let eventTimeCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Time"]!)
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
-        eventTimeCell.textLabel?.text = dateFormatter.stringFromDateInterval(fromDate: event!.dateStart, toDate: event!.dateEnd)
+        eventTimeCell.textLabel?.text = dateFormatter.stringFromDateInterval(fromDate: event.dateStart, toDate: event.dateEnd)
         
         // Start of cell insertion/deletion code.
         
@@ -156,7 +154,7 @@ class SelectEventTableViewController: UITableViewController {
         alarmTimeDisplayCell.detailTextLabel?.sizeToFit()
 
         // Handle contacts cell.
-        if event!.contacts.count > 0 {
+        if event.contacts.count > 0 {
             // If the event has contacts
             
             // Show the contacts cell if it's hidden.
@@ -183,7 +181,7 @@ class SelectEventTableViewController: UITableViewController {
         contactsCell.detailTextLabel?.sizeToFit()
         
         // Handle locations cell.
-        if event!.locations.count > 0 {
+        if event.locations.count > 0 {
             // If the event has locations
             
             // Show the locations cell if it's hidden.
@@ -193,7 +191,7 @@ class SelectEventTableViewController: UITableViewController {
             }
             
             // Show the number of locations.
-            locationsCell.detailTextLabel?.text = "\(event!.locations.count)"
+            locationsCell.detailTextLabel?.text = "\(event.locations.count)"
         }
         else {
             // If the event does not have locations
@@ -228,7 +226,7 @@ class SelectEventTableViewController: UITableViewController {
         :param: notification The notification that an event was selected.
     */
     func loadData(notification: NSNotification) {
-        event = notification.userInfo!["Event"] as? FullEvent
+        event = notification.userInfo!["Event"] as! LZEvent
     }
     
     /**
@@ -239,14 +237,7 @@ class SelectEventTableViewController: UITableViewController {
     private func showContactsTableViewController() {
         let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
         
-        // Get all contact IDs from the event contacts.
-        let storedContacts = event!.contacts.allObjects as! [Contact]
-        let contactIDs = storedContacts.map({
-            return $0.id
-        })
-        
-        // Load contact IDs into contacts table view controller.
-        contactsTableViewController.loadData(contactIDs: contactIDs)
+        // Load event into contacts table view controller.
         contactsTableViewController.loadData(event: event!)
         // Disable searching for new contacts.
         contactsTableViewController.editingEnabled = false
@@ -257,14 +248,7 @@ class SelectEventTableViewController: UITableViewController {
     private func showLocationsViewController() {
         let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
         
-        // Make array of map items from event points of interest.
-        let storedLocations = event!.locations.allObjects as! [Location]
-        let mapItems = storedLocations.map({
-            return MapItem(location: $0)
-        })
-        
-        // Load map items into locations view controller.
-        locationsViewController.loadData(mapItems: mapItems)
+        // Load event into locations table view controller.
         locationsViewController.loadData(event: event!)
         // Disable searching for new locations.
         locationsViewController.editingEnabled = false
@@ -280,7 +264,7 @@ class SelectEventTableViewController: UITableViewController {
         if segue.identifier == segueIdentifier {
             let navigationController = segue.destinationViewController as! UINavigationController
             let editEventViewController = navigationController.viewControllers.first as! ChangeEventViewController
-            editEventViewController.loadData(event: event!)
+            editEventViewController.loadData(event: event)
         }
     }
     

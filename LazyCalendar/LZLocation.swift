@@ -10,6 +10,7 @@ import UIKit
 import AddressBook
 import CoreData
 import MapKit
+import AddressBookUI
 
 class LZLocation: NSManagedObject, Equatable, MKAnnotation {
     // MARK: - Constants
@@ -80,12 +81,21 @@ class LZLocation: NSManagedObject, Equatable, MKAnnotation {
         self.address = address
     }
     
-    init(mapItem: MapItem) {
+    init(coordinate: CLLocationCoordinate2D, name: String?, addressDictionary: [NSObject: AnyObject]) {
         super.init(entity: LZLocation.entity, insertIntoManagedObjectContext: LZLocation.managedContext)
+        self.coordinate = coordinate
+        self.name = name
+        self.addressDictionary = addressDictionary
+        self.address = LZLocation.stringFromAddressDictionary(addressDictionary)
         
-        coordinate = mapItem.coordinate
-        name = mapItem.name
-        address = mapItem.address
+    }
+    
+    init(mkMapItem: MKMapItem) {
+        super.init(entity: LZLocation.entity, insertIntoManagedObjectContext: LZLocation.managedContext)
+        coordinate = mkMapItem.placemark.coordinate
+        name = mkMapItem.name
+        addressDictionary = mkMapItem.placemark.addressDictionary
+        self.address = LZLocation.stringFromAddressDictionary(mkMapItem.placemark.addressDictionary)
     }
     
     // MARK: - Search functions
@@ -111,7 +121,7 @@ class LZLocation: NSManagedObject, Equatable, MKAnnotation {
         let predicate = NSPredicate(format: requirements, argumentArray: [latitude, Math.epsilon, longitude, -Math.epsilon, longitude, Math.epsilon, longitude, -Math.epsilon])
         fetchRequest.predicate = predicate
         
-        // Search for location in storage.
+        // Execute fetch request for location.
         var error: NSError? = nil
         let storedLocation = LZLocation.managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? LZLocation
         if let error = error {
@@ -119,6 +129,56 @@ class LZLocation: NSManagedObject, Equatable, MKAnnotation {
         }
         
         return storedLocation
+    }
+    
+    // MARK: - Methods for formatting data.
+    
+    /**
+        Makes an address string out of the available information in the address dictionary.
+    
+        The address string is created in two steps:
+    
+        * Create a multiline address with all information.
+    
+        The address string created by `ABCreateStringWithAddressDictionary:` is a multiline address usually created the following format (if any parts of the address are unavailable, they do not appear):
+    
+        Street address
+    
+        City State Zip code
+    
+        Country
+    
+        * Replace newlines with spaces.
+    
+        The newlines are then replaced with spaces using `stringByReplacingOccurrencesOfString:withString:` because the `subtitle` property of `MKAnnotation` can only display single line strings.
+    
+        :param: addressDictionary A dictionary of address information.
+        :returns: The address dictionary in string form. If the address is an empty string, this returns nil.
+    */
+    static func stringFromAddressDictionary(addressDictionary: [NSObject: AnyObject]) -> String? {
+        let address = ABCreateStringWithAddressDictionary(addressDictionary, false).stringByReplacingOccurrencesOfString("\n", withString: ", ")
+        if address != "" {
+            return address
+        }
+        return nil
+    }
+    
+    /**
+        Converts a `MapItem` into an `MKMapItem`.
+    
+        If an address dictionary is available, the `MKMapItem` will be returned with an address. Otherwise it has only coordinates.
+    */
+    func getMKMapItem() -> MKMapItem {
+        let placemark: MKPlacemark
+        if let addressDictionary = addressDictionary {
+            placemark = MKPlacemark(coordinate: coordinate, addressDictionary: addressDictionary)
+        }
+        else {
+            placemark = MKPlacemark(coordinate: coordinate, addressDictionary: nil)
+        }
+        let mapItem = MKMapItem(placemark: placemark)
+        mapItem.name = name
+        return mapItem
     }
 }
 
@@ -133,8 +193,8 @@ func ==(lhs: LZLocation, rhs: LZLocation) -> Bool {
     let latitudeMatch = fabs(lhs.latitude - rhs.latitude) < Math.epsilon
     let longitudeMatch = fabs(lhs.longitude - rhs.longitude) < Math.epsilon
     let coordinateMatch = latitudeMatch && longitudeMatch
-    
     let nameMatch = lhs.name == rhs.name
     let addressMatch = lhs.address == rhs.address
+    
     return coordinateMatch && nameMatch && addressMatch
 }

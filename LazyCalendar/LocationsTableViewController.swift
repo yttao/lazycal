@@ -13,6 +13,8 @@ import AddressBookUI
 import CoreLocation
 
 class LocationsTableViewController: UITableViewController {
+    var delegate: LocationsTableViewControllerDelegate?
+    
     var editingEnabled = true
     
     // Directions being shown by table view. If nil, table view does not show directions.
@@ -25,8 +27,6 @@ class LocationsTableViewController: UITableViewController {
         }
         return false
     }
-    
-    var selectedMapItems: [MapItem]!
 
     weak var mapView: MKMapView?
 
@@ -39,6 +39,11 @@ class LocationsTableViewController: UITableViewController {
     private var addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
     
     var selectedIndexPath: NSIndexPath?
+    var event: LZEvent!
+    
+    var storedLocations: NSMutableOrderedSet {
+        return event.mutableOrderedSetValueForKey("locations")
+    }
     
     // MARK: - Methods for setting up view controller.
     
@@ -62,10 +67,6 @@ class LocationsTableViewController: UITableViewController {
         
         tableView.bounces = false
         tableView.alwaysBounceVertical = false
-        
-        if selectedMapItems == nil {
-            selectedMapItems = [MapItem]()
-        }
         
         if editingEnabled {
             initializeSearchController()
@@ -117,11 +118,11 @@ class LocationsTableViewController: UITableViewController {
     
         :param: mapItems The initial selected map items.
     */
-    func loadData(mapItems: [MapItem]) {
-        selectedMapItems = mapItems
-        
+    func loadData(#event: LZEvent) {
+        self.event = event
+        let locationsArray = storedLocations.array as! [LZLocation]
         // Add all annotations to map view.
-        mapView?.addAnnotations(selectedMapItems)
+        mapView?.addAnnotations(locationsArray)
     }
     
     // MARK: - Methods for adding map items.
@@ -131,9 +132,16 @@ class LocationsTableViewController: UITableViewController {
     
         The map item is added to the map view and the table view.
     */
-    func addNewMapItem(mapItem: MapItem) {
-        addMapItemToMapView(mapItem)
-        addMapItemToTableView(mapItem)
+    func addLocation(mapItem: MKMapItem) {
+        if let storedLocation = LZLocation.getStoredLocation(mapItem.placemark.coordinate) {
+            addLocationToMapView(storedLocation)
+            addLocationToTableView(storedLocation)
+        }
+        else {
+            let newLocation = LZLocation(mkMapItem: mapItem)
+            addLocationToMapView(newLocation)
+            addLocationToTableView(newLocation)
+        }
     }
     
     /**
@@ -141,8 +149,8 @@ class LocationsTableViewController: UITableViewController {
     
         :param: mapItem The `MapItem` to show on the map view.
     */
-    private func addMapItemToMapView(mapItem: MapItem) {
-        mapView?.addAnnotation(mapItem)
+    private func addLocationToMapView(location: LZLocation) {
+        mapView?.addAnnotation(location)
     }
     
     /**
@@ -150,10 +158,10 @@ class LocationsTableViewController: UITableViewController {
     
         :param: mapItem The `MapItem` to add to the table view.
     */
-    private func addMapItemToTableView(mapItem: MapItem) {
+    private func addLocationToTableView(location: LZLocation) {
         tableView.beginUpdates()
-        tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: selectedMapItems.count, inSection: 0)], withRowAnimation: .Automatic)
-        selectedMapItems.append(mapItem)
+        tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: storedLocations.count, inSection: 0)], withRowAnimation: .Automatic)
+        event.addLocation(location)
         tableView.endUpdates()
     }
     
@@ -165,9 +173,9 @@ class LocationsTableViewController: UITableViewController {
         :param: mapItem The map item to delete.
         :param: indexPath The index path of the deleted map item.
     */
-    private func deleteSelectedMapItem(mapItem: MapItem, atIndexPath indexPath: NSIndexPath) {
-        removeMapItemFromMapView(mapItem)
-        removeMapItemFromTableView(indexPath)
+    private func deleteLocation(location: LZLocation, atIndexPath indexPath: NSIndexPath) {
+        removeLocationFromMapView(location)
+        removeLocationFromTableView(location, atIndexPath: indexPath)
     }
     
     /**
@@ -175,12 +183,37 @@ class LocationsTableViewController: UITableViewController {
     
         :param: mapItem The map item to remove from the map view.
     */
-    private func removeMapItemFromMapView(mapItem: MapItem) {
-        let annotation = selectedMapItems.filter({
-            $0 == mapItem
+    private func removeLocationFromMapView(location: LZLocation) {
+        let locationsArray = storedLocations.array as! [LZLocation]
+        let annotation = locationsArray.filter({
+            $0 == location
         }).first
         
         mapView?.removeAnnotation(annotation)
+    }
+    
+    /**
+        Returns a `Bool` indicating if the location is already selected.
+    
+        :param: mapItem The map item to test.
+        :returns: `true` if the location is selected; `false` otherwise.
+    */
+    func locationSelected(mapItem: MKMapItem) -> Bool {
+        let coordinate = mapItem.placemark.coordinate
+        let address = LZLocation.stringFromAddressDictionary(mapItem.placemark.addressDictionary)
+        let name = mapItem.name
+        
+        let locationsArray = storedLocations.array as! [LZLocation]
+        let locationMatch = locationsArray.filter({
+            let latitudeMatch = fabs($0.latitude - coordinate.latitude) < Math.epsilon
+            let longitudeMatch = fabs($0.longitude - coordinate.longitude) < Math.epsilon
+            let coordinateMatch = latitudeMatch && longitudeMatch
+            let addressMatch = $0.address == address
+            let nameMatch = $0.name == name
+            return coordinateMatch && addressMatch && nameMatch
+        })
+        
+        return !locationMatch.isEmpty
     }
     
     /**
@@ -188,10 +221,10 @@ class LocationsTableViewController: UITableViewController {
     
         :param: indexPath The index path of the map item to remove from the table view and selected locations list.
     */
-    private func removeMapItemFromTableView(indexPath: NSIndexPath) {
+    private func removeLocationFromTableView(location: LZLocation, atIndexPath indexPath: NSIndexPath) {
         tableView.beginUpdates()
         tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-        selectedMapItems.removeAtIndex(indexPath.row)
+        event.removeLocation(location)
         tableView.endUpdates()
     }
     
@@ -215,7 +248,7 @@ class LocationsTableViewController: UITableViewController {
     }
     
     func displayLocationNotFoundAlert(address: String) {
-        if presentingViewController == nil {
+        if presentedViewController == nil {
             let alertController = UIAlertController(title: "Invalid contact address", message: "\(address) was not found. Check that it is a valid address.", preferredStyle: .Alert)
             let okAlertAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
             alertController.addAction(okAlertAction)
@@ -232,8 +265,8 @@ class LocationsTableViewController: UITableViewController {
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         
-        let changeEventViewController = navigationController!.viewControllers.first as? ChangeEventViewController
-        changeEventViewController?.updateMapItems(selectedMapItems)
+        let locationsArray = storedLocations.array as! [LZLocation]
+        delegate?.locationsTableViewControllerDidUpdateLocations(locationsArray)
     }
 }
 
@@ -253,8 +286,8 @@ extension LocationsTableViewController: UITableViewDelegate {
             NSNotificationCenter.defaultCenter().postNotificationName("DirectionSelected", object: self, userInfo: ["Direction": direction])
         }
         else {
-            let mapItem = selectedMapItems[indexPath.row]
-            NSNotificationCenter.defaultCenter().postNotificationName("MapItemSelected", object: self, userInfo: ["MapItem": mapItem])
+            let location = storedLocations[indexPath.row] as! LZLocation
+            NSNotificationCenter.defaultCenter().postNotificationName("LocationSelected", object: self, userInfo: ["Location": location])
             selectedIndexPath = indexPath
         }
         
@@ -311,7 +344,7 @@ extension LocationsTableViewController: UITableViewDataSource {
         if showingDirections {
             return directions!.count
         }
-        return selectedMapItems.count
+        return storedLocations.count
     }
     
     /**
@@ -337,14 +370,14 @@ extension LocationsTableViewController: UITableViewDataSource {
         }
         else {
             // If showing locations, main label shows name and detail label shows address.
-            let mapItem = selectedMapItems[indexPath.row]
-            if let name = mapItem.name {
+            let location = storedLocations[indexPath.row] as! LZLocation
+            if let name = location.name {
                 cell.mainLabel.text = name
             }
             else {
                 cell.mainLabel.text = " "
             }
-            if let address = mapItem.address {
+            if let address = location.address {
                 cell.subLabel.text = address
             }
             else {
@@ -352,9 +385,6 @@ extension LocationsTableViewController: UITableViewDataSource {
             }
             cell.detailLabel.text = " "
         }
-        cell.mainLabel.sizeToFit()
-        cell.subLabel.sizeToFit()
-        cell.detailLabel.sizeToFit()
         
         return cell
     }
@@ -379,7 +409,8 @@ extension LocationsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            deleteSelectedMapItem(selectedMapItems[indexPath.row], atIndexPath: indexPath)
+            let location = storedLocations[indexPath.row] as! LZLocation
+            deleteLocation(location, atIndexPath: indexPath)
         }
     }
 }
@@ -392,6 +423,7 @@ extension LocationsTableViewController: ContactsTableViewControllerDelegate {
         }
         
         for contactID in contactIDs {
+            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
             if let contact: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, contactID)?.takeUnretainedValue() {
                 if let addressDictionary = ContactsTableViewController.getAddressDictionary(contact) {
                     
@@ -410,17 +442,13 @@ extension LocationsTableViewController: ContactsTableViewControllerDelegate {
                             if let contactName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() {
                                 mkMapItem.name = contactName as String
                             }
-                            let address = MapItem.stringFromAddressDictionary(addressDictionary)
-                            let foundAddress = MapItem.stringFromAddressDictionary(mkMapItem.placemark.addressDictionary)
+                            let address = LZLocation.stringFromAddressDictionary(addressDictionary)
+                            let foundAddress = LZLocation.stringFromAddressDictionary(mkMapItem.placemark.addressDictionary)
                                 
                             // Create and add new map item only if found address matches dictionary address.
                             self.contactIDs!.insert(contactID)
                             
-                            let mapItem = MapItem(mkMapItem: mkMapItem)
-                                    
-                            if !contains(self.selectedMapItems, mapItem) {
-                                self.addNewMapItem(mapItem)
-                            }
+                            self.addLocation(mkMapItem)
                         }
                     })
                 }
@@ -439,20 +467,25 @@ extension LocationsTableViewController: ContactsTableViewControllerDelegate {
             if let contact: ABRecord = ABAddressBookGetPersonWithRecordID(addressBookRef, removedContactID)?.takeUnretainedValue() {
                 
                 if let addressDictionary = ContactsTableViewController.getAddressDictionary(contact) {
-                    let address = MapItem.stringFromAddressDictionary(addressDictionary)
-                    let removedMapItem = selectedMapItems.filter({
-                        println($0.address)
-                        println(address)
+                    let address = LZLocation.stringFromAddressDictionary(addressDictionary)
+                    let locationsArray = storedLocations.array as! [LZLocation]
+                    
+                    let removedLocation = locationsArray.filter({
                         return $0.address == address
                     }).first
-                    if let removedMapItem = removedMapItem {
+                    
+                    if let removedLocation = removedLocation {
                         self.contactIDs!.remove(removedContactID)
-                        let mapItemIndex = find(selectedMapItems, removedMapItem)
-                        let indexPath = NSIndexPath(forRow: mapItemIndex!, inSection: 0)
-                        deleteSelectedMapItem(removedMapItem, atIndexPath: indexPath)
+                        let locationIndex = find(locationsArray, removedLocation)!
+                        let indexPath = NSIndexPath(forRow: locationIndex, inSection: 0)
+                        deleteLocation(removedLocation, atIndexPath: indexPath)
                     }
                 }
             }
         }
     }
+}
+
+protocol LocationsTableViewControllerDelegate {
+    func locationsTableViewControllerDidUpdateLocations(locations: [LZLocation])
 }

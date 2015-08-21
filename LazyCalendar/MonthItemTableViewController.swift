@@ -12,12 +12,12 @@ import CoreData
 class MonthItemTableViewController: UITableViewController {
     private var date: NSDate!
     // The events for selected day
-    private var events = [FullEvent]()
+    private var events = [LZEvent]()
 
     // Reuse identifier for cells
     private let reuseIdentifier = "EventCell"
     // Name of entity to retrieve data from.
-    private let entityName = "FullEvent"
+    private let entityName = "LZEvent"
     
     private let segueIdentifier = "SelectEventSegue"
     
@@ -81,11 +81,6 @@ class MonthItemTableViewController: UITableViewController {
         :param: date The date to show.
     */
     func showEvents(date: NSDate) {
-        let entity = NSEntityDescription.entityForName(entityName, inManagedObjectContext: managedContext)!
-        
-        // Create fetch request for data
-        let fetchRequest = NSFetchRequest(entityName: entityName)
-        
         let calendar = NSCalendar.currentCalendar()
         
         // 1 day time interval in seconds
@@ -96,15 +91,7 @@ class MonthItemTableViewController: UITableViewController {
         // Upper limit on date of events is midnight of next day (not inclusive)
         let upperDate: NSDate = lowerDate.dateByAddingTimeInterval(fullDay)
         
-        // To show an event, the time interval from dateStart to dateEnd must fall between lowerDate and upperDate.
-        // (dateStart >= lower && dateStart < upper) || (dateEnd >= lower && dateEnd < upper) || (dateStart < lower && dateEnd >= lower) || (dateStart < upper && dateEnd >= upper)
-        let requirements = "(dateStart >= %@ AND dateStart < %@) OR (dateEnd >= %@ AND dateEnd < %@) OR (dateStart <= %@ AND dateEnd >= %@) OR (dateStart <= %@ AND dateEnd >= %@)"
-        let predicate = NSPredicate(format: requirements, lowerDate, upperDate, lowerDate, upperDate, lowerDate, lowerDate, upperDate, upperDate)
-        fetchRequest.predicate = predicate
-        
-        // Execute fetch request
-        var error: NSError? = nil
-        events = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [FullEvent]
+        events = LZEvent.getStoredEvents(lowerDate: lowerDate, upperDate: upperDate)
         
         // Display events sorted by dateStart.
         events.sort({
@@ -131,7 +118,7 @@ class MonthItemTableViewController: UITableViewController {
         :param: event The event to delete.
         :param: indexPath The index path of the event to be deleted from the table view.
     */
-    private func deleteEvent(event: FullEvent, atIndexPath indexPath: NSIndexPath) {
+    private func deleteEvent(event: LZEvent, atIndexPath indexPath: NSIndexPath) {
         // Deschedule all notifications
         descheduleNotificationsForDeletedEvent(event)
         
@@ -142,31 +129,6 @@ class MonthItemTableViewController: UITableViewController {
         
         // Remove from event
         removeEventFromTableView(event, atIndexPath: indexPath)
-    }
-    
-    private func removeEventRelations(event: FullEvent) {
-        let storedContacts = event.mutableSetValueForKey("contacts")
-        let storedLocations = event.mutableSetValueForKey("locations")
-        
-        for storedContact in storedContacts {
-            let storedContact = storedContact as! Contact
-            event.removeRelation(storedContact)
-        }
-        
-        for storedLocation in storedLocations {
-            let storedLocation = storedLocation as! Location
-            event.removeRelation(storedLocation)
-        }
-    }
-    
-    /**
-        Removes an event from persistent storage.
-    
-        :param: event The event to remove from persistent storage.
-    */
-    private func removeEventFromPersistentStorage(event: FullEvent) {
-        // Delete event
-        managedContext.deleteObject(event)
         
         // Save changes
         var error: NSError?
@@ -176,12 +138,40 @@ class MonthItemTableViewController: UITableViewController {
     }
     
     /**
+        Removes all relations for an event.
+    */
+    private func removeEventRelations(event: LZEvent) {
+        let storedContacts = event.storedContacts
+        let storedLocations = event.storedLocations
+        
+        for storedContact in storedContacts {
+            let storedContact = storedContact as! LZContact
+            event.removeRelation(storedContact)
+        }
+        
+        for storedLocation in storedLocations {
+            let storedLocation = storedLocation as! LZLocation
+            event.removeRelation(storedLocation)
+        }
+    }
+    
+    /**
+        Removes an event from persistent storage.
+    
+        :param: event The event to remove from persistent storage.
+    */
+    private func removeEventFromPersistentStorage(event: LZEvent) {
+        // Delete event
+        managedContext.deleteObject(event)
+    }
+    
+    /**
         Removes the event from the array of events and the table view.
     
         :param: event The event to remove from the table view.
         :param: indexPath The index path to locate the event in the table view.
     */
-    private func removeEventFromTableView(event: FullEvent, atIndexPath indexPath: NSIndexPath) {
+    private func removeEventFromTableView(event: LZEvent, atIndexPath indexPath: NSIndexPath) {
         tableView.beginUpdates()
         tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
         events.removeAtIndex(indexPath.row)
@@ -195,7 +185,7 @@ class MonthItemTableViewController: UITableViewController {
     
         :param: event The event that has notifications to deschedule.
     */
-    func descheduleNotificationsForDeletedEvent(event: FullEvent) {
+    func descheduleNotificationsForDeletedEvent(event: LZEvent) {
         // Get all notifications
         var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
         // Get notifications to remove

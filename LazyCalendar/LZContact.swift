@@ -20,8 +20,7 @@ class LZContact: NSManagedObject, Equatable {
     
     @NSManaged var id: Int32
     
-    @NSManaged var firstName: String?
-    @NSManaged var lastName: String?
+    @NSManaged var name: String?
     
     @NSManaged var events: NSSet
     
@@ -44,12 +43,11 @@ class LZContact: NSManagedObject, Equatable {
         :param: firstName The contact's first name.
         :param: lastName The contact's last name.
     */
-    init(id: ABRecordID, firstName: String?, lastName: String?) {
+    init(id: ABRecordID, name: String?) {
         super.init(entity: LZContact.entity, insertIntoManagedObjectContext: LZContact.managedContext)
         
         self.id = id
-        self.firstName = firstName
-        self.lastName = lastName
+        self.name = name
     }
     
     // MARK: - Search functions
@@ -92,6 +90,6 @@ class LZContact: NSManagedObject, Equatable {
 */
 func ==(lhs: LZContact, rhs: LZContact) -> Bool {
     let idMatch = lhs.id == rhs.id
-    let nameMatch = lhs.firstName == rhs.firstName && lhs.lastName == rhs.lastName
+    let nameMatch = lhs.name == rhs.name
     return idMatch && nameMatch
 }

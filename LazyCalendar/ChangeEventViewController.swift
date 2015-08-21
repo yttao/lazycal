@@ -14,15 +14,54 @@ import AddressBookUI
 
 class ChangeEventViewController: UITableViewController {
     // Event data to store
-    private var name: String?
-    private var dateStart: NSDate!
-    private var dateEnd: NSDate!
-    private var alarm: Bool = false
-    private var alarmTime: NSDate?
-    private var contactIDs: [ABRecordID]?
-    private var mapItems: [MapItem]?
+    private var name: String? {
+        get {
+            return event.name
+        }
+        set {
+            event.name = newValue
+        }
+    }
+    private var dateStart: NSDate! {
+        get {
+            return event.dateStart
+        }
+        set {
+            event.dateStart = newValue
+        }
+    }
+    private var dateEnd: NSDate! {
+        get {
+            return event.dateEnd
+        }
+        set {
+            event.dateEnd = newValue
+        }
+    }
+    private var alarm: Bool {
+        get {
+            return event.alarm
+        }
+        set {
+            event.alarm = newValue
+        }
+    }
+    private var alarmTime: NSDate? {
+        get {
+            return event.alarmTime
+        }
+        set {
+            event.alarmTime = newValue
+        }
+    }
+    private var contacts: NSMutableOrderedSet {
+        return event.storedContacts
+    }
+    private var locations: NSMutableOrderedSet {
+        return event.storedLocations
+    }
     
-    private var event: FullEvent!
+    private var event: LZEvent!
     
     // Date formatter to control date appearances
     private let dateFormatter = NSDateFormatter()
@@ -159,15 +198,14 @@ class ChangeEventViewController: UITableViewController {
         :param: The date to load initial data.
     */
     func loadData(#dateStart: NSDate) {
+        event = LZEvent()
+        
         name = nil
         self.dateStart = dateStart
         let hour = NSTimeInterval(3600)
         dateEnd = dateStart.dateByAddingTimeInterval(hour)
         alarm = false
         alarmTime = dateStart
-        contactIDs = nil
-        
-        event = FullEvent()
     }
     
     /**
@@ -175,7 +213,7 @@ class ChangeEventViewController: UITableViewController {
     
         :param: event The event to edit.
     */
-    func loadData(#event: FullEvent) {
+    func loadData(#event: LZEvent) {
         self.event = event
         name = event.name
         dateStart = event.dateStart
@@ -190,18 +228,6 @@ class ChangeEventViewController: UITableViewController {
         else {
             alarmTime = dateStart
         }
-        
-        // Load Contacts as ABRecordIDs
-        let storedContacts = event.contacts.allObjects as! [Contact]
-        contactIDs = storedContacts.map({
-            return $0.id
-        })
-        
-        // Load Locations as MapItems
-        let storedLocations = event.locations.allObjects as! [Location]
-        mapItems = storedLocations.map({
-            return MapItem(location: $0)
-        })
     }
     
     // MARK: - Methods related to updating data.
@@ -304,7 +330,7 @@ class ChangeEventViewController: UITableViewController {
         When the alarm switch is pressed, the alarm cell is selected and the alarm is updated.
     */
     func selectAlarm() {
-        if selectedIndexPath != nil && selectedIndexPath != indexPaths["AlarmToggle"]! {
+        if selectedIndexPath != nil && selectedIndexPath != indexPaths["AlarmToggle"] {
             deselectRowAtIndexPath(selectedIndexPath!)
         }
         selectedIndexPath = indexPaths["AlarmToggle"]
@@ -357,13 +383,9 @@ class ChangeEventViewController: UITableViewController {
         if alarmTimeDisplayCell.hidden {
             tableView.insertRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .Automatic)
         }
-        /*if alarmTimePickerCell.hidden {
-            tableView.insertRowsAtIndexPaths([indexPaths["AlarmTimePicker"]!], withRowAnimation: .Automatic)
-        }*/
         
         alarmDateToggleCell.hidden = false
         alarmTimeDisplayCell.hidden = false
-        //alarmTimePickerCell.hidden = false
         
         tableView.endUpdates()
     }
@@ -404,8 +426,6 @@ class ChangeEventViewController: UITableViewController {
         Updates the alarm time display.
     */
     func updateAlarmTimeLabels() {
-        let alarmTimeCell = alarmTimeDisplayCell
-        
         dateFormatter.dateFormat = "MMM dd, yyyy"
         alarmTimeDisplayCell.textLabel?.text = dateFormatter.stringFromDate(alarmTime!)
         
@@ -421,8 +441,8 @@ class ChangeEventViewController: UITableViewController {
     func updateContactsLabel() {
         let contactsCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Contacts"]!)
         
-        if contactIDs?.count > 0 {
-            contactsCell.detailTextLabel?.text = "\(contactIDs!.count)"
+        if contacts.count > 0 {
+            contactsCell.detailTextLabel?.text = "\(contacts.count)"
         }
         else {
             contactsCell.detailTextLabel?.text = " "
@@ -435,7 +455,6 @@ class ChangeEventViewController: UITableViewController {
         :param: mapItems The map items that were selected.
     */
     func updateMapItems(mapItems: [MapItem]) {
-        self.mapItems = mapItems
         updateLocationsLabel()
     }
     
@@ -447,8 +466,8 @@ class ChangeEventViewController: UITableViewController {
     func updateLocationsLabel() {
         let locationsCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Locations"]!)
         
-        if mapItems?.count > 0 {
-            locationsCell.detailTextLabel?.text = "\(mapItems!.count)"
+        if locations.count > 0 {
+            locationsCell.detailTextLabel?.text = "\(locations.count)"
         }
         else {
             locationsCell.detailTextLabel?.text = " "
@@ -493,9 +512,6 @@ class ChangeEventViewController: UITableViewController {
             let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
             
             // Load contacts.
-            if contactIDs?.count > 0 {
-                contactsTableViewController.loadData(contactIDs: contactIDs!)
-            }
             contactsTableViewController.loadData(event: event)
             contactsTableViewController.delegate = self
             
@@ -517,12 +533,6 @@ class ChangeEventViewController: UITableViewController {
             let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
             
             // Load data.
-            if mapItems?.count > 0 {
-                locationsViewController.loadData(mapItems: mapItems!)
-            }
-            if contactIDs?.count > 0 {
-                locationsViewController.loadData(contactIDs: contactIDs!)
-            }
             locationsViewController.loadData(event: event!)
             
             // Show view controller.
@@ -658,18 +668,11 @@ class ChangeEventViewController: UITableViewController {
     
         :returns: The saved event.
     */
-    func saveEvent() -> FullEvent {
+    func saveEvent() -> LZEvent {
         // Set alarm time to nil if alarm is off.
         if !alarm {
             alarmTime = nil
         }
-
-        // Set event info if this is an edited event.
-        event.name = name
-        event.dateStart = dateStart
-        event.dateEnd = dateEnd
-        event.alarm = alarm
-        event.alarmTime = alarmTime
         
         // Handle notification scheduling.
         
@@ -682,19 +685,13 @@ class ChangeEventViewController: UITableViewController {
             descheduleNotifications()
         }
         
-        addNewContacts()
-        removeOldContacts()
-        
-        addNewLocations()
-        removeOldLocations()
-        
         // Save event, show error if not saved successfully.
         var error: NSError?
         if !managedContext.save(&error) {
             NSLog("Error occurred while saving: %@", error!.localizedDescription)
         }
         
-        return event!
+        return event
     }
     
     // MARK: - Methods related to notifications and scheduling notifications.
@@ -741,7 +738,7 @@ class ChangeEventViewController: UITableViewController {
         TODO: make sure this doesn't reschedule a notification after the event has already fired a notification (unless the new alarm time is after current time).
     */
     private func scheduleNotifications() {
-        NSLog("Event scheduled for time: %@", event!.alarmTime!)
+        //NSLog("Event scheduled for time: %@", event!.alarmTime!)
         // Create notification
         let notification = UILocalNotification()
         
@@ -769,7 +766,7 @@ class ChangeEventViewController: UITableViewController {
         This method will do nothing if no notifications are scheduled.
     */
     private func descheduleNotifications() {
-        NSLog("Event descheduled for event: %@", event!.id)
+        //NSLog("Event descheduled for event: %@", event!.id)
         // Get all schedule notifications.
         var scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
         
@@ -799,7 +796,7 @@ class ChangeEventViewController: UITableViewController {
     /**
         Adds new contacts to the event.
     */
-    private func addNewContacts() {
+    /*private func addNewContacts() {
         // Check that there are any contact IDs to add.
         if contactIDs?.count > 0 {
             let storedContacts = event!.mutableSetValueForKey("contacts")
@@ -994,7 +991,7 @@ class ChangeEventViewController: UITableViewController {
         if inverse.count == 0 {
             managedContext.deleteObject(relatedObject)
         }
-    }
+    }*/
     
     /**
         On saving events, save event and inform observers that an event was saved.
@@ -1107,7 +1104,14 @@ extension ChangeEventViewController: ContactsTableViewControllerDelegate {
         :param: contacts The contacts IDs that were selected.
     */
     func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID]) {
-        self.contactIDs = contactIDs
+        //self.contactIDs = contactIDs
         updateContactsLabel()
+    }
+}
+
+// MARK: - LocationsTableViewControllerDelegate
+extension ChangeEventViewController: LocationsTableViewControllerDelegate {
+    func locationsTableViewControllerDidUpdateLocations(locations: [LZLocation]) {
+        updateLocationsLabel()
     }
 }

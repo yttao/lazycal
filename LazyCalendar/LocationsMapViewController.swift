@@ -35,8 +35,8 @@ class LocationsMapViewController: UIViewController {
     // The currently displayed route
     private var route: MKRoute?
     
-    private var selectedMapItem: MapItem? {
-        let annotation = mapView.selectedAnnotations?.first as? MapItem
+    private var selectedLocation: LZLocation? {
+        let annotation = mapView.selectedAnnotations?.first as? LZLocation
         if let annotation = annotation {
             return annotation
         }
@@ -51,7 +51,7 @@ class LocationsMapViewController: UIViewController {
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "selectMapItem:", name: "MapItemSelected", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "selectLocation:", name: "LocationSelected", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "selectDirection:", name: "DirectionSelected", object: nil)
     }
     
@@ -123,13 +123,13 @@ class LocationsMapViewController: UIViewController {
     
         :param: notification The notification that a location has been selected.
     */
-    func selectMapItem(notification: NSNotification) {
-        let mapItem = notification.userInfo!["MapItem"] as! MapItem
+    func selectLocation(notification: NSNotification) {
+        let location = notification.userInfo!["Location"] as! LZLocation
         
         // Center map on location.
-        centerMap(mapItem.location)
+        centerMap(location.location)
         
-        mapView.selectAnnotation(mapItem, animated: true)
+        mapView.selectAnnotation(location, animated: true)
     }
     
     /**
@@ -202,7 +202,8 @@ class LocationsMapViewController: UIViewController {
                 hideMapOptions()
             }
             else if toggledSegmentIndex == 1 {
-                if mapSegmentedControl.selectedSegment(toggledSegmentIndex) && selectedMapItem != nil {
+                if mapSegmentedControl.selectedSegment(toggledSegmentIndex) && selectedLocation != nil {
+                    updateDirections()
                     calculateDirections()
                 }
                 else if !mapSegmentedControl.selectedSegment(toggledSegmentIndex) {
@@ -210,7 +211,7 @@ class LocationsMapViewController: UIViewController {
                 }
             }
             else if toggledSegmentIndex == 2 {
-                if mapSegmentedControl.selectedSegment(toggledSegmentIndex) && selectedMapItem != nil {
+                if mapSegmentedControl.selectedSegment(toggledSegmentIndex) && selectedLocation != nil {
                     showDirections()
                 }
                 else if !mapSegmentedControl.selectedSegment(toggledSegmentIndex) {
@@ -227,8 +228,8 @@ class LocationsMapViewController: UIViewController {
     */
     func updateDirections() {
         directions?.cancel()
-        if let selectedMapItem = selectedMapItem {
-            directions = getDirections(fromLocation: MKMapItem.mapItemForCurrentLocation(), toLocation: selectedMapItem.getMKMapItem())
+        if let selectedLocation = selectedLocation {
+            directions = getDirections(fromLocation: MKMapItem.mapItemForCurrentLocation(), toLocation: selectedLocation.getMKMapItem())
         }
         else {
             directions = nil
@@ -277,6 +278,12 @@ class LocationsMapViewController: UIViewController {
                     }
                     else {
                         self.hideRoute()
+                    }
+                    if self.directionsEnabled {
+                        self.showDirections()
+                    }
+                    else {
+                        self.hideDirections()
                     }
                 }
             }

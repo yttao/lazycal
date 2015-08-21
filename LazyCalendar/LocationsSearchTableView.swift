@@ -21,9 +21,9 @@ class LocationsSearchTableView: SearchTableView {
         }
     }
     
-    private var filteredMapItems: [MapItem] {
+    private var filteredMapItems: [MKMapItem] {
         get {
-            return searchResults as! [MapItem]
+            return searchResults as! [MKMapItem]
         }
         set {
             searchResults = newValue
@@ -62,7 +62,7 @@ class LocationsSearchTableView: SearchTableView {
         :param: reuseIdentifier The cell reuse identifier.
     */
     override func initializeView(reuseIdentifier: String) {
-        filteredMapItems = [MapItem]()
+        filteredMapItems = [MKMapItem]()
         
         super.initializeView(reuseIdentifier)
     }
@@ -105,14 +105,11 @@ class LocationsSearchTableView: SearchTableView {
                 }
                 else {
                     // Get MKMapItems that were found.
-                    let mkMapItems = response.mapItems as! [MKMapItem]
-                    // Convert to [MapItem]
-                    let mapItems = mkMapItems.map({
-                        return MapItem(mkMapItem: $0)
-                    })
+                    let mapItems = response.mapItems as! [MKMapItem]
+                    
                     // Show only MapItems that aren't already present in selected map items.
                     self.filteredMapItems = mapItems.filter({
-                        !contains(self.locationsTableViewController.selectedMapItems, $0)
+                        !self.locationsTableViewController.locationSelected($0)
                     })
                 }
                 self.reloadData()
@@ -136,7 +133,9 @@ extension LocationsSearchTableView: UITableViewDelegate {
     */
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let mapItem = filteredMapItems[indexPath.row]
-        locationsTableViewController.addNewMapItem(mapItem)
+        
+        locationsTableViewController.addLocation(mapItem)
+        
         searchController!.searchBar.text = nil
     }
 }
@@ -159,7 +158,7 @@ extension LocationsSearchTableView: UITableViewDataSource {
         else {
             cell.mainLabel.text = " "
         }
-        if let address = mapItem.address {
+        if let address = LZLocation.stringFromAddressDictionary(mapItem.placemark.addressDictionary) {
             cell.subLabel.text = address
         }
         else {
@@ -167,9 +166,6 @@ extension LocationsSearchTableView: UITableViewDataSource {
         }
         cell.detailLabel.text = " "
         boldSearchTextInLabel(cell.mainLabel)
-        cell.mainLabel.sizeToFit()
-        cell.subLabel.sizeToFit()
-        cell.detailLabel.sizeToFit()
         
         return cell
     }
