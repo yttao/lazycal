@@ -96,7 +96,7 @@ class MonthItemCollectionViewController: UICollectionViewController {
         // Create date index, ensure it is set to day 1 in the month.
         let dateIndexComponents = components.copy()  as! NSDateComponents
         dateIndexComponents.day = 1
-        dateIndex = calendar.dateFromComponents(dateIndexComponents)!
+        dateIndex = calendar.dateFromComponents(dateIndexComponents)
         
         let numDays = calendar.rangeOfUnit(.CalendarUnitDay, inUnit: .CalendarUnitMonth, forDate: calendar.dateFromComponents(components)!).length
         
@@ -111,7 +111,6 @@ class MonthItemCollectionViewController: UICollectionViewController {
     func clearSelected() {
         deselectSelectedCell()
         dateComponents!.day = 1
-        getNewDateComponents(&dateComponents!)
     }
     
     /**
@@ -139,7 +138,6 @@ class MonthItemCollectionViewController: UICollectionViewController {
         
         // Update selected date components
         dateComponents!.day = selectedCell!.dayLabel.text!.toInt()!
-        getNewDateComponents(&dateComponents!)
         
         let selectedDate = calendar.dateFromComponents(dateComponents!)!
         
@@ -175,19 +173,6 @@ class MonthItemCollectionViewController: UICollectionViewController {
         let startMonthDate = calendar.dateFromComponents(componentsCopy)
         let startMonthDateComponents = calendar.components(.CalendarUnitWeekday, fromDate: startMonthDate!)
         return startMonthDateComponents.weekday
-    }
-    
-    
-    /*
-        Returns new date components after components have been modified.
-    
-        :param: components The date components to recalculate.
-    
-        :return The new date components.
-    */
-    func getNewDateComponents(inout components: NSDateComponents) {
-        let newDate = calendar.dateFromComponents(components)
-        components = calendar.components(units, fromDate: newDate!)
     }
 }
 

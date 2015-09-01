@@ -23,7 +23,9 @@ class LZEvent: NSManagedObject, Equatable {
     @NSManaged var name: String?
     
     @NSManaged var dateStart: NSDate
+    @NSManaged var dateStartTimezone: String
     @NSManaged var dateEnd: NSDate
+    @NSManaged var dateEndTimezone: String
     
     @NSManaged var alarm: Bool
     @NSManaged var alarmTime: NSDate?
@@ -73,7 +75,7 @@ class LZEvent: NSManagedObject, Equatable {
         :param: alarm A `Bool` indicating whether the event has an alarm.
         :param: alarmTime The time that the alarm will fire if `alarm == true`. If `alarm == false`, the `LZEvent`'s `alarmTime` property will be set to `nil` even if a non-`nil` argument is passed in.
     */
-    init(id: String, name: String?, dateStart: NSDate, dateEnd: NSDate, alarm: Bool, alarmTime: NSDate?) {
+    init(id: String, name: String?, dateStart: NSDate, dateStartTimezone: String, dateEnd: NSDate, dateEndTimezone: String, alarm: Bool, alarmTime: NSDate?) {
         super.init(entity: LZEvent.entity, insertIntoManagedObjectContext: LZEvent.managedContext)
         
         self.id = id

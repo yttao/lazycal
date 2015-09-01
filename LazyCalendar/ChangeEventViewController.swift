@@ -30,12 +30,28 @@ class ChangeEventViewController: UITableViewController {
             event.dateStart = newValue
         }
     }
+    private var dateStartTimezone: String! {
+        get {
+            return event.dateStartTimezone
+        }
+        set {
+            event.dateStartTimezone = newValue
+        }
+    }
     private var dateEnd: NSDate! {
         get {
             return event.dateEnd
         }
         set {
             event.dateEnd = newValue
+        }
+    }
+    private var dateEndTimezone: String! {
+        get {
+            return event.dateEndTimezone
+        }
+        set {
+            event.dateEndTimezone = newValue
         }
     }
     private var alarm: Bool {
@@ -245,10 +261,13 @@ class ChangeEventViewController: UITableViewController {
     func updateDateStart() {
         dateStart = dateStartPicker.date
         updateDateStartLabels()
-        
         updateDateEndPickerMinimumDate()
         
         updateAlarm()
+    }
+    
+    func updateDateStartTimezone() {
+        //dateStartTimezone = picker.stringInPicker
     }
     
     /**

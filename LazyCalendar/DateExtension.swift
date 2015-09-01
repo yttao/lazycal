@@ -13,8 +13,10 @@ extension NSDate {
         Compares two units between two dates.
     
         If for some reason either of the dates are invalid (ex: nonexistent dates), the function will return nil.
+    
+        TODO: Account for different timezones when implemented.
     */
-    func compareUnits(#otherDate: NSDate, units: NSCalendarUnit) -> NSComparisonResult? {
+    func compareUnits(otherDate: NSDate, units: NSCalendarUnit) -> NSComparisonResult? {
         let calendar = NSCalendar.currentCalendar()
         let firstDateComponents = calendar.components(units, fromDate: self)
         let secondDateComponents = calendar.components(units, fromDate: otherDate)
@@ -26,16 +28,22 @@ extension NSDate {
         }
         return nil
     }
+    
+    func convertToTimezone(timezone: NSTimeZone) {
+        
+    }
 }
 
 extension NSDateFormatter {
     /**
         Creates a string for a date interval.
+    
+        TODO: Add timezone if it is not the same as the currentCalendar timezone.
     */
     func stringFromDateInterval(fromDate date: NSDate, toDate otherDate: NSDate) -> String {
         var dateInterval = ""
-        if date.compareUnits(otherDate: otherDate, units: .CalendarUnitDay | .CalendarUnitMonth | .CalendarUnitYear) == .OrderedSame {
-            if date.compareUnits(otherDate: otherDate, units: .CalendarUnitHour | .CalendarUnitMinute) == .OrderedSame {
+        if date.compareUnits(otherDate, units: .CalendarUnitDay | .CalendarUnitMonth | .CalendarUnitYear) == .OrderedSame {
+            if date.compareUnits(otherDate, units: .CalendarUnitHour | .CalendarUnitMinute) == .OrderedSame {
                 // If the event date start and end times are the same, return the date and time in this format:
                 // MMM dd, yyyy h:mm a
                 

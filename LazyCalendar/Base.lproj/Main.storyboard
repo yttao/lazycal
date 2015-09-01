@@ -417,7 +417,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="yyY-Mi-MnN" userLabel="AlarmTimePicker">
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="5" translatesAutoresizingMaskIntoConstraints="NO" id="yyY-Mi-MnN" userLabel="AlarmTimePicker">
                                                     <rect key="frame" x="140" y="-60" width="320" height="162"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="458496827.252285">
                                                         <!--2015-07-13 16:13:47 +0000-->
@@ -1054,7 +1054,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="DJ3-vK-mdW" userLabel="AlarmTimePicker">
+                                                <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="5" translatesAutoresizingMaskIntoConstraints="NO" id="DJ3-vK-mdW" userLabel="AlarmTimePicker">
                                                     <rect key="frame" x="140" y="-60" width="320" height="162"/>
                                                     <date key="date" timeIntervalSinceReferenceDate="458496827.252285">
                                                         <!--2015-07-13 16:13:47 +0000-->

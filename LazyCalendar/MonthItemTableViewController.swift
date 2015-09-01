@@ -87,9 +87,9 @@ class MonthItemTableViewController: UITableViewController {
         let fullDay = NSTimeInterval(60 * 60 * 24)
         let components = calendar.components(.CalendarUnitYear | .CalendarUnitMonth | .CalendarUnitDay, fromDate: date)
         // Lower limit on date of events is midnight of that day (inclusive)
-        let lowerDate: NSDate = calendar.dateFromComponents(components)!
+        let lowerDate = calendar.dateFromComponents(components)!
         // Upper limit on date of events is midnight of next day (not inclusive)
-        let upperDate: NSDate = lowerDate.dateByAddingTimeInterval(fullDay)
+        let upperDate = lowerDate.dateByAddingTimeInterval(fullDay)
         
         events = LZEvent.getStoredEvents(lowerDate: lowerDate, upperDate: upperDate)
         
