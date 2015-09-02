@@ -30,12 +30,9 @@ class ChangeEventViewController: UITableViewController {
             event.dateStart = newValue
         }
     }
-    private var dateStartTimezone: String! {
-        get {
-            return event.dateStartTimezone
-        }
-        set {
-            event.dateStartTimezone = newValue
+    private var dateStartTimeZone: NSTimeZone! {
+        didSet {
+            event.dateStartTimeZone = dateStartTimeZone.name
         }
     }
     private var dateEnd: NSDate! {
@@ -46,12 +43,9 @@ class ChangeEventViewController: UITableViewController {
             event.dateEnd = newValue
         }
     }
-    private var dateEndTimezone: String! {
-        get {
-            return event.dateEndTimezone
-        }
-        set {
-            event.dateEndTimezone = newValue
+    private var dateEndTimeZone: NSTimeZone! {
+        didSet {
+            event.dateEndTimeZone = dateEndTimeZone.name
         }
     }
     private var alarm: Bool {
@@ -110,8 +104,10 @@ class ChangeEventViewController: UITableViewController {
     private let indexPaths = ["Name": NSIndexPath(forRow: 0, inSection: 0),
         "Start": NSIndexPath(forRow: 0, inSection: 1),
         "StartPicker": NSIndexPath(forRow: 1, inSection: 1),
+        "StartTimeZone": NSIndexPath(forRow: 2, inSection: 1),
         "End": NSIndexPath(forRow: 0, inSection: 2),
         "EndPicker": NSIndexPath(forRow: 1, inSection: 2),
+        "EndTimeZone": NSIndexPath(forRow: 2, inSection: 2),
         "AlarmToggle": NSIndexPath(forRow: 0, inSection: 3),
         "AlarmDateToggle": NSIndexPath(forRow: 1, inSection: 3),
         "AlarmTimeDisplay": NSIndexPath(forRow: 2, inSection: 3),
@@ -266,9 +262,27 @@ class ChangeEventViewController: UITableViewController {
         updateAlarm()
     }
     
-    func updateDateStartTimezone() {
-        //dateStartTimezone = picker.stringInPicker
-        //
+    /**
+        Updates the date start time zone.
+    
+        This function also changes the date start picker's time zone to match the parameter `timeZone`.
+    
+        :param: timeZone The date start time zone.
+    */
+    func updateDateStartTimeZone(timeZone: NSTimeZone) {
+        dateStartTimeZone = timeZone
+        
+        dateStartPicker.timeZone = timeZone
+        
+        updateDateStartTimeZoneLabel()
+    }
+    
+    /**
+        Updates the date start time zone label to reflect the current date start time zone.
+    */
+    func updateDateStartTimeZoneLabel() {
+        let dateStartTimeZoneCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["StartTimeZone"]!)
+        dateStartTimeZoneCell.detailTextLabel?.text = dateStartTimeZone.name
     }
     
     /**
@@ -290,6 +304,27 @@ class ChangeEventViewController: UITableViewController {
     func updateDateEnd() {
         dateEnd = dateEndPicker.date
         updateDateEndLabels()
+    }
+    
+    /**
+        Updates the date end time zone.
+    
+        This function also changes the date end picker's time zone to match the parameter `timeZone`.
+    
+        :param: timeZone The date end time zone.
+    */
+    func updateDateEndTimeZone(timeZone: NSTimeZone) {
+        dateEndTimeZone = timeZone
+        
+        updateDateEndTimeZoneLabel()
+    }
+    
+    /**
+        Updates the date end time zone label to reflect the current date end time zone.
+    */
+    func updateDateEndTimeZoneLabel() {
+        let dateEndTimeZoneCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["EndTimeZone"]!)
+        dateEndTimeZoneCell.detailTextLabel?.text = dateEndTimeZone.name
     }
     
     /**
@@ -554,10 +589,15 @@ class ChangeEventViewController: UITableViewController {
             
             // Load data.
             locationsViewController.loadData(event: event!)
+            locationsViewController.delegate = self
             
             // Show view controller.
             navigationController!.showViewController(locationsViewController, sender: self)
         }
+    }
+    
+    func showLocationTimeZoneTableViewController() {
+        
     }
     
     // MARK: - Methods for selecting and deselecting cells.
@@ -1123,7 +1163,7 @@ extension ChangeEventViewController: ContactsTableViewControllerDelegate {
     
         :param: contacts The contacts IDs that were selected.
     */
-    func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID]) {
+    func contactsTableViewControllerDidUpdateContacts(contactIDs: [LZContact]) {
         //self.contactIDs = contactIDs
         updateContactsLabel()
     }
@@ -1133,5 +1173,20 @@ extension ChangeEventViewController: ContactsTableViewControllerDelegate {
 extension ChangeEventViewController: LocationsTableViewControllerDelegate {
     func locationsTableViewControllerDidUpdateLocations(locations: [LZLocation]) {
         updateLocationsLabel()
+    }
+}
+
+extension ChangeEventViewController: LocationTimeZoneTableViewControllerDelegate {
+    func locationTimeZoneTableViewControllerDidUpdateTimeZone(timeZone: NSTimeZone) {
+        if let selectedIndexPath = selectedIndexPath {
+            switch selectedIndexPath {
+            case indexPaths["StartTimeZone"]!:
+                updateDateStartTimeZone(timeZone)
+            case indexPaths["EndTimeZone"]!:
+                updateDateEndTimeZone(timeZone)
+            default:
+                break
+            }
+        }
     }
 }

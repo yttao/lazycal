@@ -9,6 +9,8 @@
 import UIKit
 
 class LocationTimeZoneTableViewController: UITableViewController {
+    private var delegate: LocationTimeZoneTableViewControllerDelegate?
+    
     private var results = [String]()
     
     private static let timeZones = NSTimeZone.knownTimeZoneNames() as! [String]
@@ -86,8 +88,26 @@ class LocationTimeZoneTableViewController: UITableViewController {
 
 // MARK: - UITableViewDelegate
 extension LocationTimeZoneTableViewController: UITableViewDelegate {
+    /**
+        The number of rows equals the number of time zone search results.
+    */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return results.count
+    }
+    
+    /**
+        On selection, inform the delegate of the selected time zone and return.
+    */
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let timeZoneName = results[indexPath.row]
+        let timeZone = NSTimeZone(name: timeZoneName)!
+       
+        
+        println(timeZone)
+        
+        
+        delegate?.locationTimeZoneTableViewControllerDidUpdateTimeZone(timeZone)
+        //navigationController!.popViewControllerAnimated(true)
     }
 }
 
@@ -107,4 +127,8 @@ extension LocationTimeZoneTableViewController: UISearchResultsUpdating {
         updateResults()
         tableView.reloadData()
     }
+}
+
+protocol LocationTimeZoneTableViewControllerDelegate {
+    func locationTimeZoneTableViewControllerDidUpdateTimeZone(timeZone: NSTimeZone)
 }

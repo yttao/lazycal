@@ -417,7 +417,11 @@ extension LocationsTableViewController: UITableViewDataSource {
 
 // MARK: - ContactsTableViewControllerDelegate
 extension LocationsTableViewController: ContactsTableViewControllerDelegate {
-    func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID]) {
+    func contactsTableViewControllerDidUpdateContacts(contacts: [LZContact]) {
+        // TODO: make this better and work fully, this is a temporary fix.
+        let contactIDs = contacts.map({
+            return $0.id
+        })
         if self.contactIDs == nil {
             self.contactIDs = Set<ABRecordID>()
         }

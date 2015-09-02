@@ -201,7 +201,7 @@ class ContactsTableViewController: UITableViewController {
         
         // If there is a delegate, inform that delegate of the contacts of interest.
         if addressMode {
-            var selectedContactIDs = [ABRecordID]()
+            var selectedContacts = [LZContact]()
             
             // Get all selected rows.
             if let selectedIndexPaths = tableView.indexPathsForSelectedRows() as? [NSIndexPath] {
@@ -209,22 +209,18 @@ class ContactsTableViewController: UITableViewController {
                 // Add selected contacts.
                 for indexPath in selectedIndexPaths {
                     let contact = storedContacts[indexPath.row] as! LZContact
-                    let id = contact.id
-                    selectedContactIDs.append(id)
+                    selectedContacts.append(contact)
                 }
             }
             // Inform delegate of updated contact IDs.
-            delegate?.contactsTableViewControllerDidUpdateContacts(selectedContactIDs)
+            delegate?.contactsTableViewControllerDidUpdateContacts(selectedContacts)
         }
         else {
             // Convert contacts to their IDs
-            let contactsArray = storedContacts.array
-            let selectedContactIDs = contactsArray.map({
-                return ABRecordGetRecordID($0)
-            })
+            let contactsArray = storedContacts.array as! [LZContact]
             
             // Inform delegate of updated contact IDs.
-            delegate?.contactsTableViewControllerDidUpdateContacts(selectedContactIDs)
+            delegate?.contactsTableViewControllerDidUpdateContacts(contactsArray)
         }
     }
     
@@ -440,5 +436,5 @@ extension ContactsTableViewController: UITableViewDataSource {
 }
 
 protocol ContactsTableViewControllerDelegate {
-    func contactsTableViewControllerDidUpdateContacts(contactIDs: [ABRecordID])
+    func contactsTableViewControllerDidUpdateContacts(contacts: [LZContact])
 }

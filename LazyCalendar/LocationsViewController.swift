@@ -12,6 +12,8 @@ import CoreData
 import AddressBook
 
 class LocationsViewController: UIViewController {
+    var delegate: LocationsTableViewControllerDelegate?
+    
     @IBOutlet weak var locationsMapViewContainer: UIView!
     @IBOutlet weak var locationsTableViewContainer: UIView!
     
@@ -147,6 +149,7 @@ class LocationsViewController: UIViewController {
                 // Set map, map items, and editing enabled for table view controller.
                 locationsTableViewController.mapView = mapView
                 locationsTableViewController.loadData(event: event)
+                locationsTableViewController.delegate = delegate
                 if let editingEnabled = editingEnabled {
                     locationsTableViewController.editingEnabled = editingEnabled
                 }
@@ -162,8 +165,6 @@ class LocationsViewController: UIViewController {
     */
     func reloadData() {
         if isViewLoaded() && view?.window != nil {
-            
-            
             if !locationAccessible() {
                 displayLocationInaccessibleAlert()
             }

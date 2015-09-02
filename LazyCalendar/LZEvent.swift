@@ -23,9 +23,10 @@ class LZEvent: NSManagedObject, Equatable {
     @NSManaged var name: String?
     
     @NSManaged var dateStart: NSDate
-    @NSManaged var dateStartTimezone: String
+    @NSManaged var dateStartTimeZone: String
+    
     @NSManaged var dateEnd: NSDate
-    @NSManaged var dateEndTimezone: String
+    @NSManaged var dateEndTimeZone: String
     
     @NSManaged var alarm: Bool
     @NSManaged var alarmTime: NSDate?
