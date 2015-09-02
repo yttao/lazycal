@@ -31,8 +31,11 @@ class ChangeEventViewController: UITableViewController {
         }
     }
     private var dateStartTimeZone: NSTimeZone! {
-        didSet {
-            event.dateStartTimeZone = dateStartTimeZone.name
+        get {
+            return NSTimeZone(name: event.dateStartTimeZone)
+        }
+        set {
+            event.dateStartTimeZone = newValue.name
         }
     }
     private var dateEnd: NSDate! {
@@ -44,8 +47,11 @@ class ChangeEventViewController: UITableViewController {
         }
     }
     private var dateEndTimeZone: NSTimeZone! {
-        didSet {
-            event.dateEndTimeZone = dateEndTimeZone.name
+        get {
+            return NSTimeZone(name: event.dateEndTimeZone)
+        }
+        set {
+            event.dateEndTimeZone = newValue.name
         }
     }
     private var alarm: Bool {
@@ -167,8 +173,15 @@ class ChangeEventViewController: UITableViewController {
         
         // Using information from loadData:, set initial values for UI elements.
         nameTextField.text = name
+        
         dateStartPicker.date = dateStart
+        dateStartPicker.calendar.timeZone = dateStartTimeZone
+        dateStartPicker.timeZone = dateStartTimeZone
+        
         dateEndPicker.date = dateEnd
+        dateEndPicker.calendar.timeZone = dateEndTimeZone
+        dateEndPicker.timeZone = dateEndTimeZone
+        
         alarmSwitch.on = alarm
         alarmDateSwitch.on = false
         alarmTimePicker.date = alarmTime!
@@ -200,6 +213,10 @@ class ChangeEventViewController: UITableViewController {
         updateLocationsLabel()
         
         tableView.reloadData()
+        
+        if let selectedIndexPath = selectedIndexPath {
+            tableView.selectRowAtIndexPath(selectedIndexPath, animated: false, scrollPosition: .None)
+        }
     }
     
     /**
@@ -231,7 +248,6 @@ class ChangeEventViewController: UITableViewController {
         dateEndTimeZone = NSCalendar.currentCalendar().timeZone
         alarm = false
         alarmTime = dateStart
-        
     }
     
     /**
@@ -243,10 +259,11 @@ class ChangeEventViewController: UITableViewController {
         self.event = event
         name = event.name
         dateStart = event.dateStart
+        dateStartTimeZone = NSTimeZone(name: event.dateStartTimeZone)
         dateEnd = event.dateEnd
+        dateEndTimeZone = NSTimeZone(name: event.dateEndTimeZone)
         alarm = event.alarm
         
-        let test = event.dateStart
         // Set alarm time if it is available, otherwise it is the default alarm time.
         if event.alarmTime != nil {
             alarmTime = event.alarmTime
@@ -270,6 +287,7 @@ class ChangeEventViewController: UITableViewController {
     */
     func updateDateStart() {
         dateStart = dateStartPicker.date
+        
         updateDateStartLabels()
         updateDateEndPickerMinimumDate()
         
@@ -285,8 +303,9 @@ class ChangeEventViewController: UITableViewController {
     */
     func updateDateStartTimeZone(timeZone: NSTimeZone) {
         dateStartTimeZone = timeZone
-        
+        dateStartPicker.calendar.timeZone = timeZone
         dateStartPicker.timeZone = timeZone
+        updateDateStart()
         
         updateDateStartTimeZoneLabel()
     }
@@ -304,18 +323,26 @@ class ChangeEventViewController: UITableViewController {
     func updateDateStartLabels() {
         let dateStartCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Start"]!)
         
+        // Show date in date start time zone.
+        dateFormatter.timeZone = dateStartTimeZone
         dateFormatter.dateFormat = "MMM dd, yyyy"
         dateStartCell.textLabel?.text = dateFormatter.stringFromDate(dateStart)
         
         dateFormatter.dateFormat = "h:mm a"
         dateStartCell.detailTextLabel?.text = dateFormatter.stringFromDate(dateStart)
+        
+        
+        dateStartCell.detailTextLabel?.text = dateStartCell.detailTextLabel!.text! + dateStartTimeZone.abbreviation!
     }
     
     /**
         Update date end info.
     */
     func updateDateEnd() {
+        println(dateEndPicker.minimumDate)
+        println(dateEndPicker.date)
         dateEnd = dateEndPicker.date
+        
         updateDateEndLabels()
     }
     
@@ -328,7 +355,10 @@ class ChangeEventViewController: UITableViewController {
     */
     func updateDateEndTimeZone(timeZone: NSTimeZone) {
         dateEndTimeZone = timeZone
+        dateEndPicker.calendar.timeZone = dateEndTimeZone
+        dateEndPicker.timeZone = dateEndTimeZone
         
+        updateDateEnd()
         updateDateEndTimeZoneLabel()
     }
     
@@ -345,11 +375,15 @@ class ChangeEventViewController: UITableViewController {
     func updateDateEndLabels() {
         let dateEndCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["End"]!)
         
+        // Show date in date end time zone.
+        dateFormatter.timeZone = dateEndTimeZone
         dateFormatter.dateFormat = "MMM dd, yyyy"
         dateEndCell.textLabel?.text = dateFormatter.stringFromDate(dateEnd)
         
         dateFormatter.dateFormat = "h:mm a"
         dateEndCell.detailTextLabel?.text = dateFormatter.stringFromDate(dateEnd)
+        
+        dateEndCell.detailTextLabel?.text = dateEndCell.detailTextLabel!.text! + dateEndTimeZone.abbreviation!
     }
     
     /**
@@ -361,6 +395,9 @@ class ChangeEventViewController: UITableViewController {
         let originalDate = dateEndPicker.date
         dateEndPicker.minimumDate = dateStart
 
+        println(originalDate)
+        println(dateStart)
+        
         // If the old date end comes after the new date start, change the old date end to equal the new date start.
         if originalDate.compare(dateStart) == .OrderedAscending {
             resetDateEndPickerDate()
@@ -669,7 +706,7 @@ class ChangeEventViewController: UITableViewController {
             tableView.endUpdates()
             
             // If date end time zone cell is selected, show time zone table view.
-            if indexPath.row == indexPaths["EndTimeZone"] {
+            if indexPath == indexPaths["EndTimeZone"] {
                 showLocationTimeZoneTableViewController()
             }
         case sections["Alarm"]!:
@@ -858,7 +895,7 @@ class ChangeEventViewController: UITableViewController {
         else {
             notification.alertTitle = "Event"
         }
-        notification.alertBody = dateFormatter.stringFromDateInterval(fromDate: event!.dateStart, toDate: event!.dateEnd)
+        notification.alertBody = dateFormatter.stringFromDateInterval(fromDate: event!.dateStart, toDate: event!.dateEnd, fromTimeZone: NSTimeZone(name: event!.dateStartTimeZone)!, toTimeZone: NSTimeZone(name: event!.dateEndTimeZone)!)
         notification.alertAction = "view"
         notification.fireDate = event!.alarmTime
         notification.soundName = UILocalNotificationDefaultSoundName
@@ -1213,7 +1250,6 @@ extension ChangeEventViewController: ContactsTableViewControllerDelegate {
         :param: contacts The contacts IDs that were selected.
     */
     func contactsTableViewControllerDidUpdateContacts(contactIDs: [LZContact]) {
-        //self.contactIDs = contactIDs
         updateContactsLabel()
     }
 }
@@ -1226,6 +1262,9 @@ extension ChangeEventViewController: LocationsTableViewControllerDelegate {
 }
 
 extension ChangeEventViewController: LocationTimeZoneTableViewControllerDelegate {
+    /**
+        When the time zone is updated for the date start or end, update the date time zone.
+    */
     func locationTimeZoneTableViewControllerDidUpdateTimeZone(timeZone: NSTimeZone) {
         if let selectedIndexPath = selectedIndexPath {
             switch selectedIndexPath {

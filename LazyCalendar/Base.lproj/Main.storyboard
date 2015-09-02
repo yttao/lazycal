@@ -1259,8 +1259,10 @@
                         <outlet property="alarmTimePickerCell" destination="49M-Cs-C2U" id="Vs6-Wc-CLo"/>
                         <outlet property="dateEndPicker" destination="iBf-hF-ryz" id="ETq-zR-WvF"/>
                         <outlet property="dateEndPickerCell" destination="kkP-Uu-8Gp" id="9rZ-mB-nMm"/>
+                        <outlet property="dateEndTimeZoneCell" destination="PIz-oW-bh1" id="H0m-R4-hv6"/>
                         <outlet property="dateStartPicker" destination="2sB-aU-n8X" id="ugq-c0-FGh"/>
                         <outlet property="dateStartPickerCell" destination="gcA-XH-aBW" id="aeH-gA-qBu"/>
+                        <outlet property="dateStartTimeZoneCell" destination="5Qf-DK-pe0" id="xeo-nJ-OH5"/>
                         <outlet property="nameTextField" destination="YXX-Eo-oqm" id="2Wc-4j-POs"/>
                     </connections>
                 </tableViewController>

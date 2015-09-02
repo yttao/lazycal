@@ -83,7 +83,7 @@ class SelectEventTableViewController: UITableViewController {
         
         let eventTimeCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Time"]!)
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
-        eventTimeCell.textLabel?.text = dateFormatter.stringFromDateInterval(fromDate: event.dateStart, toDate: event.dateEnd)
+        eventTimeCell.textLabel?.text = dateFormatter.stringFromDateInterval(fromDate: event.dateStart, toDate: event.dateEnd, fromTimeZone: NSTimeZone(name: event.dateStartTimeZone)!, toTimeZone: NSTimeZone(name: event.dateEndTimeZone)!)
         
         // Start of cell insertion/deletion code.
         
