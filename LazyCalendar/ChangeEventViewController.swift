@@ -92,7 +92,11 @@ class ChangeEventViewController: UITableViewController {
     
     // Table cells
     @IBOutlet weak var dateStartPickerCell: UITableViewCell!
+    @IBOutlet weak var dateStartTimeZoneCell: UITableViewCell!
+    
     @IBOutlet weak var dateEndPickerCell: UITableViewCell!
+    @IBOutlet weak var dateEndTimeZoneCell: UITableViewCell!
+    
     @IBOutlet weak var alarmDateToggleCell: UITableViewCell!
     @IBOutlet weak var alarmTimeDisplayCell: UITableViewCell!
     @IBOutlet weak var alarmTimePickerCell: UITableViewCell!
@@ -183,11 +187,18 @@ class ChangeEventViewController: UITableViewController {
     */
     func reloadData() {
         updateDateStart()
+        updateDateStartTimeZoneLabel()
+        
         updateDateEnd()
+        updateDateEndTimeZoneLabel()
+        
         updateAlarmSwitchEnabled()
         updateAlarm()
+        
         updateContactsLabel()
+        
         updateLocationsLabel()
+        
         tableView.reloadData()
     }
     
@@ -214,10 +225,13 @@ class ChangeEventViewController: UITableViewController {
         
         name = nil
         self.dateStart = dateStart
+        dateStartTimeZone = NSCalendar.currentCalendar().timeZone
         let hour = NSTimeInterval(3600)
         dateEnd = dateStart.dateByAddingTimeInterval(hour)
+        dateEndTimeZone = NSCalendar.currentCalendar().timeZone
         alarm = false
         alarmTime = dateStart
+        
     }
     
     /**
@@ -281,7 +295,6 @@ class ChangeEventViewController: UITableViewController {
         Updates the date start time zone label to reflect the current date start time zone.
     */
     func updateDateStartTimeZoneLabel() {
-        let dateStartTimeZoneCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["StartTimeZone"]!)
         dateStartTimeZoneCell.detailTextLabel?.text = dateStartTimeZone.name
     }
     
@@ -323,7 +336,6 @@ class ChangeEventViewController: UITableViewController {
         Updates the date end time zone label to reflect the current date end time zone.
     */
     func updateDateEndTimeZoneLabel() {
-        let dateEndTimeZoneCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["EndTimeZone"]!)
         dateEndTimeZoneCell.detailTextLabel?.text = dateEndTimeZone.name
     }
     
@@ -596,8 +608,17 @@ class ChangeEventViewController: UITableViewController {
         }
     }
     
+    /**
+        Shows the location time zone table view controller.
+    
+        This method is called whenever a time zone cell is selected.
+    */
     func showLocationTimeZoneTableViewController() {
+        let locationTimeZoneTableViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationTimeZoneTableViewController") as! LocationTimeZoneTableViewController
+        locationTimeZoneTableViewController.delegate = self
         
+        // Show view controller
+        navigationController!.showViewController(locationTimeZoneTableViewController, sender: self)
     }
     
     // MARK: - Methods for selecting and deselecting cells.
@@ -622,7 +643,17 @@ class ChangeEventViewController: UITableViewController {
                 dateStartPickerCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
             }
+            // Show date start time zone.
+            if dateStartTimeZoneCell.hidden {
+                dateStartTimeZoneCell.hidden = false
+                tableView.insertRowsAtIndexPaths([indexPaths["StartTimeZone"]!], withRowAnimation: .None)
+            }
             tableView.endUpdates()
+            
+            // If date start time zone cell is selected, show time zone table view.
+            if indexPath == indexPaths["StartTimeZone"] {
+                showLocationTimeZoneTableViewController()
+            }
         case sections["End"]!:
             // Show date end picker.
             tableView.beginUpdates()
@@ -630,7 +661,17 @@ class ChangeEventViewController: UITableViewController {
                 dateEndPickerCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
             }
+            // Show date end time zone.
+            if dateEndTimeZoneCell.hidden {
+                dateEndTimeZoneCell.hidden = false
+                tableView.insertRowsAtIndexPaths([indexPaths["EndTimeZone"]!], withRowAnimation: .None)
+            }
             tableView.endUpdates()
+            
+            // If date end time zone cell is selected, show time zone table view.
+            if indexPath.row == indexPaths["EndTimeZone"] {
+                showLocationTimeZoneTableViewController()
+            }
         case sections["Alarm"]!:
             // Show notifications disabled alert if notifications are turned off.
             if indexPath == indexPaths["AlarmToggle"] {
@@ -691,28 +732,36 @@ class ChangeEventViewController: UITableViewController {
             nameTextField.userInteractionEnabled = false
             nameTextField.resignFirstResponder()
         case sections["Start"]!:
-            // If deselecting date start field, hide date start picker and show labels.
+            // If deselecting date start field, hide date start picker and time zone.
+            tableView.beginUpdates()
             if !dateStartPickerCell.hidden {
-                tableView.beginUpdates()
-                tableView.deleteRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
                 dateStartPickerCell.hidden = true
-                tableView.endUpdates()
+                tableView.deleteRowsAtIndexPaths([indexPaths["StartPicker"]!], withRowAnimation: .None)
             }
+            if !dateStartTimeZoneCell.hidden {
+                dateStartTimeZoneCell.hidden = true
+                tableView.deleteRowsAtIndexPaths([indexPaths["StartTimeZone"]!], withRowAnimation: .None)
+            }
+            tableView.endUpdates()
         case sections["End"]!:
             // If deselecting date end field, hide date end picker and show labels.
+            tableView.beginUpdates()
             if !dateEndPickerCell.hidden {
-                tableView.beginUpdates()
-                tableView.deleteRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
                 dateEndPickerCell.hidden = true
-                tableView.endUpdates()
+                tableView.deleteRowsAtIndexPaths([indexPaths["EndPicker"]!], withRowAnimation: .None)
             }
+            if !dateEndTimeZoneCell.hidden {
+                dateEndTimeZoneCell.hidden = true
+                tableView.deleteRowsAtIndexPaths([indexPaths["EndTimeZone"]!], withRowAnimation: .None)
+            }
+            tableView.endUpdates()
         case sections["Alarm"]!:
+            tableView.beginUpdates()
             if selectedIndexPath == indexPaths["AlarmTimeDisplay"] {
-                tableView.beginUpdates()
                 alarmTimePickerCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTimePicker"]!], withRowAnimation: .None)
-                tableView.endUpdates()
             }
+            tableView.endUpdates()
         default:
             break
         }

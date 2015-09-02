@@ -569,8 +569,10 @@
                         <outlet property="alarmTimePickerCell" destination="cVw-iZ-pNP" id="4yh-ry-gDm"/>
                         <outlet property="dateEndPicker" destination="ZBj-rj-h7a" id="dKV-vZ-7Yr"/>
                         <outlet property="dateEndPickerCell" destination="1nH-02-GEJ" id="Spk-EZ-jzK"/>
+                        <outlet property="dateEndTimeZoneCell" destination="p1p-SR-IFx" id="Rwl-5b-4vt"/>
                         <outlet property="dateStartPicker" destination="zfx-ZB-R9Q" id="RUR-LU-tYe"/>
                         <outlet property="dateStartPickerCell" destination="ty5-c7-JWi" id="sem-ll-zAO"/>
+                        <outlet property="dateStartTimeZoneCell" destination="FnD-kg-LF1" id="Rw9-E7-zM8"/>
                         <outlet property="nameTextField" destination="hmy-da-q8Z" id="yQL-kb-xtI"/>
                     </connections>
                 </tableViewController>
@@ -1440,7 +1442,7 @@
         <!--LocationTimeZoneNavigationController-->
         <scene sceneID="NQb-sc-D4W">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="AmR-ea-uUf" userLabel="LocationTimeZoneNavigationController" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="LocationTimeZoneNavigationController" automaticallyAdjustsScrollViewInsets="NO" id="AmR-ea-uUf" userLabel="LocationTimeZoneNavigationController" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="BKp-eb-WsA">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>

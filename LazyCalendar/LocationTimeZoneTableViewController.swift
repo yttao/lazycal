@@ -9,7 +9,7 @@
 import UIKit
 
 class LocationTimeZoneTableViewController: UITableViewController {
-    private var delegate: LocationTimeZoneTableViewControllerDelegate?
+    var delegate: LocationTimeZoneTableViewControllerDelegate?
     
     private var results = [String]()
     
@@ -107,7 +107,7 @@ extension LocationTimeZoneTableViewController: UITableViewDelegate {
         
         
         delegate?.locationTimeZoneTableViewControllerDidUpdateTimeZone(timeZone)
-        //navigationController!.popViewControllerAnimated(true)
+        navigationController!.popViewControllerAnimated(true)
     }
 }
 
