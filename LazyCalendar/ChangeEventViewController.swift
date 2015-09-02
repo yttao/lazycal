@@ -268,6 +268,7 @@ class ChangeEventViewController: UITableViewController {
     
     func updateDateStartTimezone() {
         //dateStartTimezone = picker.stringInPicker
+        //
     }
     
     /**

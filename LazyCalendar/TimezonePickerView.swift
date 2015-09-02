@@ -15,7 +15,14 @@ class TimezonePickerView: UIPickerView {
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
+        for timezone in TimezonePickerView.timezones {
+            println(timezone)
+            let zone = NSTimeZone(name: timezone)
+            println(zone?.abbreviation)
+        }
+        
         dataSource = self
+        delegate = self
     }
 }
 
@@ -26,5 +33,11 @@ extension TimezonePickerView: UIPickerViewDataSource {
     
     func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return TimezonePickerView.timezones.count
+    }
+}
+
+extension TimezonePickerView: UIPickerViewDelegate {
+    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
+        return TimezonePickerView.timezones[row]
     }
 }
