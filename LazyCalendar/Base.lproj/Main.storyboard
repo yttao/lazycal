@@ -1271,6 +1271,48 @@
             </objects>
             <point key="canvasLocation" x="2258" y="867"/>
         </scene>
+        <!--View Controller-->
+        <scene sceneID="vhR-9x-c56">
+            <objects>
+                <viewController storyboardIdentifier="ViewController" id="4L2-o0-m2S" customClass="ViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="c5K-wJ-tQV"/>
+                        <viewControllerLayoutGuide type="bottom" id="L2F-br-4QZ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="V0c-5a-FMy">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="6pe-xk-LVk">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="162"/>
+                                <date key="date" timeIntervalSinceReferenceDate="462911661.45442402">
+                                    <!--2015-09-02 18:34:21 +0000-->
+                                </date>
+                                <connections>
+                                    <action selector="picker1change:" destination="4L2-o0-m2S" eventType="valueChanged" id="236-yX-Ivg"/>
+                                </connections>
+                            </datePicker>
+                            <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="fWu-e4-TdP">
+                                <rect key="frame" x="0.0" y="160" width="600" height="162"/>
+                                <date key="date" timeIntervalSinceReferenceDate="462911665.51519603">
+                                    <!--2015-09-02 18:34:25 +0000-->
+                                </date>
+                                <connections>
+                                    <action selector="picker2change:" destination="4L2-o0-m2S" eventType="valueChanged" id="zqa-Bk-ofd"/>
+                                </connections>
+                            </datePicker>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="picker1" destination="6pe-xk-LVk" id="L2a-Kh-o6x"/>
+                        <outlet property="picker2" destination="fWu-e4-TdP" id="9pd-hM-evE"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Bqe-R2-4Ig" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3124" y="716"/>
+        </scene>
         <!--LocationTimeZoneTableViewController-->
         <scene sceneID="RSc-Je-3es">
             <objects>

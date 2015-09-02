@@ -174,13 +174,15 @@ class ChangeEventViewController: UITableViewController {
         // Using information from loadData:, set initial values for UI elements.
         nameTextField.text = name
         
+        dateStartPicker.calendar = NSCalendar.currentCalendar()
         //dateStartPicker.calendar.timeZone = dateStartTimeZone
         dateStartPicker.timeZone = dateStartTimeZone
-        dateStartPicker.date = dateStart
+        dateStartPicker.setDate(dateStart, animated: false)
         
+        dateEndPicker.calendar = NSCalendar.currentCalendar()
         //dateEndPicker.calendar.timeZone = dateEndTimeZone
         dateEndPicker.timeZone = dateEndTimeZone
-        dateEndPicker.date = dateEnd
+        dateEndPicker.setDate(dateEnd, animated: false)
         
         alarmSwitch.on = alarm
         alarmDateSwitch.on = false
@@ -242,10 +244,10 @@ class ChangeEventViewController: UITableViewController {
         
         name = nil
         self.dateStart = dateStart
-        dateStartTimeZone = NSCalendar.currentCalendar().timeZone
+        dateStartTimeZone = NSTimeZone.localTimeZone()
         let hour = NSTimeInterval(3600)
         dateEnd = dateStart.dateByAddingTimeInterval(hour)
-        dateEndTimeZone = NSCalendar.currentCalendar().timeZone
+        dateEndTimeZone = NSTimeZone.localTimeZone()
         alarm = false
         alarmTime = dateStart
     }
@@ -309,7 +311,6 @@ class ChangeEventViewController: UITableViewController {
         
         println(dateStartPicker.calendar.timeZone)
         println(dateStartPicker.timeZone)
-        println(dateStartPicker.locale)
         
         updateDateStartTimeZoneLabel()
     }
@@ -359,9 +360,9 @@ class ChangeEventViewController: UITableViewController {
         dateEndTimeZone = timeZone
         //dateEndPicker.calendar.timeZone = dateEndTimeZone
         dateEndPicker.timeZone = dateEndTimeZone
+        
         println(dateEndPicker.calendar.timeZone)
         println(dateEndPicker.timeZone)
-        println(dateEndPicker.locale)
         
         updateDateEnd()
         updateDateEndTimeZoneLabel()
@@ -398,14 +399,11 @@ class ChangeEventViewController: UITableViewController {
     */
     func updateDateEndPickerMinimumDate() {
         let originalDate = dateEndPicker.date
-        //dateEndPicker.minimumDate = dateStart
-
-        println(originalDate)
-        println(dateStart)
+        dateEndPicker.minimumDate = dateStart
         
         // If the old date end comes after the new date start, change the old date end to equal the new date start.
         if originalDate.compare(dateStart) == .OrderedAscending {
-            //resetDateEndPickerDate()
+            resetDateEndPickerDate()
         }
     }
     
@@ -413,8 +411,30 @@ class ChangeEventViewController: UITableViewController {
         Resets the date end to the date start.
     */
     func resetDateEndPickerDate() {
-        dateEndPicker.date = dateStart
+        dateEndPicker.setDate(dateStart, animated: false)
         updateDateEnd()
+    }
+    
+    /**
+        Refreshes a date picker's time zone.
+    
+        This is a workaround for a bug with multiple UIDatePickers. If a date picker's `timeZone` property is manually set and that time zone differs from another date picker's `timeZone` property, the other date picker's `date` property cannot be changed. This fixes the date pickers so that when they have different `timeZone` properties, the `date` properties can still be used.
+    
+        :param: datePicker The date picker to refresh.
+    */
+    func refreshDatePickerTimeZone(datePicker: UIDatePicker) {
+        // Get date picker time zone.
+        let timeZone = datePicker.timeZone
+        
+        // Reset time zone
+        if datePicker.timeZone != NSTimeZone(abbreviation: "EDT") {
+            datePicker.timeZone = NSTimeZone(abbreviation: "EDT")
+        }
+        else {
+            datePicker.timeZone = NSTimeZone(abbreviation: "PDT")
+        }
+        // Set time zone to correct time zone.
+        datePicker.timeZone = timeZone
     }
     
     /**
@@ -689,6 +709,9 @@ class ChangeEventViewController: UITableViewController {
             if dateStartTimeZoneCell.hidden {
                 dateStartTimeZoneCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["StartTimeZone"]!], withRowAnimation: .None)
+                
+                // Bugfix - see documentation details.
+                refreshDatePickerTimeZone(dateStartPicker)
             }
             tableView.endUpdates()
             
@@ -707,6 +730,9 @@ class ChangeEventViewController: UITableViewController {
             if dateEndTimeZoneCell.hidden {
                 dateEndTimeZoneCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["EndTimeZone"]!], withRowAnimation: .None)
+                
+                // Bugfix - see documentation details.
+                refreshDatePickerTimeZone(dateEndPicker)
             }
             tableView.endUpdates()
             
