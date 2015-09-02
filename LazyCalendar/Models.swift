@@ -162,16 +162,6 @@ class Location: NSManagedObject, Equatable {
         self.name = name
         self.address = address
     }
-    
-    init(mapItem: MapItem) {
-        let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
-        let entity = NSEntityDescription.entityForName("Location", inManagedObjectContext: managedContext)!
-        super.init(entity: entity, insertIntoManagedObjectContext: managedContext)
-        
-        coordinate = mapItem.coordinate
-        name = mapItem.name
-        address = mapItem.address
-    }
 }
 
 // MARK: - Equatable

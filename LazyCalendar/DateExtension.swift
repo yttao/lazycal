@@ -90,3 +90,23 @@ extension NSDateFormatter {
         return dateInterval
     }
 }
+
+extension NSTimeZone {
+    /**
+        Returns the time zone name in a readable string form.
+    
+        :returns: The time zone name as a readable string.
+    */
+    func nameString() -> String {
+        // Remove underscores
+        let timeZoneNameNoUnderscores = name.stringByReplacingOccurrencesOfString("_", withString: " ")
+        
+        // Delimit string by "/"
+        let timeZoneNameArray = timeZoneNameNoUnderscores.componentsSeparatedByString("/")
+        // Reverse order of time zone name components (so it goes from most specific location name to most general location name)
+        let reversedTimeZoneNameArray = timeZoneNameArray.reverse()
+        
+        // Separate components of the time zone name by commas.
+        return ", ".join(reversedTimeZoneNameArray)
+    }
+}

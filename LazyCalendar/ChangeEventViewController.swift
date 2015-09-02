@@ -174,13 +174,9 @@ class ChangeEventViewController: UITableViewController {
         // Using information from loadData:, set initial values for UI elements.
         nameTextField.text = name
         
-        dateStartPicker.calendar = NSCalendar.currentCalendar()
-        //dateStartPicker.calendar.timeZone = dateStartTimeZone
         dateStartPicker.timeZone = dateStartTimeZone
         dateStartPicker.setDate(dateStart, animated: false)
-        
-        dateEndPicker.calendar = NSCalendar.currentCalendar()
-        //dateEndPicker.calendar.timeZone = dateEndTimeZone
+
         dateEndPicker.timeZone = dateEndTimeZone
         dateEndPicker.setDate(dateEnd, animated: false)
         
@@ -297,20 +293,14 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Updates the date start time zone.
-    
-        This function also changes the date start picker's time zone to match the parameter `timeZone`.
+        Updates the date start time zone and the date start picker's time zone.
     
         :param: timeZone The date start time zone.
     */
     func updateDateStartTimeZone(timeZone: NSTimeZone) {
         dateStartTimeZone = timeZone
-        //dateStartPicker.calendar.timeZone = dateStartTimeZone
         dateStartPicker.timeZone = dateStartTimeZone
         updateDateStart()
-        
-        println(dateStartPicker.calendar.timeZone)
-        println(dateStartPicker.timeZone)
         
         updateDateStartTimeZoneLabel()
     }
@@ -319,7 +309,7 @@ class ChangeEventViewController: UITableViewController {
         Updates the date start time zone label to reflect the current date start time zone.
     */
     func updateDateStartTimeZoneLabel() {
-        dateStartTimeZoneCell.detailTextLabel?.text = dateStartTimeZone.name
+        dateStartTimeZoneCell.detailTextLabel?.text = dateStartTimeZone.nameString()
     }
     
     /**
@@ -337,7 +327,11 @@ class ChangeEventViewController: UITableViewController {
         dateStartCell.detailTextLabel?.text = dateFormatter.stringFromDate(dateStart)
         
         
-        dateStartCell.detailTextLabel?.text = dateStartCell.detailTextLabel!.text! + dateStartTimeZone.abbreviation!
+        dateStartCell.detailTextLabel?.text = dateStartCell.detailTextLabel!.text!
+        
+        if dateStartTimeZone != NSTimeZone.localTimeZone() {
+            dateStartCell.detailTextLabel?.text! += " \(dateStartTimeZone.abbreviation!)"
+        }
     }
     
     /**
@@ -350,20 +344,14 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Updates the date end time zone.
-    
-        This function also changes the date end picker's time zone to match the parameter `timeZone`.
+        Updates the date end time zone and date end picker's time zone.
     
         :param: timeZone The date end time zone.
     */
     func updateDateEndTimeZone(timeZone: NSTimeZone) {
         dateEndTimeZone = timeZone
-        //dateEndPicker.calendar.timeZone = dateEndTimeZone
         dateEndPicker.timeZone = dateEndTimeZone
-        
-        println(dateEndPicker.calendar.timeZone)
-        println(dateEndPicker.timeZone)
-        
+
         updateDateEnd()
         updateDateEndTimeZoneLabel()
     }
@@ -372,7 +360,7 @@ class ChangeEventViewController: UITableViewController {
         Updates the date end time zone label to reflect the current date end time zone.
     */
     func updateDateEndTimeZoneLabel() {
-        dateEndTimeZoneCell.detailTextLabel?.text = dateEndTimeZone.name
+        dateEndTimeZoneCell.detailTextLabel?.text = dateEndTimeZone.nameString()
     }
     
     /**
@@ -389,7 +377,11 @@ class ChangeEventViewController: UITableViewController {
         dateFormatter.dateFormat = "h:mm a"
         dateEndCell.detailTextLabel?.text = dateFormatter.stringFromDate(dateEnd)
         
-        dateEndCell.detailTextLabel?.text = dateEndCell.detailTextLabel!.text! + dateEndTimeZone.abbreviation!
+        dateEndCell.detailTextLabel?.text = dateEndCell.detailTextLabel!.text!
+        
+        if dateEndTimeZone != NSTimeZone.localTimeZone() {
+            dateEndCell.detailTextLabel?.text! += " \(dateEndTimeZone.abbreviation!)"
+        }
     }
     
     /**
@@ -576,15 +568,6 @@ class ChangeEventViewController: UITableViewController {
         else {
             contactsCell.detailTextLabel?.text = " "
         }
-    }
-    
-    /**
-        Updates the map items.
-    
-        :param: mapItems The map items that were selected.
-    */
-    func updateMapItems(mapItems: [MapItem]) {
-        updateLocationsLabel()
     }
     
     /**
@@ -967,208 +950,6 @@ class ChangeEventViewController: UITableViewController {
         descheduleNotifications()
         scheduleNotifications()
     }
-    
-    // MARK: - Methods for handling contacts when saving.
-    
-    /**
-        Adds new contacts to the event.
-    */
-    /*private func addNewContacts() {
-        // Check that there are any contact IDs to add.
-        if contactIDs?.count > 0 {
-            let storedContacts = event!.mutableSetValueForKey("contacts")
-            
-            for contactID in contactIDs! {
-                let record: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, contactID)?.takeUnretainedValue()
-
-                let firstName = ABRecordCopyValue(record, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
-                let lastName = ABRecordCopyValue(record, kABPersonLastNameProperty)?.takeRetainedValue() as? String
-                
-                // Check if the contact has already been stored.
-                let storedContact = getStoredContact(contactID)
-                
-                if let storedContact = storedContact {
-                    // If contact exists in storage, add contact to event.
-                    storedContacts.addObject(storedContact)
-                    
-                    addEventRelationship(storedContact)
-                }
-                else {
-                    // If contact doesn't exist in storage, add new contact and inverse relationship.
-                    let newContact = Contact(id: contactID, firstName: firstName, lastName: lastName)
-                    storedContacts.addObject(newContact)
-                    
-                    addEventRelationship(newContact)
-                }
-            }
-        }
-    }
-    
-    /**
-        Removes old contacts from the event.
-    
-        All contacts that are not currently in `contactIDs` will be removed.
-    */
-    private func removeOldContacts() {
-        let storedContacts = event!.mutableSetValueForKey("contacts")
-        let removedContacts = NSMutableSet()
-        
-        // Find old contacts to remove.
-        for contact in storedContacts {
-            let contact = contact as! Contact
-            let id = contact.id
-            // Search for stored contact IDs in current contact IDs. If not found, add to set of objects to remove from storage.
-            if !contains(contactIDs!, id) {
-                removedContacts.addObject(contact)
-                removeEventRelationship(contact)
-            }
-        }
-        storedContacts.minusSet(removedContacts as Set<NSObject>)
-    }
-    
-    /**
-        Searches the stored contacts for a contact ID. Returns the `Contact` if it was found, or `nil` if none was found.
-    
-        :param: contactID The ID of the contact to search for.
-        :returns: The contact if it was found in storage or `nil` if none was found.
-    */
-    private func getStoredContact(contactID: ABRecordID) -> Contact? {
-        // Create fetch request for contact
-        let fetchRequest = NSFetchRequest(entityName: "Contact")
-        fetchRequest.fetchLimit = 1
-        
-        // Contact can be found if a stored contact ID matches the given contact ID.
-        let requirements = "(id == %d)"
-        let predicate = NSPredicate(format: requirements, contactID)
-        fetchRequest.predicate = predicate
-        
-        // Execute fetch request for contact
-        var error: NSError? = nil
-        let storedContact = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Contact
-        if let error = error {
-            NSLog("Error occurred while fetching stored contact: %@", error.localizedDescription)
-        }
-        return storedContact
-    }
-    
-    // MARK: - Method for handling locations when saving event.
-    
-    /**
-        Adds new locations to the event.
-    */
-    private func addNewLocations() {
-        if mapItems?.count > 0 {
-            let storedLocations = event!.mutableSetValueForKey("locations")
-            
-            for mapItem in mapItems! {
-                // See if the location has been previously stored.
-                let storedLocation = getStoredLocation(mapItem.coordinate)
-                
-                if let storedLocation = storedLocation {
-                    // If location is already stored, add stored location and inverse relationship.
-                    storedLocations.addObject(storedLocation)
-                    addEventRelationship(storedLocation)
-                }
-                else {
-                    // If location is new, add new location and add inverse.
-                    let newLocation = Location(mapItem: mapItem)
-                    storedLocations.addObject(newLocation)
-                    addEventRelationship(newLocation)
-                }
-            }
-        }
-    }
-    
-    /**
-        Removes old points of interest from the event.
-    */
-    private func removeOldLocations() {
-        let storedLocations = event!.mutableSetValueForKey("locations")
-        
-        if mapItems?.count > 0 {
-            var removedLocations = NSMutableSet()
-            
-            // Find points of interest to remove
-            for location in storedLocations {
-                let location = location as! Location
-                // Convert to map item for comparing with current map items
-                let mapItem = MapItem(location: location)
-                
-                if !contains(mapItems!, mapItem) {
-                    removedLocations.addObject(location)
-                    removeEventRelationship(location)
-                }
-            }
-            // Remove old locations
-            storedLocations.minusSet(removedLocations as Set<NSObject>)
-        }
-        else {
-            // Remove event from all related locations and remove all locations from event.
-            for location in storedLocations {
-                let location = location as! Location
-                removeEventRelationship(location)
-            }
-        
-            storedLocations.removeAllObjects()
-        }
-    }
-    
-    /**
-        Searches the stored locations for a given location.
-    
-        Currently, stored locations are found by matching coordinates.
-    
-        :param: coordinate The coordinate of the location to be found.
-        :returns: The `Location` object if it was found or `nil` if none was found.
-    */
-    private func getStoredLocation(coordinate: CLLocationCoordinate2D) -> Location? {
-        let latitude = coordinate.latitude
-        let longitude = coordinate.longitude
-        
-        // Create fetch request for a location entity
-        let fetchRequest = NSFetchRequest(entityName: "Location")
-        fetchRequest.fetchLimit = 1
-        
-        // A stored location and the map item's location are considered the same if they have the same coordinates (matching latitude and longitude).
-        let requirements = "((latitude - %d) < %d AND (latitude - %d) > %d) AND ((longitude - %d) < %d AND (longitude - %d) > %d)"
-        let predicate = NSPredicate(format: requirements, argumentArray: [latitude, Math.epsilon, longitude, -Math.epsilon, longitude, Math.epsilon, longitude, -Math.epsilon])
-        fetchRequest.predicate = predicate
-        
-        // Search for location in storage.
-        var error: NSError? = nil
-        let storedLocation = managedContext.executeFetchRequest(fetchRequest, error: &error)?.first as? Location
-        if let error = error {
-            NSLog("Error occurred while fetching stored location: %@", error.localizedDescription)
-        }
-        return storedLocation
-    }
-    
-    /**
-        Adds the event to its relationship with another object.
-    
-        :param: relatedObject The object that is related to the event.
-    */
-    private func addEventRelationship(relatedObject: NSManagedObject) {
-        // Add inverse relation
-        let inverse = relatedObject.mutableSetValueForKey("events")
-        inverse.addObject(event!)
-    }
-    
-    /**
-        Removes the event from its relationship with another object.
-    
-        First, it removes the event from its inverse. Then, it checks if the relationship still has associated events. If not, the object is no longer needed and the object is removed from persistent storage. For example, if a `Location` has no related events anymore, it will be deleted.
-    
-        :param: relatedObject The object that was related to the event.
-    */
-    private func removeEventRelationship(relatedObject: NSManagedObject) {
-        let inverse = relatedObject.mutableSetValueForKey("events")
-        inverse.removeObject(event!)
-        
-        if inverse.count == 0 {
-            managedContext.deleteObject(relatedObject)
-        }
-    }*/
     
     /**
         On saving events, save event and inform observers that an event was saved.

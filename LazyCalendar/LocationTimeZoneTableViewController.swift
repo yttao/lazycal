@@ -11,9 +11,16 @@ import UIKit
 class LocationTimeZoneTableViewController: UITableViewController {
     var delegate: LocationTimeZoneTableViewControllerDelegate?
     
-    private var results = [String]()
+    private var results = [NSTimeZone]()
     
-    private static let timeZones = NSTimeZone.knownTimeZoneNames() as! [String]
+    private static var timeZones: [NSTimeZone] = {
+        let timeZoneNames = NSTimeZone.knownTimeZoneNames() as! [String]
+        
+        let timeZones = timeZoneNames.map({
+            return NSTimeZone(name: $0)!
+        })
+        return timeZones
+    }()
     
     private let reuseIdentifier = "LocationTimeZoneCell"
     
@@ -61,28 +68,9 @@ class LocationTimeZoneTableViewController: UITableViewController {
         let searchText = searchController.searchBar.text
         
         results = LocationTimeZoneTableViewController.timeZones.filter({
-            let containsMatch = $0.rangeOfString(searchText, options: .CaseInsensitiveSearch)
+            let containsMatch = $0.nameString().rangeOfString(searchText, options: .CaseInsensitiveSearch)
             return containsMatch != nil
         })
-    }
-    
-    /**
-        Converts a raw time zone name into a readable string.
-    
-        :param: timeZoneName The time zone name.
-        :returns: A readable string for the time zone name.
-    */
-    func timeZoneNameToReadableString(timeZoneName: String) -> String {
-        // Remove underscores
-        let timeZoneNameNoUnderscores = timeZoneName.stringByReplacingOccurrencesOfString("_", withString: " ")
-        
-        // Delimit string by "/"
-        let timeZoneNameArray = timeZoneNameNoUnderscores.componentsSeparatedByString("/")
-        // Reverse order of time zone name components (so it goes from most specific location name to most general location name)
-        let reversedTimeZoneNameArray = timeZoneNameArray.reverse()
-        
-        // Separate components of the time zone name by commas.
-        return ", ".join(reversedTimeZoneNameArray)
     }
 }
 
@@ -99,13 +87,7 @@ extension LocationTimeZoneTableViewController: UITableViewDelegate {
         On selection, inform the delegate of the selected time zone and return.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let timeZoneName = results[indexPath.row]
-        let timeZone = NSTimeZone(name: timeZoneName)!
-       
-        
-        println(timeZone)
-        
-        
+        let timeZone = results[indexPath.row]
         delegate?.locationTimeZoneTableViewControllerDidUpdateTimeZone(timeZone)
         navigationController!.popViewControllerAnimated(true)
     }
@@ -115,7 +97,8 @@ extension LocationTimeZoneTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         
-        cell.textLabel?.text = timeZoneNameToReadableString(results[indexPath.row])
+        let timeZone = results[indexPath.row]
+        cell.textLabel?.text = timeZone.nameString()
         
         return cell
     }
