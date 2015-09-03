@@ -23,10 +23,10 @@ class LZEvent: NSManagedObject, Equatable {
     @NSManaged var name: String?
     
     @NSManaged var dateStart: NSDate
-    @NSManaged var dateStartTimeZone: String
+    @NSManaged var dateStartTimeZoneName: String
     
     @NSManaged var dateEnd: NSDate
-    @NSManaged var dateEndTimeZone: String
+    @NSManaged var dateEndTimeZoneName: String
     
     @NSManaged var alarm: Bool
     @NSManaged var alarmTime: NSDate?
@@ -35,6 +35,25 @@ class LZEvent: NSManagedObject, Equatable {
     @NSManaged var locations: NSOrderedSet
     
     // MARK: - Computed properties
+    
+    var dateStartTimeZone: NSTimeZone {
+        get {
+            return NSTimeZone(name: dateStartTimeZoneName)!
+        }
+        set {
+            dateStartTimeZoneName = newValue.name
+        }
+        
+    }
+    var dateEndTimeZone: NSTimeZone {
+        get {
+            return NSTimeZone(name: dateEndTimeZoneName)!
+        }
+        set {
+            dateEndTimeZoneName = newValue.name
+        }
+        
+    }
     
     var storedContacts: NSMutableOrderedSet {
         return mutableOrderedSetValueForKey("contacts")
@@ -76,13 +95,15 @@ class LZEvent: NSManagedObject, Equatable {
         :param: alarm A `Bool` indicating whether the event has an alarm.
         :param: alarmTime The time that the alarm will fire if `alarm == true`. If `alarm == false`, the `LZEvent`'s `alarmTime` property will be set to `nil` even if a non-`nil` argument is passed in.
     */
-    init(id: String, name: String?, dateStart: NSDate, dateStartTimezone: String, dateEnd: NSDate, dateEndTimezone: String, alarm: Bool, alarmTime: NSDate?) {
+    init(id: String, name: String?, dateStart: NSDate, dateStartTimeZone: NSTimeZone, dateEnd: NSDate, dateEndTimeZone: NSTimeZone, alarm: Bool, alarmTime: NSDate?) {
         super.init(entity: LZEvent.entity, insertIntoManagedObjectContext: LZEvent.managedContext)
         
         self.id = id
         self.name = name
         self.dateStart = dateStart
+        self.dateStartTimeZone = dateStartTimeZone
         self.dateEnd = dateEnd
+        self.dateEndTimeZone = dateEndTimeZone
         self.alarm = alarm
         if alarm {
             self.alarmTime = alarmTime

@@ -275,7 +275,7 @@ extension MonthItemTableViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         let event = events[indexPath.row]
         cell.textLabel?.text = event.name
-        cell.detailTextLabel?.text = NSDateFormatter().stringFromDateInterval(fromDate: event.dateStart, toDate: event.dateEnd, fromTimeZone: NSTimeZone(name: event.dateStartTimeZone)!, toTimeZone: NSTimeZone(name: event.dateEndTimeZone)!)
+        cell.detailTextLabel?.text = NSDateFormatter().stringFromDateInterval(fromDate: event.dateStart, toDate: event.dateEnd, fromTimeZone: event.dateStartTimeZone, toTimeZone: event.dateEndTimeZone)
         
         return cell
     }

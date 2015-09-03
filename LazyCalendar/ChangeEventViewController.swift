@@ -32,10 +32,10 @@ class ChangeEventViewController: UITableViewController {
     }
     private var dateStartTimeZone: NSTimeZone! {
         get {
-            return NSTimeZone(name: event.dateStartTimeZone)
+            return event.dateStartTimeZone
         }
         set {
-            event.dateStartTimeZone = newValue.name
+            event.dateStartTimeZone = newValue
         }
     }
     private var dateEnd: NSDate! {
@@ -48,10 +48,10 @@ class ChangeEventViewController: UITableViewController {
     }
     private var dateEndTimeZone: NSTimeZone! {
         get {
-            return NSTimeZone(name: event.dateEndTimeZone)
+            return event.dateEndTimeZone
         }
         set {
-            event.dateEndTimeZone = newValue.name
+            event.dateEndTimeZone = newValue
         }
     }
     private var alarm: Bool {
@@ -255,12 +255,12 @@ class ChangeEventViewController: UITableViewController {
     */
     func loadData(#event: LZEvent) {
         self.event = event
-        name = event.name
+        /*name = event.name
         dateStart = event.dateStart
-        dateStartTimeZone = NSTimeZone(name: event.dateStartTimeZone)
+        dateStartTimeZone = NSTimeZone(name: event.dateStartTimeZoneName)
         dateEnd = event.dateEnd
-        dateEndTimeZone = NSTimeZone(name: event.dateEndTimeZone)
-        alarm = event.alarm
+        dateEndTimeZone = NSTimeZone(name: event.dateEndTimeZoneName)
+        alarm = event.alarm*/
         
         // Set alarm time if it is available, otherwise it is the default alarm time.
         if event.alarmTime != nil {
@@ -909,7 +909,7 @@ class ChangeEventViewController: UITableViewController {
         else {
             notification.alertTitle = "Event"
         }
-        notification.alertBody = dateFormatter.stringFromDateInterval(fromDate: event!.dateStart, toDate: event!.dateEnd, fromTimeZone: NSTimeZone(name: event!.dateStartTimeZone)!, toTimeZone: NSTimeZone(name: event!.dateEndTimeZone)!)
+        notification.alertBody = dateFormatter.stringFromDateInterval(fromDate: event!.dateStart, toDate: event!.dateEnd, fromTimeZone: dateStartTimeZone, toTimeZone: dateEndTimeZone)
         notification.alertAction = "view"
         notification.fireDate = event!.alarmTime
         notification.soundName = UILocalNotificationDefaultSoundName

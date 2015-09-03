@@ -83,7 +83,7 @@ class SelectEventTableViewController: UITableViewController {
         
         let eventTimeCell = tableView(tableView, cellForRowAtIndexPath: indexPaths["Time"]!)
         dateFormatter.dateFormat = "h:mm a MM/dd/yy"
-        eventTimeCell.textLabel?.text = dateFormatter.stringFromDateInterval(fromDate: event.dateStart, toDate: event.dateEnd, fromTimeZone: NSTimeZone(name: event.dateStartTimeZone)!, toTimeZone: NSTimeZone(name: event.dateEndTimeZone)!)
+        eventTimeCell.textLabel?.text = dateFormatter.stringFromDateInterval(fromDate: event.dateStart, toDate: event.dateEnd, fromTimeZone: event.dateStartTimeZone, toTimeZone: event.dateEndTimeZone)
         
         // Start of cell insertion/deletion code.
         
@@ -112,7 +112,7 @@ class SelectEventTableViewController: UITableViewController {
             alarmTimeDisplayCell.textLabel?.text = " "
             alarmTimeDisplayCell.detailTextLabel?.text = " "
         }
-        else if event!.alarm {
+        else if event.alarm {
             // If the alarm is on
             
             // Show the alarm time display cell if it's hidden.
@@ -128,11 +128,11 @@ class SelectEventTableViewController: UITableViewController {
             
             // The alarm main label shows the alarm date.
             dateFormatter.dateFormat = "MMM dd, yyyy"
-            alarmTimeDisplayCell.textLabel?.text = dateFormatter.stringFromDate(event!.alarmTime!)
+            alarmTimeDisplayCell.textLabel?.text = dateFormatter.stringFromDate(event.alarmTime!)
             
             // The alarm detail label shows the alarm time.
             dateFormatter.dateFormat = "h:mm a"
-            alarmTimeDisplayCell.detailTextLabel?.text = dateFormatter.stringFromDate(event!.alarmTime!)
+            alarmTimeDisplayCell.detailTextLabel?.text = dateFormatter.stringFromDate(event.alarmTime!)
         }
         else {
             // If the alarm is off
@@ -164,7 +164,7 @@ class SelectEventTableViewController: UITableViewController {
             }
             
             // Show the number of contacts.
-            contactsCell.detailTextLabel?.text = "\(event!.contacts.count)"
+            contactsCell.detailTextLabel?.text = "\(event.contacts.count)"
         }
         else {
             // If the event does not have contacts
@@ -238,7 +238,7 @@ class SelectEventTableViewController: UITableViewController {
         let contactsTableViewController = storyboard!.instantiateViewControllerWithIdentifier("ContactsTableViewController") as! ContactsTableViewController
         
         // Load event into contacts table view controller.
-        contactsTableViewController.loadData(event: event!)
+        contactsTableViewController.loadData(event: event)
         // Disable searching for new contacts.
         contactsTableViewController.editingEnabled = false
         
@@ -249,7 +249,7 @@ class SelectEventTableViewController: UITableViewController {
         let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
         
         // Load event into locations table view controller.
-        locationsViewController.loadData(event: event!)
+        locationsViewController.loadData(event: event)
         // Disable searching for new locations.
         locationsViewController.editingEnabled = false
         

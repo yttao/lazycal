@@ -68,7 +68,7 @@ extension NSDateFormatter {
                 
                 // TODO: figure out where this goes, maybe higher up.
                 if timeZone != NSTimeZone.localTimeZone() {
-                    dateFormat = "z"
+                    dateFormat = "zzz"
                     self.timeZone = timeZone
                     dateInterval += " \(stringFromDate(date))"
                 }
@@ -77,14 +77,28 @@ extension NSDateFormatter {
                 // If the event date start and end times are different, show the date and time in this format:
                 // MMM dd, yyyy h:mm a - h:mm a
                 dateFormat = "h:mm a"
-                dateInterval += "\(stringFromDate(date)) - \(stringFromDate(otherDate))"
+                dateInterval += "\(stringFromDate(date)) "
+                if timeZone != NSTimeZone.localTimeZone() {
+                    dateInterval += "\(timeZone.abbreviation!) "
+                }
+                dateInterval += "- \(stringFromDate(otherDate))"
+                if otherTimeZone != NSTimeZone.localTimeZone() {
+                    dateInterval += "\( otherTimeZone.abbreviation!)"
+                }
             }
         }
         else {
             // If the event date start and end dates are different, return the date and time in this format:
             // MMM dd, yyyy h:mm a - MMM dd, yyyy h:mm a
             dateFormat = "MMM dd, yyyy h:mm a"
-            dateInterval = "\(stringFromDate(date)) - \(stringFromDate(otherDate))"
+            dateInterval = "\(stringFromDate(date)) "
+            if timeZone != NSTimeZone.localTimeZone() {
+                dateInterval += "\(timeZone.abbreviation!) "
+            }
+            dateInterval += "- \(stringFromDate(otherDate))"
+            if otherTimeZone != NSTimeZone.localTimeZone() {
+                dateInterval += " \( otherTimeZone.abbreviation!)"
+            }
         }
         
         return dateInterval
