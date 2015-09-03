@@ -845,6 +845,30 @@ class ChangeEventViewController: UITableViewController {
             descheduleNotifications()
         }
         
+        let fetchRequest = NSFetchRequest(entityName: "LZEvent")
+        let allEvents = managedContext.executeFetchRequest(fetchRequest, error: nil) as! [LZEvent]
+        
+        println("---EVENTS---")
+        for event in allEvents {
+            println("\(event.name) \(event.id)")
+        }
+        
+        let contactsFetchRequest = NSFetchRequest(entityName: "LZContact")
+        let allContacts = managedContext.executeFetchRequest(contactsFetchRequest, error: nil) as! [LZContact]
+        
+        println("---CONTACTS---")
+        for contact in allContacts {
+            println(contact.name!)
+        }
+        
+        let locationsFetchRequest = NSFetchRequest(entityName: "LZLocation")
+        let allLocations = managedContext.executeFetchRequest(locationsFetchRequest, error: nil) as! [LZLocation]
+        
+        println("---LOCATIONS---")
+        for location in allLocations {
+            println("\(location.name) \(location.coordinate)")
+        }
+        
         // Save event, show error if not saved successfully.
         var error: NSError?
         if !managedContext.save(&error) {

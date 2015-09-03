@@ -21,13 +21,12 @@ class ContactsTableViewController: UITableViewController {
     private let reuseIdentifier = "ContactCell"
     // True if displaying contact addresses.
     var addressMode = false
+    
     var event: LZEvent!
-    var storedContacts: NSMutableOrderedSet {
-        return event.mutableOrderedSetValueForKey("contacts")
-    }
-    var addressContacts: [LZContact] {
+    // Array of all contacts selected for the event that have an address.
+    /*var addressContacts: [LZContact] {
         var contactsWithAddresses = [LZContact]()
-        for contact in storedContacts {
+        for contact in event.storedContacts {
             let contact = contact as! LZContact
             let record: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, contact.id).takeUnretainedValue()
             if ContactsTableViewController.getAddressDictionary(record) != nil {
@@ -35,7 +34,9 @@ class ContactsTableViewController: UITableViewController {
             }
         }
         return contactsWithAddresses
-    }
+    }*/
+    // Array of all contacts that have been selected for address mode; set in `loadData(event:selectedContacts:)`.
+    var selectedContacts: [LZContact]?
     
     // MARK: - Methods for initializing table view controller.
     
@@ -56,15 +57,6 @@ class ContactsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Create and configure search controller
-        if editingEnabled {
-            initializeSearchController()
-        }
-        
-        if addressMode {
-            tableView.allowsMultipleSelection = true
-        }
-        
         // Set table view delegate and data source
         tableView.delegate = self
         tableView.dataSource = self
@@ -73,6 +65,28 @@ class ContactsTableViewController: UITableViewController {
         
         tableView.bounces = false
         tableView.alwaysBounceVertical = false
+        
+        // Create and configure search controller
+        if editingEnabled {
+            initializeSearchController()
+        }
+        
+        // Allow several contacts to be selected for address mode.
+        if addressMode {
+            tableView.allowsMultipleSelection = true
+        }
+        
+        // If some contacts were previously selected for address mode, select them.
+        if let selectedContacts = selectedContacts {
+            // Select at correct indices.
+            for contact in selectedContacts {
+                let contactsArray = event.storedContacts.array as! [LZContact]
+                let index = find(contactsArray, contact)!
+                let indexPath = NSIndexPath(forRow: index, inSection: 0)
+                tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .None)
+                self.tableView(tableView, didSelectRowAtIndexPath: indexPath)
+            }
+        }
     }
     
     /**
@@ -113,8 +127,10 @@ class ContactsTableViewController: UITableViewController {
         definesPresentationContext = true
     }
     
-    func loadData(#event: LZEvent) {
+    func loadData(#event: LZEvent, selectedContacts: [LZContact]? = nil) {
         self.event = event
+        
+        self.selectedContacts = selectedContacts
     }
     
     // MARK: - Methods for accessing and handling records.
@@ -127,7 +143,7 @@ class ContactsTableViewController: UITableViewController {
     */
     func recordSelected(recordRef: ABRecordRef) -> Bool {
         // Filter by ABRecordIDs. If no records are found (recordMatch is empty), return false. Otherwise, return true.
-        let contactsArray = storedContacts.array as! [LZContact]
+        let contactsArray = event.storedContacts.array as! [LZContact]
         let recordMatch = contactsArray.filter({
             $0.id == ABRecordGetRecordID(recordRef)
         })
@@ -158,7 +174,7 @@ class ContactsTableViewController: UITableViewController {
     func addContact(recordRef: ABRecordRef) {
         tableView.beginUpdates()
         // Insert new row.
-        tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: storedContacts.count, inSection: 0)], withRowAnimation: .Automatic)
+        tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: event.storedContacts.count, inSection: 0)], withRowAnimation: .Automatic)
         
         let id = ABRecordGetRecordID(recordRef)
         
@@ -208,7 +224,7 @@ class ContactsTableViewController: UITableViewController {
 
                 // Add selected contacts.
                 for indexPath in selectedIndexPaths {
-                    let contact = storedContacts[indexPath.row] as! LZContact
+                    let contact = event.storedContacts[indexPath.row] as! LZContact
                     selectedContacts.append(contact)
                 }
             }
@@ -217,7 +233,7 @@ class ContactsTableViewController: UITableViewController {
         }
         else {
             // Convert contacts to their IDs
-            let contactsArray = storedContacts.array as! [LZContact]
+            let contactsArray = event.storedContacts.array as! [LZContact]
             
             // Inform delegate of updated contact IDs.
             delegate?.contactsTableViewControllerDidUpdateContacts(contactsArray)
@@ -300,15 +316,17 @@ extension ContactsTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if addressMode {
+            let cell = self.tableView(tableView, cellForRowAtIndexPath: indexPath)
+            cell.accessoryType = .Checkmark
             // If in address mode, put check mark next to selected contact.
-            if let cell = tableView.cellForRowAtIndexPath(indexPath) {
+            /*if let cell = tableView.cellForRowAtIndexPath(indexPath) {
                 cell.accessoryType = .Checkmark
-            }
+            }*/
         }
         else {
             // If in normal mode, show contact details.
             let personViewController = ABPersonViewController()
-            let contact = storedContacts[indexPath.row] as! LZContact
+            let contact = event.storedContacts[indexPath.row] as! LZContact
             let record: ABRecord = ABAddressBookGetPersonWithRecordID(addressBookRef, contact.id).takeRetainedValue()
             personViewController.displayedPerson = record
             navigationController!.showViewController(personViewController, sender: self)
@@ -345,7 +363,7 @@ extension ContactsTableViewController: UITableViewDataSource {
         If the search controller is active, show the filtered contacts. If the search controller is inactive, show the selected contacts.
     */
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return storedContacts.count
+        return event.storedContacts.count
     }
     
     // MARK: - Methods for setting up cells.
@@ -358,7 +376,7 @@ extension ContactsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! TwoDetailTableViewCell
 
-        let contact = storedContacts[indexPath.row] as! LZContact
+        let contact = event.storedContacts[indexPath.row] as! LZContact
         let record: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, contact.id).takeUnretainedValue()
         
         // Main label displays name.
@@ -429,7 +447,7 @@ extension ContactsTableViewController: UITableViewDataSource {
     */
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let contact = storedContacts[indexPath.row] as! LZContact
+            let contact = event.storedContacts[indexPath.row] as! LZContact
             deleteContact(contact, atIndexPath: indexPath)
         }
     }

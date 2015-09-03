@@ -29,7 +29,6 @@ class LocationsViewController: UIViewController {
     var locationsTableViewController: LocationsTableViewController!
     var locationsMapViewController: LocationsMapViewController!
 
-    private var contactIDs: [ABRecordID]?
     var editingEnabled: Bool?
     
     var event: LZEvent!
@@ -128,7 +127,7 @@ class LocationsViewController: UIViewController {
             contactsTableViewController.addressMode = true
             contactsTableViewController.editingEnabled = false
             
-            contactsTableViewController.loadData(event: event)
+            contactsTableViewController.loadData(event: event, selectedContacts: locationsTableViewController.contacts)
             contactsTableViewController.delegate = locationsTableViewController
             
             // Show view controller.

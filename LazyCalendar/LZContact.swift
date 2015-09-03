@@ -13,21 +13,26 @@ import CoreLocation
 
 class LZContact: NSManagedObject, Equatable {
     // MARK: - Constants
+    
     private static let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
     private static let entity = NSEntityDescription.entityForName("LZContact", inManagedObjectContext: LZContact.managedContext)!
     
     // MARK: - Persistent storage properties
     
     @NSManaged var id: Int32
-    
     @NSManaged var name: String?
     
     @NSManaged var events: NSSet
+    @NSManaged var locations: NSSet
     
     // MARK: - Non-stored/computed properties
     
     var storedEvents: NSMutableSet {
         return mutableSetValueForKey("events")
+    }
+    
+    var storedLocations: NSMutableSet {
+        return mutableSetValueForKey("locations")
     }
     
     // MARK: - Initializers
@@ -48,6 +53,54 @@ class LZContact: NSManagedObject, Equatable {
         
         self.id = id
         self.name = name
+    }
+    
+    // MARK: - Methods for adding and removing relations.
+    
+    /**
+        Adds a location to the contact.
+    
+        :param: location The location to add.
+    */
+    func addLocation(location: LZLocation) {
+        storedLocations.addObject(location)
+        addRelation(location)
+    }
+    
+    /**
+        Removes a location from the contact.
+    
+        :param: location The location to remove.
+    */
+    func removeLocation(location: LZLocation) {
+        storedLocations.removeObject(location)
+        removeRelation(location)
+    }
+    
+    /**
+        Adds the event to its relationship with another object.
+    
+        :param: relatedObject The object that is associated with the event.
+    */
+    func addRelation(relatedObject: NSManagedObject) {
+        let inverse = relatedObject.mutableSetValueForKey("contacts")
+        inverse.addObject(self)
+    }
+    
+    /**
+        Removes the contact from its relationship with another object. It then checks if the relationship still has associated contacts. If not, the object is no longer needed and the object is removed from persistent storage.
+    
+        :param: relatedObject The object that was associated with the contact.
+        :param: withDeletion If `true`, deletes the object if it has no associated contacts. Default is `false`.
+    */
+    func removeRelation(relatedObject: NSManagedObject, withDeletion: Bool = false) {
+        let inverse = relatedObject.mutableSetValueForKey("contacts")
+        inverse.removeObject(self)
+        
+        // Remove object if it has no associated events.
+        if withDeletion && inverse.count == 0 {
+            LZContact.managedContext.deleteObject(relatedObject)
+        }
     }
     
     // MARK: - Search functions

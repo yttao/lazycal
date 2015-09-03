@@ -4,6 +4,7 @@
         <attribute name="id" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LZEvent" inverseName="contacts" inverseEntity="LZEvent" syncable="YES"/>
+        <relationship name="locations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LZLocation" inverseName="contacts" inverseEntity="LZLocation" syncable="YES"/>
     </entity>
     <entity name="LZEvent" representedClassName="LazyCalendar.LZEvent" syncable="YES">
         <attribute name="alarm" optional="YES" attributeType="Boolean" syncable="YES"/>
@@ -22,11 +23,12 @@
         <attribute name="latitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="longitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="contacts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LZContact" inverseName="locations" inverseEntity="LZContact" syncable="YES"/>
         <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LZEvent" inverseName="locations" inverseEntity="LZEvent" syncable="YES"/>
     </entity>
     <elements>
-        <element name="LZContact" positionX="-333" positionY="-297" width="128" height="88"/>
+        <element name="LZContact" positionX="-261" positionY="-297" width="128" height="103"/>
         <element name="LZEvent" positionX="-54" positionY="-297" width="128" height="195"/>
-        <element name="LZLocation" positionX="-333" positionY="-118" width="128" height="118"/>
+        <element name="LZLocation" positionX="-261" positionY="-118" width="128" height="133"/>
     </elements>
 </model>

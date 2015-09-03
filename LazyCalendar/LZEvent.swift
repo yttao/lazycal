@@ -13,6 +13,7 @@ import CoreLocation
 
 class LZEvent: NSManagedObject, Equatable {
     // MARK: - Constants
+    
     private static let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
     private static let entity = NSEntityDescription.entityForName("LZEvent", inManagedObjectContext: LZEvent.managedContext)!
     
@@ -113,6 +114,8 @@ class LZEvent: NSManagedObject, Equatable {
         }
     }
     
+    // MARK: - Methods for adding and removing relations.
+    
     /**
         Adds a location to the event.
     
@@ -167,13 +170,14 @@ class LZEvent: NSManagedObject, Equatable {
         Removes the event from its relationship with another object. It then checks if the relationship still has associated events. If not, the object is no longer needed and the object is removed from persistent storage.
     
         :param: relatedObject The object that was associated with the event.
+        :param: withDeletion If `true`, deletes the object if it has no associated events. Default is `true`.
     */
-    func removeRelation(relatedObject: NSManagedObject) {
+    func removeRelation(relatedObject: NSManagedObject, withDeletion: Bool = true) {
         let inverse = relatedObject.mutableSetValueForKey("events")
         inverse.removeObject(self)
         
         // Remove object if it has no associated events.
-        if inverse.count == 0 {
+        if withDeletion && inverse.count == 0 {
             LZEvent.managedContext.deleteObject(relatedObject)
         }
     }

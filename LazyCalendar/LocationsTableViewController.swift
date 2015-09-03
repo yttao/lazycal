@@ -35,7 +35,7 @@ class LocationsTableViewController: UITableViewController {
     // Search request timer used to provide delay between search requests.
     private var timer: NSTimer?
     
-    var contactIDs: Set<ABRecordID>?
+    var contacts: [LZContact]?
     private var addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
     
     var selectedIndexPath: NSIndexPath?
@@ -418,8 +418,16 @@ extension LocationsTableViewController: UITableViewDataSource {
 // MARK: - ContactsTableViewControllerDelegate
 extension LocationsTableViewController: ContactsTableViewControllerDelegate {
     func contactsTableViewControllerDidUpdateContacts(contacts: [LZContact]) {
+        
+        println("ALL CONTACTS RECEIVED:")
+        for contact in contacts {
+            println(contact.name)
+        }
+        
+        self.contacts = contacts
+        
         // TODO: make this better and work fully, this is a temporary fix.
-        let contactIDs = contacts.map({
+        /*let contactIDs = contacts.map({
             return $0.id
         })
         if self.contactIDs == nil {
@@ -486,10 +494,13 @@ extension LocationsTableViewController: ContactsTableViewControllerDelegate {
                     }
                 }
             }
-        }
+        }*/
     }
 }
 
 protocol LocationsTableViewControllerDelegate {
+    /**
+        Informs the delegate that the locations table view controller updated its locations.
+    */
     func locationsTableViewControllerDidUpdateLocations(locations: [LZLocation])
 }

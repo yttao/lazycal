@@ -62,13 +62,8 @@ class ContactsSearchTableView: SearchTableView {
     override func initializeView(reuseIdentifier: String) {
         filteredContacts = [ABRecordRef]()
         
-        // Set address book and get all contacts.
-        if addressBookAccessible() {
-            allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
-        }
-        else {
-            allContacts = NSArray()
-        }
+        // Get all contacts.
+        updateAllContacts()
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateAllContacts", name: "applicationBecameActive", object: nil)
         
@@ -78,7 +73,7 @@ class ContactsSearchTableView: SearchTableView {
     /**
         Loads initial data.
     
-        :param: contactsTableViewController The `ContactsTableViewController` that contains this table view.
+        :param: selectedResultsTableViewController The `ContactsTableViewController` that contains this table view.
     */
     override func loadData(#selectedResultsTableViewController: UITableViewController, searchController: SearchController) {
         self.contactsTableViewController = selectedResultsTableViewController as! ContactsTableViewController
@@ -156,12 +151,15 @@ class ContactsSearchTableView: SearchTableView {
     // MARK: - Methods for updating information.
     
     /**
-        Updates the array of all contacts.
+        Updates the array of all contacts. If access to the address book has changed, empty the contacts list.
     */
     func updateAllContacts() {
         // Get new contacts if any were added while app was inactive.
         if addressBookAccessible() {
             allContacts = ABAddressBookCopyArrayOfAllPeople(addressBookRef).takeRetainedValue() as NSArray
+        }
+        else {
+            allContacts = NSArray()
         }
     }
 }

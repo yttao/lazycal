@@ -14,6 +14,7 @@ import AddressBookUI
 
 class LZLocation: NSManagedObject, Equatable, MKAnnotation {
     // MARK: - Constants
+    
     private static let managedContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
     private static let entity = NSEntityDescription.entityForName("LZLocation", inManagedObjectContext: LZLocation.managedContext)!
 
@@ -26,6 +27,7 @@ class LZLocation: NSManagedObject, Equatable, MKAnnotation {
     @NSManaged var address: String?
     
     @NSManaged var events: NSSet
+    @NSManaged var contacts: NSSet
     
     // MARK: - Non-stored/computed properties.
     
@@ -45,10 +47,12 @@ class LZLocation: NSManagedObject, Equatable, MKAnnotation {
         return CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
     }
     
-    var additionalInfo: [NSObject: AnyObject]?
-    
     var storedEvents: NSMutableSet {
         return mutableSetValueForKey("events")
+    }
+    
+    var storedContacts: NSMutableSet {
+        return mutableSetValueForKey("contacts")
     }
     
     // MARK: - MKAnnotation properties
@@ -96,6 +100,54 @@ class LZLocation: NSManagedObject, Equatable, MKAnnotation {
         name = mkMapItem.name
         addressDictionary = mkMapItem.placemark.addressDictionary
         self.address = LZLocation.stringFromAddressDictionary(mkMapItem.placemark.addressDictionary)
+    }
+    
+    // MARK: - Methods for adding and deleting relations.
+    
+    /**
+        Adds a contact to the location.
+    
+        :param: contact The contact to add.
+    */
+    func addContact(contact: LZContact) {
+        storedContacts.addObject(contact)
+        addRelation(contact)
+    }
+    
+    /**
+        Removes a contact from the location.
+    
+        :param: contact The contact to remove.
+    */
+    func removeContact(contact: LZContact) {
+        storedContacts.removeObject(contact)
+        removeRelation(contact)
+    }
+    
+    /**
+        Adds the location to its relationship with another object.
+    
+        :param: relatedObject The object that is associated with the location.
+    */
+    func addRelation(relatedObject: NSManagedObject) {
+        let inverse = relatedObject.mutableSetValueForKey("locations")
+        inverse.addObject(self)
+    }
+    
+    /**
+        Removes the location from its relationship with another object.
+    
+        :param: relatedObject The object that was associated with the location
+        :param: withDeletion If `true`, deletes the object if it has no associated locations. Default is `false`.
+    */
+    func removeRelation(relatedObject: NSManagedObject, withDeletion: Bool = false) {
+        let inverse = relatedObject.mutableSetValueForKey("locations")
+        inverse.removeObject(self)
+        
+        // Remove object if it has no associated events.
+        if withDeletion && inverse.count == 0 {
+            LZLocation.managedContext.deleteObject(relatedObject)
+        }
     }
     
     // MARK: - Search functions
