@@ -68,6 +68,8 @@ class MonthItemCollectionViewController: UICollectionViewController {
         
         selectedColor = UIColor(red: 0, green: 0.8, blue: 0.2, alpha: 0.5)
         deselectedColor = UIColor.clearColor()
+        
+        // TODO: insert tableView.clearsSelectionOnViewWillAppear = false and reselect that cell in viewWillAppear
     }
     
     /**

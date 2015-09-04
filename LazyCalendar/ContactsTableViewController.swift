@@ -316,12 +316,9 @@ extension ContactsTableViewController: UITableViewDelegate {
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if addressMode {
-            let cell = self.tableView(tableView, cellForRowAtIndexPath: indexPath)
-            cell.accessoryType = .Checkmark
             // If in address mode, put check mark next to selected contact.
-            /*if let cell = tableView.cellForRowAtIndexPath(indexPath) {
-                cell.accessoryType = .Checkmark
-            }*/
+            let cell = tableView.cellForRowAtIndexPath(indexPath)!
+            cell.accessoryType = .Checkmark
         }
         else {
             // If in normal mode, show contact details.
@@ -335,13 +332,14 @@ extension ContactsTableViewController: UITableViewDelegate {
     
     /**
         If in address mode, deselecting a cell will remove the check mark to indicate that it is deselected.
+    
+        TODO: fix deselection.
     */
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
         if addressMode {
             // If in address mode, remove check mark from deselected contact.
-            if let cell = tableView.cellForRowAtIndexPath(indexPath) {
-                cell.accessoryType = .None
-            }
+            let cell = tableView.cellForRowAtIndexPath(indexPath)!
+            cell.accessoryType = .None
         }
     }
 }
