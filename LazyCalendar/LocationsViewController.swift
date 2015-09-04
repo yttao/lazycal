@@ -127,7 +127,8 @@ class LocationsViewController: UIViewController {
             contactsTableViewController.addressMode = true
             contactsTableViewController.editingEnabled = false
             
-            contactsTableViewController.loadData(event: event, selectedContacts: locationsTableViewController.contacts)
+            let selectedContacts = Array(locationsTableViewController.contacts)
+            contactsTableViewController.loadData(event: event, selectedContacts: selectedContacts)
             contactsTableViewController.delegate = locationsTableViewController
             
             // Show view controller.

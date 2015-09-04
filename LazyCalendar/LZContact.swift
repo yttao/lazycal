@@ -130,6 +130,20 @@ class LZContact: NSManagedObject, Equatable {
         
         return storedContact
     }
+    
+    /**
+        Returns the `ABRecord` of the person that this `LZContact` is based upon.
+    
+        :returns: The ABRecord of this contact. If the user has not given access to their address book or no matching record is found, this method returns nil.
+    */
+    func getABRecordRef() -> ABRecordRef? {
+        if let addressBookRef: ABAddressBook? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue() {
+            let recordRef: ABRecordRef? = ABAddressBookGetPersonWithRecordID(addressBookRef, id)?.takeUnretainedValue()
+            return recordRef
+        }
+        NSLog("Attempt to access address book without permission failed.")
+        return nil
+    }
 }
 
 // MARK: - Equatable

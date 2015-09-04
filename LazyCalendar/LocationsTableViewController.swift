@@ -35,7 +35,7 @@ class LocationsTableViewController: UITableViewController {
     // Search request timer used to provide delay between search requests.
     private var timer: NSTimer?
     
-    var contacts: [LZContact]?
+    var contacts = Set<LZContact>()
     private var addressBookRef: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, nil)?.takeRetainedValue()
     
     var selectedIndexPath: NSIndexPath?
@@ -128,26 +128,19 @@ class LocationsTableViewController: UITableViewController {
     // MARK: - Methods for adding map items.
     
     /**
-        Adds a new map item to the map item's location and the table view.
+        Adds a new location to the map view, the table view, and the event.
     
-        The map item is added to the map view and the table view.
+        :param: location The location to add.
     */
-    func addLocation(mapItem: MKMapItem) {
-        if let storedLocation = LZLocation.getStoredLocation(mapItem.placemark.coordinate) {
-            addLocationToMapView(storedLocation)
-            addLocationToTableView(storedLocation)
-        }
-        else {
-            let newLocation = LZLocation(mkMapItem: mapItem)
-            addLocationToMapView(newLocation)
-            addLocationToTableView(newLocation)
-        }
+    func addLocation(#location: LZLocation) {
+        addLocationToMapView(location)
+        addLocationToTableView(location)
     }
     
     /**
         Adds an annotation to the map item's location with displayed information about the map item.
     
-        :param: mapItem The `MapItem` to show on the map view.
+        :param: location The location to show on the map view.
     */
     private func addLocationToMapView(location: LZLocation) {
         mapView?.addAnnotation(location)
@@ -156,7 +149,7 @@ class LocationsTableViewController: UITableViewController {
     /**
         Adds a map item to the table view.
     
-        :param: mapItem The `MapItem` to add to the table view.
+        :param: location The location to add to the table view.
     */
     private func addLocationToTableView(location: LZLocation) {
         tableView.beginUpdates()
@@ -168,14 +161,24 @@ class LocationsTableViewController: UITableViewController {
     // MARK: - Methods for deleting map items.
     
     /**
-        Deletes a selected map item from the map view and the table view.
+        Removes a location from the map view, the table view, and the event.
     
         :param: mapItem The map item to delete.
         :param: indexPath The index path of the deleted map item.
     */
-    private func deleteLocation(location: LZLocation, atIndexPath indexPath: NSIndexPath) {
+    func removeLocation(location: LZLocation, atIndexPath indexPath: NSIndexPath) {
         removeLocationFromMapView(location)
         removeLocationFromTableView(location, atIndexPath: indexPath)
+    }
+    
+    /**
+        Removes a location from the map view, the table view, and the event.
+    */
+    func removeLocation(location: LZLocation) {
+        // Find index of location in stored locations and remove.
+        let index = event.storedLocations.indexOfObject(location)
+        let indexPath = NSIndexPath(forRow: index, inSection: 0)
+        removeLocation(location, atIndexPath: indexPath)
     }
     
     /**
@@ -244,6 +247,72 @@ class LocationsTableViewController: UITableViewController {
         // If returning to showing map items and a map item was previously selected, reselect it.
         if selectedIndexPath != nil && !showingDirections {
             tableView.selectRowAtIndexPath(selectedIndexPath, animated: false, scrollPosition: .None)
+        }
+    }
+    
+    /**
+        Adds the contact's address to the list of locations.
+    
+        :param: contact The contact to get the address from.
+    */
+    func addContactAddress(contact: LZContact) {
+        self.contacts.insert(contact)
+        
+        // Get the contact's address dictionary.
+        let recordRef: ABRecordRef? = contact.getABRecordRef()
+        
+        // Check if the contact has an address dictionary to geocode.
+        if let addressDictionary = ContactsTableViewController.getAddressDictionary(recordRef!) {
+            // Geocode address
+            CLGeocoder().geocodeAddressDictionary(addressDictionary, completionHandler: {
+                (placemarks: [AnyObject]?, error: NSError?) in
+                if let error = error {
+                    // Give description of error if there is one.
+                    NSLog("Error occurred when geocoding contact address :%@", error.localizedDescription)
+                }
+                else {
+                    // Get all found placemarks.
+                    let placemarks = placemarks as! [CLPlacemark]
+                    
+                    // Take first as assumed correct address.
+                    let placemark = placemarks.first
+                    
+                    // Make MKPlacemark.
+                    let mkPlacemark = MKPlacemark(placemark: placemark)
+                    let mapItem = MKMapItem(placemark: mkPlacemark)
+                    
+                    // Set contact's name as map item name.
+                    if let contactName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() as? String {
+                        mapItem.name = contactName
+                    }
+                    
+                    // Add location.
+                    if let storedLocation = LZLocation.getStoredLocation(mapItem.placemark.coordinate) {
+                        // If location already exists, just add stored location.
+                        self.addLocation(location: storedLocation)
+                        contact.addLocation(storedLocation)
+                    }
+                    else {
+                        let newLocation = LZLocation(mkMapItem: mapItem)
+                        self.addLocation(location: newLocation)
+                        contact.addLocation(newLocation)
+                    }
+                }
+            })
+        }
+    }
+    
+    /**
+        Removes a contact's address from the list of locations.
+    */
+    func removeContactAddress(contact: LZContact) {
+        self.contacts.remove(contact)
+        
+        // Remove all contact relations to location and remove location from the location view.
+        let contactLocations = contact.storedLocations.allObjects as! [LZLocation]
+        for location in contactLocations {
+            contact.removeLocation(location)
+            removeLocation(location)
         }
     }
     
@@ -410,7 +479,7 @@ extension LocationsTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             let location = storedLocations[indexPath.row] as! LZLocation
-            deleteLocation(location, atIndexPath: indexPath)
+            removeLocation(location, atIndexPath: indexPath)
         }
     }
 }
@@ -424,77 +493,33 @@ extension LocationsTableViewController: ContactsTableViewControllerDelegate {
             println(contact.name)
         }
         
-        self.contacts = contacts
-        
-        // TODO: make this better and work fully, this is a temporary fix.
-        /*let contactIDs = contacts.map({
-            return $0.id
-        })
-        if self.contactIDs == nil {
-            self.contactIDs = Set<ABRecordID>()
-        }
-        
-        for contactID in contactIDs {
-            addressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-            if let contact: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, contactID)?.takeUnretainedValue() {
-                if let addressDictionary = ContactsTableViewController.getAddressDictionary(contact) {
-                    
-                    CLGeocoder().geocodeAddressDictionary(addressDictionary, completionHandler: {
-                        (placemarks: [AnyObject]?, error: NSError?) in
-                        if let error = error {
-                            // Give description of error if there is one.
-                            NSLog("Error occurred when geocoding contact address :%@", error.localizedDescription)
-                        }
-                        else {
-                            // Add contact address to map items.
-                            let placemarks = placemarks as! [CLPlacemark]
-                            let placemark = placemarks.first
-                            let mkPlacemark = MKPlacemark(placemark: placemark)
-                            let mkMapItem = MKMapItem(placemark: mkPlacemark)
-                            if let contactName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() {
-                                mkMapItem.name = contactName as String
-                            }
-                            let address = LZLocation.stringFromAddressDictionary(addressDictionary)
-                            let foundAddress = LZLocation.stringFromAddressDictionary(mkMapItem.placemark.addressDictionary)
-                                
-                            // Create and add new map item only if found address matches dictionary address.
-                            self.contactIDs!.insert(contactID)
-                            
-                            self.addLocation(mkMapItem)
-                        }
-                    })
-                }
-            }
-        }
-        
-        let contactIDsArray = Array(self.contactIDs!)
-        let removedContactIDs = contactIDsArray.filter({
-            if !contains(contactIDs, $0) {
+        // Get all contacts that were added.
+        let addedContacts = contacts.filter({
+            if !contains(self.contacts, $0) {
                 return true
             }
             return false
         })
         
-        for removedContactID in removedContactIDs {
-            if let contact: ABRecord = ABAddressBookGetPersonWithRecordID(addressBookRef, removedContactID)?.takeUnretainedValue() {
-                
-                if let addressDictionary = ContactsTableViewController.getAddressDictionary(contact) {
-                    let address = LZLocation.stringFromAddressDictionary(addressDictionary)
-                    let locationsArray = storedLocations.array as! [LZLocation]
-                    
-                    let removedLocation = locationsArray.filter({
-                        return $0.address == address
-                    }).first
-                    
-                    if let removedLocation = removedLocation {
-                        self.contactIDs!.remove(removedContactID)
-                        let locationIndex = find(locationsArray, removedLocation)!
-                        let indexPath = NSIndexPath(forRow: locationIndex, inSection: 0)
-                        deleteLocation(removedLocation, atIndexPath: indexPath)
-                    }
-                }
+        // Add all new contacts.
+        for contact in addedContacts {
+            // Add the contact's address.
+            addContactAddress(contact)
+        }
+        
+        // Get all the contacts that were removed.
+        let contactsArray = Array(self.contacts)
+        let removedContacts = contactsArray.filter({
+            if !contains(contacts, $0) {
+                return true
             }
-        }*/
+            return false
+        })
+        
+        // Remove all old contacts.
+        for contact in removedContacts {
+            removeContactAddress(contact)
+        }
     }
 }
 

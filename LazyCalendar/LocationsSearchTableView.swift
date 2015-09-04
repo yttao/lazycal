@@ -134,7 +134,15 @@ extension LocationsSearchTableView: UITableViewDelegate {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let mapItem = filteredMapItems[indexPath.row]
         
-        locationsTableViewController.addLocation(mapItem)
+        if let storedLocation = LZLocation.getStoredLocation(mapItem.placemark.coordinate) {
+            // If it is stored, add stored location to map view, table view, and event.
+            locationsTableViewController.addLocation(location: storedLocation)
+        }
+        else {
+            // If it is a new location, create new location and add location to map view, table view, and event.
+            let newLocation = LZLocation(mkMapItem: mapItem)
+            locationsTableViewController.addLocation(location: newLocation)
+        }
         
         searchController!.searchBar.text = nil
     }
