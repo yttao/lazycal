@@ -70,6 +70,14 @@ class ChangeEventViewController: UITableViewController {
             event.alarmTime = newValue
         }
     }
+    private var weather: Bool {
+        get {
+            return event.weather
+        }
+        set {
+            event.weather = newValue
+        }
+    }
     private var contacts: NSMutableOrderedSet {
         return event.storedContacts
     }
@@ -96,6 +104,9 @@ class ChangeEventViewController: UITableViewController {
     // Picks alarm time
     @IBOutlet weak var alarmTimePicker: UIDatePicker!
     
+    // Toggles weather info for locations on/off
+    @IBOutlet weak var weatherSwitch: UISwitch!
+    
     // Table cells
     @IBOutlet weak var dateStartPickerCell: UITableViewCell!
     @IBOutlet weak var dateStartTimeZoneCell: UITableViewCell!
@@ -106,6 +117,8 @@ class ChangeEventViewController: UITableViewController {
     @IBOutlet weak var alarmDateToggleCell: UITableViewCell!
     @IBOutlet weak var alarmTimeDisplayCell: UITableViewCell!
     @IBOutlet weak var alarmTimePickerCell: UITableViewCell!
+    
+    @IBOutlet weak var weatherToggleCell: UITableViewCell!
     
     // Section headers associated with section numbers
     private let sections = ["Name": 0, "Start": 1, "End": 2, "Alarm": 3, "Contacts": 4, "Locations": 5]
@@ -123,7 +136,8 @@ class ChangeEventViewController: UITableViewController {
         "AlarmTimeDisplay": NSIndexPath(forRow: 2, inSection: 3),
         "AlarmTimePicker": NSIndexPath(forRow: 3, inSection: 3),
         "Contacts": NSIndexPath(forRow: 0, inSection: 4),
-        "Locations": NSIndexPath(forRow: 0, inSection: 5)]
+        "Locations": NSIndexPath(forRow: 0, inSection: 5),
+        "Weather": NSIndexPath(forRow: 1, inSection: 5)]
     
     // Currently selected index path
     private var selectedIndexPath: NSIndexPath?
@@ -166,12 +180,13 @@ class ChangeEventViewController: UITableViewController {
         // Add targets for updates
         addTargets()
         
-        // Disable text field user interaction, needed to allow proper table view row selection
+        // Disable text field user interaction, needed to allow proper table view row selection.
         nameTextField.userInteractionEnabled = false
         nameTextField.autocapitalizationType = .Sentences
         nameTextField.delegate = self
         
         // Using information from loadData:, set initial values for UI elements.
+        
         nameTextField.text = name
         
         dateStartPicker.timeZone = dateStartTimeZone
@@ -183,6 +198,8 @@ class ChangeEventViewController: UITableViewController {
         alarmSwitch.on = alarm
         alarmDateSwitch.on = false
         alarmTimePicker.date = alarmTime!
+        
+        weatherSwitch.on = weather
     }
     
     /**
@@ -204,17 +221,18 @@ class ChangeEventViewController: UITableViewController {
         updateDateEndTimeZoneLabel()
         
         updateAlarmSwitchEnabled()
-        updateAlarm()
+        updateAlarmTime()
         
         updateContactsLabel()
         
         updateLocationsLabel()
+        updateWeather()
         
-        tableView.reloadData()
+        /*tableView.reloadData()
         
         if let selectedIndexPath = selectedIndexPath {
             tableView.selectRowAtIndexPath(selectedIndexPath, animated: false, scrollPosition: .None)
-        }
+        }*/
     }
     
     /**
@@ -226,6 +244,7 @@ class ChangeEventViewController: UITableViewController {
         dateEndPicker.addTarget(self, action: "updateDateEnd", forControlEvents: .ValueChanged)
         alarmSwitch.addTarget(self, action: "selectAlarm", forControlEvents: .ValueChanged)
         alarmTimePicker.addTarget(self, action: "updateAlarmTime", forControlEvents: .ValueChanged)
+        weatherSwitch.addTarget(self, action: "updateWeather", forControlEvents: .ValueChanged)
     }
     
     // MARK: - Methods for initializing data.
@@ -239,13 +258,18 @@ class ChangeEventViewController: UITableViewController {
         event = LZEvent()
         
         name = nil
+        
         self.dateStart = dateStart
         dateStartTimeZone = NSTimeZone.localTimeZone()
+        
         let hour = NSTimeInterval(3600)
         dateEnd = dateStart.dateByAddingTimeInterval(hour)
         dateEndTimeZone = NSTimeZone.localTimeZone()
+        
         alarm = false
         alarmTime = dateStart
+        
+        weather = false
     }
     
     /**
@@ -255,12 +279,6 @@ class ChangeEventViewController: UITableViewController {
     */
     func loadData(#event: LZEvent) {
         self.event = event
-        /*name = event.name
-        dateStart = event.dateStart
-        dateStartTimeZone = NSTimeZone(name: event.dateStartTimeZoneName)
-        dateEnd = event.dateEnd
-        dateEndTimeZone = NSTimeZone(name: event.dateEndTimeZoneName)
-        alarm = event.alarm*/
         
         // Set alarm time if it is available, otherwise it is the default alarm time.
         if event.alarmTime != nil {
@@ -480,7 +498,7 @@ class ChangeEventViewController: UITableViewController {
         }
         else {
             resetAlarmTime()
-            showFewerAlarmOptions()
+            hideAlarmOptions()
         }
     }
     
@@ -493,44 +511,41 @@ class ChangeEventViewController: UITableViewController {
     }
     
     /**
-        Show more alarm options.
+        Show more alarm options. If the alarm options are already shown, this method does nothing.
     */
     func showMoreAlarmOptions() {
         tableView.beginUpdates()
         
         if alarmDateToggleCell.hidden {
+            alarmDateToggleCell.hidden = false
             tableView.insertRowsAtIndexPaths([indexPaths["AlarmDateToggle"]!], withRowAnimation: .Automatic)
         }
         if alarmTimeDisplayCell.hidden {
+            alarmTimeDisplayCell.hidden = false
             tableView.insertRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .Automatic)
         }
-        
-        alarmDateToggleCell.hidden = false
-        alarmTimeDisplayCell.hidden = false
         
         tableView.endUpdates()
     }
     
     /**
-        Show fewer alarm options.
+        Hides alarm options. If the alarm options are already hidden, this method does nothing.
     */
-    func showFewerAlarmOptions() {
+    func hideAlarmOptions() {
         tableView.beginUpdates()
         
         if !alarmDateToggleCell.hidden {
+            alarmDateToggleCell!.hidden = true
             tableView.deleteRowsAtIndexPaths([indexPaths["AlarmDateToggle"]!], withRowAnimation: .Automatic)
         }
         if !alarmTimeDisplayCell.hidden {
+            alarmTimeDisplayCell!.hidden = true
             tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTimeDisplay"]!], withRowAnimation: .Automatic)
         }
         if !alarmTimePickerCell.hidden {
+            alarmTimePickerCell!.hidden = true
             tableView.deleteRowsAtIndexPaths([indexPaths["AlarmTimePicker"]!], withRowAnimation: .Automatic)
         }
-        
-        // Hide options
-        alarmDateToggleCell!.hidden = true
-        alarmTimeDisplayCell!.hidden = true
-        alarmTimePickerCell!.hidden = true
         
         tableView.endUpdates()
     }
@@ -584,6 +599,60 @@ class ChangeEventViewController: UITableViewController {
         else {
             locationsCell.detailTextLabel?.text = " "
         }
+    }
+    
+    // MARK: - Methods related to weather updates.
+    
+    /**
+        Updates if the weather option is available and weather data is enabled.
+    */
+    func updateWeather() {
+        updateWeatherOption()
+        
+        // If there is at least one location available, weather flag is controlled by the weather switch.
+        if event.storedLocations.count > 0 {
+            weather = weatherSwitch.on
+        }
+        else {
+            weather = false
+        }
+    }
+    
+    /**
+        Updates if the weather option is shown. It is shown if there is at least one stored location.
+    */
+    func updateWeatherOption() {
+        if event.storedLocations.count > 0 {
+            showWeatherOption()
+        }
+        else {
+            hideWeatherOption()
+        }
+    }
+    
+    /**
+        Shows the weather cell. If the cell is already shown, this method does nothing.
+    */
+    func showWeatherOption() {
+        tableView.beginUpdates()
+        if weatherToggleCell.hidden {
+            weatherToggleCell.hidden = false
+            tableView.insertRowsAtIndexPaths([indexPaths["Weather"]!], withRowAnimation: .Automatic)
+        }
+        
+        tableView.endUpdates()
+    }
+    
+    /**
+        Hides the weather cell. If the cell is already hidden, this method does nothing.
+    */
+    func hideWeatherOption() {
+        tableView.beginUpdates()
+        if !weatherToggleCell.hidden {
+            weatherToggleCell.hidden = true
+            tableView.deleteRowsAtIndexPaths([indexPaths["Weather"]!], withRowAnimation: .Automatic)
+        }
+        tableView.endUpdates()
     }
     
     // MARK: - Methods related to user permissions.
@@ -752,17 +821,19 @@ class ChangeEventViewController: UITableViewController {
                 displayContactsAccessRequest()
             }
         case sections["Locations"]!:
-            // Ensure permission to access user location, then segue to locations view.
-            let authorizationStatus = CLLocationManager.authorizationStatus()
-            
-            // If user location access is authorized, show location view. Else, display request for access.
-            switch authorizationStatus {
-            case .AuthorizedWhenInUse, .AuthorizedAlways:
-                showLocationsViewController()
-            case .Restricted, .Denied:
-                displayLocationInaccessibleAlert()
-            case .NotDetermined:
-                CLLocationManager().requestWhenInUseAuthorization()
+            if indexPath == indexPaths["Locations"] {
+                // Ensure permission to access user location, then segue to locations view.
+                let authorizationStatus = CLLocationManager.authorizationStatus()
+                
+                // If user location access is authorized, show location view. Else, display request for access.
+                switch authorizationStatus {
+                case .AuthorizedWhenInUse, .AuthorizedAlways:
+                    showLocationsViewController()
+                case .Restricted, .Denied:
+                    displayLocationInaccessibleAlert()
+                case .NotDetermined:
+                    CLLocationManager().requestWhenInUseAuthorization()
+                }
             }
         default:
             break
@@ -845,7 +916,7 @@ class ChangeEventViewController: UITableViewController {
             descheduleNotifications()
         }
         
-        for storedLocation in event.storedLocations.array as! [LZLocation] {
+        /*for storedLocation in event.storedLocations.array as! [LZLocation] {
             WeatherManager.sharedManager.getWeatherData(storedLocation.coordinate, date: event.dateStart, completionHandler: {
                 (json: JSON, error: NSError?) in
                 if let error = error {
@@ -855,7 +926,7 @@ class ChangeEventViewController: UITableViewController {
                     println(json.description)
                 }
             })
-        }
+        }*/
         
         let fetchRequest = NSFetchRequest(entityName: "LZEvent")
         let allEvents = managedContext.executeFetchRequest(fetchRequest, error: nil) as! [LZEvent]
@@ -934,7 +1005,6 @@ class ChangeEventViewController: UITableViewController {
         TODO: make sure this doesn't reschedule a notification after the event has already fired a notification (unless the new alarm time is after current time).
     */
     private func scheduleNotifications() {
-        //NSLog("Event scheduled for time: %@", event!.alarmTime!)
         // Create notification
         let notification = UILocalNotification()
         
@@ -943,7 +1013,7 @@ class ChangeEventViewController: UITableViewController {
             notification.alertTitle = "\(name)"
         }
         else {
-            notification.alertTitle = "Event"
+            notification.alertTitle = "Untitled Event"
         }
         notification.alertBody = dateFormatter.stringFromDateInterval(fromDate: event!.dateStart, toDate: event!.dateEnd, fromTimeZone: dateStartTimeZone, toTimeZone: dateEndTimeZone)
         notification.alertAction = "view"
@@ -1065,6 +1135,9 @@ extension ChangeEventViewController: UITableViewDataSource {
             else {
                 return 3
             }
+        }
+        else if section == sections["Locations"] && weatherToggleCell.hidden {
+            return 1
         }
         return super.tableView(tableView, numberOfRowsInSection: section)
     }

@@ -32,6 +32,8 @@ class LZEvent: NSManagedObject, Equatable {
     @NSManaged var alarm: Bool
     @NSManaged var alarmTime: NSDate?
     
+    @NSManaged var weather: Bool
+    
     @NSManaged var contacts: NSOrderedSet
     @NSManaged var locations: NSOrderedSet
     

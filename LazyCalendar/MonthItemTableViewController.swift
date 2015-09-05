@@ -274,7 +274,16 @@ extension MonthItemTableViewController: UITableViewDataSource {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) as! UITableViewCell
         let event = events[indexPath.row]
-        cell.textLabel?.text = event.name
+        
+        // Main label is name of event.
+        if let name = event.name {
+            cell.textLabel?.text = name
+        }
+        else {
+            cell.textLabel?.text = "Untitled Event"
+        }
+        
+        // Detail label is time interval of event.
         cell.detailTextLabel?.text = NSDateFormatter().stringFromDateInterval(fromDate: event.dateStart, toDate: event.dateEnd, fromTimeZone: event.dateStartTimeZone, toTimeZone: event.dateEndTimeZone)
         
         return cell

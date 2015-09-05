@@ -19,6 +19,7 @@ class SelectEventTableViewController: UITableViewController {
     @IBOutlet weak var alarmTimeDisplayCell: UITableViewCell!
     @IBOutlet weak var contactsCell: UITableViewCell!
     @IBOutlet weak var locationsCell: UITableViewCell!
+    @IBOutlet weak var weatherCell: UILabel!
     
     // Selected event, must exist for data to be loaded properly.
     var event: LZEvent!
@@ -32,7 +33,8 @@ class SelectEventTableViewController: UITableViewController {
         "AlarmToggle": NSIndexPath(forRow: 0, inSection: 1),
         "AlarmTime": NSIndexPath(forRow: 1, inSection: 1),
         "Contacts": NSIndexPath(forRow: 0, inSection: 2),
-        "Locations": NSIndexPath(forRow: 0, inSection: 3)]
+        "Locations": NSIndexPath(forRow: 0, inSection: 3),
+        "Weather": NSIndexPath(forRow: 1, inSection: 3)]
     
     private let segueIdentifier = "EditEventSegue"
     
@@ -185,7 +187,7 @@ class SelectEventTableViewController: UITableViewController {
             // If the event has locations
             
             // Show the locations cell if it's hidden.
-            if tableView(tableView, numberOfRowsInSection: sections["Locations"]!) != super.tableView(tableView, numberOfRowsInSection: sections["Locations"]!) {
+            if locationsCell.hidden {
                 locationsCell.hidden = false
                 tableView.insertRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
             }
@@ -197,7 +199,7 @@ class SelectEventTableViewController: UITableViewController {
             // If the event does not have locations
             
             // Hide the locations cell if it's visible.
-            if tableView(tableView, numberOfRowsInSection: sections["Locations"]!) == super.tableView(tableView, numberOfRowsInSection: sections["Locations"]!) {
+            if !locationsCell.hidden {
                 locationsCell.hidden = true
                 tableView.deleteRowsAtIndexPaths([indexPaths["Locations"]!], withRowAnimation: .None)
             }
@@ -206,6 +208,19 @@ class SelectEventTableViewController: UITableViewController {
             locationsCell.detailTextLabel?.text = " "
         }
         locationsCell.detailTextLabel?.sizeToFit()
+        
+        if event.weather {
+            if weatherCell.hidden {
+                weatherCell.hidden = false
+                tableView.insertRowsAtIndexPaths([indexPaths["Weather"]!], withRowAnimation: .None)
+            }
+        }
+        else {
+            if !weatherCell.hidden {
+                weatherCell.hidden = true
+                tableView.deleteRowsAtIndexPaths([indexPaths["Weather"]!], withRowAnimation: .None)
+            }
+        }
         
         // End of cell insertion/deletion code.
         
@@ -377,8 +392,13 @@ extension SelectEventTableViewController: UITableViewDataSource {
         else if section == sections["Contacts"]! && contactsCell.hidden {
             return 0
         }
-        else if section == sections["Locations"]! && locationsCell.hidden {
-            return 0
+        else if section == sections["Locations"]! {
+            if locationsCell.hidden && weatherCell.hidden {
+                return 0
+            }
+            else if locationsCell.hidden || weatherCell.hidden {
+                return 1
+            }
         }
         return super.tableView(tableView, numberOfRowsInSection: section)
     }
