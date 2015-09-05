@@ -182,6 +182,13 @@ class LZEvent: NSManagedObject, Equatable {
         }
     }
     
+    /**
+        Gets the events that fall within a range of dates.
+    
+        :param: lowerDate The earlier date.
+        :param: upperDate The later date.
+        :returns: An array containing the events within
+    */
     static func getStoredEvents(#lowerDate: NSDate, upperDate: NSDate) -> [LZEvent] {
         // Create fetch request for data
         let fetchRequest = NSFetchRequest(entityName: "LZEvent")
@@ -197,6 +204,23 @@ class LZEvent: NSManagedObject, Equatable {
         let storedEvents = managedContext.executeFetchRequest(fetchRequest, error: &error) as! [LZEvent]
         
         return storedEvents
+    }
+    
+    /**
+        Returns `true` if the the contact's address has been included in the event's locations. Otherwise returns `false`.
+    
+        :param: contact The contact to check.
+        :returns: `true` if the contact has been selected for the event's locations; `false` otherwise.
+    */
+    func contactSelectedInLocations(contact: LZContact) -> Bool {
+        let contactLocations = contact.storedLocations.allObjects as! [LZLocation]
+        let eventLocations = storedLocations.array as! [LZLocation]
+        for contactLocation in contactLocations {
+            if contains(eventLocations, contactLocation) {
+                return true
+            }
+        }
+        return false
     }
 }
 

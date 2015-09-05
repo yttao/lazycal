@@ -845,6 +845,18 @@ class ChangeEventViewController: UITableViewController {
             descheduleNotifications()
         }
         
+        for storedLocation in event.storedLocations.array as! [LZLocation] {
+            WeatherManager.sharedManager.getWeatherData(storedLocation.coordinate, date: event.dateStart, completionHandler: {
+                (json: JSON, error: NSError?) in
+                if let error = error {
+                    NSLog("Error occurred while retrieving weather data: %@", error.localizedDescription)
+                }
+                else {
+                    println(json.description)
+                }
+            })
+        }
+        
         let fetchRequest = NSFetchRequest(entityName: "LZEvent")
         let allEvents = managedContext.executeFetchRequest(fetchRequest, error: nil) as! [LZEvent]
         

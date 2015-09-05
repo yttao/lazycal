@@ -82,15 +82,17 @@ class LocationsTableViewController: UITableViewController {
         })
         
         for contact in contactsWithLocations {
-            let contactLocations = contact.storedLocations.allObjects as! [LZLocation]
+            /*let contactLocations = contact.storedLocations.allObjects as! [LZLocation]
 
             for contactLocation in contactLocations {
                 // If the event has a location that matches the contact's location, the contact is already selected.
                 if contains(locationsArray, contactLocation) {
                     contacts.insert(contact)
                 }
+            }*/
+            if event.contactSelectedInLocations(contact) {
+                contacts.insert(contact)
             }
-            
         }
     }
     
@@ -277,12 +279,11 @@ class LocationsTableViewController: UITableViewController {
         :param: contact The contact to get the address from.
     */
     func addContactAddress(contact: LZContact) {
-        self.contacts.insert(contact)
-        
         // Get the contact's address dictionary.
         let recordRef: ABRecordRef? = contact.getABRecordRef()
         
         // Check if the contact has an address dictionary to geocode.
+        // TODO: handle not having internet connection
         if let addressDictionary = ContactsTableViewController.getAddressDictionary(recordRef!) {
             // Geocode address
             CLGeocoder().geocodeAddressDictionary(addressDictionary, completionHandler: {
@@ -318,6 +319,9 @@ class LocationsTableViewController: UITableViewController {
                         self.addLocation(location: newLocation)
                         contact.addLocation(newLocation)
                     }
+                    
+                    // Add to contacts only if it was successfully added to the locations.
+                    self.contacts.insert(contact)
                 }
             })
         }
