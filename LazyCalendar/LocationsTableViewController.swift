@@ -508,12 +508,6 @@ extension LocationsTableViewController: UITableViewDataSource {
 // MARK: - ContactsTableViewControllerDelegate
 extension LocationsTableViewController: ContactsTableViewControllerDelegate {
     func contactsTableViewControllerDidUpdateContacts(contacts: [LZContact]) {
-        
-        println("ALL CONTACTS RECEIVED:")
-        for contact in contacts {
-            println(contact.name)
-        }
-        
         // Get all contacts that were added.
         let addedContacts = contacts.filter({
             if !contains(self.contacts, $0) {
