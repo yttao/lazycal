@@ -24,18 +24,7 @@ class ContactsTableViewController: UITableViewController {
     
     var event: LZEvent!
     // Array of all contacts selected for the event that have an address.
-    /*var addressContacts: [LZContact] {
-        var contactsWithAddresses = [LZContact]()
-        for contact in event.storedContacts {
-            let contact = contact as! LZContact
-            let record: ABRecordRef = ABAddressBookGetPersonWithRecordID(addressBookRef, contact.id).takeUnretainedValue()
-            if ContactsTableViewController.getAddressDictionary(record) != nil {
-                contactsWithAddresses.append(contact)
-            }
-        }
-        return contactsWithAddresses
-    }*/
-    // Array of all contacts that have been selected for address mode; set in `loadData(event:selectedContacts:)`.
+
     var selectedContacts: [LZContact]?
     
     // MARK: - Methods for initializing table view controller.

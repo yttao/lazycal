@@ -71,6 +71,27 @@ class LocationsTableViewController: UITableViewController {
         if editingEnabled {
             initializeSearchController()
         }
+        
+        // Get the contacts that are already selected.
+        let contactsArray = event.storedContacts.array as! [LZContact]
+        let locationsArray = event.storedLocations.array as! [LZLocation]
+        
+        // Go through all event contacts that have at least one location.
+        let contactsWithLocations = contactsArray.filter({
+            return $0.storedLocations.count > 0
+        })
+        
+        for contact in contactsWithLocations {
+            let contactLocations = contact.storedLocations.allObjects as! [LZLocation]
+
+            for contactLocation in contactLocations {
+                // If the event has a location that matches the contact's location, the contact is already selected.
+                if contains(locationsArray, contactLocation) {
+                    contacts.insert(contact)
+                }
+            }
+            
+        }
     }
     
     /**
@@ -274,7 +295,7 @@ class LocationsTableViewController: UITableViewController {
                     // Get all found placemarks.
                     let placemarks = placemarks as! [CLPlacemark]
                     
-                    // Take first as assumed correct address.
+                    // Take first as assumed correct address (TODO: improve this somehow).
                     let placemark = placemarks.first
                     
                     // Make MKPlacemark.
@@ -282,7 +303,7 @@ class LocationsTableViewController: UITableViewController {
                     let mapItem = MKMapItem(placemark: mkPlacemark)
                     
                     // Set contact's name as map item name.
-                    if let contactName = ABRecordCopyCompositeName(contact)?.takeRetainedValue() as? String {
+                    if let contactName = ABRecordCopyCompositeName(contact.getABRecordRef())?.takeRetainedValue() as? String {
                         mapItem.name = contactName
                     }
                     
