@@ -260,6 +260,9 @@ class SelectEventTableViewController: UITableViewController {
         navigationController!.showViewController(contactsTableViewController, sender: self)
     }
     
+    /**
+        Shows the locations view controller.
+    */
     private func showLocationsViewController() {
         let locationsViewController = storyboard!.instantiateViewControllerWithIdentifier("LocationsViewController") as! LocationsViewController
         
@@ -270,6 +273,16 @@ class SelectEventTableViewController: UITableViewController {
         
         // Show locations view controller
         navigationController!.showViewController(locationsViewController, sender: self)
+    }
+    
+    /**
+        Shows the weather split view controller.
+    */
+    private func showWeatherSplitViewController() {
+        let weatherNavigationController = storyboard!.instantiateViewControllerWithIdentifier("WeatherNavigationController") as! UINavigationController
+        let weatherLocationsTableViewController = weatherNavigationController.topViewController as! WeatherLocationsTableViewController
+        weatherLocationsTableViewController.loadData(event)
+        navigationController!.showViewController(weatherNavigationController, sender: self)
     }
     
     /**
@@ -354,8 +367,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
         When contacts row is selected, it displays the contacts table view controller that acts as a contact list and contact details view. When locations row is selected, it displays the locations view controller that acts as the locations list and map view.
     */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        // Contacts row selected
-        if indexPath.section == indexPaths["Contacts"]!.section {
+        if indexPath == indexPaths["Contacts"] {
             if addressBookAccessible() {
                 // If address book can be accessed, show contacts view controller.
                 showContactsTableViewController()
@@ -365,7 +377,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
                 displayAddressBookInaccessibleAlert()
             }
         }
-        else if indexPath.section == indexPaths["Locations"]!.section {
+        else if indexPath == indexPaths["Locations"] {
             if locationAccessible() {
                 // If user location can be accessed, show locations view controller.
                 showLocationsViewController()
@@ -374,6 +386,10 @@ extension SelectEventTableViewController: UITableViewDelegate {
                 // Otherwise display alert stating location can't be accessed.
                 displayLocationInaccessibleAlert()
             }
+        }
+        else if indexPath == indexPaths["Weather"] {
+            // Show weather table view.
+            showWeatherSplitViewController()
         }
     }
 }

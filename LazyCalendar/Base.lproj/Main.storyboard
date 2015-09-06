@@ -921,7 +921,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fg5-aU-SWy" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="910" y="246"/>
+            <point key="canvasLocation" x="1562" y="-144"/>
         </scene>
         <!--EditEventTableViewController-->
         <scene sceneID="Hh6-zr-xRP">
@@ -1340,55 +1340,13 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qvW-5I-FRZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="o7X-up-OQN" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="2258" y="867"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="vhR-9x-c56">
-            <objects>
-                <viewController storyboardIdentifier="ViewController" id="4L2-o0-m2S" customClass="ViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="c5K-wJ-tQV"/>
-                        <viewControllerLayoutGuide type="bottom" id="L2F-br-4QZ"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="V0c-5a-FMy">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="6pe-xk-LVk">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="162"/>
-                                <date key="date" timeIntervalSinceReferenceDate="462911661.45442402">
-                                    <!--2015-09-02 18:34:21 +0000-->
-                                </date>
-                                <connections>
-                                    <action selector="picker1change:" destination="4L2-o0-m2S" eventType="valueChanged" id="236-yX-Ivg"/>
-                                </connections>
-                            </datePicker>
-                            <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="fWu-e4-TdP">
-                                <rect key="frame" x="0.0" y="160" width="600" height="162"/>
-                                <date key="date" timeIntervalSinceReferenceDate="462911665.51519603">
-                                    <!--2015-09-02 18:34:25 +0000-->
-                                </date>
-                                <connections>
-                                    <action selector="picker2change:" destination="4L2-o0-m2S" eventType="valueChanged" id="zqa-Bk-ofd"/>
-                                </connections>
-                            </datePicker>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                    <connections>
-                        <outlet property="picker1" destination="6pe-xk-LVk" id="L2a-Kh-o6x"/>
-                        <outlet property="picker2" destination="fWu-e4-TdP" id="9pd-hM-evE"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Bqe-R2-4Ig" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3124" y="716"/>
+            <point key="canvasLocation" x="2258" y="751"/>
         </scene>
         <!--LocationTimeZoneTableViewController-->
         <scene sceneID="RSc-Je-3es">
             <objects>
                 <tableViewController storyboardIdentifier="LocationTimeZoneTableViewController" id="SmR-NF-v6T" userLabel="LocationTimeZoneTableViewController" customClass="LocationTimeZoneTableViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="9BR-ZZ-itw">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="9BR-ZZ-itw">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -1435,7 +1393,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kUi-j6-SKD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1562" y="867"/>
+            <point key="canvasLocation" x="1562" y="751"/>
         </scene>
         <!--ContactsNavigationController-->
         <scene sceneID="MVC-cK-0fi">
@@ -1571,6 +1529,168 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="C8g-XP-dsv" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2258" y="1544"/>
+        </scene>
+        <!--WeatherDetailsViewController-->
+        <scene sceneID="N19-62-OWh">
+            <objects>
+                <viewController storyboardIdentifier="WeatherDetailsViewController" id="vu1-UH-ugA" userLabel="WeatherDetailsViewController" customClass="WeatherDetailsViewController" customModule="LazyCalendar" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Tw1-BS-taj"/>
+                        <viewControllerLayoutGuide type="bottom" id="su0-yP-2RD"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="xgX-Kn-ubu">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" directionalLockEnabled="YES" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MNu-vM-I7X" userLabel="DailyScrollView">
+                                <rect key="frame" x="8" y="72" width="584" height="150"/>
+                                <color key="backgroundColor" red="0.48548004490000002" green="1" blue="0.49205435879999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="150" id="nMX-N0-u2N"/>
+                                </constraints>
+                            </scrollView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" directionalLockEnabled="YES" showsHorizontalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="54b-t7-aBj" userLabel="DetailsScrollView">
+                                <rect key="frame" x="8" y="388" width="584" height="204"/>
+                                <color key="backgroundColor" red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="calibratedRGB"/>
+                            </scrollView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" directionalLockEnabled="YES" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4no-Yp-s6P" userLabel="HourlyScrollView">
+                                <rect key="frame" x="8" y="230" width="584" height="150"/>
+                                <color key="backgroundColor" red="0.26315789470000001" green="0.67579979359999998" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="150" id="OnW-eQ-bgy"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="54b-t7-aBj" secondAttribute="trailing" constant="8" id="7ze-TQ-jO8"/>
+                            <constraint firstItem="54b-t7-aBj" firstAttribute="leading" secondItem="xgX-Kn-ubu" secondAttribute="leading" constant="8" id="DDA-s4-N4H"/>
+                            <constraint firstItem="4no-Yp-s6P" firstAttribute="top" secondItem="MNu-vM-I7X" secondAttribute="bottom" constant="8" id="DpJ-8g-0gg"/>
+                            <constraint firstItem="MNu-vM-I7X" firstAttribute="leading" secondItem="xgX-Kn-ubu" secondAttribute="leading" constant="8" id="QmD-Cq-BDc"/>
+                            <constraint firstAttribute="trailing" secondItem="MNu-vM-I7X" secondAttribute="trailing" constant="8" id="Upv-2v-lV3"/>
+                            <constraint firstItem="4no-Yp-s6P" firstAttribute="leading" secondItem="xgX-Kn-ubu" secondAttribute="leading" constant="8" id="WAi-jA-6Mz"/>
+                            <constraint firstItem="su0-yP-2RD" firstAttribute="top" secondItem="54b-t7-aBj" secondAttribute="bottom" constant="8" id="nd6-Fq-SDi"/>
+                            <constraint firstAttribute="trailing" secondItem="4no-Yp-s6P" secondAttribute="trailing" constant="8" id="qxG-lJ-BFt"/>
+                            <constraint firstItem="MNu-vM-I7X" firstAttribute="top" secondItem="Tw1-BS-taj" secondAttribute="bottom" constant="8" id="w0O-S4-kis"/>
+                            <constraint firstItem="54b-t7-aBj" firstAttribute="top" secondItem="4no-Yp-s6P" secondAttribute="bottom" constant="8" id="xP0-T0-jql"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Weather Forecast" id="zc6-Zk-VvX"/>
+                    <connections>
+                        <outlet property="dailyScrollView" destination="MNu-vM-I7X" id="1Ch-C1-gng"/>
+                        <outlet property="detailsScrollView" destination="54b-t7-aBj" id="Qyu-Di-mOb"/>
+                        <outlet property="hourlyScrollView" destination="4no-Yp-s6P" id="0Rr-dh-PwZ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="tye-qZ-UTZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2916" y="2909"/>
+        </scene>
+        <!--WeatherLocationsTableViewController-->
+        <scene sceneID="L5H-sx-9IS">
+            <objects>
+                <tableViewController storyboardIdentifier="WeatherLocationsTableViewController" clearsSelectionOnViewWillAppear="NO" id="7PL-om-KS2" userLabel="WeatherLocationsTableViewController" customClass="WeatherLocationsTableViewController" customModule="LazyCalendar" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="y4n-Jh-gfW">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="WeatherLocationCell" textLabel="Wnt-jb-aCh" style="IBUITableViewCellStyleDefault" id="53e-E7-GVD">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="53e-E7-GVD" id="L74-H5-mV9">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Location" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Wnt-jb-aCh">
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="7PL-om-KS2" id="slv-88-hFO"/>
+                            <outlet property="delegate" destination="7PL-om-KS2" id="N2H-3F-xuf"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Locations" id="8C9-xC-hfQ"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PsH-q4-5ZO" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2916" y="2231"/>
+        </scene>
+        <!--WeatherLocationsTableViewController-->
+        <scene sceneID="tOT-9e-sm8">
+            <objects>
+                <tableViewController storyboardIdentifier="WeatherLocationsTableViewControllerZ" id="bGt-D6-nYA" userLabel="WeatherLocationsTableViewController" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="QcL-no-b5e">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="WeatherLocationTableViewCell" textLabel="1lt-be-aOZ" style="IBUITableViewCellStyleDefault" id="P90-aL-uak">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="P90-aL-uak" id="a6J-Nr-nKV">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Location" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1lt-be-aOZ">
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="bGt-D6-nYA" id="0UX-bY-lx0"/>
+                            <outlet property="delegate" destination="bGt-D6-nYA" id="O90-mj-aif"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="aBk-a8-UBZ"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yfA-cp-XN6" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3984" y="3950"/>
+        </scene>
+        <!--WeatherNavigationController-->
+        <scene sceneID="shD-Nu-Dsl">
+            <objects>
+                <navigationController storyboardIdentifier="WeatherNavigationController" title="Weather Navigation Controller" automaticallyAdjustsScrollViewInsets="NO" id="L5u-VL-jQx" userLabel="WeatherNavigationController" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Bij-Ke-Ql9">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="7PL-om-KS2" kind="relationship" relationship="rootViewController" id="wui-gi-jSs"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="OM8-Gu-Axo" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2258" y="2231"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="p48-ha-Eeh">
+            <objects>
+                <navigationController storyboardIdentifier="WeatherDetailsNavigationController" automaticallyAdjustsScrollViewInsets="NO" id="ZAf-tR-hR2" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="3XF-xI-PGr">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="vu1-UH-ugA" kind="relationship" relationship="rootViewController" id="ftf-XB-5cE"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="RrO-C9-o6P" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2258" y="2909"/>
         </scene>
     </scenes>
 </document>
