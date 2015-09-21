@@ -24,7 +24,10 @@ class ContactsTableViewController: UITableViewController {
     
     var event: LZEvent!
     // Array of all contacts selected for the event that have an address.
-
+    
+    
+    @IBOutlet weak var editButton: UIBarButtonItem!
+    
     var selectedContacts: [LZContact]?
     
     // MARK: - Methods for initializing table view controller.
@@ -54,6 +57,8 @@ class ContactsTableViewController: UITableViewController {
         
         tableView.bounces = false
         tableView.alwaysBounceVertical = false
+        
+        tableView.editing = false
         
         // Create and configure search controller
         if editingEnabled {
@@ -194,6 +199,28 @@ class ContactsTableViewController: UITableViewController {
         // Remove contact from event.
         event.removeContact(contact)
         tableView.endUpdates()
+    }
+    
+    // MARK: - Methods related to editing mode.
+    
+    /**
+        Upon pressing the edit/done button, toggle editing mode and the button text.
+    
+        :param: sender The bar button item that was pressed.
+    */
+    @IBAction func editingToggled(sender: AnyObject) {
+        tableView.setEditing(!tableView.editing, animated: true)
+        
+        // Change edit button text to "Done" if starting to edit or "Edit" if not editing.
+        if tableView.editing {
+            editButton.title = "Done"
+            editButton.style = .Done
+        }
+        else {
+            editButton.title = "Edit"
+            editButton.style = .Plain
+        }
+        
     }
     
     // MARK: - Methods for exiting view controller.
@@ -427,6 +454,23 @@ extension ContactsTableViewController: UITableViewDataSource {
            return true
         }
         return false
+    }
+    
+    /**
+        If editing, the rows can be moved.
+    */
+    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        if tableView.editing {
+            return true
+        }
+        return false
+    }
+    
+    /**
+        When a row is moved, change its order in the stored contacts list.
+    */
+    override func tableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
+        event.storedContacts.moveObjectsAtIndexes(NSIndexSet(index: sourceIndexPath.row), toIndex: destinationIndexPath.row)
     }
     
     /**

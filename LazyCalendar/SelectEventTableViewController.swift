@@ -278,7 +278,7 @@ class SelectEventTableViewController: UITableViewController {
     /**
         Shows the weather split view controller.
     */
-    private func showWeatherSplitViewController() {
+    private func showWeatherTableViewController() {
         let weatherNavigationController = storyboard!.instantiateViewControllerWithIdentifier("WeatherNavigationController") as! UINavigationController
         let weatherLocationsTableViewController = weatherNavigationController.topViewController as! WeatherLocationsTableViewController
         weatherLocationsTableViewController.loadData(event)
@@ -389,7 +389,7 @@ extension SelectEventTableViewController: UITableViewDelegate {
         }
         else if indexPath == indexPaths["Weather"] {
             // Show weather table view.
-            showWeatherSplitViewController()
+            showWeatherTableViewController()
         }
     }
 }

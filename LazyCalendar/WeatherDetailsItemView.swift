@@ -18,6 +18,7 @@ class WeatherDetailsItemView: UIView {
     static let smallImageToViewScale: CGFloat = 0.1
     static let largeImageToViewScale: CGFloat = 0.2
     static let marginScale: CGFloat = 0.05, topMarginScale: CGFloat = 0.15, bottomMarginScale : CGFloat = 0.15
+    
     var imageScalingSize: CGFloat {
         if frame.size.height > frame.size.width {
             return frame.size.height
@@ -136,5 +137,12 @@ class WeatherDetailsItemView: UIView {
         let bottomConstraint = NSLayoutConstraint(item: precipitationLabel, attribute: .Bottom, relatedBy: .Equal, toItem: precipitationLabel.superview, attribute: .Bottom, multiplier: 1, constant: -WeatherDetailsItemView.bottomMarginScale * frame.height)
         
         addConstraints([topConstraint, bottomConstraint, centerXConstraint])
+    }
+    
+    /**
+        Sets the condition for the weather item.
+    */
+    func setCondition(condition: String) {
+        
     }
 }

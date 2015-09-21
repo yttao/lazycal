@@ -286,7 +286,7 @@
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Time Zone" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ADm-Rz-sfq">
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text=" " textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="HDg-4b-Cft">
@@ -363,7 +363,7 @@
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Time Zone" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="50X-ES-Vh7">
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text=" " textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="qxa-1S-5c8">
@@ -553,7 +553,7 @@
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Weather" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QbN-sD-aXz">
                                                     <rect key="frame" x="16" y="11" width="64" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -657,7 +657,16 @@
                             <outlet property="delegate" destination="r9E-dy-moz" id="xeD-zJ-7Ap"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Contacts" id="bVM-yj-ksK"/>
+                    <navigationItem key="navigationItem" title="Contacts" id="bVM-yj-ksK">
+                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="WLN-EV-OPi">
+                            <connections>
+                                <action selector="editingToggled:" destination="r9E-dy-moz" id="F7j-uC-QUn"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="editButton" destination="WLN-EV-OPi" id="uAs-iE-jIb"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YY6-IP-s8a" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -858,7 +867,7 @@
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Weather" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Cy8-vE-m0i" userLabel="Weather">
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -1019,7 +1028,7 @@
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Time Zone" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="qhS-hR-p47">
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text=" " textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="V7p-HO-j5b">
@@ -1096,7 +1105,7 @@
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Time Zone" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="A3f-Wh-RsD">
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text=" " textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="lAw-tn-pnK">
@@ -1283,7 +1292,7 @@
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Weather" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YFh-FP-aav">
                                                     <rect key="frame" x="16" y="11" width="67" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5u3-ym-aqr">
@@ -1359,7 +1368,7 @@
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9gX-Me-BkR">
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
@@ -1542,37 +1551,39 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" directionalLockEnabled="YES" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4no-Yp-s6P" userLabel="HourlyScrollView">
+                                <rect key="frame" x="8" y="230" width="584" height="150"/>
+                                <color key="backgroundColor" red="0.26315789470000001" green="0.67579979359999998" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="150" placeholder="YES" id="OnW-eQ-bgy"/>
+                                </constraints>
+                            </scrollView>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" directionalLockEnabled="YES" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MNu-vM-I7X" userLabel="DailyScrollView">
                                 <rect key="frame" x="8" y="72" width="584" height="150"/>
                                 <color key="backgroundColor" red="0.48548004490000002" green="1" blue="0.49205435879999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="150" id="nMX-N0-u2N"/>
+                                    <constraint firstAttribute="height" constant="150" placeholder="YES" id="nMX-N0-u2N"/>
                                 </constraints>
                             </scrollView>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" directionalLockEnabled="YES" showsHorizontalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="54b-t7-aBj" userLabel="DetailsScrollView">
                                 <rect key="frame" x="8" y="388" width="584" height="204"/>
                                 <color key="backgroundColor" red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="calibratedRGB"/>
-                            </scrollView>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" directionalLockEnabled="YES" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4no-Yp-s6P" userLabel="HourlyScrollView">
-                                <rect key="frame" x="8" y="230" width="584" height="150"/>
-                                <color key="backgroundColor" red="0.26315789470000001" green="0.67579979359999998" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="150" id="OnW-eQ-bgy"/>
+                                    <constraint firstAttribute="height" constant="204" placeholder="YES" id="JQf-V8-B2q"/>
                                 </constraints>
                             </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="54b-t7-aBj" secondAttribute="trailing" constant="8" id="7ze-TQ-jO8"/>
-                            <constraint firstItem="54b-t7-aBj" firstAttribute="leading" secondItem="xgX-Kn-ubu" secondAttribute="leading" constant="8" id="DDA-s4-N4H"/>
-                            <constraint firstItem="4no-Yp-s6P" firstAttribute="top" secondItem="MNu-vM-I7X" secondAttribute="bottom" constant="8" id="DpJ-8g-0gg"/>
-                            <constraint firstItem="MNu-vM-I7X" firstAttribute="leading" secondItem="xgX-Kn-ubu" secondAttribute="leading" constant="8" id="QmD-Cq-BDc"/>
-                            <constraint firstAttribute="trailing" secondItem="MNu-vM-I7X" secondAttribute="trailing" constant="8" id="Upv-2v-lV3"/>
-                            <constraint firstItem="4no-Yp-s6P" firstAttribute="leading" secondItem="xgX-Kn-ubu" secondAttribute="leading" constant="8" id="WAi-jA-6Mz"/>
-                            <constraint firstItem="su0-yP-2RD" firstAttribute="top" secondItem="54b-t7-aBj" secondAttribute="bottom" constant="8" id="nd6-Fq-SDi"/>
-                            <constraint firstAttribute="trailing" secondItem="4no-Yp-s6P" secondAttribute="trailing" constant="8" id="qxG-lJ-BFt"/>
-                            <constraint firstItem="MNu-vM-I7X" firstAttribute="top" secondItem="Tw1-BS-taj" secondAttribute="bottom" constant="8" id="w0O-S4-kis"/>
-                            <constraint firstItem="54b-t7-aBj" firstAttribute="top" secondItem="4no-Yp-s6P" secondAttribute="bottom" constant="8" id="xP0-T0-jql"/>
+                            <constraint firstAttribute="trailing" secondItem="54b-t7-aBj" secondAttribute="trailing" constant="8" id="5wg-0Z-P6r"/>
+                            <constraint firstItem="MNu-vM-I7X" firstAttribute="top" secondItem="Tw1-BS-taj" secondAttribute="bottom" constant="8" id="7jr-a0-lA9"/>
+                            <constraint firstItem="54b-t7-aBj" firstAttribute="top" secondItem="4no-Yp-s6P" secondAttribute="bottom" constant="8" id="93S-7p-rMF"/>
+                            <constraint firstAttribute="trailing" secondItem="MNu-vM-I7X" secondAttribute="trailing" constant="8" id="PVW-Ld-XrD"/>
+                            <constraint firstItem="4no-Yp-s6P" firstAttribute="leading" secondItem="xgX-Kn-ubu" secondAttribute="leading" constant="8" id="USQ-hE-BnZ"/>
+                            <constraint firstItem="54b-t7-aBj" firstAttribute="leading" secondItem="xgX-Kn-ubu" secondAttribute="leading" constant="8" id="ixu-DW-MrJ"/>
+                            <constraint firstAttribute="trailing" secondItem="4no-Yp-s6P" secondAttribute="trailing" constant="8" id="jGz-Zi-brj"/>
+                            <constraint firstItem="MNu-vM-I7X" firstAttribute="leading" secondItem="xgX-Kn-ubu" secondAttribute="leading" constant="8" id="qkp-x7-q64"/>
+                            <constraint firstItem="4no-Yp-s6P" firstAttribute="top" secondItem="MNu-vM-I7X" secondAttribute="bottom" constant="8" id="rRw-tj-MIg"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Weather Forecast" id="zc6-Zk-VvX"/>
@@ -1603,7 +1614,7 @@
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Location" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Wnt-jb-aCh">
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
@@ -1638,7 +1649,7 @@
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Location" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="1lt-be-aOZ">
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>

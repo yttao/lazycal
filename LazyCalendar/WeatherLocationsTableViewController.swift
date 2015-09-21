@@ -35,7 +35,7 @@ class WeatherLocationsTableViewController: UITableViewController {
     func showWeatherDetailsViewController(location: LZLocation) {
         let weatherDetailsNavigationController = storyboard!.instantiateViewControllerWithIdentifier("WeatherDetailsNavigationController") as! UINavigationController
         let weatherDetailsViewController = weatherDetailsNavigationController.topViewController as! WeatherDetailsViewController
-        weatherDetailsViewController.loadData(location)
+        weatherDetailsViewController.loadData(event, location: location)
         navigationController!.showViewController(weatherDetailsViewController, sender: self)
     }
 }
