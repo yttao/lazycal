@@ -1,0 +1,770 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2E0400831B5E9E9C006AEB5A /* MonthItemPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E0400821B5E9E9C006AEB5A /* MonthItemPageViewController.swift */; };
+		2E0400861B6007FC006AEB5A /* LazyCalendar.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2E0400841B6007FC006AEB5A /* LazyCalendar.xcdatamodeld */; };
+		2E0400881B6056EC006AEB5A /* ContactsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E0400871B6056EC006AEB5A /* ContactsTableViewController.swift */; };
+		2E10220F1B4EC04B00759934 /* ChangeEventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E10220E1B4EC04B00759934 /* ChangeEventViewController.swift */; };
+		2E2A10841B6875AD00F17680 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2EC260B01B417A6E002FAED2 /* Main.storyboard */; };
+		2E2A10851B6875B100F17680 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2EC260B51B417A6E002FAED2 /* LaunchScreen.xib */; };
+		2E3E67F61B52C2C100C73AF0 /* CalendarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3E67F51B52C2C100C73AF0 /* CalendarCollectionViewCell.swift */; };
+		2E57566D1B4DB17A0072D7F9 /* MonthItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E57566C1B4DB17A0072D7F9 /* MonthItemViewController.swift */; };
+		2E6883141B7F8FE0000CC4C4 /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E6883131B7F8FE0000CC4C4 /* ArrayExtension.swift */; };
+		2E6883161B7FB128000CC4C4 /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E6883151B7FB128000CC4C4 /* SearchController.swift */; };
+		2E6883611B7FBDD7000CC4C4 /* LocationsMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E6883601B7FBDD7000CC4C4 /* LocationsMapViewController.swift */; };
+		2E72FC411B6A7FF000DF5574 /* MonthItemCollectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E72FC401B6A7FF000DF5574 /* MonthItemCollectionHeaderView.swift */; };
+		2E7F13271B7AB68100E4F489 /* EventNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7F13261B7AB68100E4F489 /* EventNotifications.swift */; };
+		2E7F13291B7AB94900E4F489 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E7F13281B7AB94900E4F489 /* Settings.swift */; };
+		2E82CD241B96783F00E1A4EA /* LocationTimeZoneTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E82CD231B96783F00E1A4EA /* LocationTimeZoneTableViewController.swift */; };
+		2EB1C6E71B5ADCA700B855BF /* SelectEventTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB1C6E61B5ADCA700B855BF /* SelectEventTableViewController.swift */; };
+		2EB788071B7E6BC3006F431F /* MathExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB788061B7E6BC3006F431F /* MathExtension.swift */; };
+		2EB788091B7F1716006F431F /* MultipleSelectionSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB788081B7F1715006F431F /* MultipleSelectionSegmentedControl.swift */; };
+		2EC260AA1B417A6E002FAED2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC260A91B417A6E002FAED2 /* AppDelegate.swift */; };
+		2EC260B41B417A6E002FAED2 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2EC260B31B417A6E002FAED2 /* Images.xcassets */; };
+		2EC260C31B417A6E002FAED2 /* LazyCalendarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC260C21B417A6E002FAED2 /* LazyCalendarTests.swift */; };
+		2ED43A6A1B7020A600ED7A6A /* LocationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED43A691B7020A600ED7A6A /* LocationsViewController.swift */; };
+		2ED43A6C1B70249700ED7A6A /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2ED43A6B1B70249700ED7A6A /* MapKit.framework */; };
+		2ED43A6E1B702AC500ED7A6A /* LocationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED43A6D1B702AC500ED7A6A /* LocationsTableViewController.swift */; };
+		2ED65A1D1B7D087F0037163D /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED65A1C1B7D087F0037163D /* DateExtension.swift */; };
+		2ED65A1F1B7D71690037163D /* LocationsSearchTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED65A1E1B7D71690037163D /* LocationsSearchTableView.swift */; };
+		2ED76A491B857B940093FCE5 /* LZContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED76A481B857B940093FCE5 /* LZContact.swift */; };
+		2ED76A4B1B857BB30093FCE5 /* LZEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED76A4A1B857BB30093FCE5 /* LZEvent.swift */; };
+		2ED76A4D1B857BDD0093FCE5 /* LZLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED76A4C1B857BDD0093FCE5 /* LZLocation.swift */; };
+		2EE56C651B9AF97C0066A5B0 /* RestApiManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE56C641B9AF97C0066A5B0 /* RestApiManager.swift */; };
+		2EE56C6C1B9AFE3D0066A5B0 /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE56C6B1B9AFE3D0066A5B0 /* SwiftyJSON.swift */; };
+		2EE56C6E1B9AFE9C0066A5B0 /* WeatherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE56C6D1B9AFE9C0066A5B0 /* WeatherManager.swift */; };
+		2EE56C801B9B589D0066A5B0 /* 1441488313_weather-thunder-rainy-m.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C701B9B589D0066A5B0 /* 1441488313_weather-thunder-rainy-m.png */; };
+		2EE56C811B9B589D0066A5B0 /* 1441488312_weather-snowy-h.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C711B9B589D0066A5B0 /* 1441488312_weather-snowy-h.png */; };
+		2EE56C821B9B589D0066A5B0 /* 1441488310_weather-rainy-s.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C721B9B589D0066A5B0 /* 1441488310_weather-rainy-s.png */; };
+		2EE56C831B9B589D0066A5B0 /* 1441487303_weather-thunder-rainy.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C731B9B589D0066A5B0 /* 1441487303_weather-thunder-rainy.png */; };
+		2EE56C841B9B589D0066A5B0 /* 1441487301_weather-rainy-m.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C741B9B589D0066A5B0 /* 1441487301_weather-rainy-m.png */; };
+		2EE56C851B9B589D0066A5B0 /* 1441487300_weather-snowy-s.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C751B9B589D0066A5B0 /* 1441487300_weather-snowy-s.png */; };
+		2EE56C861B9B589D0066A5B0 /* 1441487299_weather-rainy-snowy.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C761B9B589D0066A5B0 /* 1441487299_weather-rainy-snowy.png */; };
+		2EE56C871B9B589D0066A5B0 /* 1441487295_weather-snowy-m.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C771B9B589D0066A5B0 /* 1441487295_weather-snowy-m.png */; };
+		2EE56C881B9B589D0066A5B0 /* 1441487291_weather-fog.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C781B9B589D0066A5B0 /* 1441487291_weather-fog.png */; };
+		2EE56C891B9B589D0066A5B0 /* 1441487286_weather-thunder.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C791B9B589D0066A5B0 /* 1441487286_weather-thunder.png */; };
+		2EE56C8A1B9B589D0066A5B0 /* 1441487273_weather-rainy-h.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C7A1B9B589D0066A5B0 /* 1441487273_weather-rainy-h.png */; };
+		2EE56C8B1B9B589D0066A5B0 /* 1441487229_weather-cloudy.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C7B1B9B589D0066A5B0 /* 1441487229_weather-cloudy.png */; };
+		2EE56C8C1B9B589D0066A5B0 /* 1441487215_weather-windy.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C7C1B9B589D0066A5B0 /* 1441487215_weather-windy.png */; };
+		2EE56C8D1B9B589D0066A5B0 /* 1441487203_weather-partlycloudy.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C7D1B9B589D0066A5B0 /* 1441487203_weather-partlycloudy.png */; };
+		2EE56C8E1B9B589D0066A5B0 /* 1441487173_weather-thunder-rainy-h.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C7E1B9B589D0066A5B0 /* 1441487173_weather-thunder-rainy-h.png */; };
+		2EE56C8F1B9B589D0066A5B0 /* 1441487121_weather-moon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C7F1B9B589D0066A5B0 /* 1441487121_weather-moon.png */; };
+		2EE56C911B9B598F0066A5B0 /* 1441491021_weather-thunder-rainy-h.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EE56C901B9B598F0066A5B0 /* 1441491021_weather-thunder-rainy-h.png */; };
+		2EE56C971B9B89F70066A5B0 /* WeatherDetailsItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE56C961B9B89F70066A5B0 /* WeatherDetailsItemView.swift */; };
+		2EE56C991B9BBA2C0066A5B0 /* WeatherLocationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE56C981B9BBA2C0066A5B0 /* WeatherLocationsTableViewController.swift */; };
+		2EE765491B9BEC62005CC1EA /* WeatherDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE765481B9BEC62005CC1EA /* WeatherDetailsViewController.swift */; };
+		2EE79E4F1B7BA10400F90546 /* ContactsSearchTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE79E4E1B7BA10400F90546 /* ContactsSearchTableView.swift */; };
+		2EE79E511B7C052800F90546 /* SearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE79E501B7C052800F90546 /* SearchTableViewCell.swift */; };
+		2EE79E531B7C3FEE00F90546 /* SearchTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE79E521B7C3FEE00F90546 /* SearchTableView.swift */; };
+		2EE9B3EC1B837E4300F49981 /* TwoDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE9B3EB1B837E4300F49981 /* TwoDetailTableViewCell.swift */; };
+		2EF162081B55DE48007F2125 /* AlarmPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EF162071B55DE47007F2125 /* AlarmPickerView.swift */; };
+		2EF1620A1B56B287007F2125 /* MonthItemCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EF162091B56B287007F2125 /* MonthItemCollectionViewController.swift */; };
+		2EF1620C1B56C371007F2125 /* MonthItemTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EF1620B1B56C371007F2125 /* MonthItemTableViewController.swift */; };
+		2EFF39331B628C56004E0404 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFF39321B628C56004E0404 /* Models.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2EC260BD1B417A6E002FAED2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2EC2609C1B417A6E002FAED2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2EC260A31B417A6E002FAED2;
+			remoteInfo = LazyCalendar;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		2E0400821B5E9E9C006AEB5A /* MonthItemPageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonthItemPageViewController.swift; sourceTree = "<group>"; };
+		2E0400851B6007FC006AEB5A /* LazyCalendar.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LazyCalendar.xcdatamodel; sourceTree = "<group>"; };
+		2E0400871B6056EC006AEB5A /* ContactsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsTableViewController.swift; sourceTree = "<group>"; };
+		2E10220E1B4EC04B00759934 /* ChangeEventViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeEventViewController.swift; sourceTree = "<group>"; };
+		2E3E67F51B52C2C100C73AF0 /* CalendarCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCollectionViewCell.swift; sourceTree = "<group>"; };
+		2E57566C1B4DB17A0072D7F9 /* MonthItemViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonthItemViewController.swift; sourceTree = "<group>"; };
+		2E6883131B7F8FE0000CC4C4 /* ArrayExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
+		2E6883151B7FB128000CC4C4 /* SearchController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
+		2E6883601B7FBDD7000CC4C4 /* LocationsMapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationsMapViewController.swift; sourceTree = "<group>"; };
+		2E72FC401B6A7FF000DF5574 /* MonthItemCollectionHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonthItemCollectionHeaderView.swift; sourceTree = "<group>"; };
+		2E7F13261B7AB68100E4F489 /* EventNotifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventNotifications.swift; sourceTree = "<group>"; };
+		2E7F13281B7AB94900E4F489 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		2E82CD231B96783F00E1A4EA /* LocationTimeZoneTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationTimeZoneTableViewController.swift; sourceTree = "<group>"; };
+		2EB1C6E61B5ADCA700B855BF /* SelectEventTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectEventTableViewController.swift; sourceTree = "<group>"; };
+		2EB788061B7E6BC3006F431F /* MathExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MathExtension.swift; sourceTree = "<group>"; };
+		2EB788081B7F1715006F431F /* MultipleSelectionSegmentedControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultipleSelectionSegmentedControl.swift; sourceTree = "<group>"; };
+		2EC260A41B417A6E002FAED2 /* LazyCalendar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LazyCalendar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2EC260A81B417A6E002FAED2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2EC260A91B417A6E002FAED2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		2EC260B11B417A6E002FAED2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		2EC260B31B417A6E002FAED2 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		2EC260B61B417A6E002FAED2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		2EC260BC1B417A6E002FAED2 /* LazyCalendarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LazyCalendarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2EC260C11B417A6E002FAED2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2EC260C21B417A6E002FAED2 /* LazyCalendarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyCalendarTests.swift; sourceTree = "<group>"; };
+		2ED43A691B7020A600ED7A6A /* LocationsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationsViewController.swift; sourceTree = "<group>"; };
+		2ED43A6B1B70249700ED7A6A /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		2ED43A6D1B702AC500ED7A6A /* LocationsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationsTableViewController.swift; sourceTree = "<group>"; };
+		2ED65A1C1B7D087F0037163D /* DateExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
+		2ED65A1E1B7D71690037163D /* LocationsSearchTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationsSearchTableView.swift; sourceTree = "<group>"; };
+		2ED76A481B857B940093FCE5 /* LZContact.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LZContact.swift; sourceTree = "<group>"; };
+		2ED76A4A1B857BB30093FCE5 /* LZEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LZEvent.swift; sourceTree = "<group>"; };
+		2ED76A4C1B857BDD0093FCE5 /* LZLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LZLocation.swift; sourceTree = "<group>"; };
+		2EE56C641B9AF97C0066A5B0 /* RestApiManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestApiManager.swift; sourceTree = "<group>"; };
+		2EE56C6B1B9AFE3D0066A5B0 /* SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyJSON.swift; sourceTree = "<group>"; };
+		2EE56C6D1B9AFE9C0066A5B0 /* WeatherManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherManager.swift; sourceTree = "<group>"; };
+		2EE56C701B9B589D0066A5B0 /* 1441488313_weather-thunder-rainy-m.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441488313_weather-thunder-rainy-m.png"; sourceTree = "<group>"; };
+		2EE56C711B9B589D0066A5B0 /* 1441488312_weather-snowy-h.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441488312_weather-snowy-h.png"; sourceTree = "<group>"; };
+		2EE56C721B9B589D0066A5B0 /* 1441488310_weather-rainy-s.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441488310_weather-rainy-s.png"; sourceTree = "<group>"; };
+		2EE56C731B9B589D0066A5B0 /* 1441487303_weather-thunder-rainy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487303_weather-thunder-rainy.png"; sourceTree = "<group>"; };
+		2EE56C741B9B589D0066A5B0 /* 1441487301_weather-rainy-m.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487301_weather-rainy-m.png"; sourceTree = "<group>"; };
+		2EE56C751B9B589D0066A5B0 /* 1441487300_weather-snowy-s.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487300_weather-snowy-s.png"; sourceTree = "<group>"; };
+		2EE56C761B9B589D0066A5B0 /* 1441487299_weather-rainy-snowy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487299_weather-rainy-snowy.png"; sourceTree = "<group>"; };
+		2EE56C771B9B589D0066A5B0 /* 1441487295_weather-snowy-m.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487295_weather-snowy-m.png"; sourceTree = "<group>"; };
+		2EE56C781B9B589D0066A5B0 /* 1441487291_weather-fog.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487291_weather-fog.png"; sourceTree = "<group>"; };
+		2EE56C791B9B589D0066A5B0 /* 1441487286_weather-thunder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487286_weather-thunder.png"; sourceTree = "<group>"; };
+		2EE56C7A1B9B589D0066A5B0 /* 1441487273_weather-rainy-h.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487273_weather-rainy-h.png"; sourceTree = "<group>"; };
+		2EE56C7B1B9B589D0066A5B0 /* 1441487229_weather-cloudy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487229_weather-cloudy.png"; sourceTree = "<group>"; };
+		2EE56C7C1B9B589D0066A5B0 /* 1441487215_weather-windy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487215_weather-windy.png"; sourceTree = "<group>"; };
+		2EE56C7D1B9B589D0066A5B0 /* 1441487203_weather-partlycloudy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487203_weather-partlycloudy.png"; sourceTree = "<group>"; };
+		2EE56C7E1B9B589D0066A5B0 /* 1441487173_weather-thunder-rainy-h.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487173_weather-thunder-rainy-h.png"; sourceTree = "<group>"; };
+		2EE56C7F1B9B589D0066A5B0 /* 1441487121_weather-moon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441487121_weather-moon.png"; sourceTree = "<group>"; };
+		2EE56C901B9B598F0066A5B0 /* 1441491021_weather-thunder-rainy-h.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1441491021_weather-thunder-rainy-h.png"; sourceTree = "<group>"; };
+		2EE56C961B9B89F70066A5B0 /* WeatherDetailsItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherDetailsItemView.swift; sourceTree = "<group>"; };
+		2EE56C981B9BBA2C0066A5B0 /* WeatherLocationsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherLocationsTableViewController.swift; sourceTree = "<group>"; };
+		2EE765481B9BEC62005CC1EA /* WeatherDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherDetailsViewController.swift; sourceTree = "<group>"; };
+		2EE79E4E1B7BA10400F90546 /* ContactsSearchTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsSearchTableView.swift; sourceTree = "<group>"; };
+		2EE79E501B7C052800F90546 /* SearchTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchTableViewCell.swift; sourceTree = "<group>"; };
+		2EE79E521B7C3FEE00F90546 /* SearchTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchTableView.swift; sourceTree = "<group>"; };
+		2EE9B3EB1B837E4300F49981 /* TwoDetailTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoDetailTableViewCell.swift; sourceTree = "<group>"; };
+		2EF162071B55DE47007F2125 /* AlarmPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlarmPickerView.swift; sourceTree = "<group>"; };
+		2EF162091B56B287007F2125 /* MonthItemCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonthItemCollectionViewController.swift; sourceTree = "<group>"; };
+		2EF1620B1B56C371007F2125 /* MonthItemTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonthItemTableViewController.swift; sourceTree = "<group>"; };
+		2EFF39321B628C56004E0404 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2EC260A11B417A6E002FAED2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2ED43A6C1B70249700ED7A6A /* MapKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2EC260B91B417A6E002FAED2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2E6883621B7FE340000CC4C4 /* Locations */ = {
+			isa = PBXGroup;
+			children = (
+				2E6883601B7FBDD7000CC4C4 /* LocationsMapViewController.swift */,
+				2ED43A6D1B702AC500ED7A6A /* LocationsTableViewController.swift */,
+				2ED65A1E1B7D71690037163D /* LocationsSearchTableView.swift */,
+				2ED43A691B7020A600ED7A6A /* LocationsViewController.swift */,
+				2E82CD231B96783F00E1A4EA /* LocationTimeZoneTableViewController.swift */,
+			);
+			name = Locations;
+			sourceTree = "<group>";
+		};
+		2E6883631B7FE361000CC4C4 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				2E6883691B7FE43F000CC4C4 /* Foundation */,
+				2E6883681B7FE420000CC4C4 /* Settings */,
+				2E68836A1B7FE447000CC4C4 /* UIKit */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
+		2E6883641B7FE39D000CC4C4 /* Months */ = {
+			isa = PBXGroup;
+			children = (
+				2EF1620B1B56C371007F2125 /* MonthItemTableViewController.swift */,
+				2E72FC401B6A7FF000DF5574 /* MonthItemCollectionHeaderView.swift */,
+				2EF162091B56B287007F2125 /* MonthItemCollectionViewController.swift */,
+				2E0400821B5E9E9C006AEB5A /* MonthItemPageViewController.swift */,
+				2E57566C1B4DB17A0072D7F9 /* MonthItemViewController.swift */,
+				2E3E67F51B52C2C100C73AF0 /* CalendarCollectionViewCell.swift */,
+			);
+			name = Months;
+			sourceTree = "<group>";
+		};
+		2E6883651B7FE3BD000CC4C4 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				2E0400841B6007FC006AEB5A /* LazyCalendar.xcdatamodeld */,
+				2EFF39321B628C56004E0404 /* Models.swift */,
+				2ED76A481B857B940093FCE5 /* LZContact.swift */,
+				2ED76A4A1B857BB30093FCE5 /* LZEvent.swift */,
+				2ED76A4C1B857BDD0093FCE5 /* LZLocation.swift */,
+			);
+			name = Data;
+			sourceTree = "<group>";
+		};
+		2E6883661B7FE3E1000CC4C4 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				2EE79E521B7C3FEE00F90546 /* SearchTableView.swift */,
+				2E6883151B7FB128000CC4C4 /* SearchController.swift */,
+				2EE79E501B7C052800F90546 /* SearchTableViewCell.swift */,
+			);
+			name = Search;
+			sourceTree = "<group>";
+		};
+		2E6883671B7FE404000CC4C4 /* Contacts */ = {
+			isa = PBXGroup;
+			children = (
+				2EE79E4E1B7BA10400F90546 /* ContactsSearchTableView.swift */,
+				2E0400871B6056EC006AEB5A /* ContactsTableViewController.swift */,
+			);
+			name = Contacts;
+			sourceTree = "<group>";
+		};
+		2E6883681B7FE420000CC4C4 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				2E7F13261B7AB68100E4F489 /* EventNotifications.swift */,
+				2E7F13281B7AB94900E4F489 /* Settings.swift */,
+			);
+			name = Settings;
+			sourceTree = "<group>";
+		};
+		2E6883691B7FE43F000CC4C4 /* Foundation */ = {
+			isa = PBXGroup;
+			children = (
+				2E6883131B7F8FE0000CC4C4 /* ArrayExtension.swift */,
+				2ED65A1C1B7D087F0037163D /* DateExtension.swift */,
+				2EB788061B7E6BC3006F431F /* MathExtension.swift */,
+			);
+			name = Foundation;
+			sourceTree = "<group>";
+		};
+		2E68836A1B7FE447000CC4C4 /* UIKit */ = {
+			isa = PBXGroup;
+			children = (
+				2EF162071B55DE47007F2125 /* AlarmPickerView.swift */,
+				2EB788081B7F1715006F431F /* MultipleSelectionSegmentedControl.swift */,
+				2EE9B3EB1B837E4300F49981 /* TwoDetailTableViewCell.swift */,
+			);
+			name = UIKit;
+			sourceTree = "<group>";
+		};
+		2E68836B1B7FE46F000CC4C4 /* Events */ = {
+			isa = PBXGroup;
+			children = (
+				2EB1C6E61B5ADCA700B855BF /* SelectEventTableViewController.swift */,
+				2E10220E1B4EC04B00759934 /* ChangeEventViewController.swift */,
+			);
+			name = Events;
+			sourceTree = "<group>";
+		};
+		2EC2609B1B417A6E002FAED2 = {
+			isa = PBXGroup;
+			children = (
+				2ED43A6B1B70249700ED7A6A /* MapKit.framework */,
+				2EC260A61B417A6E002FAED2 /* LazyCalendar */,
+				2EC260BF1B417A6E002FAED2 /* LazyCalendarTests */,
+				2EC260A51B417A6E002FAED2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		2EC260A51B417A6E002FAED2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2EC260A41B417A6E002FAED2 /* LazyCalendar.app */,
+				2EC260BC1B417A6E002FAED2 /* LazyCalendarTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2EC260A61B417A6E002FAED2 /* LazyCalendar */ = {
+			isa = PBXGroup;
+			children = (
+				2EE56C6F1B9B57CC0066A5B0 /* Images */,
+				2EE56C6A1B9AFC030066A5B0 /* Weather */,
+				2EC260A91B417A6E002FAED2 /* AppDelegate.swift */,
+				2EC260B51B417A6E002FAED2 /* LaunchScreen.xib */,
+				2EC260B01B417A6E002FAED2 /* Main.storyboard */,
+				2E6883671B7FE404000CC4C4 /* Contacts */,
+				2E6883651B7FE3BD000CC4C4 /* Data */,
+				2E68836B1B7FE46F000CC4C4 /* Events */,
+				2E6883631B7FE361000CC4C4 /* Extensions */,
+				2E6883621B7FE340000CC4C4 /* Locations */,
+				2E6883641B7FE39D000CC4C4 /* Months */,
+				2E6883661B7FE3E1000CC4C4 /* Search */,
+				2EC260A71B417A6E002FAED2 /* Supporting Files */,
+			);
+			path = LazyCalendar;
+			sourceTree = "<group>";
+		};
+		2EC260A71B417A6E002FAED2 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				2EC260A81B417A6E002FAED2 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		2EC260BF1B417A6E002FAED2 /* LazyCalendarTests */ = {
+			isa = PBXGroup;
+			children = (
+				2EC260C21B417A6E002FAED2 /* LazyCalendarTests.swift */,
+				2EC260C01B417A6E002FAED2 /* Supporting Files */,
+			);
+			path = LazyCalendarTests;
+			sourceTree = "<group>";
+		};
+		2EC260C01B417A6E002FAED2 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				2EC260C11B417A6E002FAED2 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		2EE56C6A1B9AFC030066A5B0 /* Weather */ = {
+			isa = PBXGroup;
+			children = (
+				2EE56C641B9AF97C0066A5B0 /* RestApiManager.swift */,
+				2EE56C6B1B9AFE3D0066A5B0 /* SwiftyJSON.swift */,
+				2EE56C961B9B89F70066A5B0 /* WeatherDetailsItemView.swift */,
+				2EE765481B9BEC62005CC1EA /* WeatherDetailsViewController.swift */,
+				2EE56C981B9BBA2C0066A5B0 /* WeatherLocationsTableViewController.swift */,
+				2EE56C6D1B9AFE9C0066A5B0 /* WeatherManager.swift */,
+			);
+			name = Weather;
+			sourceTree = "<group>";
+		};
+		2EE56C6F1B9B57CC0066A5B0 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				2EE56C901B9B598F0066A5B0 /* 1441491021_weather-thunder-rainy-h.png */,
+				2EE56C701B9B589D0066A5B0 /* 1441488313_weather-thunder-rainy-m.png */,
+				2EE56C711B9B589D0066A5B0 /* 1441488312_weather-snowy-h.png */,
+				2EE56C721B9B589D0066A5B0 /* 1441488310_weather-rainy-s.png */,
+				2EE56C731B9B589D0066A5B0 /* 1441487303_weather-thunder-rainy.png */,
+				2EE56C741B9B589D0066A5B0 /* 1441487301_weather-rainy-m.png */,
+				2EE56C751B9B589D0066A5B0 /* 1441487300_weather-snowy-s.png */,
+				2EE56C761B9B589D0066A5B0 /* 1441487299_weather-rainy-snowy.png */,
+				2EE56C771B9B589D0066A5B0 /* 1441487295_weather-snowy-m.png */,
+				2EE56C781B9B589D0066A5B0 /* 1441487291_weather-fog.png */,
+				2EE56C791B9B589D0066A5B0 /* 1441487286_weather-thunder.png */,
+				2EE56C7A1B9B589D0066A5B0 /* 1441487273_weather-rainy-h.png */,
+				2EE56C7B1B9B589D0066A5B0 /* 1441487229_weather-cloudy.png */,
+				2EE56C7C1B9B589D0066A5B0 /* 1441487215_weather-windy.png */,
+				2EE56C7D1B9B589D0066A5B0 /* 1441487203_weather-partlycloudy.png */,
+				2EE56C7E1B9B589D0066A5B0 /* 1441487173_weather-thunder-rainy-h.png */,
+				2EE56C7F1B9B589D0066A5B0 /* 1441487121_weather-moon.png */,
+				2EC260B31B417A6E002FAED2 /* Images.xcassets */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2EC260A31B417A6E002FAED2 /* LazyCalendar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2EC260C61B417A6E002FAED2 /* Build configuration list for PBXNativeTarget "LazyCalendar" */;
+			buildPhases = (
+				2EC260A01B417A6E002FAED2 /* Sources */,
+				2EC260A11B417A6E002FAED2 /* Frameworks */,
+				2EC260A21B417A6E002FAED2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LazyCalendar;
+			productName = LazyCalendar;
+			productReference = 2EC260A41B417A6E002FAED2 /* LazyCalendar.app */;
+			productType = "com.apple.product-type.application";
+		};
+		2EC260BB1B417A6E002FAED2 /* LazyCalendarTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2EC260C91B417A6E002FAED2 /* Build configuration list for PBXNativeTarget "LazyCalendarTests" */;
+			buildPhases = (
+				2EC260B81B417A6E002FAED2 /* Sources */,
+				2EC260B91B417A6E002FAED2 /* Frameworks */,
+				2EC260BA1B417A6E002FAED2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2EC260BE1B417A6E002FAED2 /* PBXTargetDependency */,
+			);
+			name = LazyCalendarTests;
+			productName = LazyCalendarTests;
+			productReference = 2EC260BC1B417A6E002FAED2 /* LazyCalendarTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2EC2609C1B417A6E002FAED2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0630;
+				ORGANIZATIONNAME = Kim;
+				TargetAttributes = {
+					2EC260A31B417A6E002FAED2 = {
+						CreatedOnToolsVersion = 6.3.2;
+						DevelopmentTeam = T3QTV33TRT;
+						SystemCapabilities = {
+							com.apple.Maps.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+					2EC260BB1B417A6E002FAED2 = {
+						CreatedOnToolsVersion = 6.3.2;
+						TestTargetID = 2EC260A31B417A6E002FAED2;
+					};
+				};
+			};
+			buildConfigurationList = 2EC2609F1B417A6E002FAED2 /* Build configuration list for PBXProject "LazyCalendar" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2EC2609B1B417A6E002FAED2;
+			productRefGroup = 2EC260A51B417A6E002FAED2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2EC260A31B417A6E002FAED2 /* LazyCalendar */,
+				2EC260BB1B417A6E002FAED2 /* LazyCalendarTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2EC260A21B417A6E002FAED2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2EE56C821B9B589D0066A5B0 /* 1441488310_weather-rainy-s.png in Resources */,
+				2EE56C831B9B589D0066A5B0 /* 1441487303_weather-thunder-rainy.png in Resources */,
+				2EE56C871B9B589D0066A5B0 /* 1441487295_weather-snowy-m.png in Resources */,
+				2EE56C911B9B598F0066A5B0 /* 1441491021_weather-thunder-rainy-h.png in Resources */,
+				2EE56C861B9B589D0066A5B0 /* 1441487299_weather-rainy-snowy.png in Resources */,
+				2E2A10851B6875B100F17680 /* LaunchScreen.xib in Resources */,
+				2EE56C891B9B589D0066A5B0 /* 1441487286_weather-thunder.png in Resources */,
+				2EE56C8A1B9B589D0066A5B0 /* 1441487273_weather-rainy-h.png in Resources */,
+				2EE56C851B9B589D0066A5B0 /* 1441487300_weather-snowy-s.png in Resources */,
+				2EE56C881B9B589D0066A5B0 /* 1441487291_weather-fog.png in Resources */,
+				2EE56C8B1B9B589D0066A5B0 /* 1441487229_weather-cloudy.png in Resources */,
+				2EE56C841B9B589D0066A5B0 /* 1441487301_weather-rainy-m.png in Resources */,
+				2EE56C8C1B9B589D0066A5B0 /* 1441487215_weather-windy.png in Resources */,
+				2EE56C8D1B9B589D0066A5B0 /* 1441487203_weather-partlycloudy.png in Resources */,
+				2E2A10841B6875AD00F17680 /* Main.storyboard in Resources */,
+				2EE56C8F1B9B589D0066A5B0 /* 1441487121_weather-moon.png in Resources */,
+				2EE56C801B9B589D0066A5B0 /* 1441488313_weather-thunder-rainy-m.png in Resources */,
+				2EC260B41B417A6E002FAED2 /* Images.xcassets in Resources */,
+				2EE56C8E1B9B589D0066A5B0 /* 1441487173_weather-thunder-rainy-h.png in Resources */,
+				2EE56C811B9B589D0066A5B0 /* 1441488312_weather-snowy-h.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2EC260BA1B417A6E002FAED2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2EC260A01B417A6E002FAED2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2E10220F1B4EC04B00759934 /* ChangeEventViewController.swift in Sources */,
+				2EB788091B7F1716006F431F /* MultipleSelectionSegmentedControl.swift in Sources */,
+				2ED76A4D1B857BDD0093FCE5 /* LZLocation.swift in Sources */,
+				2EE56C971B9B89F70066A5B0 /* WeatherDetailsItemView.swift in Sources */,
+				2E82CD241B96783F00E1A4EA /* LocationTimeZoneTableViewController.swift in Sources */,
+				2ED65A1D1B7D087F0037163D /* DateExtension.swift in Sources */,
+				2EC260AA1B417A6E002FAED2 /* AppDelegate.swift in Sources */,
+				2EE79E511B7C052800F90546 /* SearchTableViewCell.swift in Sources */,
+				2EE79E4F1B7BA10400F90546 /* ContactsSearchTableView.swift in Sources */,
+				2E6883161B7FB128000CC4C4 /* SearchController.swift in Sources */,
+				2EF162081B55DE48007F2125 /* AlarmPickerView.swift in Sources */,
+				2EF1620A1B56B287007F2125 /* MonthItemCollectionViewController.swift in Sources */,
+				2E57566D1B4DB17A0072D7F9 /* MonthItemViewController.swift in Sources */,
+				2ED43A6E1B702AC500ED7A6A /* LocationsTableViewController.swift in Sources */,
+				2EF1620C1B56C371007F2125 /* MonthItemTableViewController.swift in Sources */,
+				2ED76A491B857B940093FCE5 /* LZContact.swift in Sources */,
+				2ED76A4B1B857BB30093FCE5 /* LZEvent.swift in Sources */,
+				2E6883141B7F8FE0000CC4C4 /* ArrayExtension.swift in Sources */,
+				2EE56C6E1B9AFE9C0066A5B0 /* WeatherManager.swift in Sources */,
+				2ED65A1F1B7D71690037163D /* LocationsSearchTableView.swift in Sources */,
+				2EB788071B7E6BC3006F431F /* MathExtension.swift in Sources */,
+				2E0400861B6007FC006AEB5A /* LazyCalendar.xcdatamodeld in Sources */,
+				2ED43A6A1B7020A600ED7A6A /* LocationsViewController.swift in Sources */,
+				2EE765491B9BEC62005CC1EA /* WeatherDetailsViewController.swift in Sources */,
+				2EB1C6E71B5ADCA700B855BF /* SelectEventTableViewController.swift in Sources */,
+				2EE56C991B9BBA2C0066A5B0 /* WeatherLocationsTableViewController.swift in Sources */,
+				2EE79E531B7C3FEE00F90546 /* SearchTableView.swift in Sources */,
+				2EE9B3EC1B837E4300F49981 /* TwoDetailTableViewCell.swift in Sources */,
+				2E3E67F61B52C2C100C73AF0 /* CalendarCollectionViewCell.swift in Sources */,
+				2E72FC411B6A7FF000DF5574 /* MonthItemCollectionHeaderView.swift in Sources */,
+				2E7F13271B7AB68100E4F489 /* EventNotifications.swift in Sources */,
+				2E7F13291B7AB94900E4F489 /* Settings.swift in Sources */,
+				2E6883611B7FBDD7000CC4C4 /* LocationsMapViewController.swift in Sources */,
+				2EE56C651B9AF97C0066A5B0 /* RestApiManager.swift in Sources */,
+				2E0400831B5E9E9C006AEB5A /* MonthItemPageViewController.swift in Sources */,
+				2E0400881B6056EC006AEB5A /* ContactsTableViewController.swift in Sources */,
+				2EE56C6C1B9AFE3D0066A5B0 /* SwiftyJSON.swift in Sources */,
+				2EFF39331B628C56004E0404 /* Models.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2EC260B81B417A6E002FAED2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2EC260C31B417A6E002FAED2 /* LazyCalendarTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2EC260BE1B417A6E002FAED2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2EC260A31B417A6E002FAED2 /* LazyCalendar */;
+			targetProxy = 2EC260BD1B417A6E002FAED2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		2EC260B01B417A6E002FAED2 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2EC260B11B417A6E002FAED2 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		2EC260B51B417A6E002FAED2 /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2EC260B61B417A6E002FAED2 /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		2EC260C41B417A6E002FAED2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		2EC260C51B417A6E002FAED2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		2EC260C71B417A6E002FAED2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				INFOPLIST_FILE = LazyCalendar/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		2EC260C81B417A6E002FAED2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				INFOPLIST_FILE = LazyCalendar/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+			};
+			name = Release;
+		};
+		2EC260CA1B417A6E002FAED2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = LazyCalendarTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LazyCalendar.app/LazyCalendar";
+			};
+			name = Debug;
+		};
+		2EC260CB1B417A6E002FAED2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = LazyCalendarTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LazyCalendar.app/LazyCalendar";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2EC2609F1B417A6E002FAED2 /* Build configuration list for PBXProject "LazyCalendar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2EC260C41B417A6E002FAED2 /* Debug */,
+				2EC260C51B417A6E002FAED2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2EC260C61B417A6E002FAED2 /* Build configuration list for PBXNativeTarget "LazyCalendar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2EC260C71B417A6E002FAED2 /* Debug */,
+				2EC260C81B417A6E002FAED2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2EC260C91B417A6E002FAED2 /* Build configuration list for PBXNativeTarget "LazyCalendarTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2EC260CA1B417A6E002FAED2 /* Debug */,
+				2EC260CB1B417A6E002FAED2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		2E0400841B6007FC006AEB5A /* LazyCalendar.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				2E0400851B6007FC006AEB5A /* LazyCalendar.xcdatamodel */,
+			);
+			currentVersion = 2E0400851B6007FC006AEB5A /* LazyCalendar.xcdatamodel */;
+			path = LazyCalendar.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 2EC2609C1B417A6E002FAED2 /* Project object */;
+}
